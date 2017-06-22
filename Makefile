@@ -19,6 +19,7 @@ targets = \
   nuke \
   release \
   restart \
+  setup \
   shell \
   stop \
   superuser \
@@ -78,11 +79,13 @@ help:
 	    echo $$t; done
 	@echo
 
-build: clean
+setup:
 	@cp git-hooks/pre-commit .git/hooks/pre-commit
 	@cp git-hooks/prepare-commit-msg .git/hooks/prepare-commit-msg
 	@mkdir -p ./mysql/data
 	@mkdir -p ./redis
+
+build: clean setup
 	@docker build -f fpdiff.Dockerfile -t masschallenge/fpdiff .
 	@docker-compose build --no-cache
 
@@ -101,7 +104,7 @@ code-check:
 dev:
 	@docker-compose up
 
-test:
+test: setup
 	@docker-compose run --rm web \
 		python3 manage.py test --configuration=Test $(TESTS)
 
