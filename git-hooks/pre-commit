@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# A git commit hook that verifies that there are no stray 
+# debug statements in code that is being committed.
+
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+	against=HEAD
+else
+	# Initial commit: diff against an empty tree object
+	against=a57ab15dff74ebe7670f91009b19dcc4cf4d4f8c
+fi
+
+# If you want to allow non-ASCII filenames set this variable to true.
+# allownonascii=$(git config --bool hooks.allownonascii)
+
+# Redirect output to stderr.
+exec 1>&2
+
+DEBUG_FUNC=set_trace
+if git diff $against | grep -v '^-' | grep "$DEBUG_FUNC"
+then
+    echo "Commit failed. 'import $DEBUG_FUNC' detected."
+    exit 1
+fi

@@ -1,0 +1,125 @@
+// MIT License
+// Copyright (c) 2017 MassChallenge, Inc.
+
+@import "breakpoint";
+
+@import "mixins";
+
+//
+// DEBUG FIXME
+//
+body:before {
+    content: "XS";
+    color: red;
+}
+@include breakpoint(768px) {
+    body:before {
+        content: "SM 768+px";
+        color: red;
+    }
+}
+@include breakpoint(992px) {
+    body:before {
+        content: "MD 992+px";
+        color: red;
+    }
+}
+@include breakpoint(1200px) {
+    body:before {
+        content: "LG 1200+px";
+        color: red;
+    }
+}
+
+//
+// Breakpoints
+//
+$bp-xs: max-width 767px;
+$bp-sm: 768px;
+$bp-md: 992px;
+$bp-lg: 1200px;
+$bp-xl: 1600px;
+
+body.container{
+    .container-fluid{
+        margin-top: 30px;           
+        .branding-well{
+            width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    }
+}
+.logo-container{
+    margin: 0 0 20px;
+    .logo{
+        margin-right: 10px
+    }
+}
+#main-content{
+    margin-top: 50px;
+}
+.register-redirect{
+    color: #666;
+    font-size: 0.85em;
+    font-style: italic;
+    text-align: center;
+    margin-top: 5px;
+}
+.helptext{
+    font-size: 10px;
+    color: #333;
+    display: none;
+}
+.button {
+    display: inline-block;
+    background-color: #0EABBC;
+    color: white !important;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    border: none;
+    &:hover {
+        background-color: #0a7d89;
+        color: white;
+    }
+    &:active {
+        background-color: #0a7d89;
+        color: white;
+    }
+}
+.button.green {
+    background-color: #00718F;
+    &:hover {
+        background-color: #00495c;
+    }
+    &:active {
+        background-color: #00495c;
+    }
+}
+.button.gray {
+    background-color: #b4b4b4;
+    &:hover {
+        background-color: #898989;
+    }
+    &:active {
+        background-color: #646464;
+    }
+}
+.btn{
+    border-radius: 0;    
+}
+.nav{
+    li{
+        .button {
+            &:hover {
+                background-color: #0a7d89;
+                color: white;
+            }
+            &:active {
+                background-color: #0a7d89;
+                color: white;
+            }
+
+        }
+    }
+}

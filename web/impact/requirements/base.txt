@@ -1,0 +1,36 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
+# Libraries
+Unipath==1.1
+coreapi
+hiredis==0.2.0
+markdown # Markdown support for the browsable API.
+mysqlclient
+
+# Misc
+gunicorn
+oauth2_provider
+pycrypto
+pytz
+mock
+pycrypto
+python-magic
+gunicorn
+
+# Django
+Django==1.10.3
+dj-database-url
+dj-email-url
+django-embed-video
+django-redis-cache
+djangorestframework
+django-rest-swagger
+django-rest-framework-proxy
+django-registration
+django-filter # Filtering support
+django-oauth-toolkit
+django-cors-middleware==1.3.1
+
+# django-configurations from Git master (needed for Django 1.8 support)
+git+https://github.com/jezdez/django-configurations

@@ -1,0 +1,23 @@
+version: '2'
+services:
+  web:
+    image: 997386117669.dkr.ecr.us-east-1.amazonaws.com/impact-api
+    ports:
+      - "8000:8000"
+    env_file: .prod.env
+    user: root
+    links:
+      - redis
+  nginx:
+    image: 997386117669.dkr.ecr.us-east-1.amazonaws.com/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - web
+    environment:
+      VIRTUAL_HOST: impact.dev
+  redis:
+    image: 997386117669.dkr.ecr.us-east-1.amazonaws.com/redis
+    volumes:
+      - "redis:/var/lib/redis/data:rw"
