@@ -32,7 +32,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./web/impact/media:/media:ro
-      - ./web/impact/static:/static:ro
+      - ./web/impact/static-compiled:/static:ro
     links:
       - web
     environment:
