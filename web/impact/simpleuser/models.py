@@ -18,6 +18,12 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 
+USER_KEY_TRANSLATIONS = {
+    "first_name": "full_name",
+    "last_name": "short_name",  # Yes, this is correct
+    }
+
+
 class UserManager(BaseUserManager):
     use_in_migrations = True
 

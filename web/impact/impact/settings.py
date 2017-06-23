@@ -138,8 +138,14 @@ class Base(Configuration):
     V0_SITE_NAME = bytes(os.environ.get(
         'IMPACT_API_V0_SITE_NAME', 'masschallenge.org'), 'utf-8')
 
+    # This seems too complicated.  Why would we want to
+    # override the name of an API group using environment
+    # variables?  Shouldn't this name just be a constant?
     V0_API_GROUP = bytes(os.environ.get(
         'IMPACT_API_V0_API_GROUP', 'v0_clients'), 'utf-8')
+
+    V1_API_GROUP = bytes(os.environ.get(
+        'IMPACT_API_V1_API_GROUP', 'v1_clients'), 'utf-8')
 
     OAUTH2_PROVIDER = {
         # this is the list of available scopes
