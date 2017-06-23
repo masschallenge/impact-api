@@ -47,11 +47,6 @@ class DynamicModelPermissions(BasePermission):
     authenticated_users_only = True
 
     def has_permission(self, request, view):
-        # Workaround to ensure DjangoModelPermissions are not applied
-        # to the root view when using DefaultRouter.
-        if getattr(view, '_ignore_model_permissions', False):
-            return True
-
         model_name = view.kwargs.get('model', "").lower()
         app_label = 'mc'
         kwargs = {'app': app_label, 'model_name': model_name}

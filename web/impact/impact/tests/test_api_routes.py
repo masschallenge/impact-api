@@ -41,26 +41,6 @@ class TestApiRoute(TestCase):
                 'startupteammember',
                 'programrole']).delete()
 
-    @unittest.skip(
-        "this test will need to be revived"
-        "once we have the ability"
-        "to control permissions in the"
-        "api root view (/api/impact/)")
-    def test_model_root_get(self):
-        basic_user = self.make_user('basic_user@test.com')
-        with self.login(basic_user):
-            response = self.get("api-root")
-            self.response_200(response)
-            response_dict = json.loads(response.content)
-            self.assertNotIn("PanelTime", response_dict.keys())
-
-        perm_user = self.make_user('perm_user@test.com', perms=["django.*"])
-        with self.login(perm_user):
-            response = self.get("api-root")
-            self.response_200(response)
-            response_dict = json.loads(response.content)
-            self.assertIn("PanelTime", response_dict.keys())
-
     def test_api_object_list(self):
         StartupFactory(is_visible=1, url_slug="test1")
         StartupFactory(is_visible=1, url_slug="test2")
@@ -394,21 +374,3 @@ class TestApiRoute(TestCase):
             response_dict = json.loads(response.content)
             self.assertIn("is_visible", response_dict.keys())
             self.assertEqual(response_dict["is_visible"], True)
-
-    @unittest.skip(
-        "this test will need to be revived"
-    )
-    def test_schema(self):
-
-        User = get_user_model()
-        user = User.objects.create_superuser("admin@test.com", "password")
-        perm = PermissionFactory.create(codename='change_user')
-        user.user_permissions.add(perm)
-        with self.login(username="admin@test.com"):
-            view_kwargs = {}
-            response = self.get("schema", **view_kwargs)
-            self.response_200(response)
-            response_dict = json.loads(response.content)
-            self.assertEqual(
-                set(["info", "paths", "swagger", "securityDefinitions"]),
-                set(response_dict.keys()))
