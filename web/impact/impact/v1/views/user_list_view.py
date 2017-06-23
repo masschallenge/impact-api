@@ -104,8 +104,7 @@ def _serialize_user(user):
 
 def _construct_user(user_args, profile_args):
     user = User.objects.create_user(**user_args)
-    base = BaseProfile.objects.create(user=user, user_type="MEMBER")
+    BaseProfile.objects.create(user=user, user_type="MEMBER")
     profile_args["user"] = user
     MemberProfile.objects.create(**profile_args)
     return user
-

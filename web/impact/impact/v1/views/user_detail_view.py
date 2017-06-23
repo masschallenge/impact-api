@@ -6,7 +6,6 @@ from simpleuser.models import USER_KEY_TRANSLATIONS
 from impact.permissions import (
     V1APIPermissions,
 )
-from impact.models import ProgramStartupStatus
 from impact.utils import user_gender
 
 

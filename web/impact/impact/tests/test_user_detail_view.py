@@ -29,7 +29,7 @@ class TestUserDetailView(APITestCase):
                 "is_active": is_active,
                 "first_name": first_name,
                 }
-            response = self.client.patch(url, data)
+            self.client.patch(url, data)
             user.refresh_from_db()
             assert user.is_active == is_active
             assert user.full_name == first_name
