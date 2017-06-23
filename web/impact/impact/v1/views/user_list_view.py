@@ -57,8 +57,8 @@ class UserListView(APIView):
 
     def _user_args(self, dict):
         results = self._copy_required_keys(dict, USER_KEYS)
-        email = results["email"]
-        if User.objects.filter(email=email).exists():
+        email = results.get("email")
+        if email and User.objects.filter(email=email).exists():
             self.errors.append(EMAIL_EXISTS_ERROR.format(email))
         return results
 

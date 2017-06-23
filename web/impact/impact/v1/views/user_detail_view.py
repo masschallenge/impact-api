@@ -29,7 +29,7 @@ class UserDetailView(APIView):
             "last_name": user.short_name,
             "email": user.email,
             "is_active": user.is_active,
-            "gender": get_user_gender(user),
+            "gender": user_gender(user),
             }
         return Response(result)
 

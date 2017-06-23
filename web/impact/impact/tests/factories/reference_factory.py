@@ -37,4 +37,4 @@ class ReferenceFactory(DjangoModelFactory):
     question_1_rating = Iterator([1, 2, 3, 4])
     question_2_rating = Iterator([1, 2, 3, 4, 5])
     comments = "This is the best startup ever."
-    user = SubFactory(EntrepreneurFactory)
+    requesting_user = SubFactory(EntrepreneurFactory)
