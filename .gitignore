@@ -182,7 +182,6 @@ crashlytics-build.properties
 fabric.properties
 
 # impact-api
-web/impact/static-compiled/*
 local_settings.py
 mysql/data/
 web/impact/.coverage

@@ -1,0 +1,7 @@
+admin/
+css/
+debug_toolbar/
+img/
+js/
+rest_framework/
+rest_framework_swagger/
