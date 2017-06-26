@@ -2,6 +2,35 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 from impact.models import BaseProfile
 
+REQUIRED_USER_KEYS = [
+    "email",
+    "first_name",
+    "last_name",
+]
+OPTIONAL_USER_KEYS = [
+    "is_active",
+]
+USER_KEYS = REQUIRED_USER_KEYS + OPTIONAL_USER_KEYS
+REQUIRED_PROFILE_KEYS = [
+    "gender",
+]
+PROFILE_KEYS = REQUIRED_PROFILE_KEYS
+ALL_USER_RELATED_KEYS = USER_KEYS + PROFILE_KEYS
+KEY_TRANSLATIONS = {
+    "first_name": "full_name",
+    "last_name": "short_name",  # Yes, this is correct
+}
+VALID_GENDERS = ["f", "m", "o", "p"]
+INVALID_GENDER_ERROR = ("Invalid gender: '{}'. Valid values are "
+                        "'f' or 'female', 'm' or 'male', "
+                        "'o' or 'other', and 'p' or 'prefer not to state'")
+GENDER_TRANSLATIONS = {
+    "female": "f",
+    "male": "m",
+    "other": "o",
+    "prefer not to state": "p",
+}
+
 
 def compose_filter(key_pieces, value):
     return {"__".join(key_pieces): value}
@@ -23,4 +52,13 @@ def user_gender(user):
     profile = get_profile(user)
     if profile:
         return profile.gender
+    return None
+
+
+def find_gender(gender):
+    if not hasattr(gender, "lower"):
+        return None
+    gender = GENDER_TRANSLATIONS.get(gender.lower(), gender)
+    if gender in VALID_GENDERS:
+        return gender
     return None

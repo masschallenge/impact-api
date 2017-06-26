@@ -17,12 +17,6 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 
-USER_KEY_TRANSLATIONS = {
-    "first_name": "full_name",
-    "last_name": "short_name",  # Yes, this is correct
-    }
-
-
 class UserManager(BaseUserManager):
     use_in_migrations = True
 
@@ -35,10 +29,11 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('An email address must be provided.')
         email = self.normalize_email(email)
+        if "is_active" not in extra_fields:
+            extra_fields["is_active"] = True
         user = self.model(email=email,
-                          is_staff=is_staff, is_active=True,
-                          is_superuser=is_superuser, last_login=now,
-                          date_joined=now, **extra_fields)
+                          is_staff=is_staff, is_superuser=is_superuser,
+                          last_login=now, date_joined=now, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user

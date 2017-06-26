@@ -28,8 +28,29 @@ class TestUserDetailView(APITestCase):
             data = {
                 "is_active": is_active,
                 "first_name": first_name,
+                "gender": "Male",
                 }
             self.client.patch(url, data)
             user.refresh_from_db()
             assert user.is_active == is_active
             assert user.full_name == first_name
+
+    def test_patch_invalid_key(self):
+        context = UserContext()
+        user = context.user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            bad_key = "bad key"
+            response = self.client.patch(url, {bad_key: True})
+            assert response.status_code == 403
+            assert bad_key in response.data
+
+    def test_patch_invalid_gender(self):
+        context = UserContext()
+        user = context.user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            bad_gender = "bad gender"
+            response = self.client.patch(url, {"gender": bad_gender})
+            assert response.status_code == 403
+            assert bad_gender in response.data

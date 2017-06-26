@@ -43,6 +43,14 @@ class TestUserListView(APITestCase):
             response = self.client.post(url, {})
             assert response.status_code == 403
 
+    def test_post_bad_key(self):
+        with self.login(username=self.basic_user().username):
+            url = reverse("user")
+            bad_key = "bad key"
+            response = self.client.post(url, {bad_key: True})
+            assert response.status_code == 403
+            assert any([bad_key in error for error in response.data])
+
     def test_post_existing(self):
         user = UserContext().user
         data = EXAMPLE_USER.copy()
