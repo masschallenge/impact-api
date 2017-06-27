@@ -11,7 +11,7 @@ COPY scripts/start-nodaemon.sh /usr/bin
 RUN apt-get update -y
 
 # python2.7 is required to run supervisor
-RUN apt-get install -y netcat mysql-client python2.7 python-setuptools
+RUN apt-get install -y netcat mysql-client python2.7 python-setuptools nginx
 
 RUN pip install --upgrade pip
 
