@@ -94,18 +94,14 @@ class DynamicModelPermissions(BasePermission):
         try:
             boolean_value = literal_eval(text_value.title())
         except:  # pragma: no cover
-            # Regarding coverage, it's not clear that we need this code
-            # any more.  See has_object_permissions.
-            # not a bool? unequivocably reject permission
+            # Regarding coverage, see AC-4573
             raise PermissionDenied  # pragma: no cover
         return boolean_value
 
     def has_object_permission(self, request, view, obj):
         model_name = view.kwargs.get('model', "").lower()
         app_label = 'mc'
-        # This needs to be revised but is outside the scope of AC-4501.
-        # Field level permissions are no longer expected to be handled
-        # through the low level API.
+        # This needs to be revised.  See AC-4573
         for permission in self.get_field_level_perms(app_label, model_name):
             action, perm_model, field, boolean_str = (
                 self.decompose_perm(permission.codename))
