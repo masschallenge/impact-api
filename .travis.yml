@@ -37,5 +37,5 @@ after_success:
 - sudo chmod +x /usr/local/bin/ecs-cli;
 - pip install awscli;
 - export PATH=$PATH:$HOME/.local/bin;
-- eval $(aws ecr get-login --region us-east-1);
+- eval $(aws ecr get-login --region us-east-1 --no-include-email);
 - make release AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ENVIRONMENT=$DEPLOY_ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY RELEASE_TAG=$BRANCH
