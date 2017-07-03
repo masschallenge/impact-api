@@ -19,13 +19,13 @@ before_script:
 - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 - git checkout $BRANCH
 - echo "" >> .prod.env
-- echo "DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}" >> .prod.env
-- echo "" >> .prod.env
+- keys="DJANGO_SECRET_KEY IMPACT_API_V0_SECURITY_KEY IMPACT_API_V0_IMAGE_PASSWORD"
+- for key in $keys
+- do
+-     echo "$key=${key}" >> .prod.env
+-     echo "" >> .prod.env
+- done
 - echo "DATABASE_URL=mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}/${DATABASE_NAME}" >> .prod.env
-- echo "" >> .prod.env
-- echo "IMPACT_API_V0_SECURITY_KEY=${IMPACT_API_V0_SECURITY_KEY}" >> .prod.env
-- echo "" >> .prod.env
-- echo "IMPACT_API_V0_IMAGE_PASSWORD=${IMPACT_API_V0_IMAGE_PASSWORD}" >> .prod.env
 - echo "" >> .prod.env
 - docker-compose build --no-cache
 - docker-compose up -d 
