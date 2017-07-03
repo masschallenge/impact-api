@@ -7,12 +7,12 @@ from django.http import HttpResponse
 from django.conf import settings
 
 from django.contrib.auth.models import Group
-from impact.tests.api_v0_test_case import APIV0TestCase
+from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import match_errors
 from impact.v0.views import MentorsProxyView
 
 
-class TestMentorsProxyView(APIV0TestCase):
+class TestMentorsProxyView(APITestCase):
     SOME_SECURITY_KEY = "Some Secret Security Key"
 
     def test_proxy_mentors_view(self):

@@ -30,7 +30,7 @@ class Reference(MCModel):
     question_1_rating = models.IntegerField(null=True)
     question_2_rating = models.IntegerField(null=True)
     comments = models.TextField(blank=True)
-    user = models.ForeignKey(User, null=True)
+    requesting_user = models.ForeignKey(User, null=True)
 
     class Meta(MCModel.Meta):
         db_table = "mc_reference"

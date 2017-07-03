@@ -8,6 +8,7 @@ targets = \
   comp-message \
   coverage \
   coverage-html \
+  dbdump \
   dbload \
   dbshell \
   deploy \
@@ -38,6 +39,7 @@ target_help = \
   "comp-message - Compiles .po files and makes them available to Django." \
   "coverage - Run coverage and generate text report." \
   "coverage-html - Run coverage and generate HTML report." \
+  "dbdump - Create a gzipped database dump as dump.sql.gz in local directory." \
   "dbload - Load gzipped database file. GZ_FILE must be defined." \
   "dbshell - Access to running MySQL." \
   "dev - Start all containers needed to run a webserver." \
@@ -154,6 +156,10 @@ lint:
 
 messages:
 	@docker-compose exec web python manage.py makemessages -a
+
+dbdump:
+	@docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev | gzip > dump.sql.gz
+	@echo Created dump.sql.gz
 
 dbload:
 ifndef GZ_FILE

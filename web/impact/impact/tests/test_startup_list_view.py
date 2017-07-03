@@ -4,7 +4,7 @@
 from django.urls import reverse
 
 from impact.v0.api_data.startup_list_data import StartupListData as Data
-from impact.tests.api_v0_test_case import APIV0TestCase
+from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import (
     IndustryFactory,
     ProgramFactory,
@@ -47,7 +47,7 @@ STARTUP_LOGO = "logo.jpg"
 REMOTE_LOGO = "http://cloud.test.com/logo.jpg"
 
 
-class TestStartupListView(APIV0TestCase):
+class TestStartupListView(APITestCase):
     def test_program_key_post(self):
         program = ProgramFactory()
         with self.login(username=self.basic_user().username):

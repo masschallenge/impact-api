@@ -19,6 +19,10 @@ from impact.v0.views import (
     StartupListView,
     StartupDetailView,
 )
+from impact.v1.views import (
+    UserDetailView,
+    UserListView,
+)
 from rest_framework import routers
 
 impact_router = routers.DefaultRouter()
@@ -243,8 +247,18 @@ v0_urlpatterns = [
         name="startup_detail"),
 ]
 
+v1_urlpatterns = [
+    url(r"^user/(?P<pk>[0-9]+)/$",
+        UserDetailView.as_view(),
+        name="user_detail"),
+    url(r"^user/$",
+        UserListView.as_view(),
+        name="user"),
+]
+
 urls = [
     url(r"^api/v0/", include(v0_urlpatterns)),
+    url(r"^api/v1/", include(v1_urlpatterns)),
     url(r'^api/(?P<app>\w+)/(?P<model>\w+)/$',
         GeneralViewSet.as_view({'get': 'list', 'post': 'create'}),
         name='object-list'),
