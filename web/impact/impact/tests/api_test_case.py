@@ -11,9 +11,10 @@ from django.conf import settings
 from impact.tests.factories import UserFactory
 
 OAuth_App = get_application_model()
+API_GROUPS = [settings.V0_API_GROUP, settings.V1_API_GROUP]
 
 
-class APIV0TestCase(TestCase):
+class APITestCase(TestCase):
     SOME_SITE_NAME = "somesite.com"
 
     client_class = APIClient
@@ -21,20 +22,17 @@ class APIV0TestCase(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        Group.objects.get_or_create(
-            name=settings.V0_API_GROUP)
+        [Group.objects.get_or_create(name=name) for name in API_GROUPS]
 
     @classmethod
     def tearDownClass(cls):
-        Group.objects.get(
-            name=settings.V0_API_GROUP).delete()
+        [Group.objects.get(name=name).delete() for name in API_GROUPS]
 
     def basic_user(self):
         user = self.make_user('basic_user@test.com',
                               perms=["mc.view_startup"])
-        v0_group = Group.objects.get(
-            name=settings.V0_API_GROUP)
-        user.groups.add(v0_group)
+        [user.groups.add(group)
+         for group in Group.objects.filter(name__in=API_GROUPS)]
         user.set_password('password')
         user.save()
         return user

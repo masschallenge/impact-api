@@ -2,14 +2,14 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from django.urls import reverse
-from impact.tests.api_v0_test_case import APIV0TestCase
+from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import (
     JobPostingFactory,
     StartupStatusFactory,
 )
 
 
-class TestJobPostingDetailView(APIV0TestCase):
+class TestJobPostingDetailView(APITestCase):
 
     def test_request_with_no_jobkey(self):
         with self.login(username=self.basic_user().username):

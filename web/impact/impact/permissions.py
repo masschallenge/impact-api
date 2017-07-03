@@ -24,6 +24,15 @@ class V0APIPermissions(BasePermission):
             name=settings.V0_API_GROUP).exists()
 
 
+class V1APIPermissions(BasePermission):
+
+    authenticated_users_only = True
+
+    def has_permission(self, request, view):
+        return request.user.groups.filter(
+            name=settings.V1_API_GROUP).exists()
+
+
 class DynamicModelPermissions(BasePermission):
     perms_map = {
         'GET': ['%(app)s.view_%(model_name)s'],
@@ -38,11 +47,6 @@ class DynamicModelPermissions(BasePermission):
     authenticated_users_only = True
 
     def has_permission(self, request, view):
-        # Workaround to ensure DjangoModelPermissions are not applied
-        # to the root view when using DefaultRouter.
-        if getattr(view, '_ignore_model_permissions', False):
-            return True
-
         model_name = view.kwargs.get('model', "").lower()
         app_label = 'mc'
         kwargs = {'app': app_label, 'model_name': model_name}
@@ -89,14 +93,15 @@ class DynamicModelPermissions(BasePermission):
     def convert_string_to_bool(self, text_value):
         try:
             boolean_value = literal_eval(text_value.title())
-        except:
-            # not a bool? unequivocably reject permission
-            raise PermissionDenied
+        except:  # pragma: no cover
+            # Regarding coverage, see AC-4573
+            raise PermissionDenied  # pragma: no cover
         return boolean_value
 
     def has_object_permission(self, request, view, obj):
         model_name = view.kwargs.get('model', "").lower()
         app_label = 'mc'
+        # This needs to be revised.  See AC-4573
         for permission in self.get_field_level_perms(app_label, model_name):
             action, perm_model, field, boolean_str = (
                 self.decompose_perm(permission.codename))
@@ -107,7 +112,7 @@ class DynamicModelPermissions(BasePermission):
                         '{}.{}'.format(app_label, permission.codename))
                     if getattr(obj, field, None) is boolean_value:
                         if not get_user(request).has_perm(permission_code):
-                            return False
+                            return False  # pragma: no cover
                     # some other value is in place,
                     # so we don't require permissions
         return True
