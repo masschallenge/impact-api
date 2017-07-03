@@ -11,7 +11,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mc_dev
-
   # Redis
   redis:
     build:
@@ -21,23 +20,6 @@ services:
       - ./redis:/var/lib/redis/data
     ports:
       - "6379:6379"
-  # Nginx
-  nginx:
-    build:
-      dockerfile: nginx.Dockerfile
-      context: .
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./web/impact/media:/media:ro
-      - ./web/impact/static-compiled:/static:ro
-    links:
-      - web
-    environment:
-      VIRTUAL_HOST: impact.dev
-  # Assets
   assets:
     image: donnex/assets
     ports:
@@ -51,9 +33,16 @@ services:
   web:
     build: ./web
     ports:
+      - "80:80"
+      - "443:443"
       - "8000:8000"
+    expose:
+      - "80"
+      - "443"
     volumes:
       - ./web/impact:/wwwroot
+      - ./web/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./web/impact/media:/media:ro
     depends_on:
       - mysql
     links:
