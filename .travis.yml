@@ -26,9 +26,6 @@ before_script:
 - git fetch
 - git checkout $BRANCH
 - echo "" >> .prod.env
-- stuff="STUFF1 STUFF2 STUFF3"
-- for key in $stuff; do echo "$key" >> stuff.txt; echo "" >> stuff.txt; done
-- cat stuff.txt
 - keys="DJANGO_SECRET_KEY IMPACT_API_V0_SECURITY_KEY IMPACT_API_V0_IMAGE_PASSWORD"
 - for key in $keys; do echo "$key=${!key}" >> .prod.env; echo "" >> .prod.env; done
 - echo "DATABASE_URL=mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}/${DATABASE_NAME}" >> .prod.env
