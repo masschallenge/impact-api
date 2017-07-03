@@ -1,9 +1,13 @@
 sudo: required
+
 language: python
+
 services:
   - docker
+
 env:
     DOCKER_COMPOSE_VERSION: 1.10.1
+
 before_install:
 - sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu trusty-backports universe'
 - sudo apt-get update -qq
@@ -15,6 +19,7 @@ before_install:
 - chmod +x docker-compose
 - sudo mv docker-compose /usr/local/bin
 - docker-compose --version
+
 before_script:
 - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 - git checkout $BRANCH
@@ -29,8 +34,10 @@ before_script:
 - echo "" >> .prod.env
 - docker-compose build --no-cache
 - docker-compose up -d 
+
 script:
 - make test
+
 after_success:
 - if [ "$DEPLOY_ENVIRONMENT" == "" ]; then export DEPLOY_ENVIRONMENT=$(if [ "$BRANCH" == "master" ]; then echo "production"; else echo "staging"; fi); fi;
 - sudo curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest;
