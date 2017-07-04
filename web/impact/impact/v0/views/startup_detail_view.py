@@ -71,7 +71,7 @@ class StartupDetailView(APIView):
             return EMPTY_DETAIL_RESULT
         return {
             "additional_industries": [
-                sri.industry.name for sri in
+                industry.name for industry in
                 startup.additional_industry_categories.all()],
             "facebook_url": startup.facebook_url,
             "full_elevator_pitch": startup.full_elevator_pitch,
