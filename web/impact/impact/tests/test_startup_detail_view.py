@@ -4,6 +4,7 @@
 from django.urls import reverse
 
 from impact.tests.factories import (
+    IndustryFactory,
     ProgramFactory,
     StartupFactory,
     StartupStatusFactory,
@@ -11,7 +12,7 @@ from impact.tests.factories import (
 )
 from impact.tests.contexts import UserContext
 from impact.tests.utils import match_errors
-from impact.tests.api_v0_test_case import APIV0TestCase
+from impact.tests.api_test_case import APITestCase
 from impact.v0.views.startup_detail_view import EMPTY_DETAIL_RESULT
 from impact.v0.views.utils import BADGE_DISPLAYS
 
@@ -22,12 +23,13 @@ BAD_YOUTUBE_EXAMPLE = "https://www.youtube.com/x/y/z"
 UNKNOWN_VIDEO_EXAMPLE = "http://blahblahblah.com/149212783"
 
 
-class TestStartupDetailView(APIV0TestCase):
+class TestStartupDetailView(APITestCase):
 
     def test_basic_post(self):
         context = UserContext()
         member = StartupTeamMemberFactory(user=context.user)
         startup = member.startup
+        startup.additional_industry_categories.add(IndustryFactory())
         program = ProgramFactory()
         program_status = StartupStatusFactory(
             program_startup_status__program=program,

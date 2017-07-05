@@ -8,6 +8,7 @@ targets = \
   comp-message \
   coverage \
   coverage-html \
+  dbdump \
   dbload \
   dbshell \
   deploy \
@@ -38,6 +39,7 @@ target_help = \
   "comp-message - Compiles .po files and makes them available to Django." \
   "coverage - Run coverage and generate text report." \
   "coverage-html - Run coverage and generate HTML report." \
+  "dbdump - Create a gzipped database dump as dump.sql.gz in local directory." \
   "dbload - Load gzipped database file. GZ_FILE must be defined." \
   "dbshell - Access to running MySQL." \
   "dev - Start all containers needed to run a webserver." \
@@ -155,6 +157,10 @@ lint:
 messages:
 	@docker-compose exec web python manage.py makemessages -a
 
+dbdump:
+	@docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev | gzip > dump.sql.gz
+	@echo Created dump.sql.gz
+
 dbload:
 ifndef GZ_FILE
 	$(error $(dbload_error_msg))
@@ -174,7 +180,7 @@ endif
 
 deploy: IMAGE_TAG?=$(shell if [ "${RELEASE_TAG}" == "" ]; then echo "${IMAGE_TAG}"; else echo "${RELEASE_TAG}"; fi;)
 deploy:
-	@ecs deploy $(ENVIRONMENT) impact --image web $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG) --image redis $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG) --image nginx $(DOCKER_REGISTRY)/nginx:$(IMAGE_TAG)
+	@ecs deploy $(ENVIRONMENT) impact --image web $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG) --image redis $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
 
 release: IMAGE_TAG?=$(shell if [ "${RELEASE_TAG}" == "" ]; then echo "${IMAGE_TAG}"; else echo "${RELEASE_TAG}"; fi;)
 release:
@@ -192,8 +198,6 @@ endif
 	@ecs-cli configure --region us-east-1 --access-key $(AWS_ACCESS_KEY_ID) --secret-key $(AWS_SECRET_ACCESS_KEY) --cluster $(ENVIRONMENT);
 	@docker tag impactapi_web:latest $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG)
 	@docker push $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG)
-	@docker tag impactapi_nginx:latest $(DOCKER_REGISTRY)/nginx:$(IMAGE_TAG)
-	@docker push $(DOCKER_REGISTRY)/nginx:$(IMAGE_TAG)
 	@docker tag impactapi_redis:latest $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
 	@docker push $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
 	@ecs-cli compose -f docker-compose.prod.yml down

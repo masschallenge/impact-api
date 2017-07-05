@@ -7,7 +7,6 @@ user model.  JamBon SW is planning to open source this code before March
 under a BSD 2-clause license. This will allow for this entire app to be
 removed by MC, if so desired.
 """
-from django.core.mail import send_mail
 from django.contrib.auth.models import (
     BaseUserManager,
     AbstractBaseUser,
@@ -30,10 +29,11 @@ class UserManager(BaseUserManager):
         if not email:
             raise ValueError('An email address must be provided.')
         email = self.normalize_email(email)
+        if "is_active" not in extra_fields:
+            extra_fields["is_active"] = True
         user = self.model(email=email,
-                          is_staff=is_staff, is_active=True,
-                          is_superuser=is_superuser, last_login=now,
-                          date_joined=now, **extra_fields)
+                          is_staff=is_staff, is_superuser=is_superuser,
+                          last_login=now, date_joined=now, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
@@ -76,14 +76,6 @@ class SimpleIdentityMixin(models.Model):
     class Meta:
         abstract = True
 
-    def get_full_name(self):
-        """Returns the full name of the user."""
-        return self.full_name
-
-    def get_short_name(self):
-        """Returns the short name for the user."""
-        return self.short_name
-
 
 class AbstractUser(SimpleIdentityMixin, PermissionsMixin, AbstractBaseUser):
     """
@@ -103,10 +95,6 @@ class AbstractUser(SimpleIdentityMixin, PermissionsMixin, AbstractBaseUser):
         verbose_name = _('user')
         verbose_name_plural = _('users')
         abstract = True
-
-    def email_user(self, subject, message, from_email=None, **kwargs):
-        """Sends an email to this User."""
-        send_mail(subject, message, from_email, [self.email], **kwargs)
 
 
 class User(AbstractUser):

@@ -9,7 +9,7 @@ from datetime import (
 import json
 from django.urls import reverse
 
-from impact.tests.api_v0_test_case import APIV0TestCase
+from impact.tests.api_test_case import APITestCase
 from impact.models import (
     JobPosting,
     Site,
@@ -26,7 +26,7 @@ from impact.tests.factories import (
 )
 
 
-class TestJobPostingListView(APIV0TestCase):
+class TestJobPostingListView(APITestCase):
 
     def setUp(self):
         # Many objects must be created to scaffold this thing
