@@ -4,6 +4,7 @@
 from django.urls import reverse
 
 from impact.tests.factories import (
+    IndustryFactory,
     ProgramFactory,
     StartupFactory,
     StartupStatusFactory,
@@ -28,6 +29,7 @@ class TestStartupDetailView(APITestCase):
         context = UserContext()
         member = StartupTeamMemberFactory(user=context.user)
         startup = member.startup
+        startup.additional_industry_categories.add(IndustryFactory())
         program = ProgramFactory()
         program_status = StartupStatusFactory(
             program_startup_status__program=program,
