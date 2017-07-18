@@ -157,7 +157,7 @@ class Base(Configuration):
     CORS_ORIGIN_ALLOW_ALL = True
     # settings.py
     REST_PROXY = {
-        'HOST': 'https://accelerate.masschallenge.org',
+        'HOST': 'https://accelerate-test-3-sf-elb-1843213725.us-east-1.elb.amazonaws.com',
         'AUTH': {
             'user': None,
             'password': None,
