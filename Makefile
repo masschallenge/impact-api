@@ -97,7 +97,7 @@ superuser:
 code-check: DIFFBRANCH?=$(shell if [ "${BRANCH}" == "" ]; \
    then echo "development"; else echo "${BRANCH}"; fi;)
 code-check:
-	-@docker run -v ${PWD}:/code -e BRANCH=$(DIFFBRANCH) \
+	-@docker run --rm -v ${PWD}:/code -e BRANCH=$(DIFFBRANCH) \
 		masschallenge/fpdiff /bin/bash | grep -v "^\.\/\.venv" | \
 		grep -v "site-packages"
 

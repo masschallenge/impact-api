@@ -9,7 +9,6 @@ from unipath import Path
 
 
 class Base(Configuration):
-
     LANGUAGE_CODE = 'en-us'
 
     TIME_ZONE = 'America/New_York'
@@ -157,7 +156,9 @@ class Base(Configuration):
     CORS_ORIGIN_ALLOW_ALL = True
     # settings.py
     REST_PROXY = {
-        'HOST': 'https://accelerate.masschallenge.org',
+        'HOST': bytes(
+            os.environ.get('ACCELERATE_SITE_URL',
+                           'https://accelerate.masschallenge.org'), 'utf-8'),
         'AUTH': {
             'user': None,
             'password': None,
@@ -188,7 +189,6 @@ class Base(Configuration):
 
 
 class Dev(Base):
-
     DEBUG = True
 
     Base.TEMPLATES[0]['OPTIONS']['debug'] = True
@@ -202,8 +202,8 @@ class Dev(Base):
     ]
 
     MIDDLEWARE_CLASSES = [
-        'debug_toolbar.middleware.DebugToolbarMiddleware',
-    ] + Base.MIDDLEWARE_CLASSES
+                             'debug_toolbar.middleware.DebugToolbarMiddleware',
+                         ] + Base.MIDDLEWARE_CLASSES
 
     INSTALLED_APPS = Base.INSTALLED_APPS + [
         'debug_toolbar',
@@ -215,7 +215,6 @@ class Dev(Base):
 
 
 class Test(Base):
-
     MIGRATION_MODULES = {'django.contrib.auth': None, 'impact': None}
     DATABASES = {
         'default': {
@@ -233,7 +232,6 @@ class Test(Base):
 
 
 class Prod(Base):
-
     ALLOWED_HOSTS = Base.ALLOWED_HOSTS + [
         os.environ.get('DJANGO_ALLOWED_HOST', '*'),
     ]
