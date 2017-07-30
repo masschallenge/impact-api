@@ -56,6 +56,7 @@ from .functional_expertise import FunctionalExpertise
 from .industry import Industry
 from .member_profile import MemberProfile
 from .named_group import NamedGroup
+from .organization import Organization
 from .partner import Partner
 from .partner_team_member import PartnerTeamMember
 from .program_manager import ProgramManager

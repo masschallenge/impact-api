@@ -22,6 +22,8 @@ from impact.v0.views import (
 from impact.v1.views import (
     UserDetailView,
     UserListView,
+    OrganizationDetailView,
+    OrganizationListView,
 )
 from rest_framework import routers
 
@@ -29,6 +31,7 @@ impact_router = routers.DefaultRouter()
 simpleuser_router = routers.DefaultRouter()
 
 simpleuser_router.register('User', GeneralViewSet, base_name='User')
+impact_router.register('Organization', GeneralViewSet, base_name='Organization')
 impact_router.register('Application', GeneralViewSet, base_name='Application')
 impact_router.register('ApplicationAnswer', GeneralViewSet,
                        base_name='ApplicationAnswer')
@@ -254,6 +257,13 @@ v1_urlpatterns = [
     url(r"^user/$",
         UserListView.as_view(),
         name="user"),
+    url(r"^organization_detail/(?P<pk>[0-9]+)/$",
+        OrganizationDetailView.as_view(),
+        name="organization_detail"),
+    url(r"^organization/$",
+        OrganizationListView.as_view(),
+        name="organization"),
+    
 ]
 
 urls = [
