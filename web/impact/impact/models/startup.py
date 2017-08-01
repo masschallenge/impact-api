@@ -18,6 +18,7 @@ except ImportError:
     HAS_SORL = False
 
 from impact.models.mc_model import MCModel
+from impact.models.organization import Organization
 from impact.models.industry import Industry
 from impact.models.recommendation_tag import RecommendationTag
 from impact.models.currency import Currency
@@ -39,6 +40,7 @@ STARTUP_COMMUNITIES = (
 
 class Startup(MCModel):
     name = models.CharField(max_length=255)
+    organization = models.ForeignKey(Organization, blank=True, null=True)    
     user = models.ForeignKey(User)
     is_visible = models.BooleanField(
         default=True,

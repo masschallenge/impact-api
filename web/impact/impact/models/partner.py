@@ -15,11 +15,13 @@ except ImportError:
     HAS_SORL = False
 
 from impact.models.mc_model import MCModel
+from impact.models.organization import Organization
 from impact.models.utils import is_managed
 
 
 class Partner(MCModel):
     name = models.CharField(max_length=100, unique=True)
+    organization = models.ForeignKey(Organization, blank=True, null=True)    
     description = models.TextField(
         max_length=1000,
         blank=True,
