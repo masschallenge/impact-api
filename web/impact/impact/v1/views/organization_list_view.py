@@ -9,18 +9,11 @@ from impact.permissions import (
     V1APIPermissions,
 )
 from impact.models import Organization
-from impact.utils import (
-    find_gender,
-    user_gender,
-    ALL_USER_RELATED_KEYS,
-    INVALID_GENDER_ERROR,
-    KEY_TRANSLATIONS,
-    PROFILE_KEYS,
-    REQUIRED_PROFILE_KEYS,
-    REQUIRED_USER_KEYS,
-    USER_KEYS,
+from .organization_detail_view import (
+    organization_is_startup,
+    organization_is_partner,
+    public_inquiry_email,
 )
-
 
 class OrganizationListView(APIView):
     permission_classes = (
@@ -53,7 +46,11 @@ def _results(limit, offset):
 
 def _serialize_org(org):
     return {"id": org.id,
-            "name": org.name}
+            "name": org.name,
+            "url_slug": org.url_slug,
+            "public_inquiry_email": public_inquiry_email(org),
+            "is_startup": organization_is_startup(org),
+            "is_partner": organization_is_partner(org)}
                         
 def _url(base_url, limit, offset):
     if offset >= 0:

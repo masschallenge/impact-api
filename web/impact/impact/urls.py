@@ -257,7 +257,7 @@ v1_urlpatterns = [
     url(r"^user/$",
         UserListView.as_view(),
         name="user"),
-    url(r"^organization_detail/(?P<pk>[0-9]+)/$",
+    url(r"^organization/(?P<pk>[0-9]+)/$",
         OrganizationDetailView.as_view(),
         name="organization_detail"),
     url(r"^organization/$",
