@@ -58,7 +58,8 @@ class APIData(object):
             if isinstance(key, int) or key.isdigit():
                 result = Startup.objects.filter(id=key).first()
             elif isinstance(key, str):
-                result = Startup.objects.filter(url_slug=key).first()
+                result = Startup.objects.filter(
+                    organization__url_slug=key).first()
         if result:
             return result
         else:

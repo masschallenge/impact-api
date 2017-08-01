@@ -83,7 +83,7 @@ class JobPostingListView(APIView):
                 image_token = ""
             url = ""
             if job.startup.is_visible:
-                url = base_url + job.startup.url_slug
+                url = base_url + job.startup.organization.url_slug
             joblist.append({"startup_name": job.startup.name,
                             "startup_profile_url": url,
                             "startup_logo_image_token": image_token,

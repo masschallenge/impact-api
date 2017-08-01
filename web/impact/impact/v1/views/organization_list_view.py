@@ -40,11 +40,11 @@ class OrganizationListView(APIView):
         return Response({"foo": "bar"})                        
 
 def _results(limit, offset):
-    return [_serialize_org(org)
+    return [serialize_org(org)
             for org in Organization.objects.all()[offset:offset+limit]]
                         
 
-def _serialize_org(org):
+def serialize_org(org):
     return {"id": org.id,
             "name": org.name,
             "url_slug": org.url_slug,

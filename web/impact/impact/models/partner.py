@@ -33,7 +33,7 @@ class Partner(MCModel):
             verbose_name="Partner Logo",
             blank=True)
     else:
-        partner_logo = models.CharField(max_length=100)
+        partner_logo = models.CharField(max_length=100, blank=True)
 
     website_url = models.URLField(max_length=100, blank=True)
     twitter_handle = models.CharField(
@@ -43,15 +43,6 @@ class Partner(MCModel):
     public_inquiry_email = models.EmailField(verbose_name="Email address",
                                              max_length=100,
                                              blank=True)
-    url_slug = models.CharField(
-        max_length=64,
-        blank=True,
-        default="",  # This actually gets replaced by a real slug.
-        unique=True,
-        validators=[RegexValidator(".*\D.*",
-                                   "Slug must contain a non-numeral."),
-                    validate_slug, ]
-    )
 
     class Meta(MCModel.Meta):
         db_table = 'mc_partner'

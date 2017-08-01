@@ -111,15 +111,6 @@ class Startup(MCModel):
         choices=STARTUP_COMMUNITIES,
         blank=True,
     )
-    url_slug = models.CharField(
-        max_length=64,
-        blank=True,
-        default="",  # This actually gets replaced by a real slug.
-        unique=True,
-        validators=[RegexValidator(".*\D.*",
-                                   "Slug must contain a non-numeral."),
-                    validate_slug, ]
-    )
 
     # profile color fields are deprecated - do not delete until we know
     # what the marketing site is doing with startup display
