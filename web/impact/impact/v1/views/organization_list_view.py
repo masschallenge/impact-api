@@ -36,9 +36,6 @@ class OrganizationListView(APIView):
             }
         return Response(result)
 
-    def post(self, request):
-        return Response({"foo": "bar"})
-
 
 def _results(limit, offset):
     return [serialize_org(org)
