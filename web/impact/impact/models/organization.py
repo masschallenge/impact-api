@@ -17,8 +17,7 @@ class Organization(MCModel):
     description = models.TextField(
         max_length=1000,
         blank=True,
-        help_text='This is the generic description of the Partner, shared '
-        'across all Programs.')
+        help_text='This is the generic description of the Organization.')
     website_url = models.URLField(max_length=100, blank=True)
     twitter_handle = models.CharField(
         max_length=40,
