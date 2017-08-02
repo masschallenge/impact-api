@@ -1,12 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-
 from django.db import models
-from django.core.validators import (
-    RegexValidator,
-    validate_slug
-)
 
 try:
     from sorl.thumbnail import ImageField
@@ -21,7 +16,7 @@ from impact.models.utils import is_managed
 
 class Partner(MCModel):
     name = models.CharField(max_length=100, unique=True)
-    organization = models.ForeignKey(Organization, blank=True, null=True)    
+    organization = models.ForeignKey(Organization, blank=True, null=True)
     description = models.TextField(
         max_length=1000,
         blank=True,

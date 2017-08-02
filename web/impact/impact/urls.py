@@ -31,7 +31,9 @@ impact_router = routers.DefaultRouter()
 simpleuser_router = routers.DefaultRouter()
 
 simpleuser_router.register('User', GeneralViewSet, base_name='User')
-impact_router.register('Organization', GeneralViewSet, base_name='Organization')
+impact_router.register('Organization',
+                       GeneralViewSet,
+                       base_name='Organization')
 impact_router.register('Application', GeneralViewSet, base_name='Application')
 impact_router.register('ApplicationAnswer', GeneralViewSet,
                        base_name='ApplicationAnswer')
@@ -263,7 +265,7 @@ v1_urlpatterns = [
     url(r"^organization/$",
         OrganizationListView.as_view(),
         name="organization"),
-    
+
 ]
 
 urls = [

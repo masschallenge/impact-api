@@ -1,7 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -14,6 +13,7 @@ from .organization_detail_view import (
     organization_is_partner,
     public_inquiry_email,
 )
+
 
 class OrganizationListView(APIView):
     permission_classes = (
@@ -37,12 +37,13 @@ class OrganizationListView(APIView):
         return Response(result)
 
     def post(self, request):
-        return Response({"foo": "bar"})                        
+        return Response({"foo": "bar"})
+
 
 def _results(limit, offset):
     return [serialize_org(org)
             for org in Organization.objects.all()[offset:offset+limit]]
-                        
+
 
 def serialize_org(org):
     return {"id": org.id,
@@ -51,7 +52,8 @@ def serialize_org(org):
             "public_inquiry_email": public_inquiry_email(org),
             "is_startup": organization_is_startup(org),
             "is_partner": organization_is_partner(org)}
-                        
+
+
 def _url(base_url, limit, offset):
     if offset >= 0:
         return base_url + "?limit={limit}&offset={offset}".format(

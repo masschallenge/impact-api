@@ -68,4 +68,3 @@ def organization_save_patch(self, *args, **kwargs):
 
 
 Organization.save_base = organization_save_patch
-    

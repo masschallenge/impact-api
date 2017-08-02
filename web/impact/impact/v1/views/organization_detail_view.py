@@ -1,7 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -17,11 +16,14 @@ from impact.models import (
 INVALID_KEYS_ERROR = ("Received invalid key(s): {invalid_keys}. "
                       "Valid keys are: {valid_keys}.")
 
+
 def organization_is_startup(organization):
     return _organization_is(organization, Startup)
 
+
 def organization_is_partner(organization):
     return _organization_is(organization, Partner)
+
 
 def public_inquiry_email(organization):
     for klass in (Partner, Startup):
@@ -29,6 +31,7 @@ def public_inquiry_email(organization):
         if qs.exists():
             return qs.first().public_inquiry_email
     return ""
+
 
 def _organization_is(organization, klass):
     return klass.objects.filter(organization=organization).exists()
@@ -57,7 +60,7 @@ class OrganizationDetailView(APIView):
     def get_model_fields(self):
         return {field: getattr(self.instance, field)
                 for field in self.model_fields}
-    
+
     def derived_fields(self):
         return {key: func(self.instance)
                 for (key, func) in self.derived_field_functions.items()}
