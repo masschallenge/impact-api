@@ -22,8 +22,10 @@ from impact.v0.views import (
 from impact.v1.views import (
     UserDetailView,
     UserListView,
+    UserOrganizationsView,
     OrganizationDetailView,
     OrganizationListView,
+    OrganizationUsersView,
 )
 from rest_framework import routers
 
@@ -259,13 +261,19 @@ v1_urlpatterns = [
     url(r"^user/$",
         UserListView.as_view(),
         name="user"),
+    url(r"^user/(?P<pk>[0-9]+)/organizations/$",
+        UserOrganizationsView.as_view(),
+        name="user_organizations"),
+
     url(r"^organization/(?P<pk>[0-9]+)/$",
         OrganizationDetailView.as_view(),
         name="organization_detail"),
     url(r"^organization/$",
         OrganizationListView.as_view(),
         name="organization"),
-
+    url(r"^organization/(?P<pk>[0-9]+)/users/$",
+        OrganizationUsersView.as_view(),
+        name="organization_users"),
 ]
 
 urls = [
