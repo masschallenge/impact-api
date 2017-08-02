@@ -44,3 +44,17 @@ class Organization(MCModel):
 
     def __str__(self):
         return self.name
+
+    @classmethod
+    def slug_from_instance(cls, instance):
+        slug = slugify(instance.name)
+        if slug == "":
+            slug = "organization"
+        slug = slug[:61]
+        slugbase = slug
+        i = 0
+        while (cls.objects.filter(url_slug=slug).exists() and
+               (i < 100 or slugbase == "organization")):
+            i += 1
+            slug = slugbase + "-" + str(i)
+        return slug
