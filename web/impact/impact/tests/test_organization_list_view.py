@@ -4,13 +4,13 @@
 from django.urls import reverse
 
 from impact.tests.factories import (
-    OrganizationFactory,
     PartnerFactory,
     StartupFactory,
 )
-    
+
 from impact.tests.api_test_case import APITestCase
 from impact.v1.views.organization_list_view import serialize_org
+
 
 class TestOrganizationDetailView(APITestCase):
 
@@ -21,7 +21,8 @@ class TestOrganizationDetailView(APITestCase):
             url = reverse("organization")
             response = self.client.get(url)
             assert response.data['count'] == count
-            assert all([serialize_org(startup.organization) in response.data['results']
+            assert all([serialize_org(startup.organization)
+                        in response.data['results']
                         for startup in startups])
 
     def test_get_partner(self):
@@ -31,6 +32,6 @@ class TestOrganizationDetailView(APITestCase):
             url = reverse("organization")
             response = self.client.get(url)
             assert response.data['count'] == count
-            assert all([serialize_org(partner.organization) in response.data['results']
+            assert all([serialize_org(partner.organization)
+                        in response.data['results']
                         for partner in partners])
-            

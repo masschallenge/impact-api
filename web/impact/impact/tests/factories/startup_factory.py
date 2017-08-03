@@ -14,7 +14,6 @@ from impact.models import (
     DEFAULT_PROFILE_BACKGROUND_COLOR,
     DEFAULT_PROFILE_TEXT_COLOR,
     STARTUP_COMMUNITIES,
-    Organization,
     Startup,
 )
 
@@ -23,12 +22,13 @@ from .industry_factory import IndustryFactory
 from .user_factory import UserFactory
 from .organization_factory import OrganizationFactory
 
+
 class StartupFactory(DjangoModelFactory):
     class Meta:
         model = Startup
 
     name = Sequence(lambda n: "Test Startup {0} Inc.".format(n))
-    organization = SubFactory(OrganizationFactory)    
+    organization = SubFactory(OrganizationFactory)
     user = SubFactory(UserFactory)
     is_visible = True
     primary_industry = SubFactory(IndustryFactory)
@@ -54,7 +54,7 @@ class StartupFactory(DjangoModelFactory):
     location_postcode = "02210"
     date_founded = "01/2010"
     landing_page = None
-    
+
     @post_generation
     def additional_industry_categories(self, create, extracted, **kwargs):
         if not create:

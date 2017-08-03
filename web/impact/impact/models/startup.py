@@ -6,10 +6,7 @@ from embed_video.fields import EmbedVideoField
 
 from simpleuser.models import User
 from django.db import models
-from django.core.validators import (
-    RegexValidator,
-    validate_slug
-)
+from django.core.validators import RegexValidator
 
 try:
     from sorl.thumbnail import ImageField
@@ -40,7 +37,7 @@ STARTUP_COMMUNITIES = (
 
 class Startup(MCModel):
     name = models.CharField(max_length=255)
-    organization = models.ForeignKey(Organization, blank=True, null=True)    
+    organization = models.ForeignKey(Organization, blank=True, null=True)
     user = models.ForeignKey(User)
     is_visible = models.BooleanField(
         default=True,

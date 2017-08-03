@@ -9,6 +9,7 @@ from factory import (
 from impact.models import Partner
 from .organization_factory import OrganizationFactory
 
+
 class PartnerFactory(DjangoModelFactory):
 
     class Meta:
