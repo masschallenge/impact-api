@@ -40,9 +40,9 @@ class TestApiRoute(TestCase):
                 'programrole']).delete()
 
     def test_api_object_list(self):
-        StartupFactory(is_visible=1, url_slug="test1")
-        StartupFactory(is_visible=1, url_slug="test2")
-        StartupFactory(is_visible=1, url_slug="test3")
+        StartupFactory(is_visible=1, organization__url_slug="test1")
+        StartupFactory(is_visible=1, organization__url_slug="test2")
+        StartupFactory(is_visible=1, organization__url_slug="test3")
         Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
                 app_label='mc',

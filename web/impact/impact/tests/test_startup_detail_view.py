@@ -94,9 +94,10 @@ class TestStartupDetailView(APITestCase):
         program = ProgramFactory()
         with self.login(username=self.basic_user().username):
             url = reverse("startup_detail")
-            response = self.client.post(url,
-                                        {"ProgramKey": program.id,
-                                         "StartupKey": startup.url_slug})
+            response = self.client.post(
+                url,
+                {"ProgramKey": program.id,
+                 "StartupKey": startup.organization.url_slug})
             assert startup.name == response.data["name"]
 
     def test_public_member_post(self):

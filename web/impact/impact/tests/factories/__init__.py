@@ -40,6 +40,7 @@ from .named_group_factory import NamedGroupFactory
 from .newsletter_factory import NewsletterFactory
 from .newsletter_receipt_factory import NewsletterReceiptFactory
 from .observer_factory import ObserverFactory
+from .organization_factory import OrganizationFactory
 from .panel_factory import PanelFactory
 from .panel_location_factory import PanelLocationFactory
 from .panel_time_factory import PanelTimeFactory

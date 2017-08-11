@@ -154,8 +154,8 @@ class StartupListView(APIView):
         if self.data.order_by == self.data.RANDOM_ORDER:
             return startups.order_by("?")
         elif self.data.order_by == self.data.ALPHA_DSC_ORDER:
-            return startups.order_by("-name")
-        return startups.order_by("name")
+            return startups.order_by("-organization__name")
+        return startups.order_by("organization__name")
 
     def _startups_to_statuses(self, startups):
         statuses = StartupStatus.objects.filter(
@@ -178,7 +178,7 @@ def _startup_description(startup, statuses, base_url):
             "is_visible": True,
             "name": startup.name,
             "id": startup.id,
-            "profile_url": base_url + startup.url_slug,
+            "profile_url": base_url + startup.organization.url_slug,
             "image_token": encrypt_image_token(startup.high_resolution_logo),
             "logo_url": logo_url(startup),
             "statuses": [status_description(status) for status in statuses],
