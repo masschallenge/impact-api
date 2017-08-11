@@ -27,7 +27,6 @@ class StartupFactory(DjangoModelFactory):
     class Meta:
         model = Startup
 
-    name = Sequence(lambda n: "Test Startup {0} Inc.".format(n))
     organization = SubFactory(OrganizationFactory)
     user = SubFactory(UserFactory)
     is_visible = True
@@ -35,13 +34,9 @@ class StartupFactory(DjangoModelFactory):
     short_pitch = "Doing the things with the stuff."
     full_elevator_pitch = "It is really hard to throw elevators."
     video_elevator_pitch_url = "http://example.com"
-    website_url = Sequence(lambda n: "startup{0}.com".format(n))
     linked_in_url = Sequence(lambda n: "linkedin.com/startup{0}".format(n))
     facebook_url = Sequence(lambda n: "facebook.com/startup{0}".format(n))
     high_resolution_logo = None
-    twitter_handle = Sequence(lambda n: "startup{0}".format(n))
-    public_inquiry_email = Sequence(
-        lambda n: "contact@startup{0}.com".format(n))
     created_datetime = utc.localize(datetime(2015, 1, 1))
     last_updated_datetime = utc.localize(datetime(2015, 7, 1))
     community = STARTUP_COMMUNITIES[0][0]

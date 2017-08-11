@@ -39,11 +39,47 @@ class Partner(MCModel):
                                              max_length=100,
                                              blank=True)
 
+    @property
+    def name(self):
+        return self.organization.name
+
+    @name.setter
+    def name(self, value):
+        self.organization.name = value
+        self.organization.save()
+
+    @property
+    def website_url(self):
+        return self.organization.website_url
+
+    @website_url.setter
+    def website_url(self, website_url):
+        self.organization.website_url = website_url
+        self.organization.save()
+
+    @property
+    def twitter_handle(self):
+        return self.organization.twitter_handle
+
+    @twitter_handle.setter
+    def twitter_handle(self, twitter_handle):
+        self.organization.twitter_handle = twitter_handle
+        self.organization.save()
+
+    @property
+    def public_inquiry_email(self):
+        return self.organization.public_inquiry_email
+
+    @public_inquiry_email.setter
+    def public_inquiry_email(self, public_inquiry_email):
+        self.organization.public_inquiry_email = public_inquiry_email
+        self.organization.save()
+
     class Meta(MCModel.Meta):
         db_table = 'mc_partner'
         managed = is_managed(db_table)
         verbose_name_plural = 'Partners'
-        ordering = ['name', ]
+        ordering = ['organization__name', ]
 
     def __str__(self):
         return self.name
