@@ -12,7 +12,7 @@ from impact.models.utils import is_managed
 
 class ProgramRole(MCModel):
     program = models.ForeignKey(Program)
-    name = models.CharField(max_length=30, unique=True, db_index=True)
+    name = models.CharField(max_length=255, unique=True, db_index=True)
     user_role = models.ForeignKey(UserRole, null=True, blank=True)
     landing_page = models.CharField(max_length=255, null=True, blank=True)
     newsletter_recipient = models.BooleanField(default=False)
