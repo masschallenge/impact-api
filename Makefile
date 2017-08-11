@@ -7,7 +7,10 @@ targets = \
   code-check \
   comp-message \
   coverage \
+  coverage-run \
+  coverage-report \
   coverage-html \
+  coverage-html-open \
   dbdump \
   dbload \
   dbshell \
@@ -139,12 +142,23 @@ clean:
 comp-messages:
 	@docker-compose exec web python manage.py compilemessages
 
-coverage:
-	@docker-compose run --rm web coverage run --omit="*/tests/*" --source='.' manage.py test --configuration=Test
-	@docker-compose run --rm web coverage report
+coverage: coverage-run coverage-report coverage-html
 
-coverage-html: coverage
+coverage-run:
+	@docker-compose run --rm web coverage run --omit="*/tests/*" --source='.' manage.py test --configuration=Test
+
+coverage-report: DIFFBRANCH?=$(shell if [ "${BRANCH}" == "" ]; \
+   then echo "development"; else echo "${BRANCH}"; fi;)
+coverage-report: diff_files:=$(shell git diff --name-only $(DIFFBRANCH))
+coverage-report: diff_sed:=$(shell echo $(diff_files)| sed s:web/impact/::g)
+coverage-report: diff_grep:=$(shell echo $(diff_sed) | tr ' ' '\n' | grep \.py | grep -v /tests/ | grep -v /django_migrations/ | tr '\n' ' ' )
+coverage-report:
+	@docker-compose run --rm web coverage report --skip-covered $(diff_grep) | grep -v "NoSource:"
+
+coverage-html:
 	@docker-compose run --rm web coverage html --omit="*/tests/*"
+
+coverage-html-open: coverage-html
 	@open web/impact/htmlcov/index.html
 
 demo:
