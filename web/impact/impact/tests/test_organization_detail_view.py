@@ -13,7 +13,6 @@ from impact.tests.api_test_case import APITestCase
 
 
 class TestOrganizationDetailView(APITestCase):
-
     def test_get_startup(self):
         startup = StartupFactory()
         with self.login(username=self.basic_user().username):

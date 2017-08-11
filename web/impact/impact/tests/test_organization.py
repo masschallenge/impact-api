@@ -3,7 +3,6 @@ from impact.tests.factories import OrganizationFactory
 
 
 class TestOrganization(APITestCase):
-
     def test_str(self):
         organization = OrganizationFactory()
         assert str(organization) == organization.name
