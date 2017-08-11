@@ -64,9 +64,6 @@ class Startup(MCModel):
         max_length=500,
         blank=False,
         help_text="Your startup in 500 characters or less.")
-    website_url = models.CharField(
-        max_length=100,
-        blank=True)
     linked_in_url = models.URLField(max_length=100, blank=True)
     facebook_url = models.URLField(max_length=100, blank=True)
 
@@ -78,18 +75,6 @@ class Startup(MCModel):
     else:
         high_resolution_logo = models.CharField(max_length=100, null=True)
 
-    twitter_handle = models.CharField(
-        max_length=40,
-        blank=True,
-        help_text="Omit the \"@\". We'll add it.")
-    public_inquiry_email = models.EmailField(
-        verbose_name="Email address",
-        max_length=100,
-        blank=True,
-        help_text=(
-            "This email will be posted on the public MassChallenge website "
-            "if your startup is not in stealth mode as a way for people to "
-            "contact you outside of MassChallenge."))
     video_elevator_pitch_url = EmbedVideoField(
         max_length=100,
         blank=True,
@@ -169,11 +154,47 @@ class Startup(MCModel):
     )
     landing_page = models.CharField(max_length=255, null=True, blank=True)
 
+    @property
+    def name(self):
+        return self.organization.name
+
+    @name.setter
+    def name(self, value):
+        self.organization.name = value
+        self.organization.save()
+
+    @property
+    def website_url(self):
+        return self.organization.website_url
+
+    @website_url.setter
+    def website_url(self, website_url):
+        self.organization.website_url = website_url
+        self.organization.save()
+
+    @property
+    def twitter_handle(self):
+        return self.organization.twitter_handle
+
+    @twitter_handle.setter
+    def twitter_handle(self, twitter_handle):
+        self.organization.twitter_handle = twitter_handle
+        self.organization.save()
+
+    @property
+    def public_inquiry_email(self):
+        return self.organization.public_inquiry_email
+
+    @public_inquiry_email.setter
+    def public_inquiry_email(self, public_inquiry_email):
+        self.organization.public_inquiry_email = public_inquiry_email
+        self.organization.save()
+
     class Meta(MCModel.Meta):
         db_table = 'mc_startup'
         managed = is_managed(db_table)
         verbose_name_plural = "Startups"
-        ordering = ["name"]
+        ordering = ["organization__name"]
 
     def __str__(self):
         return self.name

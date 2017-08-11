@@ -154,8 +154,8 @@ class StartupListView(APIView):
         if self.data.order_by == self.data.RANDOM_ORDER:
             return startups.order_by("?")
         elif self.data.order_by == self.data.ALPHA_DSC_ORDER:
-            return startups.order_by("-name")
-        return startups.order_by("name")
+            return startups.order_by("-organization__name")
+        return startups.order_by("organization__name")
 
     def _startups_to_statuses(self, startups):
         statuses = StartupStatus.objects.filter(

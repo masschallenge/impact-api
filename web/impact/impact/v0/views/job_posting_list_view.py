@@ -68,11 +68,13 @@ class JobPostingListView(APIView):
 
         # Parameter `OrderBy
         if self.data.order_by == "startup":
-            jobs = jobs.order_by("startup__name", "-postdate")
+            jobs = jobs.order_by("startup__organization__name", "-postdate")
         elif self.data.order_by == "postdatedesc":
-            jobs = jobs.order_by("-postdate", "startup__name")
+            jobs = jobs.order_by("-postdate", "startup__organization__name")
         elif self.data.order_by == "jobtype":
-            jobs = jobs.order_by("type", "-postdate", "startup__name")
+            jobs = jobs.order_by("type",
+                                 "-postdate",
+                                 "startup__organization__name")
 
         joblist = []
         for job in jobs:
