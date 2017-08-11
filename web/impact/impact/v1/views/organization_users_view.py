@@ -10,9 +10,13 @@ from impact.models import (
     StartupTeamMember,
 )
 
+
 class OrganizationUsersView(APIView):
+    permission_classes = (
+        V1APIPermissions,
+    )
     model = Organization
-    
+
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
         users = set(list(self.partner_users()) + list(self.startup_users()))

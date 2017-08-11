@@ -4,7 +4,6 @@
 from django.urls import reverse
 
 from impact.tests.factories import (
-    OrganizationFactory,
     PartnerTeamMemberFactory,
     StartupTeamMemberFactory,
 )
@@ -22,5 +21,7 @@ class TestUserOrganizationsView(APITestCase):
             url = reverse("user_organizations",
                           args=[startup_team_member.user_id])
             response = self.client.get(url)
-            assert startup_team_member.startup_id in response.data['organizations']
-            assert partner_team_member.partner_id in response.data['organizations']
+            assert startup_team_member.startup_id in response.data[
+                'organizations']
+            assert partner_team_member.partner_id in response.data[
+                'organizations']

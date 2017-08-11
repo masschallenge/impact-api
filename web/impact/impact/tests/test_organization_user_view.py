@@ -4,7 +4,6 @@
 from django.urls import reverse
 
 from impact.tests.factories import (
-    OrganizationFactory,
     PartnerTeamMemberFactory,
     StartupTeamMemberFactory,
 )

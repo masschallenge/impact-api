@@ -6,15 +6,18 @@ from impact.permissions import (
     V1APIPermissions,
 )
 from impact.models import (
-    Organization,
     PartnerTeamMember,
     StartupTeamMember,
 )
 
 
 class UserOrganizationsView(APIView):
+    permission_classes = (
+        V1APIPermissions,
+    )
+
     model = get_user_model()
-    
+
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
         organizations = set(list(self.partner_organizations()) +

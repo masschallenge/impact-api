@@ -42,7 +42,7 @@ class TestOrganizationDetailView(APITestCase):
 
     def test_get_org_is_both_partner_and_startup(self):
         partner = PartnerFactory()
-        
+
         with self.login(username=self.basic_user().username):
             url = reverse("organization_detail",
                           args=[partner.organization.id])
@@ -53,7 +53,7 @@ class TestOrganizationDetailView(APITestCase):
                     partner.public_inquiry_email)
             assert response.data["is_startup"] is False
             assert response.data["is_partner"] is True
-            
+
     def test_organization_has_no_startup_nor_partner(self):
         organization = OrganizationFactory()
         with self.login(username=self.basic_user().username):
