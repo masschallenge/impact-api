@@ -44,6 +44,7 @@ impact_router.register('ApplicationQuestion',
 impact_router.register('ApplicationType', GeneralViewSet,
                        base_name='ApplicationType')
 impact_router.register('BaseProfile', GeneralViewSet, base_name='BaseProfile')
+impact_router.register('Clearance', GeneralViewSet, base_name='Clearance')
 impact_router.register('Country', GeneralViewSet, base_name='Country')
 impact_router.register('Currency', GeneralViewSet, base_name='Currency')
 impact_router.register('EntrepreneurProfile',
