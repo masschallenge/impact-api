@@ -10,9 +10,9 @@ from django.core.validators import RegexValidator
 
 try:
     from sorl.thumbnail import ImageField
-    HAS_SORL = True
+    HAS_SORL = True  # pragma: no cover
 except ImportError:
-    HAS_SORL = False
+    HAS_SORL = False  # pragma: no cover
 
 from impact.models.mc_model import MCModel
 from impact.models.organization import Organization
@@ -71,9 +71,10 @@ class Startup(MCModel):
         high_resolution_logo = ImageField(
             upload_to="startup_pics",
             verbose_name="High Resolution Logo",
-            blank=True)
+            blank=True)  # pragma: no cover
     else:
-        high_resolution_logo = models.CharField(max_length=100, null=True)
+        high_resolution_logo = models.CharField(max_length=100,
+                                                null=True)  # pragma: no cover
 
     video_elevator_pitch_url = EmbedVideoField(
         max_length=100,
@@ -158,37 +159,17 @@ class Startup(MCModel):
     def name(self):
         return self.organization.name
 
-    @name.setter
-    def name(self, value):
-        self.organization.name = value
-        self.organization.save()
-
     @property
     def website_url(self):
         return self.organization.website_url
-
-    @website_url.setter
-    def website_url(self, website_url):
-        self.organization.website_url = website_url
-        self.organization.save()
 
     @property
     def twitter_handle(self):
         return self.organization.twitter_handle
 
-    @twitter_handle.setter
-    def twitter_handle(self, twitter_handle):
-        self.organization.twitter_handle = twitter_handle
-        self.organization.save()
-
     @property
     def public_inquiry_email(self):
         return self.organization.public_inquiry_email
-
-    @public_inquiry_email.setter
-    def public_inquiry_email(self, public_inquiry_email):
-        self.organization.public_inquiry_email = public_inquiry_email
-        self.organization.save()
 
     class Meta(MCModel.Meta):
         db_table = 'mc_startup'
