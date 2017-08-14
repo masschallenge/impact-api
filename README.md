@@ -211,7 +211,7 @@ The `make grant-permissions` command can be used to assign django permissions fo
 
 `make grant-permissions PERMISSION_CLASSES=view_startup,change_startup PERMISSION_USER=test@example.org`
 
-To give a user access to the v0 api, issue the command with 'v0_clients' specified in PERMISSION_CLASSES:
+To give a user access to the v0 api, issue the command with 'v0_api' specified in PERMISSION_CLASSES:
 
 `make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v0_api`
 
