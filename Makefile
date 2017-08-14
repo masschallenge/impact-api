@@ -64,7 +64,7 @@ dbload_error_msg = GZ_FILE must be set. \
   E.g. 'make dbload GZ_FILE=../accelerate/test_data/initial_schema.sql.gz'
 
 grant_permissions_error_msg = PERMISSION_USER and PERMISSION_CLASSES must be \
-  set.  E.g., 'make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v0_clients'
+  set.  E.g., 'make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v0_api'
 
 registry_error_msg = DOCKER_REGISTRY must be \
   set.  E.g., 'make release DOCKER_REGISTRY=<ecr-container>.amazonaws.com ENVIRONMENT=staging AWS_SECRET_ACCESS_KEY=abcdefghijk AWS_ACCESS_KEY_ID=ABCDEFGH12IJKL'
