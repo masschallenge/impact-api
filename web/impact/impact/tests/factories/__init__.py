@@ -11,6 +11,7 @@ from .application_type_factory import ApplicationTypeFactory
 from .base_profile_factory import BaseProfileFactory
 from .bucket_state_factory import BucketStateFactory
 from .content_type_factory import ContentTypeFactory
+from .clearance_factory import ClearanceFactory
 from .core_profile_factory import CoreProfileFactory
 from .currency_factory import CurrencyFactory
 from .entrepreneur_factory import EntrepreneurFactory

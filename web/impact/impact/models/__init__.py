@@ -103,6 +103,16 @@ from .application import (
     SUBMITTED_APP_STATUS,
     UNPAID_PAYMENT_STATUS,
 )
+
+from impact.models.clearance import (
+    Clearance,
+    CLEARANCE_LEVEL_EXEC_MD,
+    CLEARANCE_LEVEL_GLOBAL_MANAGER,
+    CLEARANCE_LEVEL_ORDER,
+    CLEARANCE_LEVEL_POM,
+    CLEARANCE_LEVELS,
+)
+
 from .refund_code_redemption import RefundCodeRedemption
 from .reference import Reference
 from .startup_team_member import StartupTeamMember
