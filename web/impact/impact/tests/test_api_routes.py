@@ -290,7 +290,6 @@ class TestApiRoute(TestCase):
             "public_inquiry_email": "test@test.com",
             "video_elevator_pitch_url": "http://example.com",
             "user": startup.user.id,
-            "high_resolution_logo": "test",
             "created_datetime": None,
             "last_updated_datetime": None,
             "community": "red",
@@ -304,7 +303,7 @@ class TestApiRoute(TestCase):
             "location_postcode": "test",
             "location_regional": "test",
             "landing_page": "test"
-        })
+        })  # field "high_resolution_logo" was removed, to be solved in AC-4750
         extra = {"content_type": "application/json"}
         put_kwargs = get_kwargs.copy()
         put_kwargs["data"] = data
@@ -348,7 +347,7 @@ class TestApiRoute(TestCase):
         )
         change_startup_permission, _ = Permission.objects.get_or_create(
             content_type=startup_content_type,
-            codename='change_startup',)
+            codename='change_startup', )
         perm_user = self.make_user(
             'perm_user@test.com')
         perm_user.user_permissions.add(startup_permission)
