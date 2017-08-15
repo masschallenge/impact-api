@@ -17,6 +17,13 @@ git checkout development
 git pull
 ```
 
+Note that the impact-api code is currently designed to work with an
+instance of the MassChallenge Accelerate platform.  Specifically it
+expects an instance the Accelerate platform to manage a shared
+database.  This quick start quide does not require a running version
+of the Accelerate platform, but it does require an initial database
+dump which is normally part of the accelerate code base.
+
 If you don't have impact-api checked out, but you do have the
 accelerate code base checked out, checkout the impact-api code
 next to the accelerate directory with:
@@ -100,7 +107,7 @@ password-based".  "Redirect URIs" should not be given.  Click "Save".
 value that may not be completely visible.  However, double clicking it
 and then copying should get the entire value.
 
-12. Test functionally test the API, we recommend downloading Postman
+12. To functionally test the API, we recommend downloading Postman
 (https://www.getpostman.com/) and importing our testing collection.
 To import a collection into Postman go to File -> Import and select
 the "Import From Link" tab, insert the URL
