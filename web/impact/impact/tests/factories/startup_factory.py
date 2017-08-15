@@ -16,8 +16,10 @@ from impact.models import (
     STARTUP_COMMUNITIES,
     Startup,
 )
-
-from .currency_factory import CurrencyFactory
+from accelerator.tests.factories.currency_factory import (
+    CurrencyFactory as NewCurrencyFactory
+)
+from .currency_factory import CurrencyFactory as OldCurrencyFactory
 from .industry_factory import IndustryFactory
 from .user_factory import UserFactory
 from .organization_factory import OrganizationFactory
@@ -42,7 +44,8 @@ class StartupFactory(DjangoModelFactory):
     community = STARTUP_COMMUNITIES[0][0]
     profile_background_color = DEFAULT_PROFILE_BACKGROUND_COLOR
     profile_text_color = DEFAULT_PROFILE_TEXT_COLOR
-    currency = SubFactory(CurrencyFactory)
+    currency = SubFactory(OldCurrencyFactory)
+    new_currency = SubFactory(NewCurrencyFactory)
     location_national = "United States"
     location_regional = "Massachusetts"
     location_city = "Boston"

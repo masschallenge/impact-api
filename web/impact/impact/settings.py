@@ -79,7 +79,9 @@ class Base(Configuration):
         'oauth2_provider',
         'corsheaders',
         'embed_video',
+        'accelerator.apps.AcceleratorConfig',
     ]
+    ACCELERATOR_MODELS_ARE_MANAGED = False
 
     AUTH_USER_MODEL = 'simpleuser.User'
 
