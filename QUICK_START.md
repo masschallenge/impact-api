@@ -3,10 +3,10 @@ _Copyright (c) 2017 MassChallenge, Inc._
 
 ## Quickstart for Impact-API
 
-1. Install [Docker](https://docs.docker.com/docker-for-mac/)
+1. Install [Docker](https://docs.docker.com/engine/installation/#supported-platforms)
 (download the stable channel).
 
-2. Start Docker from the Applications folder.
+2. Start Docker.
 
 3. Get the source code.  If you already have impact-api checked out,
 then in a Terminal window go to that directory and bring it up to date
@@ -19,13 +19,13 @@ git pull
 
 Note that the impact-api code is currently designed to work with an
 instance of the MassChallenge Accelerate platform.  Specifically it
-expects an instance the Accelerate platform to manage a shared
-database.  This quick start quide does not require a running version
+expects an instance of the Accelerate platform to manage a shared
+database.  This quick start guide does not require a running version
 of the Accelerate platform, but it does require an initial database
 dump which is normally part of the accelerate code base.
 
 If you don't have impact-api checked out, but you do have the
-accelerate code base checked out, checkout the impact-api code
+accelerate code base checked out, check out the impact-api code
 next to the accelerate directory with:
 ```
 cd <accelerate-directory>/..
@@ -87,9 +87,9 @@ address is "admin@example.com".
 make grant-permissions PERMISSION_USER=admin@example.com PERMISSION_CLASSES=v0_clients,v1_clients
 ```
 
-Respond to the questions with "yes" or "y".
+Respond to any confirmation prompts with "yes" or "y".
 
-8. Go to http://localhost:8000 and login as admin@example.com.  At
+8. Go to http://localhost:8000 and log in as admin@example.com.  At
 this point you should be see a list of types of available accelerate
 objects.  Clicking on one of those links should give a you short list
 of some of the objects of the given type.  For example,
@@ -148,11 +148,11 @@ returned by the "startup" call.  You can click on the value of
 "short_pitch" in the body of the "startup patch" call and then click
 change to change it to any other value.
 
-17. You can go through a similar process with system users, but
+17. You can go through a similar process with system users, by
 opening the "v1" folder and using the various "user" calls.  Note that
 there is a "v1 user post" call.  This will create a new user using the
 values given in the body of that call.  Creating a new user will
-automatcally update Postman so it will be the subject of further calls
+automatically update Postman so it will be the subject of further calls
 related the users.
 
 18. The "v0" and "proxy" calls are historical calls that you probably
