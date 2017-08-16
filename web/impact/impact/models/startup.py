@@ -11,7 +11,7 @@ from django.core.validators import RegexValidator
 try:
     from sorl.thumbnail import ImageField
     HAS_SORL = True  # pragma: no cover
-except ImportError:
+except ImportError:  # pragma: no cover - handle in AC-4750
     HAS_SORL = False  # pragma: no cover
 
 from accelerator.models.currency import Currency as NewCurrency
