@@ -34,7 +34,9 @@ accelerator_router = routers.DefaultRouter()
 simpleuser_router = routers.DefaultRouter()
 
 simpleuser_router.register('User', GeneralViewSet, base_name='User')
+
 accelerator_router.register('Currency', GeneralViewSet, base_name='Currency')
+
 impact_router.register('Organization',
                        GeneralViewSet,
                        base_name='Organization')
@@ -50,7 +52,6 @@ impact_router.register('ApplicationType', GeneralViewSet,
 impact_router.register('BaseProfile', GeneralViewSet, base_name='BaseProfile')
 impact_router.register('Clearance', GeneralViewSet, base_name='Clearance')
 impact_router.register('Country', GeneralViewSet, base_name='Country')
-impact_router.register('Currency', GeneralViewSet, base_name='Currency')
 impact_router.register('EntrepreneurProfile',
                        GeneralViewSet, base_name='EntrepreneurProfile')
 impact_router.register('EntrepreneurProfileInterestCategories',
