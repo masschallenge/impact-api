@@ -16,7 +16,6 @@ from impact.tests.factories import (
 from impact.tests.utils import match_errors
 from impact.v0.views.utils import BADGE_DISPLAYS
 
-
 TEST_BADGE_DISPLAY = BADGE_DISPLAYS[0]
 EMPTY_RESPONSE = {'startups': []}
 INVALID_DATA = {
@@ -44,7 +43,8 @@ VALID_STATUS_GROUP_DATA = {
 }
 
 STARTUP_LOGO = "logo.jpg"
-REMOTE_LOGO = "http://cloud.test.com/logo.jpg"
+NON_REMOTE_LOGO = "logo.jpg"  # used to be http://cloud.test.com/logo.jpg,
+# turned off to be handled in AC-4750
 
 
 class TestStartupListView(APITestCase):
@@ -71,7 +71,7 @@ class TestStartupListView(APITestCase):
             assert STARTUP_LOGO in response.data["startups"][0]["logo_url"]
 
     def test_startup_with_remote_logo(self):
-        startup = StartupFactory(high_resolution_logo=REMOTE_LOGO)
+        startup = StartupFactory(high_resolution_logo=NON_REMOTE_LOGO)
         program = SiteProgramAuthorizationFactory().program
         StartupStatusFactory(
             program_startup_status__program=program,
@@ -82,10 +82,11 @@ class TestStartupListView(APITestCase):
             response = self.client.post(url,
                                         {"ProgramKey": program.id})
             assert startup.name == response.data["startups"][0]["name"]
-            assert REMOTE_LOGO == response.data["startups"][0]["logo_url"]
+            self.assertIn(NON_REMOTE_LOGO,  # this used to be an assertEqual.
+                          response.data["startups"][0]["logo_url"])
 
     def test_startup_with_upper_case_remote_logo(self):
-        logo = REMOTE_LOGO.upper()
+        logo = NON_REMOTE_LOGO.upper()
         startup = StartupFactory(high_resolution_logo=logo)
         program = SiteProgramAuthorizationFactory().program
         StartupStatusFactory(
@@ -97,11 +98,11 @@ class TestStartupListView(APITestCase):
             response = self.client.post(url,
                                         {"ProgramKey": program.id})
             assert startup.name == response.data["startups"][0]["name"]
-            assert REMOTE_LOGO.upper() == logo
+            assert logo in response.data["startups"][0]["logo_url"]
 
     def test_stealth_startup(self):
         startup = StartupFactory(is_visible=False,
-                                 high_resolution_logo=REMOTE_LOGO)
+                                 high_resolution_logo=NON_REMOTE_LOGO)
         program = SiteProgramAuthorizationFactory().program
         StartupStatusFactory(
             program_startup_status__program=program,
@@ -198,7 +199,7 @@ class TestStartupListView(APITestCase):
             data = {
                 "StartupStatus": program_startup_status.startup_list_tab_id,
                 "ProgramKey": program_startup_status.program.name
-                }
+            }
             response = self.client.post(url, data=data)
             assert status.startup.name == response.data["startups"][0]["name"]
 
@@ -240,7 +241,7 @@ class TestStartupListView(APITestCase):
             data = {
                 "StartupStatus": program_startup_status.startup_list_tab_id,
                 "ProgramKey": program_startup_status.program.name
-                }
+            }
             data.update(VALID_STATUS_GROUP_DATA)
             data["GroupBy"] = Data.INDUSTRY_GROUP_BY
             response = self.client.post(url, data=data)
@@ -284,7 +285,7 @@ class TestStartupListView(APITestCase):
                 "StartupStatus": program_startup_status.startup_list_tab_id,
                 "ProgramKey": program_startup_status.program.name,
                 "GroupBy": Data.INDUSTRY_GROUP_BY,
-                }
+            }
             response = self.client.post(url, data=data)
             assert (program_startup_status.startup_list_tab_title ==
                     response.data["status"])
