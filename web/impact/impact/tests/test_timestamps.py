@@ -3,17 +3,17 @@
 
 from test_plus.test import TestCase
 from impact.tests.factories import (
-    CurrencyFactory,
     FunctionalExpertiseFactory,
     IndustryFactory,
     StartupProgramInterestFactory,
+    StartupFactory,
 )
 
 
 class TestTimestamps(TestCase):
     def test_currency(self):
-        currency = CurrencyFactory()
-        assert currency.created_at <= currency.updated_at
+        startup = StartupFactory()
+        assert startup.created_at <= startup.updated_at
 
     def test_non_mc_models(self):
         for factory in [FunctionalExpertiseFactory,

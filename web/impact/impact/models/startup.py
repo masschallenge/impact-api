@@ -14,12 +14,11 @@ try:
 except ImportError:  # pragma: no cover - handle in AC-4750
     HAS_SORL = False  # pragma: no cover
 
-from accelerator.models.currency import Currency as NewCurrency
+from accelerator.models.currency import Currency
 from impact.models.mc_model import MCModel
 from impact.models.organization import Organization
 from impact.models.industry import Industry
 from impact.models.recommendation_tag import RecommendationTag
-from impact.models.currency import Currency as OldCurrency
 from impact.models.utils import is_managed
 
 import logging
@@ -120,10 +119,8 @@ class Startup(MCModel):
 
     recommendation_tags = models.ManyToManyField(RecommendationTag,
                                                  blank=True)
-    currency = models.ForeignKey(OldCurrency, blank=True, null=True,
-                                 related_name="deprecated_currency_startups")
-    new_currency = models.ForeignKey(NewCurrency, blank=True, null=True,
-                                     related_name="new_currency_startups")
+    currency = models.ForeignKey(Currency, blank=True, null=True,
+                                 related_name="startups")
     location_national = models.CharField(
         max_length=100,
         blank=True,
