@@ -30,9 +30,11 @@ from impact.v1.views import (
 from rest_framework import routers
 
 impact_router = routers.DefaultRouter()
+accelerator_router = routers.DefaultRouter()
 simpleuser_router = routers.DefaultRouter()
 
 simpleuser_router.register('User', GeneralViewSet, base_name='User')
+accelerator_router.register('Currency', GeneralViewSet, base_name='Currency')
 impact_router.register('Organization',
                        GeneralViewSet,
                        base_name='Organization')
@@ -293,6 +295,8 @@ urls = [
         name='object-detail'),
     url(r'^api/simpleuser/', include(simpleuser_router.urls)),
     url(r'^api/impact/', include(impact_router.urls), name='api-root'),
+    url(r'^api/accelerator/', include(accelerator_router.urls),
+        name='api-root'),
     url(r'^$', IndexView.as_view()),
     url(r'^accounts/', include(account_urlpatterns)),
     url(r'^schema/$', schema_view, name='schema'),
