@@ -28,7 +28,7 @@ If you don't have impact-api checked out, but you do have the
 accelerate code base checked out, checkout the impact-api code
 next to the accelerate directory with:
 ```
-cd <accelerate-api-directory>/..
+cd <accelerate-directory>/..
 git clone https://github.com/masschallenge/impact-api.git
 cd impact-api
 ```
@@ -60,7 +60,7 @@ make dev
 ```
 
 Once the process completes (it will take a little while and the last
-line should sya "BUILD COMPLETE"), visit http://localhost:8000 in a
+line should say "BUILD COMPLETE"), visit http://localhost:8000 in a
 browser to see the login screen.
 
 5. In a separate shell, load an accelerate database.  Assuming
@@ -87,7 +87,7 @@ address is "admin@example.com".
 make grant-permissions PERMISSION_USER=admin@example.com PERMISSION_CLASSES=v0_clients,v1_clients
 ```
 
-Rspond to the questions with "yes" or "y".
+Respond to the questions with "yes" or "y".
 
 8. Go to http://localhost:8000 and login as admin@example.com.  At
 this point you should be see a list of types of available accelerate
