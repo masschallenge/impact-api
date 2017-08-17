@@ -35,11 +35,9 @@ simpleuser_router = routers.DefaultRouter()
 
 simpleuser_router.register('User', GeneralViewSet, base_name='User')
 
-accelerator_router.register('Currency', GeneralViewSet, base_name='Currency')
+accelerator_router.register('Currency', GeneralViewSet,
+                            base_name="accelerator.Currency")
 
-impact_router.register('Organization',
-                       GeneralViewSet,
-                       base_name='Organization')
 impact_router.register('Application', GeneralViewSet, base_name='Application')
 impact_router.register('ApplicationAnswer', GeneralViewSet,
                        base_name='ApplicationAnswer')
@@ -138,6 +136,9 @@ impact_router.register('NewsletterReceipt', GeneralViewSet,
 impact_router.register('Observer', GeneralViewSet, base_name='Observer')
 impact_router.register('ObserverNewsletterCcRoles',
                        GeneralViewSet, base_name='ObserverNewsletterCcRoles')
+impact_router.register('Organization',
+                       GeneralViewSet,
+                       base_name='Organization')
 impact_router.register('Panel', GeneralViewSet, base_name='Panel')
 impact_router.register('PanelSequenceUpdates',
                        GeneralViewSet, base_name='PanelSequenceUpdates')
@@ -295,9 +296,8 @@ urls = [
         }),
         name='object-detail'),
     url(r'^api/simpleuser/', include(simpleuser_router.urls)),
+    url(r'^api/accelerator/', include(accelerator_router.urls)),
     url(r'^api/impact/', include(impact_router.urls), name='api-root'),
-    url(r'^api/accelerator/', include(accelerator_router.urls),
-        name='api-root'),
     url(r'^$', IndexView.as_view()),
     url(r'^accounts/', include(account_urlpatterns)),
     url(r'^schema/$', schema_view, name='schema'),
