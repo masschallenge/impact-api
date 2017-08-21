@@ -9,13 +9,14 @@ from impact.models import (
     PartnerTeamMember,
     StartupTeamMember,
 )
+from impact.v1.metadata import UserOrganizationsMetadata
 
 
 class UserOrganizationsView(APIView):
     permission_classes = (
         V1APIPermissions,
     )
-
+    metadata_class = UserOrganizationsMetadata
     model = get_user_model()
 
     def get(self, request, pk):

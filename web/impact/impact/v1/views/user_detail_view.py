@@ -1,7 +1,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from impact.models import PartnerTeamMember, StartupTeamMember
+from impact.v1.metadata import UserMetadata
 from impact.permissions import (
     V1APIPermissions,
 )
@@ -27,12 +28,16 @@ class UserDetailView(APIView):
     permission_classes = (
         V1APIPermissions,
     )
+    metadata_class = UserMetadata
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
     def get(self, request, pk):
         user = User.objects.get(pk=pk)
+        organizations = set(
+            list(self.partner_organizations(user)) +
+            list(self.startup_organizations(user)))
         result = {
             "id": pk,
             "first_name": user.full_name,
@@ -40,7 +45,8 @@ class UserDetailView(APIView):
             "email": user.email,
             "is_active": user.is_active,
             "gender": user_gender(user),
-            }
+            'organizations': organizations
+        }
         return Response(result)
 
     def patch(self, request, pk):
@@ -68,3 +74,13 @@ class UserDetailView(APIView):
                 profile.save()
         user.save()
         return Response(status=200)
+
+    def partner_organizations(self, user):
+        team = PartnerTeamMember.objects.filter(
+            team_member=user)
+        return team.values_list('partner__organization_id', flat=True)
+
+    def startup_organizations(self, user):
+        team = StartupTeamMember.objects.filter(
+            user=user)
+        return team.values_list('startup__organization_id', flat=True)

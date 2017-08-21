@@ -3,7 +3,8 @@
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.metadata import BaseMetadata
+
+from drf_auto_endpoint.metadata import AutoMetadataMixin
 from impact.permissions import (
     V1APIPermissions,
 )
@@ -13,26 +14,18 @@ from .organization_detail_view import (
     organization_is_partner,
     public_inquiry_email,
 )
+from impact.serializers import GeneralSerializer
+from impact.v1.metadata import OrganizationMetadata
 
 
-class OrganizationListViewMetadata(BaseMetadata):
-    """
-    Don't include field and other information for `OPTIONS` requests.
-    Just return the name and description.
-    """
-    def determine_metadata(self, request, view):
-        return {
-            'name': view.get_view_name(),
-            'description': view.get_view_description()
-        }
-
-
-class OrganizationListView(APIView):
+class OrganizationListView(APIView, AutoMetadataMixin):
     permission_classes = (
         V1APIPermissions,
     )
 
-    metadata_class = OrganizationListViewMetadata
+    metadata_class = OrganizationMetadata
+
+    serializer_class = GeneralSerializer
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -47,7 +40,7 @@ class OrganizationListView(APIView):
             "next": _url(base_url, limit, offset + limit),
             "previous": _url(base_url, limit, offset - limit),
             "results": _results(limit, offset),
-            }
+        }
         return Response(result)
 
 

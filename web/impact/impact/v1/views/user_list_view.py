@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework.metadata import SimpleMetadata
 from impact.permissions import (
     V1APIPermissions,
 )
@@ -20,6 +20,7 @@ from impact.utils import (
     REQUIRED_USER_KEYS,
     USER_KEYS,
 )
+from impact.v1.metadata import UserMetadata
 
 
 EMAIL_EXISTS_ERROR = "User with email {} already exists"
@@ -33,6 +34,7 @@ class UserListView(APIView):
     permission_classes = (
         V1APIPermissions,
     )
+    metadata_class = UserMetadata
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -47,7 +49,7 @@ class UserListView(APIView):
             "next": _url(base_url, limit, offset + limit),
             "previous": _url(base_url, limit, offset - limit),
             "results": _user_results(limit, offset),
-            }
+        }
         return Response(result)
 
     def post(self, request):
@@ -110,7 +112,7 @@ def _url(base_url, limit, offset):
 
 def _user_results(limit, offset):
     return [_serialize_user(user)
-            for user in User.objects.all()[offset:offset+limit]]
+            for user in User.objects.all()[offset:offset + limit]]
 
 
 def _serialize_user(user):
@@ -121,7 +123,7 @@ def _serialize_user(user):
         "last_name": user.short_name,
         "is_active": user.is_active,
         "gender": user_gender(user),
-        }
+    }
 
 
 def _construct_user(user_args, profile_args):

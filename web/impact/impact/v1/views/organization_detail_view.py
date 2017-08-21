@@ -12,9 +12,11 @@ from impact.models import (
     Partner,
     Startup,
 )
+from impact.v1.metadata import OrganizationMetadata
 
 INVALID_KEYS_ERROR = ("Received invalid key(s): {invalid_keys}. "
                       "Valid keys are: {valid_keys}.")
+
 
 
 def organization_is_startup(organization):
@@ -43,6 +45,8 @@ class OrganizationDetailView(APIView):
     derived_field_functions = {"public_inquiry_email": public_inquiry_email,
                                "is_startup": organization_is_startup,
                                "is_partner": organization_is_partner}
+
+    metadata_class = OrganizationMetadata
 
     permission_classes = (
         V1APIPermissions,
