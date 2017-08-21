@@ -11,6 +11,8 @@ from impact.models import (
     EntrepreneurProfile,
     ExpertProfile
 )
+import datetime
+from django.utils.formats import get_format
 from impact.utils import (
     find_gender,
     user_gender,
@@ -23,6 +25,8 @@ from impact.utils import (
     USER_KEYS,
 )
 from impact.v1.metadata import UserMetadata
+from django.db.models import Q
+import dateutil.parser
 
 
 EMAIL_EXISTS_ERROR = "User with email {} already exists"
@@ -50,7 +54,7 @@ class UserListView(APIView):
             "count": User.objects.count(),
             "next": _url(base_url, limit, offset + limit),
             "previous": _url(base_url, limit, offset - limit),
-            "results": _user_results(limit, offset),
+            "results": self._user_results(limit, offset),
         }
         return Response(result)
 
@@ -104,17 +108,52 @@ class UserListView(APIView):
         for key in set(user_keys) - set(ALL_USER_RELATED_KEYS):
             self.errors.append(INVALID_KEY_ERROR.format(key))
 
+    def _user_results(self, limit, offset):
+        queryset = User.objects.all()
+        updated_at_gt = self.request.query_params.get('updated_at__gt', None)
+        updated_at_lt = self.request.query_params.get('updated_at__lt', None)
+        if updated_at_gt or updated_at_lt:
+            queryset = _filter_profiles_by_date(
+                queryset,
+                updated_at_gt,
+                updated_at_lt)
+        return [
+            _serialize_user(user) for user in queryset[offset:offset + limit]]
+
+
+def _parse_date(date_str):
+    for item in get_format('DATE_INPUT_FORMATS'):
+        try:
+            return dateutil.parser(date_str, item)
+        except (ValueError, TypeError):
+            continue
+    if date_str:
+        return dateutil.parser.parse(date_str)
+
+
+def _filter_profiles_by_date(queryset, updated_at_gt, updated_at_lt):
+    updated_at_gt = _parse_date(updated_at_gt)
+    updated_at_lt = _parse_date(updated_at_lt)
+    if updated_at_gt:
+        queryset = queryset.filter(
+            Q(expertprofile__updated_at__gt=updated_at_gt) |
+            Q(entrepreneurprofile__updated_at__gt=updated_at_gt) |
+            Q(memberprofile__updated_at__gt=updated_at_gt)
+        )
+    if updated_at_lt:
+        queryset.filter(
+            Q(expertprofile__updated_at__lt=updated_at_lt) |
+            Q(entrepreneurprofile__updated_at__lt=updated_at_lt) |
+            Q(memberprofile__updated_at__lt=updated_at_lt)
+        )
+    return queryset
+
 
 def _url(base_url, limit, offset):
     if offset >= 0:
         return base_url + "?limit={limit}&offset={offset}".format(
             limit=limit, offset=offset)
     return None
-
-
-def _user_results(limit, offset):
-    return [_serialize_user(user)
-            for user in User.objects.all()[offset:offset + limit]]
 
 
 def _serialize_user(user):
@@ -129,7 +168,7 @@ def _serialize_user(user):
     }
 
 
-def _get_profile_update_timestamp(user):
+def _get_profile_class(user):
     if BaseProfile.objects.filter(user=user).exists():
         base_profile = BaseProfile.objects.get(user=user)
         profile_types = {
@@ -137,7 +176,11 @@ def _get_profile_update_timestamp(user):
             'ENTREPRENEUR': EntrepreneurProfile,
             'MEMBER': MemberProfile
         }
-        profile_class = profile_types.get(base_profile.user_type)
+        return profile_types.get(base_profile.user_type)
+
+
+def _get_profile_update_timestamp(user):
+        profile_class = _get_profile_class(user)
         if profile_class:
             return profile_class.objects.get(user=user).updated_at
 
