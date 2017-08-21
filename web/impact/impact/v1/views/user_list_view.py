@@ -8,6 +8,8 @@ from impact.permissions import (
 from impact.models import (
     BaseProfile,
     MemberProfile,
+    EntrepreneurProfile,
+    ExpertProfile
 )
 from impact.utils import (
     find_gender,
@@ -123,7 +125,20 @@ def _serialize_user(user):
         "last_name": user.short_name,
         "is_active": user.is_active,
         "gender": user_gender(user),
+        'updated_at': _get_profile_update_timestamp(user)
     }
+
+
+def _get_profile_update_timestamp(user):
+    base_profile = BaseProfile.objects.get(user=user)
+    profile_types = {
+        'EXPERT': ExpertProfile,
+        'ENTREPRENEUR': EntrepreneurProfile,
+        'MEMBER': MemberProfile
+    }
+    profile_class = profile_types.get(base_profile.user_type)
+    if profile_class:
+        return profile_class.objects.get(user=user).updated_at
 
 
 def _construct_user(user_args, profile_args):

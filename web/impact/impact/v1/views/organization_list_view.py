@@ -46,7 +46,7 @@ class OrganizationListView(APIView, AutoMetadataMixin):
 
 def _results(limit, offset):
     return [serialize_org(org)
-            for org in Organization.objects.all()[offset:offset+limit]]
+            for org in Organization.objects.all()[offset:offset + limit]]
 
 
 def serialize_org(org):
@@ -55,7 +55,9 @@ def serialize_org(org):
             "url_slug": org.url_slug,
             "public_inquiry_email": public_inquiry_email(org),
             "is_startup": organization_is_startup(org),
-            "is_partner": organization_is_partner(org)}
+            "is_partner": organization_is_partner(org),
+            'updated_at': org.updated_at
+            }
 
 
 def _url(base_url, limit, offset):

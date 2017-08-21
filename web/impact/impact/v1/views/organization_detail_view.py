@@ -18,7 +18,6 @@ INVALID_KEYS_ERROR = ("Received invalid key(s): {invalid_keys}. "
                       "Valid keys are: {valid_keys}.")
 
 
-
 def organization_is_startup(organization):
     return _organization_is(organization, Startup)
 
@@ -59,6 +58,7 @@ class OrganizationDetailView(APIView):
         self.instance = self.model.objects.get(pk=pk)
         result = self.get_model_fields()
         result.update(self.derived_fields())
+        result['updated_at'] = self.instance.updated_at
         return Response(result)
 
     def get_model_fields(self):
