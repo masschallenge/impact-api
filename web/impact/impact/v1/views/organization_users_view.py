@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework.metadata import BaseMetadata
 from impact.permissions import (
     V1APIPermissions,
 )
@@ -11,10 +11,23 @@ from impact.models import (
 )
 
 
+class OrganizationUsersViewMetadata(BaseMetadata):
+    """
+    Don't include field and other information for `OPTIONS` requests.
+    Just return the name and description.
+    """
+    def determine_metadata(self, request, view):
+        return {
+            'name': view.get_view_name(),
+            'description': view.get_view_description()
+        }
+
+
 class OrganizationUsersView(APIView):
     permission_classes = (
         V1APIPermissions,
     )
+    metadata_class = OrganizationUsersViewMetadata
     model = Organization
 
     def get(self, request, pk):
