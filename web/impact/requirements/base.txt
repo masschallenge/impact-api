@@ -27,6 +27,7 @@ django-redis-cache
 djangorestframework
 django-rest-swagger
 django-rest-framework-proxy
+drf-schema-adapter
 django-registration
 django-filter # Filtering support
 django-oauth-toolkit
