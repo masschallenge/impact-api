@@ -130,15 +130,16 @@ def _serialize_user(user):
 
 
 def _get_profile_update_timestamp(user):
-    base_profile = BaseProfile.objects.get(user=user)
-    profile_types = {
-        'EXPERT': ExpertProfile,
-        'ENTREPRENEUR': EntrepreneurProfile,
-        'MEMBER': MemberProfile
-    }
-    profile_class = profile_types.get(base_profile.user_type)
-    if profile_class:
-        return profile_class.objects.get(user=user).updated_at
+    if BaseProfile.objects.filter(user=user).exists():
+        base_profile = BaseProfile.objects.get(user=user)
+        profile_types = {
+            'EXPERT': ExpertProfile,
+            'ENTREPRENEUR': EntrepreneurProfile,
+            'MEMBER': MemberProfile
+        }
+        profile_class = profile_types.get(base_profile.user_type)
+        if profile_class:
+            return profile_class.objects.get(user=user).updated_at
 
 
 def _construct_user(user_args, profile_args):
