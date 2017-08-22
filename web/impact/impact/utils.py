@@ -1,7 +1,8 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 from impact.models import BaseProfile
-
+from django.utils.formats import get_format
+import dateutil.parser
 REQUIRED_USER_KEYS = [
     "email",
     "first_name",
@@ -30,6 +31,16 @@ GENDER_TRANSLATIONS = {
     "other": "o",
     "prefer not to state": "p",
 }
+
+
+def parse_date(date_str):
+    for item in get_format('DATE_INPUT_FORMATS'):
+        try:
+            return dateutil.parser(date_str, item)
+        except (ValueError, TypeError):
+            continue
+    if date_str:
+        return dateutil.parser.parse(date_str)
 
 
 def compose_filter(key_pieces, value):

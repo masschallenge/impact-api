@@ -26,7 +26,7 @@ from impact.utils import (
 )
 from impact.v1.metadata import UserMetadata
 from django.db.models import Q
-import dateutil.parser
+from impact.utils import parse_date
 
 
 EMAIL_EXISTS_ERROR = "User with email {} already exists"
@@ -122,19 +122,9 @@ class UserListView(APIView):
             _serialize_user(user) for user in queryset[offset:offset + limit]]
 
 
-def _parse_date(date_str):
-    for item in get_format('DATE_INPUT_FORMATS'):
-        try:
-            return dateutil.parser(date_str, item)
-        except (ValueError, TypeError):
-            continue
-    if date_str:
-        return dateutil.parser.parse(date_str)
-
-
 def _filter_profiles_by_date(queryset, updated_at_gt, updated_at_lt):
-    updated_at_gt = _parse_date(updated_at_gt)
-    updated_at_lt = _parse_date(updated_at_lt)
+    updated_at_gt = parse_date(updated_at_gt)
+    updated_at_lt = parse_date(updated_at_lt)
     if updated_at_lt:
         queryset = queryset.exclude(
             Q(expertprofile__updated_at__isnull=True) |
