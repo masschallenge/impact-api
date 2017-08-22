@@ -104,7 +104,7 @@ class User(AbstractUser):
     """
     username = models.CharField(_('username'), max_length=150, blank=True)
 
-    def get_short_name(self):
+    def get_short_name(self):  # pragma: no cover
         return self.email
 
     def save(self, *args, **kwargs):

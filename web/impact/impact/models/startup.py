@@ -11,7 +11,7 @@ from django.core.validators import RegexValidator
 try:
     from sorl.thumbnail import ImageField
     HAS_SORL = True  # pragma: no cover
-except ImportError:
+except ImportError:  # pragma: no cover
     HAS_SORL = False  # pragma: no cover
 
 from impact.models.mc_model import MCModel
@@ -36,7 +36,6 @@ STARTUP_COMMUNITIES = (
 
 
 class Startup(MCModel):
-    name = models.CharField(max_length=255)
     organization = models.ForeignKey(Organization, blank=True, null=True)
     user = models.ForeignKey(User)
     is_visible = models.BooleanField(

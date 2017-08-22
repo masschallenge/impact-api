@@ -6,7 +6,7 @@ from django.db import models
 try:
     from sorl.thumbnail import ImageField
     HAS_SORL = True  # pragma: no cover
-except ImportError:
+except ImportError:  # pragma: no cover
     HAS_SORL = False  # pragma: no cover
 
 from impact.models.mc_model import MCModel

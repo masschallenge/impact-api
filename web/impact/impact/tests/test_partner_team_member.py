@@ -3,6 +3,7 @@ from impact.tests.factories import PartnerTeamMemberFactory
 
 
 class TestPartnerTeamMember(APITestCase):
+
     def test_str(self):
         partner_team_member = PartnerTeamMemberFactory()
         assert str(partner_team_member.team_member) in str(partner_team_member)
