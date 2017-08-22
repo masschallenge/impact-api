@@ -50,11 +50,12 @@ class UserListView(APIView):
         limit = int(request.GET.get('limit', 10))
         offset = int(request.GET.get('offset', 0))
         base_url = request.build_absolute_uri().split("?")[0]
+        results = self._user_results(limit, offset)
         result = {
-            "count": User.objects.count(),
+            "count": len(results),
             "next": _url(base_url, limit, offset + limit),
             "previous": _url(base_url, limit, offset - limit),
-            "results": self._user_results(limit, offset),
+            "results": results
         }
         return Response(result)
 
@@ -134,17 +135,25 @@ def _parse_date(date_str):
 def _filter_profiles_by_date(queryset, updated_at_gt, updated_at_lt):
     updated_at_gt = _parse_date(updated_at_gt)
     updated_at_lt = _parse_date(updated_at_lt)
-    if updated_at_gt:
-        queryset = queryset.filter(
-            Q(expertprofile__updated_at__gt=updated_at_gt) |
-            Q(entrepreneurprofile__updated_at__gt=updated_at_gt) |
-            Q(memberprofile__updated_at__gt=updated_at_gt)
-        )
     if updated_at_lt:
-        queryset.filter(
-            Q(expertprofile__updated_at__lt=updated_at_lt) |
-            Q(entrepreneurprofile__updated_at__lt=updated_at_lt) |
-            Q(memberprofile__updated_at__lt=updated_at_lt)
+        queryset = queryset.exclude(
+            Q(expertprofile__updated_at__isnull=True) |
+            Q(entrepreneurprofile__updated_at__isnull=True) |
+            Q(memberprofile__updated_at__isnull=True)
+        ).exclude(
+            Q(expertprofile__updated_at__gt=updated_at_lt) |
+            Q(entrepreneurprofile__updated_at__gt=updated_at_lt) |
+            Q(memberprofile__updated_at__gt=updated_at_lt)
+        )
+    if updated_at_gt:
+        queryset.exclude(
+            Q(expertprofile__updated_at__isnull=True) |
+            Q(entrepreneurprofile__updated_at__isnull=True) |
+            Q(memberprofile__updated_at__isnull=True)
+        ).exclude(
+            Q(expertprofile__updated_at__lt=updated_at_gt) |
+            Q(entrepreneurprofile__updated_at__lt=updated_at_gt) |
+            Q(memberprofile__updated_at__lt=updated_at_gt)
         )
     return queryset
 
