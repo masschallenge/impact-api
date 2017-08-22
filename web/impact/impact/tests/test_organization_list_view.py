@@ -16,6 +16,7 @@ from impact.v1.views.organization_list_view import serialize_org
 import simplejson as json
 import pytz
 
+
 class TestOrganizationListView(APITestCase):
 
     def test_get_startup(self):
