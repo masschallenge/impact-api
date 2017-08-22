@@ -261,7 +261,6 @@ from .panel_type import PanelType
 from .judge_availability import JudgeAvailability
 from .application_panel_assignment import ApplicationPanelAssignment
 
-from .currency import Currency
 from .paypal_payment import PayPalPayment
 from .paypal_refund import PayPalRefund
 from .startup_label import StartupLabel
