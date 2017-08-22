@@ -126,24 +126,24 @@ def _filter_profiles_by_date(queryset, updated_at_gt, updated_at_lt):
     updated_at_gt = parse_date(updated_at_gt)
     updated_at_lt = parse_date(updated_at_lt)
     if updated_at_lt:
-        queryset = queryset.exclude(
-            Q(expertprofile__updated_at__isnull=True) |
-            Q(entrepreneurprofile__updated_at__isnull=True) |
-            Q(memberprofile__updated_at__isnull=True)
+        queryset = queryset.filter(
+            Q(expertprofile__updated_at__isnull=False) |
+            Q(entrepreneurprofile__updated_at__isnull=False) |
+            Q(memberprofile__updated_at__isnull=False)
         ).exclude(
-            Q(expertprofile__updated_at__gt=updated_at_lt) |
-            Q(entrepreneurprofile__updated_at__gt=updated_at_lt) |
-            Q(memberprofile__updated_at__gt=updated_at_lt)
+            Q(expertprofile__updated_at__gte=updated_at_lt) |
+            Q(entrepreneurprofile__updated_at__gte=updated_at_lt) |
+            Q(memberprofile__updated_at__gte=updated_at_lt)
         )
     if updated_at_gt:
-        queryset.exclude(
-            Q(expertprofile__updated_at__isnull=True) |
-            Q(entrepreneurprofile__updated_at__isnull=True) |
-            Q(memberprofile__updated_at__isnull=True)
+        queryset.filter(
+            Q(expertprofile__updated_at__isnull=False) |
+            Q(entrepreneurprofile__updated_at__isnull=False) |
+            Q(memberprofile__updated_at__isnull=False)
         ).exclude(
-            Q(expertprofile__updated_at__lt=updated_at_gt) |
-            Q(entrepreneurprofile__updated_at__lt=updated_at_gt) |
-            Q(memberprofile__updated_at__lt=updated_at_gt)
+            Q(expertprofile__updated_at__lte=updated_at_gt) |
+            Q(entrepreneurprofile__updated_at__lte=updated_at_gt) |
+            Q(memberprofile__updated_at__lte=updated_at_gt)
         )
     return queryset
 
