@@ -40,8 +40,8 @@ simpleuser_router = routers.DefaultRouter()
 simpleuser_router.register('User', GeneralViewSet, base_name='User')
 
 for model in apps.get_models('impact'):
-    schema_router.register(model)
-
+    if model._meta.app_label == 'impact':
+        schema_router.register(model, url=model.__name__)
 
 account_urlpatterns = [
     url(r'^', include('registration.backends.simple.urls')),

@@ -23,8 +23,39 @@ ORGANIZATION_ACTIONS = {
         },
         "is_partner": {
             "type": "boolean"
+        },
+        "updated_at": {
+            "type": "string"
         }
+    }
+}
 
+ORGANIZATION_DETAIL_ACTIONS = {
+    'GET': {
+        "id": {
+            "type": "integer",
+            "required": False,
+            "read_only": True,
+            "label": "ID"
+        },
+        "name": {
+            "type": "string"
+        },
+        "url_slug": {
+            "type": "string"
+        },
+        "public_inquiry_email": {
+            "type": "string"
+        },
+        "is_startup": {
+            "type": "boolean"
+        },
+        "is_partner": {
+            "type": "boolean"
+        },
+        "updated_at": {
+            "type": "string"
+        }
     }
 }
 
@@ -45,7 +76,6 @@ ORGANIZATION_USER_ACTIONS = {
         }
     }
 }
-
 
 USER_ACTIONS = {
     'GET': {
@@ -70,9 +100,8 @@ USER_ACTIONS = {
         "gender": {
             "type": "string"
         },
-        'organizations': {
-            'type': 'list',
-            "read_only": True,
+        "updated_at": {
+            "type": "string"
         }
     },
     'POST': {
@@ -90,10 +119,6 @@ USER_ACTIONS = {
         },
         "gender": {
             "type": "string"
-        },
-        'organizations': {
-            'type': 'list',
-            "read_only": True,
         }
     }
 }
@@ -155,7 +180,8 @@ METADATA_MAP = {
     'Organization List': ORGANIZATION_ACTIONS,
     'Organization Users': ORGANIZATION_USER_ACTIONS,
     'User Organizations': USER_ORGANIZATION_ACTIONS,
-    'User Detail': USER_DETAIL_ACTIONS
+    'User Detail': USER_DETAIL_ACTIONS,
+    'Organization Detail': ORGANIZATION_DETAIL_ACTIONS
 }
 
 
