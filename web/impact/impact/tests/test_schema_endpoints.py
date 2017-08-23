@@ -27,7 +27,7 @@ class TestSchemaEndpoints(APITestCase):
         response_json = json.loads(response.content)
         self.assertTrue(
             ORGANIZATION_ACTIONS[
-                'POST'].keys() == response_json['actions']['POST'].keys()
+                'GET'].keys() == response_json['actions']['GET'].keys()
         )
 
     def test_organization_users_schema_endpoint(self):

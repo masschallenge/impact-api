@@ -2,35 +2,6 @@ from rest_framework.metadata import SimpleMetadata
 
 
 ORGANIZATION_ACTIONS = {
-    'POST': {
-        'id': {
-            "type": "integer",
-            "required": False,
-            "read_only": True,
-            "label": "ID"
-        },
-        "name": {
-            "type": "string",
-            "required": True,
-            "read_only": False,
-            "label": "Name",
-            "max_length": 225
-        },
-        "url_slug": {
-            "type": "string",
-            "required": True,
-            "read_only": False,
-            "label": "Name",
-            "max_length": 225
-        },
-        "public_inquiry_email": {
-            "type": "string",
-            "required": True,
-            "read_only": False,
-            "label": "Name",
-            "max_length": 225
-        }
-    },
     'GET': {
         "id": {
             "type": "integer",
@@ -55,7 +26,6 @@ ORGANIZATION_ACTIONS = {
         }
 
     }
-
 }
 
 USER_ORGANIZATION_ACTIONS = {
@@ -104,15 +74,88 @@ USER_ACTIONS = {
             'type': 'list',
             "read_only": True,
         }
+    },
+    'POST': {
+        "first_name": {
+            'type': 'string'
+        },
+        "last_name": {
+            'type': 'string'
+        },
+        "email": {
+            'type': 'string'
+        },
+        "is_active": {
+            'type': 'boolean'
+        },
+        "gender": {
+            "type": "string"
+        },
+        'organizations': {
+            'type': 'list',
+            "read_only": True,
+        }
     }
 }
 
+
+USER_DETAIL_ACTIONS = {
+    'GET': {
+        "id": {
+            "type": "integer",
+            "required": False,
+            "read_only": True,
+            "label": "ID"
+        },
+        "first_name": {
+            'type': 'string'
+        },
+        "last_name": {
+            'type': 'string'
+        },
+        "email": {
+            'type': 'string'
+        },
+        "is_active": {
+            'type': 'boolean'
+        },
+        "gender": {
+            "type": "string"
+        },
+        'organizations': {
+            'type': 'list',
+            "read_only": True,
+        }
+    },
+    'PATCH': {
+        "first_name": {
+            'type': 'string'
+        },
+        "last_name": {
+            'type': 'string'
+        },
+        "email": {
+            'type': 'string'
+        },
+        "is_active": {
+            'type': 'boolean'
+        },
+        "gender": {
+            "type": "string"
+        },
+        'organizations': {
+            'type': 'list',
+            "read_only": True,
+        }
+    }
+}
 
 METADATA_MAP = {
     'User List': USER_ACTIONS,
     'Organization List': ORGANIZATION_ACTIONS,
     'Organization Users': ORGANIZATION_USER_ACTIONS,
-    'User Organizations': USER_ORGANIZATION_ACTIONS
+    'User Organizations': USER_ORGANIZATION_ACTIONS,
+    'User Detail': USER_DETAIL_ACTIONS
 }
 
 
