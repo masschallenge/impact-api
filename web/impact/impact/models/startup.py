@@ -6,24 +6,23 @@ from embed_video.fields import EmbedVideoField
 
 from simpleuser.models import User
 from django.db import models
-from django.core.validators import (
-    RegexValidator,
-    validate_slug
-)
+from django.core.validators import RegexValidator
 
 try:
     from sorl.thumbnail import ImageField
-    HAS_SORL = True
-except ImportError:
-    HAS_SORL = False
+    HAS_SORL = True  # pragma: no cover
+except ImportError:  # pragma: no cover - handle in AC-4750
+    HAS_SORL = False  # pragma: no cover
 
+from accelerator.models.currency import Currency
 from impact.models.mc_model import MCModel
+from impact.models.organization import Organization
 from impact.models.industry import Industry
 from impact.models.recommendation_tag import RecommendationTag
-from impact.models.currency import Currency
 from impact.models.utils import is_managed
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 DEFAULT_PROFILE_BACKGROUND_COLOR = "217181"  # default dark blue
@@ -38,7 +37,7 @@ STARTUP_COMMUNITIES = (
 
 
 class Startup(MCModel):
-    name = models.CharField(max_length=255)
+    organization = models.ForeignKey(Organization, blank=True, null=True)
     user = models.ForeignKey(User)
     is_visible = models.BooleanField(
         default=True,
@@ -65,9 +64,6 @@ class Startup(MCModel):
         max_length=500,
         blank=False,
         help_text="Your startup in 500 characters or less.")
-    website_url = models.CharField(
-        max_length=100,
-        blank=True)
     linked_in_url = models.URLField(max_length=100, blank=True)
     facebook_url = models.URLField(max_length=100, blank=True)
 
@@ -75,22 +71,11 @@ class Startup(MCModel):
         high_resolution_logo = ImageField(
             upload_to="startup_pics",
             verbose_name="High Resolution Logo",
-            blank=True)
+            blank=True)  # pragma: no cover
     else:
-        high_resolution_logo = models.CharField(max_length=100, null=True)
+        high_resolution_logo = models.CharField(max_length=100,
+                                                null=True)  # pragma: no cover
 
-    twitter_handle = models.CharField(
-        max_length=40,
-        blank=True,
-        help_text="Omit the \"@\". We'll add it.")
-    public_inquiry_email = models.EmailField(
-        verbose_name="Email address",
-        max_length=100,
-        blank=True,
-        help_text=(
-            "This email will be posted on the public MassChallenge website "
-            "if your startup is not in stealth mode as a way for people to "
-            "contact you outside of MassChallenge."))
     video_elevator_pitch_url = EmbedVideoField(
         max_length=100,
         blank=True,
@@ -108,15 +93,6 @@ class Startup(MCModel):
         max_length=64,
         choices=STARTUP_COMMUNITIES,
         blank=True,
-    )
-    url_slug = models.CharField(
-        max_length=64,
-        blank=True,
-        default="",  # This actually gets replaced by a real slug.
-        unique=True,
-        validators=[RegexValidator(".*\D.*",
-                                   "Slug must contain a non-numeral."),
-                    validate_slug, ]
     )
 
     # profile color fields are deprecated - do not delete until we know
@@ -142,8 +118,8 @@ class Startup(MCModel):
 
     recommendation_tags = models.ManyToManyField(RecommendationTag,
                                                  blank=True)
-    currency = models.ForeignKey(Currency, blank=True, null=True)
-
+    currency = models.ForeignKey(Currency, blank=True, null=True,
+                                 related_name="startups")
     location_national = models.CharField(
         max_length=100,
         blank=True,
@@ -179,11 +155,27 @@ class Startup(MCModel):
     )
     landing_page = models.CharField(max_length=255, null=True, blank=True)
 
+    @property
+    def name(self):
+        return self.organization.name
+
+    @property
+    def website_url(self):
+        return self.organization.website_url
+
+    @property
+    def twitter_handle(self):
+        return self.organization.twitter_handle
+
+    @property
+    def public_inquiry_email(self):
+        return self.organization.public_inquiry_email
+
     class Meta(MCModel.Meta):
         db_table = 'mc_startup'
         managed = is_managed(db_table)
         verbose_name_plural = "Startups"
-        ordering = ["name"]
+        ordering = ["organization__name"]
 
     def __str__(self):
         return self.name

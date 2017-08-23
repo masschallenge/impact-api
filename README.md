@@ -158,10 +158,10 @@ To add a new language to impact-api's Locale dir:
 
     django-admin makemessages -l -piglatin
 
-Replace 'piglatin' with the [lanaguge code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
-for the lanaguage you would like the API to translate.
+Replace 'piglatin' with the [language code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+for the language you would like the API to translate.
 
-After adding a new languge, you can add new strings for translation (and update previously added languages
+After adding a new language, you can add new strings for translation (and update previously added languages
 with more strings).  
 
 To add new strings:
@@ -185,7 +185,6 @@ There are two ways to mark a string for translation. The first is to use a
 [{% trans %} template tag](https://docs.djangoproject.com/en/1.10/topics/i18n/translation/#trans-template-tag})
 or a [{% blocktrans %} template tag](https://docs.djangoproject.com/en/1.10/topics/i18n/translation/#blocktrans-template-tag).
 
-To mark a single string within a template for translation:
 
     {% trans "string to translate" %}
 
@@ -212,7 +211,7 @@ The `make grant-permissions` command can be used to assign django permissions fo
 
 `make grant-permissions PERMISSION_CLASSES=view_startup,change_startup PERMISSION_USER=test@example.org`
 
-To give a user access to the v0 api, issue the command with 'v0_api' specified in PERMISSION_CLASSES:
+To give a user access to the v0 api, issue the command with 'v0_clients' specified in PERMISSION_CLASSES:
 
 `make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v0_api`
 

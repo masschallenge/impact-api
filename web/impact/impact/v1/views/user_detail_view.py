@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from impact.v1.metadata import ImpactMetadata
 from impact.permissions import (
     V1APIPermissions,
 )
@@ -27,6 +27,7 @@ class UserDetailView(APIView):
     permission_classes = (
         V1APIPermissions,
     )
+    metadata_class = ImpactMetadata
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -39,8 +40,8 @@ class UserDetailView(APIView):
             "last_name": user.short_name,
             "email": user.email,
             "is_active": user.is_active,
-            "gender": user_gender(user),
-            }
+            "gender": user_gender(user)
+        }
         return Response(result)
 
     def patch(self, request, pk):

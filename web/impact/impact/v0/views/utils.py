@@ -29,7 +29,7 @@ def encrypt_image_token(token, password=None):
         iv = os.urandom(IMAGE_TOKEN_BLOCK_SIZE)
         key = hashlib.sha256(password).hexdigest()[:32]
         cipher = AES.new(key, AES.MODE_CBC, iv)
-        raw = _pad(token + ":" + str(time()))
+        raw = _pad(str(token) + ":" + str(time()))
         return base64.urlsafe_b64encode((iv + cipher.encrypt(raw)))
     return b""
 
@@ -46,9 +46,9 @@ def logo_url(startup):
     if not startup.high_resolution_logo:
         return ""
     schema = "^(http|https)://"
-    if re.match(schema, startup.high_resolution_logo, re.IGNORECASE):
+    if re.match(schema, str(startup.high_resolution_logo), re.IGNORECASE):
         return startup.high_resolution_logo
-    return BaseMediaInfo.url(startup.high_resolution_logo)
+    return BaseMediaInfo.url(str(startup.high_resolution_logo))
 
 
 def status_description(status):

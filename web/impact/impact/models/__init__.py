@@ -56,6 +56,7 @@ from .functional_expertise import FunctionalExpertise
 from .industry import Industry
 from .member_profile import MemberProfile
 from .named_group import NamedGroup
+from .organization import Organization
 from .partner import Partner
 from .partner_team_member import PartnerTeamMember
 from .program_manager import ProgramManager
@@ -102,6 +103,16 @@ from .application import (
     SUBMITTED_APP_STATUS,
     UNPAID_PAYMENT_STATUS,
 )
+
+from impact.models.clearance import (
+    Clearance,
+    CLEARANCE_LEVEL_EXEC_MD,
+    CLEARANCE_LEVEL_GLOBAL_MANAGER,
+    CLEARANCE_LEVEL_ORDER,
+    CLEARANCE_LEVEL_POM,
+    CLEARANCE_LEVELS,
+)
+
 from .refund_code_redemption import RefundCodeRedemption
 from .reference import Reference
 from .startup_team_member import StartupTeamMember
@@ -234,23 +245,17 @@ from .panel import (
     PREVIEW_PANEL_STATUS,
     Panel,
 )
-from .judge_application_feedback import JudgeApplicationFeedback
 from .judge_feedback_component import (
     JUDGE_FEEDBACK_REVIEWER,
     JUDGE_FEEDBACK_SANITIZER,
     JudgeFeedbackComponent,
 )
-from .judge_panel_assignment import JudgePanelAssignment
-from .judge_panel_assignment_manager import (
-    JudgePanelAssignmentManager,
-)
+
 from .panel_location import PanelLocation
 from .panel_time import PanelTime
 from .panel_type import PanelType
-from .judge_availability import JudgeAvailability
 from .application_panel_assignment import ApplicationPanelAssignment
 
-from .currency import Currency
 from .paypal_payment import PayPalPayment
 from .paypal_refund import PayPalRefund
 from .startup_label import StartupLabel

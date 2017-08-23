@@ -11,8 +11,8 @@ from .application_type_factory import ApplicationTypeFactory
 from .base_profile_factory import BaseProfileFactory
 from .bucket_state_factory import BucketStateFactory
 from .content_type_factory import ContentTypeFactory
+from .clearance_factory import ClearanceFactory
 from .core_profile_factory import CoreProfileFactory
-from .currency_factory import CurrencyFactory
 from .entrepreneur_factory import EntrepreneurFactory
 from .entrepreneur_profile_factory import EntrepreneurProfileFactory
 from .expert_category_factory import ExpertCategoryFactory
@@ -40,6 +40,7 @@ from .named_group_factory import NamedGroupFactory
 from .newsletter_factory import NewsletterFactory
 from .newsletter_receipt_factory import NewsletterReceiptFactory
 from .observer_factory import ObserverFactory
+from .organization_factory import OrganizationFactory
 from .panel_factory import PanelFactory
 from .panel_location_factory import PanelLocationFactory
 from .panel_time_factory import PanelTimeFactory

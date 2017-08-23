@@ -7,7 +7,10 @@ targets = \
   code-check \
   comp-message \
   coverage \
+  coverage-run \
+  coverage-report \
   coverage-html \
+  coverage-html-open \
   dbdump \
   dbload \
   dbshell \
@@ -61,7 +64,7 @@ dbload_error_msg = GZ_FILE must be set. \
   E.g. 'make dbload GZ_FILE=../accelerate/test_data/initial_schema.sql.gz'
 
 grant_permissions_error_msg = PERMISSION_USER and PERMISSION_CLASSES must be \
-  set.  E.g., 'make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v0_api'
+  set.  E.g., 'make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v0_clients'
 
 registry_error_msg = DOCKER_REGISTRY must be \
   set.  E.g., 'make release DOCKER_REGISTRY=<ecr-container>.amazonaws.com ENVIRONMENT=staging AWS_SECRET_ACCESS_KEY=abcdefghijk AWS_ACCESS_KEY_ID=ABCDEFGH12IJKL'
@@ -139,12 +142,23 @@ clean:
 comp-messages:
 	@docker-compose exec web python manage.py compilemessages
 
-coverage:
-	@docker-compose run --rm web coverage run --omit="*/tests/*" --source='.' manage.py test --configuration=Test
-	@docker-compose run --rm web coverage report
+coverage: coverage-run coverage-report coverage-html
 
-coverage-html: coverage
+coverage-run:
+	@docker-compose run --rm web coverage run --omit="*/tests/*" --source='.' manage.py test --configuration=Test
+
+coverage-report: DIFFBRANCH?=$(shell if [ "${BRANCH}" == "" ]; \
+   then echo "development"; else echo "${BRANCH}"; fi;)
+coverage-report: diff_files:=$(shell git diff --name-only $(DIFFBRANCH))
+coverage-report: diff_sed:=$(shell echo $(diff_files)| sed s:web/impact/::g)
+coverage-report: diff_grep:=$(shell echo $(diff_sed) | tr ' ' '\n' | grep \.py | grep -v /tests/ | grep -v /django_migrations/ | tr '\n' ' ' )
+coverage-report:
+	@docker-compose run --rm web coverage report --skip-covered $(diff_grep) | grep -v "NoSource:"
+
+coverage-html:
 	@docker-compose run --rm web coverage html --omit="*/tests/*"
+
+coverage-html-open: coverage-html
 	@open web/impact/htmlcov/index.html
 
 demo:
