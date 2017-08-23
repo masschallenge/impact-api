@@ -6,9 +6,7 @@ from impact.permissions import (
 )
 from impact.models import (
     BaseProfile,
-    MemberProfile,
-    EntrepreneurProfile,
-    ExpertProfile
+    MemberProfile
 )
 from impact.utils import (
     find_gender,
@@ -23,7 +21,10 @@ from impact.utils import (
 )
 from impact.v1.metadata import ImpactMetadata
 from django.db.models import Q
-from impact.utils import parse_date
+from impact.utils import (
+    parse_date,
+    get_profile
+)
 
 
 EMAIL_EXISTS_ERROR = "User with email {} already exists"
@@ -47,7 +48,7 @@ class UserListView(APIView):
         limit = int(request.GET.get('limit', 10))
         offset = int(request.GET.get('offset', 0))
         base_url = request.build_absolute_uri().split("?")[0]
-        results = self._user_results(limit, offset)
+        results = self._results(limit, offset)
         result = {
             "count": len(results),
             "next": _url(base_url, limit, offset + limit),
@@ -106,7 +107,7 @@ class UserListView(APIView):
         for key in set(user_keys) - set(ALL_USER_RELATED_KEYS):
             self.errors.append(INVALID_KEY_ERROR.format(key))
 
-    def _user_results(self, limit, offset):
+    def _results(self, limit, offset):
         queryset = User.objects.all()
         updated_at_gt = self.request.query_params.get('updated_at__gt', None)
         updated_at_lt = self.request.query_params.get('updated_at__lt', None)
@@ -164,21 +165,10 @@ def _serialize_user(user):
     }
 
 
-def _get_profile_class(user):
-    if BaseProfile.objects.filter(user=user).exists():
-        base_profile = BaseProfile.objects.get(user=user)
-        profile_types = {
-            'EXPERT': ExpertProfile,
-            'ENTREPRENEUR': EntrepreneurProfile,
-            'MEMBER': MemberProfile
-        }
-        return profile_types.get(base_profile.user_type)
-
-
 def _get_profile_update_timestamp(user):
-    profile_class = _get_profile_class(user)
-    if profile_class:
-        return profile_class.objects.get(user=user).updated_at
+    profile = get_profile(user)
+    if profile:
+        return profile.updated_at
 
 
 def _construct_user(user_args, profile_args):

@@ -105,6 +105,10 @@ class User(AbstractUser):
     username = models.CharField(_('username'), max_length=150, blank=True)
 
     def get_short_name(self):  # pragma: no cover
+        """
+        get_short_name is not used but is required to be defined
+        in subclasses of AbstractBaseUser
+        """
         return self.email
 
     def save(self, *args, **kwargs):
