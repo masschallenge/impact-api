@@ -111,4 +111,9 @@ class TestUserListView(APITestCase):
                 datestr=lastweek.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
             response = self.client.get(url)
         response_json = json.loads(response.content)
-        self.assertTrue(response_json['count'] > 0)
+        contains_user = False
+        for result in response_json['results']:
+            if result['id'] == user.id:
+                contains_user = True
+                break
+        self.assertTrue(contains_user)

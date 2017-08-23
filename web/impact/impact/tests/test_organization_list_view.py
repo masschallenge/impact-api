@@ -73,4 +73,9 @@ class TestOrganizationListView(APITestCase):
                 datestr=lastweek.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
             response = self.client.get(url)
         json_response = json.loads(response.content)
-        self.assertTrue(json_response['count'] > 0)
+        contains_organization = False
+        for result in json_response['results']:
+            if result['id'] == organizations[0].id:
+                contains_organization = True
+                break
+        self.assertTrue(contains_organization)
