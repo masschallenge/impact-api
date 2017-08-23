@@ -1,6 +1,5 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.metadata import SimpleMetadata
 from impact.permissions import (
     V1APIPermissions,
 )
