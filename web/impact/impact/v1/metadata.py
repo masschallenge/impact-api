@@ -146,10 +146,6 @@ USER_DETAIL_ACTIONS = {
         },
         "gender": {
             "type": "string"
-        },
-        'organizations': {
-            'type': 'list',
-            "read_only": True,
         }
     },
     'PATCH': {
@@ -167,10 +163,6 @@ USER_DETAIL_ACTIONS = {
         },
         "gender": {
             "type": "string"
-        },
-        'organizations': {
-            'type': 'list',
-            "read_only": True,
         }
     }
 }

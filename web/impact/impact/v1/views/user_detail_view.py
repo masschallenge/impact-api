@@ -34,17 +34,13 @@ class UserDetailView(APIView):
 
     def get(self, request, pk):
         user = User.objects.get(pk=pk)
-        organizations = set(
-            list(self.partner_organizations(user)) +
-            list(self.startup_organizations(user)))
         result = {
             "id": pk,
             "first_name": user.full_name,
             "last_name": user.short_name,
             "email": user.email,
             "is_active": user.is_active,
-            "gender": user_gender(user),
-            'organizations': organizations
+            "gender": user_gender(user)
         }
         return Response(result)
 
@@ -73,11 +69,3 @@ class UserDetailView(APIView):
                 profile.save()
         user.save()
         return Response(status=200)
-
-    def partner_organizations(self, user):
-        team = user.partnerteammember_set.all()
-        return team.values_list('partner__organization_id', flat=True)
-
-    def startup_organizations(self, user):
-        team = user.startupteammember_set.all()
-        return team.values_list('startup__organization_id', flat=True)
