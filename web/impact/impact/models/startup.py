@@ -37,7 +37,6 @@ STARTUP_COMMUNITIES = (
 
 
 class Startup(MCModel):
-    name = models.CharField(max_length=255)
     organization = models.ForeignKey(Organization, blank=True, null=True)
     user = models.ForeignKey(User)
     is_visible = models.BooleanField(

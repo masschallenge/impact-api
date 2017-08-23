@@ -12,6 +12,7 @@ from impact.models import (
     Partner,
     Startup,
 )
+from impact.v1.metadata import ImpactMetadata
 
 INVALID_KEYS_ERROR = ("Received invalid key(s): {invalid_keys}. "
                       "Valid keys are: {valid_keys}.")
@@ -44,6 +45,8 @@ class OrganizationDetailView(APIView):
                                "is_startup": organization_is_startup,
                                "is_partner": organization_is_partner}
 
+    metadata_class = ImpactMetadata
+
     permission_classes = (
         V1APIPermissions,
     )
@@ -55,6 +58,7 @@ class OrganizationDetailView(APIView):
         self.instance = self.model.objects.get(pk=pk)
         result = self.get_model_fields()
         result.update(self.derived_fields())
+        result['updated_at'] = self.instance.updated_at
         return Response(result)
 
     def get_model_fields(self):

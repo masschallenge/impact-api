@@ -1,13 +1,12 @@
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from impact.permissions import (
     V1APIPermissions,
 )
 from impact.models import (
     BaseProfile,
-    MemberProfile,
+    MemberProfile
 )
 from impact.utils import (
     find_gender,
@@ -19,6 +18,12 @@ from impact.utils import (
     REQUIRED_PROFILE_KEYS,
     REQUIRED_USER_KEYS,
     USER_KEYS,
+)
+from impact.v1.metadata import ImpactMetadata
+from django.db.models import Q
+from impact.utils import (
+    parse_date,
+    get_profile
 )
 
 
@@ -33,6 +38,7 @@ class UserListView(APIView):
     permission_classes = (
         V1APIPermissions,
     )
+    metadata_class = ImpactMetadata
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -42,12 +48,13 @@ class UserListView(APIView):
         limit = int(request.GET.get('limit', 10))
         offset = int(request.GET.get('offset', 0))
         base_url = request.build_absolute_uri().split("?")[0]
+        results = self._results(limit, offset)
         result = {
-            "count": User.objects.count(),
+            "count": len(results),
             "next": _url(base_url, limit, offset + limit),
             "previous": _url(base_url, limit, offset - limit),
-            "results": _user_results(limit, offset),
-            }
+            "results": results
+        }
         return Response(result)
 
     def post(self, request):
@@ -100,17 +107,50 @@ class UserListView(APIView):
         for key in set(user_keys) - set(ALL_USER_RELATED_KEYS):
             self.errors.append(INVALID_KEY_ERROR.format(key))
 
+    def _results(self, limit, offset):
+        queryset = User.objects.all()
+        updated_at_gt = self.request.query_params.get('updated_at__gt', None)
+        updated_at_lt = self.request.query_params.get('updated_at__lt', None)
+        if updated_at_gt or updated_at_lt:
+            queryset = _filter_profiles_by_date(
+                queryset,
+                updated_at_gt,
+                updated_at_lt)
+        return [
+            _serialize_user(user) for user in queryset[offset:offset + limit]]
+
+
+def _filter_profiles_by_date(queryset, updated_at_gt, updated_at_lt):
+    updated_at_gt = parse_date(updated_at_gt)
+    updated_at_lt = parse_date(updated_at_lt)
+    if updated_at_lt:
+        queryset = queryset.filter(
+            Q(expertprofile__updated_at__isnull=False) |
+            Q(entrepreneurprofile__updated_at__isnull=False) |
+            Q(memberprofile__updated_at__isnull=False)
+        ).exclude(
+            Q(expertprofile__updated_at__gte=updated_at_lt) |
+            Q(entrepreneurprofile__updated_at__gte=updated_at_lt) |
+            Q(memberprofile__updated_at__gte=updated_at_lt)
+        )
+    if updated_at_gt:
+        queryset.filter(
+            Q(expertprofile__updated_at__isnull=False) |
+            Q(entrepreneurprofile__updated_at__isnull=False) |
+            Q(memberprofile__updated_at__isnull=False)
+        ).exclude(
+            Q(expertprofile__updated_at__lte=updated_at_gt) |
+            Q(entrepreneurprofile__updated_at__lte=updated_at_gt) |
+            Q(memberprofile__updated_at__lte=updated_at_gt)
+        )
+    return queryset
+
 
 def _url(base_url, limit, offset):
     if offset >= 0:
         return base_url + "?limit={limit}&offset={offset}".format(
             limit=limit, offset=offset)
     return None
-
-
-def _user_results(limit, offset):
-    return [_serialize_user(user)
-            for user in User.objects.all()[offset:offset+limit]]
 
 
 def _serialize_user(user):
@@ -121,7 +161,14 @@ def _serialize_user(user):
         "last_name": user.short_name,
         "is_active": user.is_active,
         "gender": user_gender(user),
-        }
+        'updated_at': _get_profile_update_timestamp(user)
+    }
+
+
+def _get_profile_update_timestamp(user):
+    profile = get_profile(user)
+    if profile:
+        return profile.updated_at
 
 
 def _construct_user(user_args, profile_args):
