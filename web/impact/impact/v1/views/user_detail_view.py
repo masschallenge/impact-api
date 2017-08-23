@@ -76,11 +76,9 @@ class UserDetailView(APIView):
         return Response(status=200)
 
     def partner_organizations(self, user):
-        team = PartnerTeamMember.objects.filter(
-            team_member=user)
+        team = user.partnerteammember_set.all()
         return team.values_list('partner__organization_id', flat=True)
 
     def startup_organizations(self, user):
-        team = StartupTeamMember.objects.filter(
-            user=user)
+        team = user.startupteammember_set.all()
         return team.values_list('startup__organization_id', flat=True)
