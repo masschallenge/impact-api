@@ -8,14 +8,14 @@ from impact.models import (
     PartnerTeamMember,
     StartupTeamMember,
 )
-from impact.v1.metadata import OrganizationUsersMetadata
+from impact.v1.metadata import ImpactMetadata
 
 
 class OrganizationUsersView(APIView):
     permission_classes = (
         V1APIPermissions,
     )
-    metadata_class = OrganizationUsersMetadata
+    metadata_class = ImpactMetadata
     model = Organization
 
     def get(self, request, pk):

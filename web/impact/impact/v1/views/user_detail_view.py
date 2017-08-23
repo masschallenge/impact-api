@@ -1,8 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from impact.models import PartnerTeamMember, StartupTeamMember
-from impact.v1.metadata import UserMetadata
+from impact.v1.metadata import ImpactMetadata
 from impact.permissions import (
     V1APIPermissions,
 )
@@ -28,7 +27,7 @@ class UserDetailView(APIView):
     permission_classes = (
         V1APIPermissions,
     )
-    metadata_class = UserMetadata
+    metadata_class = ImpactMetadata
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

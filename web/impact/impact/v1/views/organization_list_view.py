@@ -15,7 +15,7 @@ from .organization_detail_view import (
     public_inquiry_email,
 )
 from impact.serializers import GeneralSerializer
-from impact.v1.metadata import OrganizationMetadata
+from impact.v1.metadata import ImpactMetadata
 from impact.utils import parse_date
 from django.db.models import Q
 
@@ -25,7 +25,7 @@ class OrganizationListView(APIView, AutoMetadataMixin):
         V1APIPermissions,
     )
 
-    metadata_class = OrganizationMetadata
+    metadata_class = ImpactMetadata
 
     serializer_class = GeneralSerializer
 

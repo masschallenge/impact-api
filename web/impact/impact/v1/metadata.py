@@ -108,53 +108,23 @@ USER_ACTIONS = {
 }
 
 
-class OrganizationMetadata(SimpleMetadata):
+METADATA_MAP = {
+    'User List': USER_ACTIONS,
+    'Organization List': ORGANIZATION_ACTIONS,
+    'Organization Users': ORGANIZATION_USER_ACTIONS,
+    'User Organizations': USER_ORGANIZATION_ACTIONS
+}
+
+
+class ImpactMetadata(SimpleMetadata):
     """
     Don't include field and other information for `OPTIONS` requests.
     Just return the name and description.
     """
 
     def determine_metadata(self, request, view):
+        view_name = view.get_view_name()
         metadata = super().determine_metadata(request, view)
-        metadata['actions'] = ORGANIZATION_ACTIONS
-
-        return metadata
-
-
-class UserMetadata(SimpleMetadata):
-    """
-    Don't include field and other information for `OPTIONS` requests.
-    Just return the name and description.
-    """
-
-    def determine_metadata(self, request, view):
-        metadata = super().determine_metadata(request, view)
-        metadata['actions'] = USER_ACTIONS
-
-        return metadata
-
-
-class UserOrganizationsMetadata(SimpleMetadata):
-    """
-    Don't include field and other information for `OPTIONS` requests.
-    Just return the name and description.
-    """
-
-    def determine_metadata(self, request, view):
-        metadata = super().determine_metadata(request, view)
-        metadata['actions'] = USER_ORGANIZATION_ACTIONS
-
-        return metadata
-
-
-class OrganizationUsersMetadata(SimpleMetadata):
-    """
-    Don't include field and other information for `OPTIONS` requests.
-    Just return the name and description.
-    """
-
-    def determine_metadata(self, request, view):
-        metadata = super().determine_metadata(request, view)
-        metadata['actions'] = ORGANIZATION_USER_ACTIONS
+        metadata['actions'] = METADATA_MAP.get(view_name)
 
         return metadata

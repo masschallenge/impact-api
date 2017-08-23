@@ -21,7 +21,7 @@ from impact.utils import (
     REQUIRED_USER_KEYS,
     USER_KEYS,
 )
-from impact.v1.metadata import UserMetadata
+from impact.v1.metadata import ImpactMetadata
 from django.db.models import Q
 from impact.utils import parse_date
 
@@ -37,7 +37,7 @@ class UserListView(APIView):
     permission_classes = (
         V1APIPermissions,
     )
-    metadata_class = UserMetadata
+    metadata_class = ImpactMetadata
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
