@@ -31,11 +31,17 @@ from rest_framework import routers
 from drf_auto_endpoint.router import router as schema_router
 from django.apps import apps
 
+
+accelerator_router = routers.DefaultRouter()
+accelerator_router.register('Currency', GeneralViewSet,
+                            base_name="accelerator.Currency")
+
 simpleuser_router = routers.DefaultRouter()
 simpleuser_router.register('User', GeneralViewSet, base_name='User')
 
 for model in apps.get_models('impact'):
     schema_router.register(model)
+
 
 account_urlpatterns = [
     url(r'^', include('registration.backends.simple.urls')),
@@ -100,6 +106,7 @@ urls = [
         name='object-detail'),
     url(r'^api/simpleuser/', include(simpleuser_router.urls)),
     url(r'^api/impact/', include(schema_router.urls), name='api-root'),
+    url(r'^api/accelerator/', include(accelerator_router.urls)),
     url(r'^$', IndexView.as_view()),
     url(r'^accounts/', include(account_urlpatterns)),
     url(r'^schema/$', schema_view, name='schema'),

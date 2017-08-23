@@ -256,7 +256,6 @@ from .panel_time import PanelTime
 from .panel_type import PanelType
 from .application_panel_assignment import ApplicationPanelAssignment
 
-from .currency import Currency
 from .paypal_payment import PayPalPayment
 from .paypal_refund import PayPalRefund
 from .startup_label import StartupLabel

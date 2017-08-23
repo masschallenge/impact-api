@@ -16,8 +16,7 @@ from impact.models import (
     STARTUP_COMMUNITIES,
     Startup,
 )
-
-from .currency_factory import CurrencyFactory
+from accelerator.tests.factories.currency_factory import CurrencyFactory
 from .industry_factory import IndustryFactory
 from .user_factory import UserFactory
 from .organization_factory import OrganizationFactory
