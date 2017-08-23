@@ -245,20 +245,15 @@ from .panel import (
     PREVIEW_PANEL_STATUS,
     Panel,
 )
-from .judge_application_feedback import JudgeApplicationFeedback
 from .judge_feedback_component import (
     JUDGE_FEEDBACK_REVIEWER,
     JUDGE_FEEDBACK_SANITIZER,
     JudgeFeedbackComponent,
 )
-from .judge_panel_assignment import JudgePanelAssignment
-from .judge_panel_assignment_manager import (
-    JudgePanelAssignmentManager,
-)
+
 from .panel_location import PanelLocation
 from .panel_time import PanelTime
 from .panel_type import PanelType
-from .judge_availability import JudgeAvailability
 from .application_panel_assignment import ApplicationPanelAssignment
 
 from .currency import Currency

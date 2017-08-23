@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.metadata import SimpleMetadata
 from impact.permissions import (
     V1APIPermissions,
 )
@@ -11,8 +10,6 @@ from impact.models import (
     EntrepreneurProfile,
     ExpertProfile
 )
-import datetime
-from django.utils.formats import get_format
 from impact.utils import (
     find_gender,
     user_gender,
@@ -179,9 +176,9 @@ def _get_profile_class(user):
 
 
 def _get_profile_update_timestamp(user):
-        profile_class = _get_profile_class(user)
-        if profile_class:
-            return profile_class.objects.get(user=user).updated_at
+    profile_class = _get_profile_class(user)
+    if profile_class:
+        return profile_class.objects.get(user=user).updated_at
 
 
 def _construct_user(user_args, profile_args):
