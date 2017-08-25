@@ -40,11 +40,12 @@ class OrganizationHistoryView(APIView):
 
     def _created_event(self):
         earliest, latest = self._created_datetime()
+        entrants = self._became_entrant()
         return {
             "datetime": earliest,
             "latest_datetime": latest,
             "event_type": "created",
-            "description": ""
+            "description": entrants
             }
 
     def _created_datetime(self):
@@ -55,6 +56,22 @@ class OrganizationHistoryView(APIView):
         if partner:
             return _created_datetimes(partner, Partner)
         return _created_datetimes(self.instance, Organization)
+
+
+    def _became_entrant(self):
+        startups = self.instance.startup_set.all()
+        if startups:
+            apps = _app_dates(startups)
+            for app in apps:
+                return ("Applied to " + app.cycle.name)
+            
+                    
+def _app_dates(startups):
+    for startup in startups:
+        if startup.application_set:
+            return startup.application_set.exclude(
+                application_type__name__icontains="Company Overview").order_by("submission_datetime")
+
 
 
 def _created_datetimes(instance, klass):

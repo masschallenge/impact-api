@@ -13,7 +13,7 @@ from impact.models.utils import is_managed
 
 class UserRole(MCModel):
     # Known User Roles
-    ACTIVE_JUDGE = "Active Judge"
+    # ACTIVE_JUDGE = "Active Judge"
     ALUM = "Alum"
     ALUM_MENTOR = "Alum Mentor"
     AIR = "Alumni in Residence"

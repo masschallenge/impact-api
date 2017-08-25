@@ -17,7 +17,7 @@ User = get_user_model()
 
 class V0APIPermissions(BasePermission):
 
-    authenticated_users_only = True
+    authenticated_users_only = False
 
     def has_permission(self, request, view):
         return request.user.groups.filter(
