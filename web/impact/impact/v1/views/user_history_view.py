@@ -3,11 +3,13 @@
 
 from django.contrib.auth import get_user_model
 from impact.v1.views.base_history_view import BaseHistoryView
-# from impact.v1.events import ()
+from impact.v1.events import (
+    UserCreatedEvent,
+)
 
 User = get_user_model()
 
 
 class UserHistoryView(BaseHistoryView):
     model = User
-    event_classes = []
+    event_classes = [UserCreatedEvent]
