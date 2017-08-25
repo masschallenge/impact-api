@@ -5,8 +5,8 @@ from impact.v1.views.base_history_view import BaseHistoryView
 
 from impact.models import Organization
 from impact.v1.events import (
-    OrganizationBecomeEntrantEvent,
-    OrganizationBecomeFinalistEvent,
+    OrganizationBecameEntrantEvent,
+    OrganizationBecameFinalistEvent,
     OrganizationCreatedEvent,
 )
 
@@ -14,5 +14,5 @@ from impact.v1.events import (
 class OrganizationHistoryView(BaseHistoryView):
     model = Organization
     event_classes = [OrganizationCreatedEvent,
-                     OrganizationBecomeEntrantEvent,
-                     OrganizationBecomeFinalistEvent]
+                     OrganizationBecameEntrantEvent,
+                     OrganizationBecameFinalistEvent]

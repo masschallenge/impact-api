@@ -4,9 +4,9 @@ from impact.models import (
 )
 
 
-class OrganizationBecomeEntrantEvent(object):
+class OrganizationBecameEntrantEvent(object):
     DESCRIPTION_FORMAT = "Applied to {}"
-    EVENT_TYPE = "become entrant"
+    EVENT_TYPE = "became entrant"
 
     def __init__(self, application):
         self.application = application

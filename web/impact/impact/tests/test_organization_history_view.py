@@ -23,8 +23,8 @@ from impact.tests.utils import (
 )
 from impact.utils import DAWN_OF_TIME
 from impact.v1.events import (
-    OrganizationBecomeEntrantEvent,
-    OrganizationBecomeFinalistEvent,
+    OrganizationBecameEntrantEvent,
+    OrganizationBecameFinalistEvent,
     OrganizationCreatedEvent,
 )
 
@@ -139,7 +139,7 @@ class TestOrganizationHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             self.assertEqual(org.created_at, events[0]["datetime"])
 
-    def test_startup_become_entrant(self):
+    def test_startup_became_entrant(self):
         cycle = ProgramCycleFactory()
         application = ApplicationFactory(
             application_status=SUBMITTED_APP_STATUS,
@@ -151,11 +151,11 @@ class TestOrganizationHistoryView(APITestCase):
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["history"],
-                                 OrganizationBecomeEntrantEvent.EVENT_TYPE)
+                                 OrganizationBecameEntrantEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertTrue(cycle.name in events[0]["description"])
 
-    def test_startup_become_entrant_no_submission_datetime(self):
+    def test_startup_became_entrant_no_submission_datetime(self):
         cycle_deadline = days_from_now(-1)
         cycle = ProgramCycleFactory(
             application_final_deadline_date=cycle_deadline)
@@ -170,12 +170,12 @@ class TestOrganizationHistoryView(APITestCase):
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["history"],
-                                 OrganizationBecomeEntrantEvent.EVENT_TYPE)
+                                 OrganizationBecameEntrantEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(cycle_deadline,
                              events[0]["datetime"])
 
-    def test_startup_become_finalist(self):
+    def test_startup_became_finalist(self):
         startup = StartupFactory()
         startup_status = StartupStatusFactory(
             program_startup_status__startup_role__name=StartupRole.FINALIST,
@@ -186,11 +186,11 @@ class TestOrganizationHistoryView(APITestCase):
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["history"],
-                                 OrganizationBecomeFinalistEvent.EVENT_TYPE)
+                                 OrganizationBecameFinalistEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertTrue(program.name in events[0]["description"])
 
-    def test_startup_become_finalist_no_created_at(self):
+    def test_startup_became_finalist_no_created_at(self):
         startup = StartupFactory()
         start_date = days_from_now(10)
         startup_status = StartupStatusFactory(
@@ -204,6 +204,6 @@ class TestOrganizationHistoryView(APITestCase):
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["history"],
-                                 OrganizationBecomeFinalistEvent.EVENT_TYPE)
+                                 OrganizationBecameFinalistEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(start_date, events[0]["datetime"])

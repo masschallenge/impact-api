@@ -2,9 +2,9 @@ from impact.models import StartupRole
 from impact.utils import compose_filter
 
 
-class OrganizationBecomeFinalistEvent(object):
+class OrganizationBecameFinalistEvent(object):
     DESCRIPTION_FORMAT = "Became Finalist on {}"
-    EVENT_TYPE = "become finalist"
+    EVENT_TYPE = "became finalist"
 
     def __init__(self, startup_status):
         self.startup_status = startup_status
