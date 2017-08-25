@@ -1,7 +1,5 @@
-from impact.models import (
-    StartupRole,
-    StartupStatus,    
-)
+from impact.models import StartupRole
+from impact.utils import compose_filter
 
 
 class OrganizationBecomeFinalistEvent(object):
@@ -15,8 +13,11 @@ class OrganizationBecomeFinalistEvent(object):
     def events(cls, organization):
         result = []
         for startup in organization.startup_set.all():
-            for ss in startup.startupstatus_set.filter(
-                    program_startup_status__startup_role__name=StartupRole.FINALIST):
+            for ss in startup.startupstatus_set.filter(**compose_filter(
+                    ["program_startup_status",
+                     "startup_role",
+                     "name"],
+                    StartupRole.FINALIST)):
                 result.append(cls(ss))
         return result
 
@@ -32,5 +33,6 @@ class OrganizationBecomeFinalistEvent(object):
     def _finalist_datetime(self):
         result = self.startup_status.created_at
         if result is None:
-            return self.startup_status.program_startup_status.program.start_date
+            program = self.startup_status.program_startup_status.program
+            return program.startup_date
         return result

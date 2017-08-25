@@ -4,10 +4,12 @@ from impact.models import (
     Partner,
     Startup,
 )
-DAWN_OF_TIME = "2010-01-01T00:00:00Z"
+from impact.utils import DAWN_OF_TIME
 
 
 class OrganizationCreatedEvent(object):
+    EVENT_TYPE = "created"
+
     def __init__(self, organization):
         self.organization = organization
 
@@ -20,7 +22,7 @@ class OrganizationCreatedEvent(object):
         return {
             "datetime": earliest,
             "latest_datetime": latest,
-            "event_type": "created",
+            "event_type": self.EVENT_TYPE,
             "description": "",
             }
 

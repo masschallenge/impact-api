@@ -3,7 +3,6 @@
 
 from django.contrib.auth import get_user_model
 from impact.v1.views.base_history_view import BaseHistoryView
-from impact.models import Organization
 # from impact.v1.events import ()
 
 User = get_user_model()

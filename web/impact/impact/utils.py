@@ -1,5 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
+from datetime import datetime
 from impact.models import BaseProfile
 from django.utils.formats import get_format
 import dateutil.parser
@@ -31,6 +32,9 @@ GENDER_TRANSLATIONS = {
     "other": "o",
     "prefer not to state": "p",
 }
+DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
+DAWN_OF_TIME = datetime.strptime("2010-01-01T00:00:00Z",
+                                 DATETIME_FORMAT)
 
 
 def parse_date(date_str):
