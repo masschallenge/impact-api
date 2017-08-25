@@ -35,5 +35,5 @@ class OrganizationBecomeEntrantEvent(object):
     def _submission_datetime(self):
         result = self.application.submission_datetime
         if result is None:
-            return self.cycle.application_final_deadline_date
+            return self.application.cycle.application_final_deadline_date
         return result

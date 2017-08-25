@@ -34,5 +34,5 @@ class OrganizationBecomeFinalistEvent(object):
         result = self.startup_status.created_at
         if result is None:
             program = self.startup_status.program_startup_status.program
-            return program.startup_date
+            return program.start_date
         return result
