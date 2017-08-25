@@ -18,10 +18,7 @@ from impact.tests.factories import (
 
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import days_from_now
-from impact.utils import (
-    DATETIME_FORMAT,
-    DAWN_OF_TIME,
-)
+from impact.utils import DAWN_OF_TIME
 from impact.v1.events import (
     OrganizationBecomeEntrantEvent,
     OrganizationBecomeFinalistEvent,
@@ -69,10 +66,10 @@ class TestOrganizationHistoryView(APITestCase):
 
     def test_startup_created_using_other_startups(self):
         prev_created_datetime = days_from_now(-10)
-        prev_startup = StartupFactory(created_datetime=prev_created_datetime)
+        StartupFactory(created_datetime=prev_created_datetime)
         startup = StartupFactory(created_datetime=None)
         next_created_datetime = days_from_now(-2)
-        next_startup = StartupFactory(created_datetime=next_created_datetime)
+        StartupFactory(created_datetime=next_created_datetime)
         startup.created_at = None
         startup.save()
         with self.login(username=self.basic_user().username):
@@ -199,7 +196,6 @@ class TestOrganizationHistoryView(APITestCase):
             startup=startup)
         startup_status.created_at = None
         startup_status.save()
-        program = startup_status.program_startup_status.program
         with self.login(username=self.basic_user().username):
             url = reverse("organization_history",
                           args=[startup.organization.id])
