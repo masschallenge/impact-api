@@ -4,7 +4,6 @@ from impact.models import (
     Partner,
     Startup,
 )
-DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
 DAWN_OF_TIME = "2010-01-01T00:00:00Z"
 
 
@@ -49,7 +48,7 @@ def _created_datetimes(instance, cls):
                                        ).order_by("id").first()
     if next_instance:
         return (DAWN_OF_TIME, next_instance.created_at)
-    return (DAWN_OF_TIME, datetime.now().strftime(DATETIME_FORMAT))
+    return (DAWN_OF_TIME, datetime.now())
 
 
 def _previous_created_datetime(instance, cls):
@@ -57,7 +56,7 @@ def _previous_created_datetime(instance, cls):
                                        created_datetime__isnull=False
                                        ).order_by('-id').first()
     if prev_instance:
-        return prev_instance.created_datetime.strftime(DATETIME_FORMAT)
+        return prev_instance.created_datetime
     return DAWN_OF_TIME
 
 
@@ -66,5 +65,5 @@ def _next_created_datetime(instance, cls):
                                        created_datetime__isnull=False
                                        ).order_by('id').first()
     if next_instance:
-        return next_instance.created_datetime.strftime(DATETIME_FORMAT)
-    return datetime.now().strftime(DATETIME_FORMAT)
+        return next_instance.created_datetime
+    return datetime.now()

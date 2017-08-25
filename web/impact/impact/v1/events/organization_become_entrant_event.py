@@ -2,8 +2,6 @@ from impact.models import (
     ProgramCycle,
     SUBMITTED_APP_STATUS,
 )
-DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
-DAWN_OF_TIME = "2010-01-01T00:00:00Z"
 
 
 class OrganizationBecomeEntrantEvent(object):
