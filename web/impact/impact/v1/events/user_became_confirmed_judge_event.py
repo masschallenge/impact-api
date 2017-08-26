@@ -1,37 +1,17 @@
-from impact.models import UserRole
-from impact.utils import compose_filter
+from impact.v1.events.base_user_role_grant_event import (
+    BaseUserRoleGrantEvent,
+)
 
-
-class UserBecameConfirmedJudgeEvent(object):
+class UserBecameConfirmedJudgeEvent(BaseUserRoleGrantEvent):
     DESCRIPTION_FORMAT = "Became Confirmed Judge for {name} ({id})"
     EVENT_TYPE = "became confirmed judge"
+    USER_ROLE = UserRole.JUDGE
 
-    def __init__(self, program_role_grant):
-        self.program_role_grant = program_role_grant
-
-    @classmethod
-    def events(cls, user):
-        result = []
-        for prg in user.programrolegrant_set.filter(**compose_filter(
-            ["program_role",
-            "user_role",
-            "name"],
-            UserRole.JUDGE)):
-            result.append(cls(prg))
-        return result
-
-    def serialize(self):
-        confirmed_judge_time = self._confirmed_judge_datetime()
-        program = self.program_role_grant.program_role.program
-        judging_round = program.judginground_set.first()
-        return {
-            "datetime": confirmed_judge_time,
-            "latest_datetime": "",
-            "event_type": self.EVENT_TYPE,
-            "description": self.DESCRIPTION_FORMAT.format(
-                name=judging_round.short_name(),
-                id=judging_round.id)
-            }
+    def description():
+        judging_round = 
+        return self.DESCRIPTION_FORMAT.format(
+                                        name=judging_round.short_name(),
+                                        id=judging_round.id)
 
     def _confirmed_judge_datetime(self):
         program = self.program_role_grant.program_role.program 

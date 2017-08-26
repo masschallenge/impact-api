@@ -14,9 +14,10 @@ User = get_user_model()
 
 
 class UserHistoryView(BaseHistoryView):
+
     model = User
 
     event_classes = [UserBecameConfirmedJudgeEvent,
-    				 UserBecameFinalistEvent,
-    				 UserCreatedEvent,
+                     UserBecameFinalistEvent,
+                     UserCreatedEvent,
                      UserJoinedStartupEvent]
