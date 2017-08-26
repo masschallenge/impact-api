@@ -13,9 +13,9 @@ from .utils import is_managed
 
 try:
     from .judging_round_manager import JudgingRoundManager
-    HAS_MANAGER = True
-except ImportError:
-    HAS_MANAGER = False
+    HAS_MANAGER = True  # pragma: no cover
+except ImportError:  # pragma: no cover
+    HAS_MANAGER = False  # pragma: no cover
 
 
 ONLINE_JUDGING_ROUND_TYPE = "Online"
@@ -181,7 +181,7 @@ class JudgingRound(MCModel):
         related_name="rounds_confirmed_for")
 
     if HAS_MANAGER:
-        objects = JudgingRoundManager()
+        objects = JudgingRoundManager()  # pragma: no cover
 
     class Meta(MCModel.Meta):
         db_table = 'mc_judginground'
