@@ -1,3 +1,4 @@
+from impact.models import UserRole
 from impact.v1.events.base_user_role_grant_event import (
     BaseUserRoleGrantEvent,
 )

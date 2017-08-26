@@ -12,9 +12,9 @@ from impact.v1.events.organization_created_event import (
 from impact.v1.events.user_became_confirmed_judge_event import (
     UserBecameConfirmedJudgeEvent,
 )
-# from impact.v1.events.user_became_confirmed_mentor_event import (
-#     UserBecameConfirmedMentorEvent,
-# )
+from impact.v1.events.user_became_confirmed_mentor_event import (
+    UserBecameConfirmedMentorEvent,
+)
 from impact.v1.events.user_became_finalist_event import (
     UserBecameFinalistEvent,
 )

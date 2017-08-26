@@ -1,15 +1,21 @@
-from datetime import datetime
-from impact.models import (
-    ProgramRoleGrant,
-    UserRole,
+from abc import (
+    ABCMeta,
+    abstractmethod,
 )
+from datetime import datetime
+from impact.models import ProgramRoleGrant
 from impact.utils import compose_filter
 
 
 class BaseUserRoleGrantEvent(object):
+    __metaclass__ = ABCMeta
 
     def __init__(self, program_role_grant):
         self.program_role_grant = program_role_grant
+
+    @abstractmethod
+    def description(self):
+        pass  # pragma: no cover
 
     @classmethod
     def events(cls, user):
@@ -36,7 +42,7 @@ class BaseUserRoleGrantEvent(object):
         if result:
             return (result, result)
         program = self.program_role_grant.program_role.program
-        earliest = max(program.start_date,
+        earliest = max(program.cycle.application_final_deadline_date,
                        self.program_role_grant.person.date_joined)
         latest = datetime.now()
         prg_with_created_at = ProgramRoleGrant.objects.filter(

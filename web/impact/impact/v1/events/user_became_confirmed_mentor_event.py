@@ -1,11 +1,15 @@
-# from impact.v1.events.base_user_event import BaseUserEvent
+from impact.models import UserRole
+from impact.v1.events.base_user_role_grant_event import (
+    BaseUserRoleGrantEvent,
+)
 
 
-# class UserBecameConfirmedMentorEvent(BaseUserEvent):
-#     DESCRIPTION_FORMAT = ("Became Confirmed Judge "
-#                           "for {name} ({id})").format(
-#                                                 name=program.name,
-#                                                 id=program.id)
-#     EVENT_TYPE = "became confirmed judge"
-#     # user_role = UserRole.MENTOR
-#     result = program_role_grant.created_at
+class UserBecameConfirmedMentorEvent(BaseUserRoleGrantEvent):
+    DESCRIPTION_FORMAT = "Became Confirmed Mentor for Program {name} ({id})"
+    EVENT_TYPE = "became confirmed mentor"
+    USER_ROLE = UserRole.MENTOR
+
+    def description(self):
+        program = self.program_role_grant.program_role.program
+        return self.DESCRIPTION_FORMAT.format(name=program.name,
+                                              id=program.id)
