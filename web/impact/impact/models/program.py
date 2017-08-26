@@ -125,3 +125,6 @@ class Program(MCModel):
 
     def __str__(self):
         return self.name
+
+    def family_abbr(self):
+        return self.program_family.url_slug.upper()
