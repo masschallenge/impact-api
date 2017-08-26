@@ -17,10 +17,10 @@ class UserBecameFinalistEvent(object):
     def events(cls, user):
         result = []
         for prg in user.programrolegrant_set.filter(**compose_filter(
-            ["program_role",
-             "user_role",
-             "name"],
-            UserRole.FINALIST)):
+                ["program_role",
+                 "user_role",
+                 "name"],
+                UserRole.FINALIST)):
             result.append(cls(prg))
         return result
 
