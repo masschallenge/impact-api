@@ -7,7 +7,7 @@ from simpleuser.models import User
 
 from impact.models.mc_model import MCModel
 from impact.models.application import Application
-from impact.models.judging_round_stage import JudgingRoundStage
+from impact.models.judging_round import JudgingRound
 from impact.models.utils import is_managed
 
 
@@ -25,7 +25,7 @@ class Scenario(MCModel):
         Application,
         related_name="scenarios",
         through="impact.ScenarioApplication")
-    stage = models.ForeignKey(JudgingRoundStage)
+    judging_round = models.ForeignKey(JudgingRound)
     # Default False and set True when selected. Only one may be True.
     is_active = models.BooleanField(default=False)
     panel_size = models.IntegerField(blank=True,
@@ -43,8 +43,8 @@ class Scenario(MCModel):
     class Meta(MCModel.Meta):
         db_table = 'mc_scenario'
         managed = is_managed(db_table)
-        unique_together = (('name', 'stage'),
-                           ('stage', 'sequence_number'), )
+        unique_together = (('name', 'judging_round'),
+                           ('judging_round', 'sequence_number'), )
 
     def __str__(self):
         return self.name

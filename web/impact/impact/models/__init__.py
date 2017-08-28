@@ -196,7 +196,6 @@ from .judging_round import (
     RECRUIT_APPROVED_ONLY,
 
 )
-from .judging_round_stage import JudgingRoundStage
 
 from .scenario import (
     DEFAULT_PANEL_SIZE,
