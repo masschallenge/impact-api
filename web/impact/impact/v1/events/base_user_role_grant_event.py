@@ -4,8 +4,11 @@ from abc import (
 )
 from datetime import datetime
 from pytz import utc
-from impact.models import ProgramRoleGrant
-from impact.utils import compose_filter
+from django.db.models import Q
+from impact.utils import (
+    compose_filter,
+    next_instance,
+)
 
 
 class BaseUserRoleGrantEvent(object):
@@ -45,9 +48,8 @@ class BaseUserRoleGrantEvent(object):
         earliest = max(program.cycle.application_final_deadline_date,
                        self.program_role_grant.person.date_joined)
         latest = utc.localize(datetime.now())
-        prg_with_created_at = ProgramRoleGrant.objects.filter(
-            id__gt=self.program_role_grant.id,
-            created_at__isnull=False).order_by("id").first()
+        prg_with_created_at = next_instance(self.program_role_grant,
+                                            Q(created_at__isnull=False))
         if prg_with_created_at:
             latest = prg_with_created_at.created_at
         return (earliest, latest)

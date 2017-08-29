@@ -112,12 +112,16 @@ class TestOrganizationHistoryView(APITestCase):
             self.assertEqual(DAWN_OF_TIME, events[0]["datetime"])
 
     def test_partner_created_using_later_partner(self):
+        prev_partner = PartnerFactory()
+        prev_created_at = days_from_now(-10)
+        prev_partner.created_at = prev_created_at
+        prev_partner.save()
         partner = PartnerFactory()
         partner.created_at = None
         partner.save()
         next_partner = PartnerFactory()
-        partner_created_at = days_from_now(-2)
-        next_partner.created_at = partner_created_at
+        next_created_at = days_from_now(-2)
+        next_partner.created_at = next_created_at
         next_partner.save()
         with self.login(username=self.basic_user().username):
             url = reverse("organization_history",
@@ -126,8 +130,8 @@ class TestOrganizationHistoryView(APITestCase):
             events = find_events(response.data["results"],
                                  OrganizationCreatedEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
-            self.assertEqual(DAWN_OF_TIME, events[0]["datetime"])
-            self.assertEqual(partner_created_at, events[0]["latest_datetime"])
+            self.assertEqual(prev_created_at, events[0]["datetime"])
+            self.assertEqual(next_created_at, events[0]["latest_datetime"])
 
     def test_organization_created(self):
         org = OrganizationFactory()

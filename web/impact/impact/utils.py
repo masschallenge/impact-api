@@ -3,6 +3,7 @@
 from datetime import datetime
 from pytz import utc
 from impact.models import BaseProfile
+from django.db.models import Q
 from django.utils.formats import get_format
 import dateutil.parser
 REQUIRED_USER_KEYS = [
@@ -78,3 +79,15 @@ def find_gender(gender):
     if gender in VALID_GENDERS:
         return gender
     return None
+
+
+def next_instance(instance, query):
+    return _find_instance(instance, Q(id__gt=instance.id) & query, "id")
+
+
+def previous_instance(instance, query):
+    return _find_instance(instance, Q(id__lt=instance.id) & query, "-id")
+
+
+def _find_instance(instance, query, order):
+    return type(instance).objects.filter(query).order_by(order).first()

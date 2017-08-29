@@ -1,6 +1,11 @@
 from datetime import datetime
 from pytz import utc
-from impact.utils import DAWN_OF_TIME
+from django.db.models import Q
+from impact.utils import (
+    DAWN_OF_TIME,
+    next_instance,
+    previous_instance,
+)
 
 
 class OrganizationCreatedEvent(object):
@@ -41,27 +46,29 @@ def _created_datetimes(instance):
                     instance.created_datetime)
         return (_previous_created_datetime(instance),
                 _next_created_datetime(instance))
-    next_instance = type(instance).objects.filter(id__gt=instance.id,
-                                                  created_at__isnull=False
-                                                  ).order_by("id").first()
-    if next_instance:
-        return (DAWN_OF_TIME, next_instance.created_at)
-    return (DAWN_OF_TIME, utc.localize(datetime.now()))
+    query = Q(created_at__isnull=False)
+    earliest = DAWN_OF_TIME
+    previous = previous_instance(instance, query)
+    if previous:
+        earliest = previous.created_at
+    latest = utc.localize(datetime.now())
+    next = next_instance(instance, query)
+    if next:
+        latest = next.created_at
+    return (earliest, latest)
 
 
 def _previous_created_datetime(instance):
-    prev_instance = type(instance).objects.filter(
-        id__lt=instance.id,
-        created_datetime__isnull=False).order_by('-id').first()
-    if prev_instance:
-        return prev_instance.created_datetime
+    prev = previous_instance(instance,
+                             Q(created_datetime__isnull=False))
+    if prev:
+        return prev.created_datetime
     return DAWN_OF_TIME
 
 
 def _next_created_datetime(instance):
-    next_instance = type(instance).objects.filter(
-        id__gt=instance.id,
-        created_datetime__isnull=False).order_by('id').first()
-    if next_instance:
-        return next_instance.created_datetime
+    next = next_instance(instance,
+                         Q(created_datetime__isnull=False))
+    if next:
+        return next.created_datetime
     return datetime.now()

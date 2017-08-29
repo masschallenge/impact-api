@@ -1,12 +1,17 @@
 from datetime import datetime
 from pytz import utc
+from django.db.models import Q
 from impact.models import (
     ProgramCycle,
     SUBMITTED_APP_STATUS,
     StartupRole,
     StartupStatus,
 )
-from impact.utils import DAWN_OF_TIME
+from impact.utils import (
+    DAWN_OF_TIME,
+    next_instance,
+    previous_instance,
+)
 
 
 class OrganizationBecameEntrantEvent(object):
@@ -72,15 +77,12 @@ class OrganizationBecameEntrantEvent(object):
     def _infer_datetimes(self):
         earliest = DAWN_OF_TIME
         cycle = self.application.cycle
-        prev_cycle = ProgramCycle.objects.filter(
-            application_final_deadline_date__isnull=False,
-            id__lt=cycle.id).order_by("-id").first()
+        query = Q(application_final_deadline_date__isnull=False)
+        prev_cycle = previous_instance(cycle, query)
         if prev_cycle:
             earliest = prev_cycle.application_final_deadline_date
         latest = utc.localize(datetime.now())
-        next_cycle = ProgramCycle.objects.filter(
-            application_final_deadline_date__isnull=False,
-            id__gt=cycle.id).order_by("id").first()
+        next_cycle = next_instance(cycle, query)
         if next_cycle:
             latest = next_cycle.application_final_deadline_date
         return (earliest, latest)

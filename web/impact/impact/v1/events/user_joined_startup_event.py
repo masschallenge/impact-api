@@ -1,7 +1,10 @@
 from datetime import datetime
 from pytz import utc
 from django.contrib.auth import get_user_model
-from impact.models import StartupTeamMember
+from django.db.models import Q
+from impact.utils import (
+    next_instance,
+)
 
 User = get_user_model()
 
@@ -42,9 +45,8 @@ class UserJoinedStartupEvent(object):
             ).order_by('-date_joined').first()
         if most_recent_stm:
             earliest = most_recent_stm.date_joined
-        stm_with_created_at = StartupTeamMember.objects.filter(
-            id__gt=self.member.id,
-            created_at__isnull=False).order_by("id").first()
+        stm_with_created_at = next_instance(self.member,
+                                            Q(created_at__isnull=False))
         if stm_with_created_at:
             latest = stm_with_created_at.created_at
         return (earliest, latest)
