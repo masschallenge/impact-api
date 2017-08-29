@@ -27,7 +27,7 @@ class UserJoinedStartupEvent(object):
             "event_type": self.EVENT_TYPE,
             "description": self.DESCRIPTION_FORMAT.format(
                 name=self.member.startup.name,
-                id=self.member.startup.id)
+                id=self.member.startup.organization.id)
             }
 
     def _join_time(self):

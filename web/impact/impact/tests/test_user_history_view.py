@@ -46,6 +46,11 @@ class TestUserHistoryView(APITestCase):
                                  UserJoinedStartupEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(stm.created_at, events[0]["datetime"])
+            startup = stm.startup
+            startup_str = UserJoinedStartupEvent.DESCRIPTION_FORMAT.format(
+                name=startup.name,
+                id=startup.organization.id)
+            self.assertEqual(startup_str, events[0]["description"])
 
     def test_user_joined_startup_no_created_at(self):
         join_date = days_from_now(-10)
