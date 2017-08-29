@@ -26,7 +26,7 @@ class BaseHistoryView(APIView):
         for event_class in self.event_classes:
             events = events + event_class.events(self.instance)
         result = {
-            "history": sorted([event.serialize() for event in events],
+            "results": sorted([event.serialize() for event in events],
                               key=lambda e: e["datetime"])
         }
         return Response(result)
