@@ -68,6 +68,15 @@ ORGANIZATION_HISTORY_ACTIONS = {
     }
 }
 
+USER_HISTORY_ACTIONS = {
+    "GET": {
+        "history": {
+            "type": "field",
+            "read_only": True,
+        }
+    }
+}
+
 USER_ORGANIZATION_ACTIONS = {
     'GET': {
         'organizations': {
@@ -177,13 +186,14 @@ USER_DETAIL_ACTIONS = {
 }
 
 METADATA_MAP = {
-    'User List': USER_ACTIONS,
-    'Organization List': ORGANIZATION_ACTIONS,
-    'Organization Users': ORGANIZATION_USER_ACTIONS,
-    'User Organizations': USER_ORGANIZATION_ACTIONS,
-    'User Detail': USER_DETAIL_ACTIONS,
     'Organization Detail': ORGANIZATION_DETAIL_ACTIONS,
     'Organization History': ORGANIZATION_HISTORY_ACTIONS,
+    'Organization List': ORGANIZATION_ACTIONS,
+    'Organization Users': ORGANIZATION_USER_ACTIONS,
+    'User Detail': USER_DETAIL_ACTIONS,
+    'User List': USER_ACTIONS,
+    'User Organizations': USER_ORGANIZATION_ACTIONS,
+    'User History': USER_HISTORY_ACTIONS,
 }
 
 
