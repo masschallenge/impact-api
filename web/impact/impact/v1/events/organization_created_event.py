@@ -28,10 +28,10 @@ class OrganizationCreatedEvent(object):
             }
 
     def _created_datetime(self):
-        startup = self.organization.startup_set.first()
+        startup = self.organization.startup_set.order_by("id").first()
         if startup:
             return _created_datetimes(startup, Startup)
-        partner = self.organization.partner_set.first()
+        partner = self.organization.partner_set.order_by("id").first()
         if partner:
             return _created_datetimes(partner, Partner)
         return _created_datetimes(self.organization, Organization)
