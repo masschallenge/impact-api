@@ -32,9 +32,9 @@ GENDER_TRANSLATIONS = {
     "other": "o",
     "prefer not to state": "p",
 }
-DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
-DAWN_OF_TIME = datetime.strptime("2010-01-01T00:00:00Z",
-                                 DATETIME_FORMAT)
+DAWN_OF_TIME = datetime.strptime(
+    "2010-01-01T00:00:00Z",
+    "%Y-%m-%dT%H:%M:%SZ")  # format based on what the browsable API shows
 
 
 def parse_date(date_str):
