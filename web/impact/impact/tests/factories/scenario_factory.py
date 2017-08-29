@@ -15,7 +15,7 @@ from impact.models import (
     Scenario,
 )
 
-from .judging_round_stage_factory import JudgingRoundStageFactory
+from .judging_round_factory import JudgingRoundFactory
 
 
 class ScenarioFactory(DjangoModelFactory):
@@ -24,7 +24,7 @@ class ScenarioFactory(DjangoModelFactory):
 
     name = Sequence(lambda n: "Scenario {0}".format(n))
     description = Sequence(lambda n: "Scenario Description {0}".format(n))
-    stage = SubFactory(JudgingRoundStageFactory)
+    judging_round = SubFactory(JudgingRoundFactory)
     is_active = True
     panel_size = DEFAULT_PANEL_SIZE
     max_panels_per_judge = None
