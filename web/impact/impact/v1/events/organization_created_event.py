@@ -8,7 +8,7 @@ from impact.utils import DAWN_OF_TIME
 
 
 class OrganizationCreatedEvent(object):
-    EVENT_TYPE = "created"
+    EVENT_TYPE = "organization created"
 
     def __init__(self, organization):
         self.organization = organization

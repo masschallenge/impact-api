@@ -4,7 +4,7 @@ User = get_user_model()
 
 
 class UserCreatedEvent(object):
-    EVENT_TYPE = "created"
+    EVENT_TYPE = "user created"
 
     def __init__(self, user):
         self.user = user
