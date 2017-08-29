@@ -3,7 +3,7 @@ from impact.utils import compose_filter
 
 
 class OrganizationBecameFinalistEvent(object):
-    DESCRIPTION_FORMAT = "Became Finalist on {}"
+    DESCRIPTION_FORMAT = "Became Finalist for {}"
     EVENT_TYPE = "became finalist"
 
     def __init__(self, startup_status):
