@@ -1,6 +1,9 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
+from datetime import datetime
+from pytz import utc
 from impact.models import BaseProfile
+from django.db.models import Q
 from django.utils.formats import get_format
 import dateutil.parser
 REQUIRED_USER_KEYS = [
@@ -31,6 +34,9 @@ GENDER_TRANSLATIONS = {
     "other": "o",
     "prefer not to state": "p",
 }
+DAWN_OF_TIME = utc.localize(datetime.strptime(
+        "2010-01-01T00:00:00Z",
+        "%Y-%m-%dT%H:%M:%SZ"))  # format based on what the browsable API shows
 
 
 def parse_date(date_str):
@@ -73,3 +79,15 @@ def find_gender(gender):
     if gender in VALID_GENDERS:
         return gender
     return None
+
+
+def next_instance(instance, query):
+    return _find_instance(instance, Q(id__gt=instance.id) & query, "id")
+
+
+def previous_instance(instance, query):
+    return _find_instance(instance, Q(id__lt=instance.id) & query, "-id")
+
+
+def _find_instance(instance, query, order):
+    return type(instance).objects.filter(query).order_by(order).first()

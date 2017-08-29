@@ -13,9 +13,9 @@ from .utils import is_managed
 
 try:
     from .judging_round_manager import JudgingRoundManager
-    HAS_MANAGER = True
-except ImportError:
-    HAS_MANAGER = False
+    HAS_MANAGER = True  # pragma: no cover
+except ImportError:  # pragma: no cover
+    HAS_MANAGER = False  # pragma: no cover
 
 
 ONLINE_JUDGING_ROUND_TYPE = "Online"
@@ -75,6 +75,9 @@ BUFFER_TIMES = tuple([(i * FIFTEEN_MINUTES, i * FIFTEEN_MINUTES)
 
 class JudgingRound(MCModel):
     program = models.ForeignKey(Program)
+    cycle_based_round = models.BooleanField(
+        default=False,
+        help_text="Include startups from all programs in this Program's cycle")
     name = models.CharField(max_length=60)
     start_date_time = models.DateTimeField(blank=True, null=True)
     end_date_time = models.DateTimeField(blank=True, null=True)
@@ -178,7 +181,7 @@ class JudgingRound(MCModel):
         related_name="rounds_confirmed_for")
 
     if HAS_MANAGER:
-        objects = JudgingRoundManager()
+        objects = JudgingRoundManager()  # pragma: no cover
 
     class Meta(MCModel.Meta):
         db_table = 'mc_judginground'
@@ -192,3 +195,20 @@ class JudgingRound(MCModel):
 
     def __str__(self):
         return "%s in %s" % (self.name, self.program)
+
+    def short_name(self):
+        return "{year_month} {family_abbrs} {round_name}".format(
+            year_month=self.year_month(),
+            family_abbrs=self.program_family_abbrs(),
+            round_name=self.name)
+
+    def year_month(self):
+        date = self.end_date_time
+        return "{year}-{month:02}".format(year=date.year, month=date.month)
+
+    def program_family_abbrs(self):
+        if self.cycle_based_round:
+            programs = self.program.cycle.programs.all()
+            return " ".join(sorted([program.family_abbr()
+                                    for program in programs]))
+        return self.program.family_abbr()
