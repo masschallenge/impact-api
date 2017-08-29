@@ -124,6 +124,24 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             self.assertEqual(deadline, events[0]["datetime"])
 
+    def test_user_became_judge_with_no_cycle_deadline(self):
+        user_date = days_from_now(-4)
+        user = UserFactory(date_joined=user_date)
+        cycle = ProgramCycleFactory(application_final_deadline_date=None)
+        prg = ProgramRoleGrantFactory(
+            person=user,
+            program_role__program__cycle=cycle,
+            program_role__user_role__name=UserRole.JUDGE)
+        prg.created_at = None
+        prg.save()
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_history", args=[prg.person.id])
+            response = self.client.get(url)
+            events = find_events(response.data["results"],
+                                 UserBecameConfirmedJudgeEvent.EVENT_TYPE)
+            self.assertEqual(1, len(events))
+            self.assertEqual(user_date, events[0]["datetime"])
+
     def test_user_became_confirmed_judge(self):
         prg = ProgramRoleGrantFactory(
             program_role__user_role__name=UserRole.JUDGE)

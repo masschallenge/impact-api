@@ -45,8 +45,10 @@ class BaseUserRoleGrantEvent(object):
         if result:
             return (result, result)
         program = self.program_role_grant.program_role.program
-        earliest = max(program.cycle.application_final_deadline_date,
-                       self.program_role_grant.person.date_joined)
+        earliest = self.program_role_grant.person.date_joined
+        deadline = program.cycle.application_final_deadline_date
+        if deadline and deadline > earliest:
+            earliest = deadline
         latest = utc.localize(datetime.now())
         prg_with_created_at = next_instance(self.program_role_grant,
                                             Q(created_at__isnull=False))
