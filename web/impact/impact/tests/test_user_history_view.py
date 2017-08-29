@@ -32,7 +32,7 @@ class TestUserHistoryView(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("user_history", args=[user.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  UserCreatedEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(user.date_joined, events[0]["datetime"])
@@ -42,7 +42,7 @@ class TestUserHistoryView(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("user_history", args=[stm.user.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  UserJoinedStartupEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(stm.created_at, events[0]["datetime"])
@@ -59,7 +59,7 @@ class TestUserHistoryView(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("user_history", args=[stm.user.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  UserJoinedStartupEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(join_date, events[0]["datetime"])
@@ -71,7 +71,7 @@ class TestUserHistoryView(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("user_history", args=[prg.person.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  UserBecameFinalistEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(prg.created_at, events[0]["datetime"])
@@ -94,7 +94,7 @@ class TestUserHistoryView(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("user_history", args=[prg.person.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  UserBecameFinalistEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(user_date, events[0]["datetime"])
@@ -114,7 +114,7 @@ class TestUserHistoryView(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("user_history", args=[prg.person.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  UserBecameFinalistEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(deadline, events[0]["datetime"])
@@ -125,7 +125,7 @@ class TestUserHistoryView(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("user_history", args=[prg.person.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  UserBecameConfirmedJudgeEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.PROGRAM_ROLE_FORMAT
@@ -141,7 +141,7 @@ class TestUserHistoryView(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("user_history", args=[prg.person.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  UserBecameConfirmedJudgeEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.JUDGING_ROUND_FORMAT
@@ -158,7 +158,7 @@ class TestUserHistoryView(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("user_history", args=[prg.person.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  UserBecameConfirmedJudgeEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.JUDGING_ROUND_FORMAT
@@ -172,7 +172,7 @@ class TestUserHistoryView(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("user_history", args=[prg.person.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  UserBecameConfirmedMentorEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(prg.created_at, events[0]["datetime"])

@@ -36,7 +36,7 @@ class TestOrganizationHistoryView(APITestCase):
             url = reverse("organization_history",
                           args=[startup.organization.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  OrganizationCreatedEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(startup.created_at, events[0]["datetime"])
@@ -49,7 +49,7 @@ class TestOrganizationHistoryView(APITestCase):
             url = reverse("organization_history",
                           args=[startup.organization.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  OrganizationCreatedEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(startup.created_datetime, events[0]["datetime"])
@@ -62,7 +62,7 @@ class TestOrganizationHistoryView(APITestCase):
             url = reverse("organization_history",
                           args=[startup.organization.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  OrganizationCreatedEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(DAWN_OF_TIME, events[0]["datetime"])
@@ -79,7 +79,7 @@ class TestOrganizationHistoryView(APITestCase):
             url = reverse("organization_history",
                           args=[startup.organization.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  OrganizationCreatedEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(prev_created_datetime, events[0]["datetime"])
@@ -92,7 +92,7 @@ class TestOrganizationHistoryView(APITestCase):
             url = reverse("organization_history",
                           args=[partner.organization.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  OrganizationCreatedEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(partner.created_at, events[0]["datetime"])
@@ -105,7 +105,7 @@ class TestOrganizationHistoryView(APITestCase):
             url = reverse("organization_history",
                           args=[partner.organization.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  OrganizationCreatedEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(DAWN_OF_TIME, events[0]["datetime"])
@@ -122,7 +122,7 @@ class TestOrganizationHistoryView(APITestCase):
             url = reverse("organization_history",
                           args=[partner.organization.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  OrganizationCreatedEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(DAWN_OF_TIME, events[0]["datetime"])
@@ -134,7 +134,7 @@ class TestOrganizationHistoryView(APITestCase):
             url = reverse("organization_history",
                           args=[org.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  OrganizationCreatedEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(org.created_at, events[0]["datetime"])
@@ -150,7 +150,7 @@ class TestOrganizationHistoryView(APITestCase):
             url = reverse("organization_history",
                           args=[startup.organization.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  OrganizationBecameEntrantEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertTrue(cycle.name in events[0]["description"])
@@ -169,7 +169,7 @@ class TestOrganizationHistoryView(APITestCase):
             url = reverse("organization_history",
                           args=[startup.organization.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  OrganizationBecameEntrantEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(cycle_deadline,
@@ -185,7 +185,7 @@ class TestOrganizationHistoryView(APITestCase):
             url = reverse("organization_history",
                           args=[startup.organization.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  OrganizationBecameFinalistEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertTrue(program.name in events[0]["description"])
@@ -203,7 +203,7 @@ class TestOrganizationHistoryView(APITestCase):
             url = reverse("organization_history",
                           args=[startup.organization.id])
             response = self.client.get(url)
-            events = find_events(response.data["history"],
+            events = find_events(response.data["results"],
                                  OrganizationBecameFinalistEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(start_date, events[0]["datetime"])
