@@ -224,13 +224,11 @@ class TestOrganizationHistoryView(APITestCase):
 
     def test_startup_became_entrant_no_final_deadline_with_other_cycles(self):
         prev_deadline = days_from_now(-10)
-        prev_cycle = ProgramCycleFactory(
-            application_final_deadline_date=prev_deadline)
+        ProgramCycleFactory(application_final_deadline_date=prev_deadline)
         cycle = ProgramCycleFactory(
             application_final_deadline_date=None)
         next_deadline = days_from_now(-5)
-        next_cycle = ProgramCycleFactory(
-            application_final_deadline_date=next_deadline)
+        ProgramCycleFactory(application_final_deadline_date=next_deadline)
         application = ApplicationFactory(
             application_status=SUBMITTED_APP_STATUS,
             application_type=cycle.default_application_type,

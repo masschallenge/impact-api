@@ -1,10 +1,5 @@
 from datetime import datetime
 from pytz import utc
-from impact.models import (
-    Organization,
-    Partner,
-    Startup,
-)
 from impact.utils import DAWN_OF_TIME
 
 
@@ -30,43 +25,43 @@ class OrganizationCreatedEvent(object):
     def _created_datetime(self):
         startup = self.organization.startup_set.order_by("id").first()
         if startup:
-            return _created_datetimes(startup, Startup)
+            return _created_datetimes(startup)
         partner = self.organization.partner_set.order_by("id").first()
         if partner:
-            return _created_datetimes(partner, Partner)
-        return _created_datetimes(self.organization, Organization)
+            return _created_datetimes(partner)
+        return _created_datetimes(self.organization)
 
 
-def _created_datetimes(instance, cls):
+def _created_datetimes(instance):
     if instance.created_at is not None:
         return (instance.created_at, instance.created_at)
     if hasattr(instance, "created_datetime"):
         if instance.created_datetime is not None:
             return (instance.created_datetime,
                     instance.created_datetime)
-        return (_previous_created_datetime(instance, cls),
-                _next_created_datetime(instance, cls))
-    next_instance = cls.objects.filter(id__gt=instance.id,
-                                       created_at__isnull=False
-                                       ).order_by("id").first()
+        return (_previous_created_datetime(instance),
+                _next_created_datetime(instance))
+    next_instance = type(instance).objects.filter(id__gt=instance.id,
+                                                  created_at__isnull=False
+                                                  ).order_by("id").first()
     if next_instance:
         return (DAWN_OF_TIME, next_instance.created_at)
     return (DAWN_OF_TIME, utc.localize(datetime.now()))
 
 
-def _previous_created_datetime(instance, cls):
-    prev_instance = cls.objects.filter(id__lt=instance.id,
-                                       created_datetime__isnull=False
-                                       ).order_by('-id').first()
+def _previous_created_datetime(instance):
+    prev_instance = type(instance).objects.filter(
+        id__lt=instance.id,
+        created_datetime__isnull=False).order_by('-id').first()
     if prev_instance:
         return prev_instance.created_datetime
     return DAWN_OF_TIME
 
 
-def _next_created_datetime(instance, cls):
-    next_instance = cls.objects.filter(id__gt=instance.id,
-                                       created_datetime__isnull=False
-                                       ).order_by('id').first()
+def _next_created_datetime(instance):
+    next_instance = type(instance).objects.filter(
+        id__gt=instance.id,
+        created_datetime__isnull=False).order_by('id').first()
     if next_instance:
         return next_instance.created_datetime
     return datetime.now()
