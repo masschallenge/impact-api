@@ -71,10 +71,10 @@ class TestOrganizationHistoryView(APITestCase):
         prev_created_datetime = days_from_now(-10)
         StartupFactory(created_datetime=prev_created_datetime)
         startup = StartupFactory(created_datetime=None)
-        next_created_datetime = days_from_now(-2)
-        StartupFactory(created_datetime=next_created_datetime)
         startup.created_at = None
         startup.save()
+        next_created_datetime = days_from_now(-2)
+        StartupFactory(created_datetime=next_created_datetime)
         with self.login(username=self.basic_user().username):
             url = reverse("organization_history",
                           args=[startup.organization.id])
