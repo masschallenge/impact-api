@@ -1,4 +1,5 @@
 from datetime import datetime
+from pytz import utc
 from django.contrib.auth import get_user_model
 from impact.models import StartupTeamMember
 
@@ -35,7 +36,7 @@ class UserJoinedStartupEvent(object):
         if member_time:
             return (member_time, member_time)
         earliest = self.member.user.date_joined
-        latest = datetime.now()
+        latest = utc.localize(datetime.now())
         most_recent_stm = User.objects.filter(
             startupteammember__id__lte=self.member.id
             ).order_by('-date_joined').first()

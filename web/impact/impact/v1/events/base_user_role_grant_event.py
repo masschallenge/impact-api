@@ -3,6 +3,7 @@ from abc import (
     abstractmethod,
 )
 from datetime import datetime
+from pytz import utc
 from impact.models import ProgramRoleGrant
 from impact.utils import compose_filter
 
@@ -43,7 +44,7 @@ class BaseUserRoleGrantEvent(object):
         program = self.program_role_grant.program_role.program
         earliest = max(program.cycle.application_final_deadline_date,
                        self.program_role_grant.person.date_joined)
-        latest = datetime.now()
+        latest = utc.localize(datetime.now())
         prg_with_created_at = ProgramRoleGrant.objects.filter(
             id__gt=self.program_role_grant.id,
             created_at__isnull=False).order_by("id").first()

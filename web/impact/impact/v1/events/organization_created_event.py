@@ -1,4 +1,5 @@
 from datetime import datetime
+from pytz import utc
 from impact.models import (
     Organization,
     Partner,
@@ -50,7 +51,7 @@ def _created_datetimes(instance, cls):
                                        ).order_by("id").first()
     if next_instance:
         return (DAWN_OF_TIME, next_instance.created_at)
-    return (DAWN_OF_TIME, datetime.now())
+    return (DAWN_OF_TIME, utc.localize(datetime.now()))
 
 
 def _previous_created_datetime(instance, cls):

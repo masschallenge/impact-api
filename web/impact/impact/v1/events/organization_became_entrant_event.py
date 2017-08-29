@@ -1,7 +1,12 @@
+from datetime import datetime
+from pytz import utc
 from impact.models import (
     ProgramCycle,
     SUBMITTED_APP_STATUS,
+    StartupRole,
+    StartupStatus,
 )
+from impact.utils import DAWN_OF_TIME
 
 
 class OrganizationBecameEntrantEvent(object):
@@ -24,16 +29,58 @@ class OrganizationBecameEntrantEvent(object):
         return result
 
     def serialize(self):
-        submission_time = self._submission_datetime()
+        earliest, latest = self._datetimes()
         return {
-            "datetime": submission_time,
+            "datetime": earliest,
+            "latest_datetime": latest,
             "event_type": self.EVENT_TYPE,
             "description": self.DESCRIPTION_FORMAT.format(
                 self.application.cycle.name)
             }
 
+    def _datetimes(self):
+        return (self._startup_status_time() or
+                self._submission_datetime() or
+                self._application_final_deadline() or
+                self._infer_datetimes())
+
+    def _startup_status_time(self):
+        startup = self.application.startup
+        cycle = self.application.cycle
+        startup_status = StartupStatus.objects.filter(
+            program_startup_status__startup_role__name=StartupRole.ENTRANT,
+            program_startup_status__program__cycle=cycle,
+            startup=startup,
+            created_at__isnull=False).order_by("created_at").first()
+        if startup_status:
+            return (startup_status.created_at, startup_status.created_at)
+        return None
+
     def _submission_datetime(self):
         result = self.application.submission_datetime
-        if result is None:
-            return self.application.cycle.application_final_deadline_date
-        return result
+        if result is not None:
+            return (result, result)
+        return None
+
+    def _application_final_deadline(self):
+        cycle = self.application.cycle
+        result = cycle.application_final_deadline_date
+        if result is not None:
+            return (result, result)
+        return None
+
+    def _infer_datetimes(self):
+        earliest = DAWN_OF_TIME
+        cycle = self.application.cycle
+        prev_cycle = ProgramCycle.objects.filter(
+            application_final_deadline_date__isnull=False,
+            id__lt=cycle.id).order_by("-id").first()
+        if prev_cycle:
+            earliest = prev_cycle.application_final_deadline_date
+        latest = utc.localize(datetime.now())
+        next_cycle = ProgramCycle.objects.filter(
+            application_final_deadline_date__isnull=False,
+            id__gt=cycle.id).order_by("id").first()
+        if next_cycle:
+            latest = next_cycle.application_final_deadline_date
+        return (earliest, latest)

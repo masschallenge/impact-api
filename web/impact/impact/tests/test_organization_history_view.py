@@ -12,6 +12,7 @@ from impact.tests.factories import (
     OrganizationFactory,
     PartnerFactory,
     ProgramCycleFactory,
+    ProgramFactory,
     StartupFactory,
     StartupStatusFactory,
 )
@@ -140,10 +141,36 @@ class TestOrganizationHistoryView(APITestCase):
             self.assertEqual(org.created_at, events[0]["datetime"])
 
     def test_startup_became_entrant(self):
-        cycle = ProgramCycleFactory()
+        program = ProgramFactory()
+        cycle = program.cycle
         application = ApplicationFactory(
             application_status=SUBMITTED_APP_STATUS,
             application_type=cycle.default_application_type,
+            cycle=cycle)
+        startup = application.startup
+        startup_status = StartupStatusFactory(
+            startup=startup,
+            program_startup_status__program=program,
+            program_startup_status__startup_role__name=StartupRole.ENTRANT)
+        startup_status.created_at = days_from_now(-1)
+        startup_status.save()
+        with self.login(username=self.basic_user().username):
+            url = reverse("organization_history",
+                          args=[startup.organization.id])
+            response = self.client.get(url)
+            events = find_events(response.data["results"],
+                                 OrganizationBecameEntrantEvent.EVENT_TYPE)
+            self.assertEqual(1, len(events))
+            self.assertTrue(cycle.name in events[0]["description"])
+            self.assertEqual(startup_status.created_at, events[0]["datetime"])
+
+    def test_startup_became_entrant_no_startup_status(self):
+        cycle = ProgramCycleFactory()
+        submission_datetime = days_from_now(-2)
+        application = ApplicationFactory(
+            application_status=SUBMITTED_APP_STATUS,
+            application_type=cycle.default_application_type,
+            submission_datetime=submission_datetime,
             cycle=cycle)
         startup = application.startup
         with self.login(username=self.basic_user().username):
@@ -154,6 +181,7 @@ class TestOrganizationHistoryView(APITestCase):
                                  OrganizationBecameEntrantEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertTrue(cycle.name in events[0]["description"])
+            self.assertEqual(submission_datetime, events[0]["datetime"])
 
     def test_startup_became_entrant_no_submission_datetime(self):
         cycle_deadline = days_from_now(-1)
@@ -174,6 +202,52 @@ class TestOrganizationHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             self.assertEqual(cycle_deadline,
                              events[0]["datetime"])
+
+    def test_startup_became_entrant_no_final_deadline(self):
+        cycle = ProgramCycleFactory(
+            application_final_deadline_date=None)
+        application = ApplicationFactory(
+            application_status=SUBMITTED_APP_STATUS,
+            application_type=cycle.default_application_type,
+            cycle=cycle,
+            submission_datetime=None)
+        startup = application.startup
+        with self.login(username=self.basic_user().username):
+            url = reverse("organization_history",
+                          args=[startup.organization.id])
+            response = self.client.get(url)
+            events = find_events(response.data["results"],
+                                 OrganizationBecameEntrantEvent.EVENT_TYPE)
+            self.assertEqual(1, len(events))
+            self.assertEqual(DAWN_OF_TIME,
+                             events[0]["datetime"])
+
+    def test_startup_became_entrant_no_final_deadline_with_other_cycles(self):
+        prev_deadline = days_from_now(-10)
+        prev_cycle = ProgramCycleFactory(
+            application_final_deadline_date=prev_deadline)
+        cycle = ProgramCycleFactory(
+            application_final_deadline_date=None)
+        next_deadline = days_from_now(-5)
+        next_cycle = ProgramCycleFactory(
+            application_final_deadline_date=next_deadline)
+        application = ApplicationFactory(
+            application_status=SUBMITTED_APP_STATUS,
+            application_type=cycle.default_application_type,
+            cycle=cycle,
+            submission_datetime=None)
+        startup = application.startup
+        with self.login(username=self.basic_user().username):
+            url = reverse("organization_history",
+                          args=[startup.organization.id])
+            response = self.client.get(url)
+            events = find_events(response.data["results"],
+                                 OrganizationBecameEntrantEvent.EVENT_TYPE)
+            self.assertEqual(1, len(events))
+            self.assertEqual(prev_deadline,
+                             events[0]["datetime"])
+            self.assertEqual(next_deadline,
+                             events[0]["latest_datetime"])
 
     def test_startup_became_finalist(self):
         startup = StartupFactory()
