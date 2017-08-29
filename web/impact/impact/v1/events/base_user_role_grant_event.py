@@ -20,11 +20,10 @@ class BaseUserRoleGrantEvent(object):
     @classmethod
     def events(cls, user):
         result = []
-        for prg in user.programrolegrant_set.filter(**compose_filter(
-                ["program_role",
-                 "user_role",
-                 "name"],
-                cls.USER_ROLE)):
+        user_role_name_filter = compose_filter(
+            ["program_role", "user_role", "name"],
+            cls.USER_ROLE)
+        for prg in user.programrolegrant_set.filter(**user_role_name_filter):
             result.append(cls(prg))
         return result
 
