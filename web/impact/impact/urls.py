@@ -20,12 +20,14 @@ from impact.v0.views import (
     StartupDetailView,
 )
 from impact.v1.views import (
-    UserDetailView,
-    UserListView,
-    UserOrganizationsView,
     OrganizationDetailView,
+    OrganizationHistoryView,
     OrganizationListView,
     OrganizationUsersView,
+    UserDetailView,
+    UserHistoryView,
+    UserListView,
+    UserOrganizationsView,
 )
 from rest_framework import routers
 from drf_auto_endpoint.router import router as schema_router
@@ -69,25 +71,31 @@ v0_urlpatterns = [
 ]
 
 v1_urlpatterns = [
-    url(r"^user/(?P<pk>[0-9]+)/$",
-        UserDetailView.as_view(),
-        name="user_detail"),
-    url(r"^user/$",
-        UserListView.as_view(),
-        name="user"),
-    url(r"^user/(?P<pk>[0-9]+)/organizations/$",
-        UserOrganizationsView.as_view(),
-        name="user_organizations"),
-
     url(r"^organization/(?P<pk>[0-9]+)/$",
         OrganizationDetailView.as_view(),
         name="organization_detail"),
+    url(r"^organization/(?P<pk>[0-9]+)/history$",
+        OrganizationHistoryView.as_view(),
+        name="organization_history"),
     url(r"^organization/$",
         OrganizationListView.as_view(),
         name="organization"),
     url(r"^organization/(?P<pk>[0-9]+)/users/$",
         OrganizationUsersView.as_view(),
         name="organization_users"),
+
+    url(r"^user/(?P<pk>[0-9]+)/$",
+        UserDetailView.as_view(),
+        name="user_detail"),
+    url(r"^user/(?P<pk>[0-9]+)/history$",
+        UserHistoryView.as_view(),
+        name="user_history"),
+    url(r"^user/$",
+        UserListView.as_view(),
+        name="user"),
+    url(r"^user/(?P<pk>[0-9]+)/organizations/$",
+        UserOrganizationsView.as_view(),
+        name="user_organizations"),
 ]
 
 urls = [

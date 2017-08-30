@@ -32,6 +32,7 @@ class JudgingRoundFactory(DjangoModelFactory):
         model = JudgingRound
 
     program = SubFactory(ProgramFactory)
+    cycle_based_round = False
     name = Sequence(lambda n: "name{0}".format(n))
     start_date_time = months_from_now(1)
     end_date_time = months_from_now(2)

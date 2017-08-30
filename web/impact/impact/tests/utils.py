@@ -25,3 +25,8 @@ def match_errors(data, errors):
         if not found:
             return False
     return True
+
+
+def find_events(history, event_type):
+    return [event for event in history
+            if event["event_type"] == event_type]
