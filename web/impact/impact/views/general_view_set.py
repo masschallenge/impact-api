@@ -5,12 +5,14 @@ from django.apps import apps
 from django.db import models
 from rest_framework import viewsets
 from rest_framework import permissions
+from rest_framework_tracking.mixins import LoggingMixin
+
 
 from impact.permissions import DynamicModelPermissions
 from impact.serializers import GeneralSerializer
 
 
-class GeneralViewSet(viewsets.ModelViewSet):
+class GeneralViewSet(LoggingMixin, viewsets.ModelViewSet):
     permission_classes = (
         permissions.IsAuthenticated,
         DynamicModelPermissions,
