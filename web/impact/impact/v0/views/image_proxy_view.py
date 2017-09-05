@@ -7,6 +7,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from rest_framework.response import Response
 from rest_framework_proxy.views import ProxyView
+from rest_framework_tracking.mixins import LoggingMixin
 
 from impact.permissions import (
     V0APIPermissions
@@ -14,7 +15,7 @@ from impact.permissions import (
 from impact.v0.views.utils import encrypt_image_token
 
 
-class ImageProxyView(ProxyView):
+class ImageProxyView(LoggingMixin, ProxyView):
     source = "api/image/"
     verify_ssl = False
     return_raw = True

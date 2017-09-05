@@ -4,13 +4,14 @@
 from django.conf import settings
 from rest_framework.response import Response
 from rest_framework_proxy.views import ProxyView
+from rest_framework_tracking.mixins import LoggingMixin
 
 from impact.permissions import (
     V0APIPermissions,
 )
 
 
-class MentorsProxyView(ProxyView):
+class MentorsProxyView(LoggingMixin, ProxyView):
     source = 'api/mentors/'
     verify_ssl = False
     permission_classes = (
