@@ -4,9 +4,9 @@ from rest_framework_tracking.models import APIRequestLog
 
 class LogProxyView():
     """
-    Proxy views can't use the drf-tracking mixin; this mixin gives them a 
-    `log` method to log requests manually
+    Manual logging for proxy views, which can't use the drf-tracking mixin.
     """
+
     def log(self):
         ip = self.request.META.get("HTTP_X_FORWARDED_FOR")
         ip = ip or self.request.META.get("REMOTE_ADDR")
