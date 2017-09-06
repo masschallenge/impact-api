@@ -13,9 +13,10 @@ from impact.permissions import (
     V0APIPermissions
 )
 from impact.v0.views.utils import encrypt_image_token
+from ..mixins.proxy_view_logging_mixin import LogProxyView
 
 
-class ImageProxyView(LoggingMixin, ProxyView):
+class ImageProxyView(LogProxyView, ProxyView):
     source = "api/image/"
     verify_ssl = False
     return_raw = True
@@ -39,6 +40,7 @@ class ImageProxyView(LoggingMixin, ProxyView):
                                    self.request.GET.get("Size", "100x100"))
         self._update_get_parameter("SiteName", settings.V0_SITE_NAME)
         self._update_get_parameter("ImageToken", self._secure_image_token())
+        self.log()
         return self.proxy(self.request, *args, **kwargs)
 
     def valid(self, data):

@@ -2,16 +2,17 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from django.conf import settings
+
 from rest_framework.response import Response
 from rest_framework_proxy.views import ProxyView
-from rest_framework_tracking.mixins import LoggingMixin
 
 from impact.permissions import (
     V0APIPermissions,
 )
+from ..mixins.proxy_view_logging_mixin import LogProxyView
 
 
-class MentorsProxyView(LoggingMixin, ProxyView):
+class MentorsProxyView(LogProxyView, ProxyView):
     source = 'api/mentors/'
     verify_ssl = False
     permission_classes = (
@@ -29,6 +30,7 @@ class MentorsProxyView(LoggingMixin, ProxyView):
         self.request.query_params['SiteName'] = settings.V0_SITE_NAME
         self.request.query_params['SecurityKey'] = settings.V0_SECURITY_KEY
         self.request.query_params._mutable = False
+        self.log()
         return self.proxy(self.request, *args, **kwargs)
 
     def valid(self, data):
