@@ -61,7 +61,7 @@ target_help = \
 
 
 dbload_error_msg = GZ_FILE must be set. \
-  E.g. 'make dbload GZ_FILE=../accelerate/db_cache/initial_schema.sql.gz'
+  E.g. 'make dbload GZ_FILE=../accelerate/test_data/initial_schema.sql.gz'
 
 grant_permissions_error_msg = PERMISSION_USER and PERMISSION_CLASSES must be \
   set.  E.g., 'make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v0_clients'

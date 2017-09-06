@@ -68,7 +68,7 @@ you have an up-to-date accelerate source code directory next to
 the impact-api directory, the following should work:
 
 ```
-make dbload GZ_FILE=../accelerate/db_cache/initial_schema.sql.gz
+make dbload GZ_FILE=../accelerate/test_data/initial_schema.sql.gz
 ```
 
 6. Create a new superuser account:
