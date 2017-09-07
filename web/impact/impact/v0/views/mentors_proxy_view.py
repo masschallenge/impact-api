@@ -9,10 +9,9 @@ from rest_framework_proxy.views import ProxyView
 from impact.permissions import (
     V0APIPermissions,
 )
-from ..mixins.proxy_view_logging_mixin import LogProxyView
 
 
-class MentorsProxyView(LogProxyView, ProxyView):
+class MentorsProxyView(ProxyView):
     source = 'api/mentors/'
     verify_ssl = False
     permission_classes = (
