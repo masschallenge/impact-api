@@ -38,7 +38,6 @@ class ImageProxyView(ProxyView):
                                    self.request.GET.get("Size", "100x100"))
         self._update_get_parameter("SiteName", settings.V0_SITE_NAME)
         self._update_get_parameter("ImageToken", self._secure_image_token())
-        self.log()
         return self.proxy(self.request, *args, **kwargs)
 
     def valid(self, data):

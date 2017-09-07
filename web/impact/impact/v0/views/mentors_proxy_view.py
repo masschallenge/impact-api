@@ -29,7 +29,6 @@ class MentorsProxyView(ProxyView):
         self.request.query_params['SiteName'] = settings.V0_SITE_NAME
         self.request.query_params['SecurityKey'] = settings.V0_SECURITY_KEY
         self.request.query_params._mutable = False
-        self.log()
         return self.proxy(self.request, *args, **kwargs)
 
     def valid(self, data):
