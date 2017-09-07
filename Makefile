@@ -243,3 +243,12 @@ endif
 	@docker push $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
 	@ecs-cli compose -f docker-compose.prod.yml down
 	@ecs-cli compose -f docker-compose.prod.yml up
+
+dbdump:
+	@echo ERROR: dbdump has been replaced by db-dump
+
+dbload:
+	@echo ERROR: dbload has been replaced by load-db
+
+dbshell:
+	@echo ERROR: dbshell has been replaced by db-shell
