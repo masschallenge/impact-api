@@ -11,11 +11,13 @@ targets = \
   coverage-report \
   coverage-html \
   coverage-html-open \
-  dbdump \
-  dbload \
-  dbshell \
+  dump-db \
+  load-db \
+  load-remote-db \
+  db-shell \
   deploy \
   dev \
+  fetch-remote-db \
   grant-permissions \
   help \
   lint \
@@ -42,13 +44,15 @@ target_help = \
   "comp-message - Compiles .po files and makes them available to Django." \
   "coverage - Run coverage and generate text report." \
   "coverage-html - Run coverage and generate HTML report." \
-  "dbdump - Create a gzipped database dump as dump.sql.gz in local directory." \
-  "dbload - Load gzipped database file. GZ_FILE must be defined." \
-  "dbshell - Access to running MySQL." \
+  "dump-db - Create a gzipped database dump as dump.sql.gz in local directory." \
+  "load-db - Load gzipped database file. GZ_FILE must be defined." \
+  "db-shell - Access to running MySQL." \
   "dev - Start all containers needed to run a webserver." \
+  "fetch-remote-db - Updates a DB image from remote container." \
   "grant-permissions - Grants PERMISSION_CLASSES to PERMISSION_USER." \
   "help - Prints this help message." \
   "lint - Runs any configured linters (pylint at the moment)." \
+  "load-remote-db" - fetches a remote db and loads it in one target. \
   "messages - Creates .po files for languages targeted for translation." \
   "nuke - The nuclear option. Deletes ALL images and containers." \
   "release - pushes to a given DOCKER_REGISTRY with the provided AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY" \
@@ -60,8 +64,11 @@ target_help = \
   "\tmake test TESTS='impact.tests.test_api_routes.TestApiRoute.test_api_object_get impact.tests.test_api_routes.TestApiRoute.test_api_object_delete'"
 
 
-dbload_error_msg = GZ_FILE must be set. \
-  E.g. 'make dbload GZ_FILE=../accelerate/db_cache/initial_schema.sql.gz'
+load_db_error_msg = GZ_FILE must be set. \
+  E.g. 'make load-db GZ_FILE=${DB_CACHE_DIR}initial_schema.sql.gz'
+
+fetch_remote_db_error_msg = DB_FILE_NAME must be set. \
+  E.g. 'make $(MAKECMDGOALS) DB_FILE_NAME=initial_schema.sql.gz' or
 
 grant_permissions_error_msg = PERMISSION_USER and PERMISSION_CLASSES must be \
   set.  E.g., 'make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v0_clients'
@@ -77,6 +84,8 @@ environment_error_msg = ENVIRONMENT must be \
 
 
 .PHONY: $(targets) $(deprecated_targets)
+
+DB_CACHE_DIR = db_cache/
 
 help:
 	@echo "Valid targets are:\n"
@@ -122,7 +131,7 @@ runserver:
 shell:
 	@docker-compose run --rm web ./manage.py shell
 
-dbshell:
+db-shell:
 	@docker-compose run --rm web ./manage.py dbshell
 
 stop:
@@ -171,17 +180,35 @@ lint:
 messages:
 	@docker-compose exec web python manage.py makemessages -a
 
-dbdump:
+dump-db:
 	@docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev | gzip > dump.sql.gz
 	@echo Created dump.sql.gz
 
-dbload:
-ifndef GZ_FILE
-	$(error $(dbload_error_msg))
+GZ_FILE ?= $(DB_CACHE_DIR)$(DB_FILE_NAME)
+
+load-db:
+ifeq ($(GZ_FILE), $(DB_CACHE_DIR))
+	$(error $(load_db_error_msg))
 endif
 	@echo "drop database mc_dev; create database mc_dev;" | docker-compose run --rm web ./manage.py dbshell
 	@gzcat $(GZ_FILE) | docker-compose run --rm web ./manage.py dbshell
 	@docker-compose run --rm web ./manage.py migrate --no-input
+
+${DB_CACHE_DIR}:
+	mkdir -p ${DB_CACHE_DIR}
+
+fetch-remote-db: ${DB_CACHE_DIR}
+fetch-remote-db:
+ifndef DB_FILE_NAME
+	$(error $(fetch_remote_db_error_msg))
+endif
+	@echo cleaning cache for ${DB_FILE_NAME}
+	@rm -f ${DB_CACHE_DIR}$(DB_FILE_NAME)
+	@echo downloading db...
+	@wget -P ${DB_CACHE_DIR} https://s3.amazonaws.com/public-clean-saved-db-states/${DB_FILE_NAME}
+
+load-remote-db: fetch-remote-db load-db
+
 
 restart:
 	@docker-compose restart web
@@ -216,3 +243,12 @@ endif
 	@docker push $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
 	@ecs-cli compose -f docker-compose.prod.yml down
 	@ecs-cli compose -f docker-compose.prod.yml up
+
+dbdump:
+	@echo ERROR: dbdump has been replaced by db-dump
+
+dbload:
+	@echo ERROR: dbload has been replaced by load-db
+
+dbshell:
+	@echo ERROR: dbshell has been replaced by db-shell
