@@ -52,7 +52,7 @@ target_help = \
   "grant-permissions - Grants PERMISSION_CLASSES to PERMISSION_USER." \
   "help - Prints this help message." \
   "lint - Runs any configured linters (pylint at the moment)." \
-  "load-remote-db" - fetches a remote db and loads it in one target. \
+  "load-remote-db - fetches a remote db and loads it in one target." \
   "messages - Creates .po files for languages targeted for translation." \
   "nuke - The nuclear option. Deletes ALL images and containers." \
   "release - pushes to a given DOCKER_REGISTRY with the provided AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY" \
