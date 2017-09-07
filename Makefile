@@ -13,6 +13,7 @@ targets = \
   coverage-html-open \
   dump-db \
   load-db \
+  load-remote-db \
   db-shell \
   deploy \
   dev \
@@ -51,6 +52,7 @@ target_help = \
   "grant-permissions - Grants PERMISSION_CLASSES to PERMISSION_USER." \
   "help - Prints this help message." \
   "lint - Runs any configured linters (pylint at the moment)." \
+  "load-remote-db" - fetches a remote db and loads it in one target. \
   "messages - Creates .po files for languages targeted for translation." \
   "nuke - The nuclear option. Deletes ALL images and containers." \
   "release - pushes to a given DOCKER_REGISTRY with the provided AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY" \
@@ -63,10 +65,10 @@ target_help = \
 
 
 load_db_error_msg = GZ_FILE must be set. \
-  E.g. 'make load-db GZ_FILE=./db_cache/initial_schema.sql.gz'
+  E.g. 'make load-db GZ_FILE=${DB_CACHE_DIR}initial_schema.sql.gz'
 
 fetch_remote_db_error_msg = DB_FILE_NAME must be set. \
-  E.g. 'make fetch-remote-db DB_FILE_NAME=initial_schema.sql.gz'
+  E.g. 'make $(MAKECMDGOALS) DB_FILE_NAME=initial_schema.sql.gz' or
 
 grant_permissions_error_msg = PERMISSION_USER and PERMISSION_CLASSES must be \
   set.  E.g., 'make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v0_clients'
@@ -82,6 +84,8 @@ environment_error_msg = ENVIRONMENT must be \
 
 
 .PHONY: $(targets) $(deprecated_targets)
+
+DB_CACHE_DIR = db_cache/
 
 help:
 	@echo "Valid targets are:\n"
@@ -180,24 +184,31 @@ dump-db:
 	@docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev | gzip > dump.sql.gz
 	@echo Created dump.sql.gz
 
+GZ_FILE ?= $(DB_CACHE_DIR)$(DB_FILE_NAME)
+
 load-db:
-ifndef GZ_FILE
+ifeq ($(GZ_FILE), $(DB_CACHE_DIR))
 	$(error $(load_db_error_msg))
 endif
 	@echo "drop database mc_dev; create database mc_dev;" | docker-compose run --rm web ./manage.py dbshell
 	@gzcat $(GZ_FILE) | docker-compose run --rm web ./manage.py dbshell
 	@docker-compose run --rm web ./manage.py migrate --no-input
 
-fetch-remote-db: $(shell if [ ! -d "./db_cache/" ]; then mkdir ./db_cache/; fi;)
+db_cache:
+	mkdir -p ${DB_CACHE_DIR}
+
+fetch-remote-db: db_cache
 fetch-remote-db:
 ifndef DB_FILE_NAME
 	$(error $(fetch_remote_db_error_msg))
 endif
 	@echo cleaning cache for ${DB_FILE_NAME}
-	@$(shell if [ -f ./db_cache/${DB_FILE_NAME} ]; then rm ./db_cache/${DB_FILE_NAME};fi;)
+	@rm -f ${DB_CACHE_DIR}$(DB_FILE_NAME)
 	@echo downloading db...
-	@wget -P ./db_cache/ https://s3.amazonaws.com/public-clean-saved-db-states/${DB_FILE_NAME}
-	@echo "DB ${DB_FILE_NAME} is now up to date. You can load it by running 'make load-db GZ_FILE=./db_cache/${DB_FILE_NAME}'."
+	@wget -P ${DB_CACHE_DIR} https://s3.amazonaws.com/public-clean-saved-db-states/${DB_FILE_NAME}
+
+load-remote-db: fetch-remote-db load-db
+
 
 restart:
 	@docker-compose restart web
