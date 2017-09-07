@@ -194,10 +194,10 @@ endif
 	@gzcat $(GZ_FILE) | docker-compose run --rm web ./manage.py dbshell
 	@docker-compose run --rm web ./manage.py migrate --no-input
 
-db_cache:
+${DB_CACHE_DIR}:
 	mkdir -p ${DB_CACHE_DIR}
 
-fetch-remote-db: db_cache
+fetch-remote-db: ${DB_CACHE_DIR}
 fetch-remote-db:
 ifndef DB_FILE_NAME
 	$(error $(fetch_remote_db_error_msg))
