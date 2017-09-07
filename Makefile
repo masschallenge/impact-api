@@ -16,6 +16,7 @@ targets = \
   dbshell \
   deploy \
   dev \
+  fetchremotedb \
   grant-permissions \
   help \
   lint \
@@ -46,6 +47,7 @@ target_help = \
   "dbload - Load gzipped database file. GZ_FILE must be defined." \
   "dbshell - Access to running MySQL." \
   "dev - Start all containers needed to run a webserver." \
+  "fetchremotedb - Updates a DB image from remote container." \
   "grant-permissions - Grants PERMISSION_CLASSES to PERMISSION_USER." \
   "help - Prints this help message." \
   "lint - Runs any configured linters (pylint at the moment)." \
@@ -61,7 +63,10 @@ target_help = \
 
 
 dbload_error_msg = GZ_FILE must be set. \
-  E.g. 'make dbload GZ_FILE=../accelerate/test_data/initial_schema.sql.gz'
+  E.g. 'make dbload GZ_FILE=./db_cache/initial_schema.sql.gz'
+
+remotedbload_error_msg = DB_FILE_NAME must be set. \
+  E.g. 'make remotedbload DB_FILE_NAME=initial_schema.sql.gz'
 
 grant_permissions_error_msg = PERMISSION_USER and PERMISSION_CLASSES must be \
   set.  E.g., 'make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v0_clients'
@@ -182,6 +187,17 @@ endif
 	@echo "drop database mc_dev; create database mc_dev;" | docker-compose run --rm web ./manage.py dbshell
 	@gzcat $(GZ_FILE) | docker-compose run --rm web ./manage.py dbshell
 	@docker-compose run --rm web ./manage.py migrate --no-input
+
+fetchremotedb: $(shell if [ ! -d "./db_cache/" ]; then mkdir ./db_cache/; fi;)
+fetchremotedb:
+ifndef DB_FILE_NAME
+	$(error $(remotedbload_error_msg))
+endif
+	@echo cleaning cache for ${DB_FILE_NAME}
+	@$(shell if [ -f ./db_cache/${DB_FILE_NAME} ]; then rm ./db_cache/${DB_FILE_NAME};fi;)
+	@echo downloading db...
+	@wget -P ./db_cache/ https://s3.amazonaws.com/public-clean-saved-db-states/${DB_FILE_NAME}
+	@echo "DB ${DB_FILE_NAME} is now up to date. You can load it by running 'make dbload GZ_FILE=./db_cache/${DB_FILE_NAME}'."
 
 restart:
 	@docker-compose restart web
