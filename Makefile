@@ -11,12 +11,12 @@ targets = \
   coverage-report \
   coverage-html \
   coverage-html-open \
-  dbdump \
-  dbload \
-  dbshell \
+  dump-db \
+  load-db \
+  db-shell \
   deploy \
   dev \
-  fetchremotedb \
+  fetch-remote-db \
   grant-permissions \
   help \
   lint \
@@ -43,11 +43,11 @@ target_help = \
   "comp-message - Compiles .po files and makes them available to Django." \
   "coverage - Run coverage and generate text report." \
   "coverage-html - Run coverage and generate HTML report." \
-  "dbdump - Create a gzipped database dump as dump.sql.gz in local directory." \
-  "dbload - Load gzipped database file. GZ_FILE must be defined." \
-  "dbshell - Access to running MySQL." \
+  "dump-db - Create a gzipped database dump as dump.sql.gz in local directory." \
+  "load-db - Load gzipped database file. GZ_FILE must be defined." \
+  "db-shell - Access to running MySQL." \
   "dev - Start all containers needed to run a webserver." \
-  "fetchremotedb - Updates a DB image from remote container." \
+  "fetch-remote-db - Updates a DB image from remote container." \
   "grant-permissions - Grants PERMISSION_CLASSES to PERMISSION_USER." \
   "help - Prints this help message." \
   "lint - Runs any configured linters (pylint at the moment)." \
@@ -62,11 +62,11 @@ target_help = \
   "\tmake test TESTS='impact.tests.test_api_routes.TestApiRoute.test_api_object_get impact.tests.test_api_routes.TestApiRoute.test_api_object_delete'"
 
 
-dbload_error_msg = GZ_FILE must be set. \
-  E.g. 'make dbload GZ_FILE=./db_cache/initial_schema.sql.gz'
+load_db_error_msg = GZ_FILE must be set. \
+  E.g. 'make load-db GZ_FILE=./db_cache/initial_schema.sql.gz'
 
-remotedbload_error_msg = DB_FILE_NAME must be set. \
-  E.g. 'make remotedbload DB_FILE_NAME=initial_schema.sql.gz'
+fetch_remote_db_error_msg = DB_FILE_NAME must be set. \
+  E.g. 'make fetch-remote-db DB_FILE_NAME=initial_schema.sql.gz'
 
 grant_permissions_error_msg = PERMISSION_USER and PERMISSION_CLASSES must be \
   set.  E.g., 'make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v0_clients'
@@ -127,7 +127,7 @@ runserver:
 shell:
 	@docker-compose run --rm web ./manage.py shell
 
-dbshell:
+db-shell:
 	@docker-compose run --rm web ./manage.py dbshell
 
 stop:
@@ -176,28 +176,28 @@ lint:
 messages:
 	@docker-compose exec web python manage.py makemessages -a
 
-dbdump:
+dump-db:
 	@docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev | gzip > dump.sql.gz
 	@echo Created dump.sql.gz
 
-dbload:
+load-db:
 ifndef GZ_FILE
-	$(error $(dbload_error_msg))
+	$(error $(load_db_error_msg))
 endif
 	@echo "drop database mc_dev; create database mc_dev;" | docker-compose run --rm web ./manage.py dbshell
 	@gzcat $(GZ_FILE) | docker-compose run --rm web ./manage.py dbshell
 	@docker-compose run --rm web ./manage.py migrate --no-input
 
-fetchremotedb: $(shell if [ ! -d "./db_cache/" ]; then mkdir ./db_cache/; fi;)
-fetchremotedb:
+fetch-remote-db: $(shell if [ ! -d "./db_cache/" ]; then mkdir ./db_cache/; fi;)
+fetch-remote-db:
 ifndef DB_FILE_NAME
-	$(error $(remotedbload_error_msg))
+	$(error $(fetch_remote_db_error_msg))
 endif
 	@echo cleaning cache for ${DB_FILE_NAME}
 	@$(shell if [ -f ./db_cache/${DB_FILE_NAME} ]; then rm ./db_cache/${DB_FILE_NAME};fi;)
 	@echo downloading db...
 	@wget -P ./db_cache/ https://s3.amazonaws.com/public-clean-saved-db-states/${DB_FILE_NAME}
-	@echo "DB ${DB_FILE_NAME} is now up to date. You can load it by running 'make dbload GZ_FILE=./db_cache/${DB_FILE_NAME}'."
+	@echo "DB ${DB_FILE_NAME} is now up to date. You can load it by running 'make load-db GZ_FILE=./db_cache/${DB_FILE_NAME}'."
 
 restart:
 	@docker-compose restart web
