@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_tracking.mixins import LoggingMixin
 
 from impact.permissions import (
     V1APIPermissions,
@@ -12,7 +13,7 @@ from impact.models import (
 from impact.v1.metadata import ImpactMetadata
 
 
-class UserOrganizationsView(APIView):
+class UserOrganizationsView(LoggingMixin, APIView):
     permission_classes = (
         V1APIPermissions,
     )
