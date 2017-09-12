@@ -3,6 +3,7 @@
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_tracking.mixins import LoggingMixin
 
 from impact.permissions import V0APIPermissions
 from impact.v0.api_data.job_posting_detail_data import (
@@ -15,7 +16,7 @@ from impact.v0.views.utils import (
 )
 
 
-class JobPostingDetailView(APIView):
+class JobPostingDetailView(LoggingMixin, APIView):
     permission_classes = (V0APIPermissions,)
 
     def __init__(self, *args, **kwargs):

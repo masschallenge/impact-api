@@ -1,6 +1,9 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_tracking.mixins import LoggingMixin
+
 from impact.permissions import (
     V1APIPermissions,
 )
@@ -9,22 +12,19 @@ from impact.models import (
     MemberProfile
 )
 from impact.utils import (
-    find_gender,
-    user_gender,
     ALL_USER_RELATED_KEYS,
+    find_gender,
+    get_profile,
     INVALID_GENDER_ERROR,
     KEY_TRANSLATIONS,
+    parse_date,
     PROFILE_KEYS,
     REQUIRED_PROFILE_KEYS,
     REQUIRED_USER_KEYS,
+    user_gender,
     USER_KEYS,
 )
 from impact.v1.metadata import ImpactMetadata
-from django.db.models import Q
-from impact.utils import (
-    parse_date,
-    get_profile
-)
 
 
 EMAIL_EXISTS_ERROR = "User with email {} already exists"
@@ -34,7 +34,7 @@ VALID_KEYS_NOTE = "Valid keys are: {}"
 User = get_user_model()
 
 
-class UserListView(APIView):
+class UserListView(LoggingMixin, APIView):
     permission_classes = (
         V1APIPermissions,
     )

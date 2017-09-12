@@ -19,19 +19,20 @@ python-magic
 gunicorn
 
 # Django
-Django==1.10.3
 dj-database-url
 dj-email-url
+django-cors-middleware==1.3.1
 django-embed-video
-django-redis-cache
-djangorestframework
-django-rest-swagger
-django-rest-framework-proxy
-drf-schema-adapter
-django-registration
 django-filter # Filtering support
 django-oauth-toolkit
-django-cors-middleware==1.3.1
+django-redis-cache
+django-registration
+django-rest-framework-proxy
+django-rest-swagger
+Django==1.10.3
+djangorestframework
+drf-schema-adapter
+drf-tracking
 git+https://github.com/masschallenge/django-accelerator.git@2017.09.06a#egg=django-accelerator
 
 # django-configurations from Git master (needed for Django 1.8 support)
