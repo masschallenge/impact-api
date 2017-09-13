@@ -6,17 +6,16 @@ from rest_framework_tracking.mixins import LoggingMixin
 from impact.permissions import (
     V1APIPermissions,
 )
-from impact.utils import (
-    ALL_USER_RELATED_KEYS,
+from impact.utils import get_profile
+from impact.v1.helpers import (
+    ALL_USER_INPUT_KEYS,
     INVALID_GENDER_ERROR,
-    PROFILE_KEYS,
-    USER_KEYS,
+    INPUT_PROFILE_KEYS,
+    INPUT_USER_KEYS,
     KEY_TRANSLATIONS,
     find_gender,
-    get_profile,
-    user_gender,
+    UserHelper,
 )
-from impact.v1.helpers import UserHelper
 from impact.v1.metadata import ImpactMetadata
 
 
@@ -43,13 +42,13 @@ class UserDetailView(LoggingMixin, APIView):
     def patch(self, request, pk):
         user = User.objects.get(pk=pk)
         data = request.data
-        invalid_keys = set(data.keys()) - set(ALL_USER_RELATED_KEYS)
+        invalid_keys = set(data.keys()) - set(ALL_USER_INPUT_KEYS)
         if invalid_keys:
             return Response(
                 status=403,
                 data=INVALID_KEYS_ERROR.format(
                     invalid_keys=list(invalid_keys),
-                    valid_keys=ALL_USER_RELATED_KEYS))
+                    valid_keys=ALL_USER_INPUT_KEYS))
         if "gender" in data and not find_gender(data.get("gender")):
             return Response(
                 status=403,
@@ -57,9 +56,9 @@ class UserDetailView(LoggingMixin, APIView):
         for key, value in data.items():
             if key in KEY_TRANSLATIONS:
                 setattr(user, KEY_TRANSLATIONS[key], data[key])
-            elif key in USER_KEYS:
+            elif key in INPUT_USER_KEYS:
                 setattr(user, key, data[key])
-            elif key in PROFILE_KEYS:
+            elif key in INPUT_PROFILE_KEYS:
                 profile = get_profile(user)
                 setattr(profile, key, data[key])
                 profile.save()

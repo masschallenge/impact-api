@@ -95,8 +95,43 @@ ORGANIZATION_USER_ACTIONS = {
     }
 }
 
-USER_ACTIONS = {
-    'GET': {
+
+USER_POST_OPTIONS = {
+    "first_name": {
+        "type": "string"
+        },
+    "last_name": {
+        "type": "string"
+        },
+    "email": {
+        "type": "string"
+        },
+    "is_active": {
+        "type": "boolean"
+        },
+    "gender": {
+        "type": "string"
+        },
+    "phone": {
+        "type": "string"
+        },
+    "linked_in_url": {
+        "type": "string"
+        },
+    "facebook_url": {
+        "type": "string"
+        },
+    "twitter_handle": {
+        "type": "string"
+        },
+    "personal_website_url": {
+        "type": "string"
+        }
+}
+
+USER_GET_OPTIONS = USER_POST_OPTIONS.copy()
+USER_GET_OPTIONS.update(
+    {
         "id": {
             "type": "integer",
             "required": False,
@@ -115,108 +150,20 @@ USER_ACTIONS = {
             "type": "string",
             "read_only": True
         },
-        "first_name": {
-            'type': 'string'
-        },
-        "last_name": {
-            'type': 'string'
-        },
-        "email": {
-            'type': 'string'
-        },
-        "is_active": {
-            'type': 'boolean'
-        },
-        "gender": {
-            "type": "string"
-        },
-        "phone": {
-            "type": "string"
-        }
-    },
-    'POST': {
-        "first_name": {
-            'type': 'string'
-        },
-        "last_name": {
-            'type': 'string'
-        },
-        "email": {
-            'type': 'string'
-        },
-        "is_active": {
-            'type': 'boolean'
-        },
-        "gender": {
-            "type": "string"
-        },
-        "phone": {
-            "type": "string"
-        }
-    }
+    })
+
+
+USER_ACTIONS = {
+    "GET": USER_GET_OPTIONS,
+    "POST": USER_POST_OPTIONS,
 }
 
 
 USER_DETAIL_ACTIONS = {
-    'GET': {
-        "id": {
-            "type": "integer",
-            "required": False,
-            "read_only": True,
-            "label": "ID"
-        },
-        "updated_at": {
-            "type": "string",
-            "read_only": True
-        },
-        "last_login": {
-            "type": "string",
-            "read_only": True
-        },
-        "date_joined": {
-            "type": "string",
-            "read_only": True
-        },
-        "first_name": {
-            'type': 'string'
-        },
-        "last_name": {
-            'type': 'string'
-        },
-        "email": {
-            'type': 'string'
-        },
-        "is_active": {
-            'type': 'boolean'
-        },
-        "gender": {
-            "type": "string"
-        },
-        "phone": {
-            "type": "string"
-        }
-    },
-    'PATCH': {
-        "first_name": {
-            'type': 'string'
-        },
-        "last_name": {
-            'type': 'string'
-        },
-        "email": {
-            'type': 'string'
-        },
-        "is_active": {
-            'type': 'boolean'
-        },
-        "gender": {
-            "type": "string"
-        },
-        "phone": {
-            "type": "string"
-        }
-    }
+    "GET": USER_GET_OPTIONS,
+    "PATCH": USER_POST_OPTIONS,
 }
+
 
 METADATA_MAP = {
     'Organization Detail': ORGANIZATION_DETAIL_ACTIONS,
