@@ -1,4 +1,3 @@
-from impact.models import BaseProfile
 from impact.utils import get_profile
 
 
@@ -24,10 +23,21 @@ REQUIRED_PROFILE_KEYS = [
     "gender",
 ]
 OPTIONAL_PROFILE_KEYS = [
-    "phone",
+    "bio",
+    "company",
+    "facebook_url",
+    "judge_interest",
     "linked_in_url",
-    "twitter_handle",
+    "mentor_interest",
+    "office_hours_interest",
+    "office_hours_topics",
     "personal_website_url",
+    "phone",
+    "referred_by",
+    "speaker_interest",
+    "speaker_topics",
+    "title",
+    "twitter_handle",
 ]
 INPUT_PROFILE_KEYS = REQUIRED_PROFILE_KEYS + OPTIONAL_PROFILE_KEYS
 
@@ -67,6 +77,13 @@ class UserHelper(object):
             result[field] = getattr(self.user,
                                     KEY_TRANSLATIONS.get(field, field))
         result.update(self.profile_fields(OUTPUT_PROFILE_KEYS))
+        category = self.profile_field("expert_category")
+        if category:
+            result["expert_category"] = category.name
+        specialties = self.profile_field("mentoring_specialties")
+        if specialties:
+            result["mentoring_specialties"] = [
+                specialty.name for specialty in specialties.all()]
         return result
 
     def profile(self):

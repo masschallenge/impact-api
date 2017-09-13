@@ -4,6 +4,7 @@ from impact.v1.helpers.user_helper import (
     INPUT_USER_KEYS,
     INVALID_GENDER_ERROR,
     KEY_TRANSLATIONS,
+    OPTIONAL_PROFILE_KEYS,
     REQUIRED_PROFILE_KEYS,
     REQUIRED_USER_KEYS,
     UserHelper,

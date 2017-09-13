@@ -4,6 +4,7 @@
 from django.urls import reverse
 
 from impact.tests.contexts import UserContext
+from impact.tests.factories import MentoringSpecialtiesFactory
 from impact.tests.api_test_case import APITestCase
 from impact.v1.helpers import UserHelper
 
@@ -62,3 +63,16 @@ class TestUserDetailView(APITestCase):
             response = self.client.patch(url, {"gender": bad_gender})
             assert response.status_code == 403
             assert bad_gender in response.data
+
+    def test_expert_fields(self):
+        context = UserContext(user_type="EXPERT")
+        user = context.user
+        profile = context.profile
+        category = profile.expert_category
+        specialty = MentoringSpecialtiesFactory()
+        profile.mentoring_specialties.add(specialty)
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            response = self.client.get(url)
+            assert category.name == response.data["expert_category"]
+            assert specialty.name in response.data["mentoring_specialties"]

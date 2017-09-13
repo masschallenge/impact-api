@@ -1,5 +1,9 @@
 from rest_framework.metadata import SimpleMetadata
+from impact.v1.helpers import OPTIONAL_PROFILE_KEYS
 
+
+OPTIONAL_STRING_TYPE = {"type": "string"}
+OPTIONAL_BOOLEAN_TYPE = {"type": "string"}
 
 ORGANIZATION_ACTIONS = {
     'GET': {
@@ -9,24 +13,12 @@ ORGANIZATION_ACTIONS = {
             "read_only": True,
             "label": "ID"
         },
-        "name": {
-            "type": "string"
-        },
-        "url_slug": {
-            "type": "string"
-        },
-        "public_inquiry_email": {
-            "type": "string"
-        },
-        "is_startup": {
-            "type": "boolean"
-        },
-        "is_partner": {
-            "type": "boolean"
-        },
-        "updated_at": {
-            "type": "string"
-        }
+        "name": OPTIONAL_STRING_TYPE,
+        "url_slug": OPTIONAL_STRING_TYPE,
+        "public_inquiry_email": OPTIONAL_STRING_TYPE,
+        "is_startup": OPTIONAL_BOOLEAN_TYPE,
+        "is_partner": OPTIONAL_BOOLEAN_TYPE,
+        "updated_at": OPTIONAL_STRING_TYPE
     }
 }
 
@@ -38,24 +30,12 @@ ORGANIZATION_DETAIL_ACTIONS = {
             "read_only": True,
             "label": "ID"
         },
-        "name": {
-            "type": "string"
-        },
-        "url_slug": {
-            "type": "string"
-        },
-        "public_inquiry_email": {
-            "type": "string"
-        },
-        "is_startup": {
-            "type": "boolean"
-        },
-        "is_partner": {
-            "type": "boolean"
-        },
-        "updated_at": {
-            "type": "string"
-        }
+        "name": OPTIONAL_STRING_TYPE,
+        "url_slug": OPTIONAL_STRING_TYPE,
+        "public_inquiry_email": OPTIONAL_STRING_TYPE,
+        "is_startup": OPTIONAL_BOOLEAN_TYPE,
+        "is_partner": OPTIONAL_BOOLEAN_TYPE,
+        "updated_at": OPTIONAL_STRING_TYPE
     }
 }
 
@@ -97,37 +77,15 @@ ORGANIZATION_USER_ACTIONS = {
 
 
 USER_POST_OPTIONS = {
-    "first_name": {
-        "type": "string"
-        },
-    "last_name": {
-        "type": "string"
-        },
-    "email": {
-        "type": "string"
-        },
-    "is_active": {
-        "type": "boolean"
-        },
-    "gender": {
-        "type": "string"
-        },
-    "phone": {
-        "type": "string"
-        },
-    "linked_in_url": {
-        "type": "string"
-        },
-    "facebook_url": {
-        "type": "string"
-        },
-    "twitter_handle": {
-        "type": "string"
-        },
-    "personal_website_url": {
-        "type": "string"
-        }
+    "first_name": OPTIONAL_STRING_TYPE,
+    "last_name": OPTIONAL_STRING_TYPE,
+    "email": OPTIONAL_STRING_TYPE,
+    "is_active": OPTIONAL_BOOLEAN_TYPE,
+    "gender": OPTIONAL_STRING_TYPE,
+    "phone": OPTIONAL_STRING_TYPE,
 }
+USER_POST_OPTIONS.update(dict([(key, OPTIONAL_STRING_TYPE)
+                               for key in OPTIONAL_PROFILE_KEYS]))
 
 USER_GET_OPTIONS = USER_POST_OPTIONS.copy()
 USER_GET_OPTIONS.update(
