@@ -17,6 +17,7 @@ class TestUserDetailView(APITestCase):
             response = self.client.get(url)
             assert user.full_name == response.data["first_name"]
             assert user.short_name == response.data["last_name"]
+            assert user.last_login == response.data["last_login"]
 
     def test_patch(self):
         context = UserContext()

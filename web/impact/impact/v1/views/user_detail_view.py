@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_tracking.mixins import LoggingMixin
 
-from impact.v1.metadata import ImpactMetadata
 from impact.permissions import (
     V1APIPermissions,
 )
@@ -17,6 +16,9 @@ from impact.utils import (
     get_profile,
     user_gender,
 )
+from impact.v1.helpers import UserHelper
+from impact.v1.metadata import ImpactMetadata
+
 
 INVALID_KEYS_ERROR = ("Recevied invalid key(s): {invalid_keys}. "
                       "Valid keys are: {valid_keys}.")
@@ -36,15 +38,7 @@ class UserDetailView(LoggingMixin, APIView):
 
     def get(self, request, pk):
         user = User.objects.get(pk=pk)
-        result = {
-            "id": pk,
-            "first_name": user.full_name,
-            "last_name": user.short_name,
-            "email": user.email,
-            "is_active": user.is_active,
-            "gender": user_gender(user)
-        }
-        return Response(result)
+        return Response(UserHelper(user).serialize())
 
     def patch(self, request, pk):
         user = User.objects.get(pk=pk)

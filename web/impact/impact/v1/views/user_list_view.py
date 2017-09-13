@@ -24,6 +24,7 @@ from impact.utils import (
     user_gender,
     USER_KEYS,
 )
+from impact.v1.helpers import UserHelper
 from impact.v1.metadata import ImpactMetadata
 
 
@@ -117,7 +118,8 @@ class UserListView(LoggingMixin, APIView):
                 updated_at_gt,
                 updated_at_lt)
         return [
-            _serialize_user(user) for user in queryset[offset:offset + limit]]
+            UserHelper(user).serialize()
+            for user in queryset[offset:offset + limit]]
 
 
 def _filter_profiles_by_date(queryset, updated_at_gt, updated_at_lt):
@@ -151,24 +153,6 @@ def _url(base_url, limit, offset):
         return base_url + "?limit={limit}&offset={offset}".format(
             limit=limit, offset=offset)
     return None
-
-
-def _serialize_user(user):
-    return {
-        "id": user.id,
-        "email": user.email,
-        "first_name": user.full_name,
-        "last_name": user.short_name,
-        "is_active": user.is_active,
-        "gender": user_gender(user),
-        'updated_at': _get_profile_update_timestamp(user)
-    }
-
-
-def _get_profile_update_timestamp(user):
-    profile = get_profile(user)
-    if profile:
-        return profile.updated_at
 
 
 def _construct_user(user_args, profile_args):
