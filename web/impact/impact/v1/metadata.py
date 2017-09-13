@@ -103,6 +103,18 @@ USER_ACTIONS = {
             "read_only": True,
             "label": "ID"
         },
+        "updated_at": {
+            "type": "string",
+            "read_only": True
+        },
+        "last_login": {
+            "type": "string",
+            "read_only": True
+        },
+        "date_joined": {
+            "type": "string",
+            "read_only": True
+        },
         "first_name": {
             'type': 'string'
         },
@@ -118,7 +130,7 @@ USER_ACTIONS = {
         "gender": {
             "type": "string"
         },
-        "updated_at": {
+        "phone": {
             "type": "string"
         }
     },
@@ -137,6 +149,9 @@ USER_ACTIONS = {
         },
         "gender": {
             "type": "string"
+        },
+        "phone": {
+            "type": "string"
         }
     }
 }
@@ -149,6 +164,18 @@ USER_DETAIL_ACTIONS = {
             "required": False,
             "read_only": True,
             "label": "ID"
+        },
+        "updated_at": {
+            "type": "string",
+            "read_only": True
+        },
+        "last_login": {
+            "type": "string",
+            "read_only": True
+        },
+        "date_joined": {
+            "type": "string",
+            "read_only": True
         },
         "first_name": {
             'type': 'string'
@@ -163,6 +190,9 @@ USER_DETAIL_ACTIONS = {
             'type': 'boolean'
         },
         "gender": {
+            "type": "string"
+        },
+        "phone": {
             "type": "string"
         }
     },
@@ -180,6 +210,9 @@ USER_DETAIL_ACTIONS = {
             'type': 'boolean'
         },
         "gender": {
+            "type": "string"
+        },
+        "phone": {
             "type": "string"
         }
     }

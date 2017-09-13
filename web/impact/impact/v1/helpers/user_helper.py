@@ -8,14 +8,16 @@ class UserHelper(object):
     def serialize(self):
         return {
             "id": self.user.id,
+            'updated_at': self._get_profile_update_timestamp(),
+            "last_login": self.user.last_login,
+            "date_joined": self.user.date_joined,
             "email": self.user.email,
             "first_name": self.user.full_name,
             "last_name": self.user.short_name,
             "is_active": self.user.is_active,
-            "gender": self.user_gender(),
-            'updated_at': self._get_profile_update_timestamp(),
-            "last_login": self.user.last_login,
-            }
+            "gender": self.gender(),
+            "phone": self.phone(),
+        }
 
     def get_profile(self):
         try:
@@ -34,8 +36,14 @@ class UserHelper(object):
             return profile.updated_at
         return None
 
-    def user_gender(self):
+    def gender(self):
         profile = self.get_profile()
         if profile:
             return profile.gender
+        return None
+
+    def phone(self):
+        profile = self.get_profile()
+        if profile:
+            return profile.phone
         return None

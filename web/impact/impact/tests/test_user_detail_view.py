@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from impact.tests.contexts import UserContext
 from impact.tests.api_test_case import APITestCase
+from impact.v1.helpers import UserHelper
 
 
 class TestUserDetailView(APITestCase):
@@ -18,6 +19,8 @@ class TestUserDetailView(APITestCase):
             assert user.full_name == response.data["first_name"]
             assert user.short_name == response.data["last_name"]
             assert user.last_login == response.data["last_login"]
+            assert user.date_joined == response.data["date_joined"]
+            assert UserHelper(user).phone() == response.data["phone"]
 
     def test_patch(self):
         context = UserContext()
@@ -26,15 +29,18 @@ class TestUserDetailView(APITestCase):
             url = reverse("user_detail", args=[user.id])
             is_active = not user.is_active
             first_name = "David"
+            phone = "+1-555-555-5555"
             data = {
                 "is_active": is_active,
                 "first_name": first_name,
                 "gender": "Male",
+                "phone": phone,
                 }
             self.client.patch(url, data)
             user.refresh_from_db()
             assert user.is_active == is_active
             assert user.full_name == first_name
+            assert UserHelper(user).phone() == phone
 
     def test_patch_invalid_key(self):
         context = UserContext()
