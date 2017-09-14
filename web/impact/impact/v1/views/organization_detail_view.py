@@ -8,44 +8,13 @@ from rest_framework_tracking.mixins import LoggingMixin
 from impact.permissions import (
     V1APIPermissions,
 )
-from impact.models import (
-    Organization,
-    Partner,
-    Startup,
-)
+from impact.models import Organization
+from impact.v1.helpers import OrganizationHelper
 from impact.v1.metadata import ImpactMetadata
-
-INVALID_KEYS_ERROR = ("Received invalid key(s): {invalid_keys}. "
-                      "Valid keys are: {valid_keys}.")
-
-
-def organization_is_startup(organization):
-    return _organization_is(organization, Startup)
-
-
-def organization_is_partner(organization):
-    return _organization_is(organization, Partner)
-
-
-def public_inquiry_email(organization):
-    for klass in (Partner, Startup):
-        qs = klass.objects.filter(organization=organization)
-        if qs.exists():
-            return qs.first().public_inquiry_email
-    return ""
-
-
-def _organization_is(organization, klass):
-    return klass.objects.filter(organization=organization).exists()
 
 
 class OrganizationDetailView(LoggingMixin, APIView):
     model = Organization
-    model_fields = ["name", "url_slug"]
-    derived_field_functions = {"public_inquiry_email": public_inquiry_email,
-                               "is_startup": organization_is_startup,
-                               "is_partner": organization_is_partner}
-
     metadata_class = ImpactMetadata
 
     permission_classes = (
@@ -57,15 +26,4 @@ class OrganizationDetailView(LoggingMixin, APIView):
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
-        result = self.get_model_fields()
-        result.update(self.derived_fields())
-        result['updated_at'] = self.instance.updated_at
-        return Response(result)
-
-    def get_model_fields(self):
-        return {field: getattr(self.instance, field)
-                for field in self.model_fields}
-
-    def derived_fields(self):
-        return {key: func(self.instance)
-                for (key, func) in self.derived_field_functions.items()}
+        return Response(OrganizationHelper(self.instance).serialize())

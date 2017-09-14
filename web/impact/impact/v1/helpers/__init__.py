@@ -10,3 +10,4 @@ from impact.v1.helpers.user_helper import (
     UserHelper,
     find_gender,
 )
+from impact.v1.helpers.organization_helper import OrganizationHelper

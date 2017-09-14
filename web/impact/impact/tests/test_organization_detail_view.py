@@ -61,6 +61,7 @@ class TestOrganizationDetailView(APITestCase):
             response = self.client.get(url)
             assert response.data["name"] == organization.name
             assert response.data["url_slug"] == organization.url_slug
-            assert response.data["public_inquiry_email"] == ""
+            assert (response.data["public_inquiry_email"] ==
+                    organization.public_inquiry_email)
             assert response.data["is_startup"] is False
             assert response.data["is_partner"] is False

@@ -10,12 +10,8 @@ from impact.permissions import (
     V1APIPermissions,
 )
 from impact.models import Organization
-from .organization_detail_view import (
-    organization_is_startup,
-    organization_is_partner,
-    public_inquiry_email,
-)
 from impact.serializers import GeneralSerializer
+from impact.v1.helpers import OrganizationHelper
 from impact.v1.metadata import ImpactMetadata
 from impact.utils import parse_date
 from django.db.models import Q
@@ -56,7 +52,7 @@ class OrganizationListView(LoggingMixin, APIView, AutoMetadataMixin):
                 queryset,
                 updated_at_gt,
                 updated_at_lt)
-        return [serialize_org(org)
+        return [OrganizationHelper(org).serialize()
                 for org in queryset[offset:offset + limit]]
 
 
@@ -76,17 +72,6 @@ def _filter_organizations_by_date(queryset, updated_at_gt, updated_at_lt):
             Q(updated_at__lte=updated_at_gt)
         )
     return queryset
-
-
-def serialize_org(org):
-    return {"id": org.id,
-            "name": org.name,
-            "url_slug": org.url_slug,
-            "public_inquiry_email": public_inquiry_email(org),
-            "is_startup": organization_is_startup(org),
-            "is_partner": organization_is_partner(org),
-            'updated_at': org.updated_at
-            }
 
 
 def _url(base_url, limit, offset):
