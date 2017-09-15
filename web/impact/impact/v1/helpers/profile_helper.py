@@ -1,5 +1,5 @@
-from impact.utils import get_profile
 from impact.v1.helpers.model_helper import ModelHelper
+
 
 class ProfileHelper(ModelHelper):
     REQUIRED_KEYS = [
