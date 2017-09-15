@@ -80,6 +80,10 @@ class TestUserHistoryView(APITestCase):
                                  UserBecameFinalistEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(prg.created_at, events[0]["datetime"])
+            self.assertEqual(prg.program_role.program.name,
+                             events[0]["program"])
+            self.assertEqual(prg.program_role.program.cycle.name,
+                             events[0]["cycle"])
 
     def test_user_became_finalist_no_created_at_new_user(self):
         deadline = days_from_now(-4)
