@@ -18,7 +18,6 @@ from impact.v1.helpers import (
     INPUT_PROFILE_KEYS,
     INPUT_USER_KEYS,
     INVALID_GENDER_ERROR,
-    KEY_TRANSLATIONS,
     REQUIRED_PROFILE_KEYS,
     REQUIRED_USER_KEYS,
     UserHelper,
@@ -84,7 +83,7 @@ class UserListView(LoggingMixin, APIView):
         result = {}
         for key in keys:
             if key in user_data:
-                target_key = KEY_TRANSLATIONS.get(key, key)
+                target_key = UserHelper.translate(key)
                 result[target_key] = user_data[key]
         return result
 

@@ -12,7 +12,6 @@ from impact.v1.helpers import (
     INVALID_GENDER_ERROR,
     INPUT_PROFILE_KEYS,
     INPUT_USER_KEYS,
-    KEY_TRANSLATIONS,
     find_gender,
     UserHelper,
 )
@@ -41,6 +40,7 @@ class UserDetailView(LoggingMixin, APIView):
 
     def patch(self, request, pk):
         user = User.objects.get(pk=pk)
+        helper = UserHelper(user)
         data = request.data
         invalid_keys = set(data.keys()) - set(ALL_USER_INPUT_KEYS)
         if invalid_keys:
@@ -54,8 +54,9 @@ class UserDetailView(LoggingMixin, APIView):
                 status=403,
                 data=INVALID_GENDER_ERROR.format(data.get("gender")))
         for key, value in data.items():
-            if key in KEY_TRANSLATIONS:
-                setattr(user, KEY_TRANSLATIONS[key], data[key])
+            field = helper.translate(key)
+            if key in helper.KEY_TRANSLATIONS:
+                setattr(user, field, data[key])
             elif key in INPUT_USER_KEYS:
                 setattr(user, key, data[key])
             elif key in INPUT_PROFILE_KEYS:

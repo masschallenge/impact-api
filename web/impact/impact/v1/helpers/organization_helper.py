@@ -1,20 +1,35 @@
-class OrganizationHelper(object):
+from impact.v1.helpers.model_helper import ModelHelper
+
+REQUIRED_ORG_KEYS = [
+    "name",
+    "url_slug",
+]
+OPTIONAL_ORG_KEYS = [
+    "public_inquiry_email",
+]
+INPUT_ORG_KEYS = REQUIRED_ORG_KEYS + OPTIONAL_ORG_KEYS
+
+READ_ONLY_ORG_KEYS = [
+    "id",
+    "updated_at",
+]
+OUTPUT_ORG_KEYS = READ_ONLY_ORG_KEYS + INPUT_ORG_KEYS
+
+
+class OrganizationHelper(ModelHelper):
     def __init__(self, organization):
-        self.org = organization
+        self.subject = organization
+
+    OUTPUT_KEYS = OUTPUT_ORG_KEYS
 
     def serialize(self):
-        return {
-            "id": self.org.id,
-            "name": self.org.name,
-            "url_slug": self.org.url_slug,
-            "public_inquiry_email": self.org.public_inquiry_email,
-            "is_startup": self.is_startup(),
-            "is_partner": self.is_partner(),
-            'updated_at': self.org.updated_at
-            }
+        result = super(OrganizationHelper, self).serialize()
+        result["is_startup"] = self.is_startup()
+        result["is_partner"] = self.is_partner()
+        return result
 
     def is_startup(self):
-        return self.org.startup_set.exists()
+        return self.subject.startup_set.exists()
 
     def is_partner(self):
-        return self.org.partner_set.exists()
+        return self.subject.partner_set.exists()

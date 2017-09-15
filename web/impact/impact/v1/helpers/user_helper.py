@@ -1,4 +1,5 @@
 from impact.utils import get_profile
+from impact.v1.helpers.model_helper import ModelHelper
 
 
 REQUIRED_USER_KEYS = [
@@ -48,11 +49,6 @@ OUTPUT_PROFILE_KEYS = READ_ONLY_PROFILE_KEYS + INPUT_PROFILE_KEYS
 
 ALL_USER_INPUT_KEYS = INPUT_USER_KEYS + INPUT_PROFILE_KEYS
 
-KEY_TRANSLATIONS = {
-    "first_name": "full_name",
-    "last_name": "short_name",  # Yes, this is correct
-}
-
 VALID_GENDERS = ["f", "m", "o", "p"]
 
 INVALID_GENDER_ERROR = ("Invalid gender: '{}'. Valid values are "
@@ -67,15 +63,19 @@ GENDER_TRANSLATIONS = {
 }
 
 
-class UserHelper(object):
+class UserHelper(ModelHelper):
     def __init__(self, user):
-        self.user = user
+        self.subject = user
+
+    KEY_TRANSLATIONS = {
+        "first_name": "full_name",
+        "last_name": "short_name",  # Yes, this is correct
+        }
+
+    OUTPUT_KEYS = OUTPUT_USER_KEYS
 
     def serialize(self):
-        result = {}
-        for field in OUTPUT_USER_KEYS:
-            result[field] = getattr(self.user,
-                                    KEY_TRANSLATIONS.get(field, field))
+        result = super(UserHelper, self).serialize()
         result.update(self.profile_fields(OUTPUT_PROFILE_KEYS))
         category = self.profile_field("expert_category")
         if category:
@@ -87,7 +87,7 @@ class UserHelper(object):
         return result
 
     def profile(self):
-        return get_profile(self.user)
+        return get_profile(self.subject)
 
     def profile_fields(self, fields):
         profile = self.profile()
