@@ -8,13 +8,18 @@ from rest_framework.test import APIClient
 from django.contrib.contenttypes.models import ContentType
 from impact.tests.factories.accelerator import (
     StartupFactory,
-    IndustryFactory)
+    IndustryFactory,
+    OrganizationFactory)
 from django.contrib.auth.models import Permission
 import simplejson as json
 
-from impact.tests.factories import UserFactory
+from impact.tests.factories import (
+    UserFactory,
+    StartupStatusFactory
+)
 from impact.tests.factories import ContentTypeFactory
 from impact.tests.factories import PermissionFactory
+from accelerator.models import Startup
 
 
 class TestAcceleratorRoutes(TestCase):
@@ -24,8 +29,10 @@ class TestAcceleratorRoutes(TestCase):
     @classmethod
     def setUpClass(cls):
         ContentTypeFactory(app_label='mc', model='startup')
+        ContentTypeFactory(app_label='mc', model='startupstatus')
         ContentTypeFactory(app_label='mc', model='organization')
         ContentTypeFactory(app_label='mc', model='recommendationtag')
+        ContentTypeFactory(app_label='mc', model='programrole')
 
     @classmethod
     def tearDownClass(cls):
@@ -34,7 +41,56 @@ class TestAcceleratorRoutes(TestCase):
             model__in=[
                 'startup',
                 'organization',
+                'programrole',
                 'recommendationtag']).delete()
+
+    def test_user_with_permissions_can_create_objects(self):
+        url_name = "object-list"
+        StartupStatusFactory(id=1)
+        view_kwargs = {
+            'app': 'accelerator',
+            "model": "startup",
+        }
+        self.response_401(self.get(url_name, **view_kwargs))
+        startup_add_permission, _ = Permission.objects.get_or_create(
+            content_type=ContentType.objects.get(
+                app_label='mc',
+                model='startup'),
+            codename='add_startup',
+        )
+        perm_user = self.make_user(
+            'perm_user2@test.com', perms=["mc.add_startup"])
+        perm = PermissionFactory.create(codename='change_startup')
+        view_perm = PermissionFactory.create(codename='view_startup')
+        startup_permission, _ = Permission.objects.get_or_create(
+            content_type=ContentType.objects.get(
+                app_label='mc',
+                model='startup'),
+            codename='view_startup',
+        )
+        perm_user.user_permissions.add(perm)
+        perm_user.user_permissions.add(startup_add_permission)
+        perm_user.user_permissions.add(startup_permission)
+        perm_user.user_permissions.add(view_perm)
+        perm_user.save()
+        org = OrganizationFactory()
+        industry = IndustryFactory()
+        self.assertFalse(
+            Startup.objects.filter(organization=org).exists())
+        with self.login(perm_user):
+            self.post(url_name, data={
+                "is_visible": False,
+                "full_elevator_pitch": "test",
+                "linked_in_url": "",
+                "short_pitch": "test",
+                "facebook_url": "",
+                "video_elevator_pitch_url": "",
+                "organization": org.id,
+                "user": perm_user.id,
+                "primary_industry": industry.id
+            }, **view_kwargs)
+            self.assertTrue(
+                Startup.objects.filter(organization=org).exists())
 
     def test_api_object_list(self):
         StartupFactory(is_visible=1)
