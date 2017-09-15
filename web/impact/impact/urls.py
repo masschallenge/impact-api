@@ -45,8 +45,7 @@ for model in apps.get_models('impact'):
 
 
 for model in apps.get_models('accelerator'):
-    if model._meta.app_label == 'accelerator':
-        print(dir(model._meta))
+    if model._meta.app_label == 'accelerator' and hasattr(model, "Meta"):
         accelerator_router.register(
             model.__name__, GeneralViewSet,
             base_name="accelerator.{model}".format(model=model.__name__))
