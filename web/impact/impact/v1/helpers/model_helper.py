@@ -1,6 +1,4 @@
 class ModelHelper(object):
-    KEY_TRANSLATIONS = {}
-
     def __init__(self, subject):
         self.subject = subject
 
@@ -13,8 +11,7 @@ class ModelHelper(object):
         return result
 
     def field_value(self, field):
-        return getattr(self.subject, self.translate(field))
-
-    @classmethod
-    def translate(cls, field):
-        return cls.KEY_TRANSLATIONS.get(field, field)
+        result = getattr(self, field, None)
+        if result is not None:
+            return result
+        return getattr(self.subject, field, None)

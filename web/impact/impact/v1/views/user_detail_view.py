@@ -52,14 +52,12 @@ class UserDetailView(LoggingMixin, APIView):
                 status=403,
                 data=INVALID_GENDER_ERROR.format(data.get("gender")))
         for key, value in data.items():
-            field = helper.translate(key)
-            if key in helper.KEY_TRANSLATIONS:
-                setattr(user, field, data[key])
-            elif key in UserHelper.USER_INPUT_KEYS:
-                setattr(user, key, data[key])
+            field = helper.translate_key(key)
+            if key in UserHelper.USER_INPUT_KEYS:
+                setattr(user, field, value)
             elif key in ProfileHelper.INPUT_KEYS:
                 profile = get_profile(user)
-                setattr(profile, key, data[key])
+                setattr(profile, field, value)
                 profile.save()
         user.save()
         return Response(status=200)

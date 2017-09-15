@@ -21,7 +21,7 @@ class TestUserDetailView(APITestCase):
             assert user.short_name == response.data["last_name"]
             assert user.last_login == response.data.get("last_login")
             assert user.date_joined == response.data["date_joined"]
-            assert (UserHelper(user).profile_field("phone") ==
+            assert (UserHelper(user).field_value("phone") ==
                     response.data["phone"])
 
     def test_patch(self):
@@ -42,7 +42,7 @@ class TestUserDetailView(APITestCase):
             user.refresh_from_db()
             assert user.is_active == is_active
             assert user.full_name == first_name
-            assert UserHelper(user).profile_field("phone") == phone
+            assert UserHelper(user).field_value("phone") == phone
 
     def test_patch_invalid_key(self):
         context = UserContext()

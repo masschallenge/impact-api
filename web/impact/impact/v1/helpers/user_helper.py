@@ -1,10 +1,6 @@
+from impact.utils import get_profile
 from impact.v1.helpers.model_helper import ModelHelper
-from impact.v1.helpers.profile_helper import (
-    ProfileHelper,
-    expert_category,
-    mentoring_specialties,
-    profile_field,
-)
+from impact.v1.helpers.profile_helper import ProfileHelper
 
 VALID_GENDERS = ["f", "m", "o", "p"]
 
@@ -20,17 +16,7 @@ GENDER_TRANSLATIONS = {
 }
 
 
-OTHER_FUNCTIONS = {
-    "expert_category": expert_category,
-    "mentoring_specialties": mentoring_specialties,
-}
-
-
 class UserHelper(ModelHelper):
-    KEY_TRANSLATIONS = {
-        "first_name": "full_name",
-        "last_name": "short_name",  # Yes, this is correct
-        }
     REQUIRED_KEYS = [
         "email",
         "first_name",
@@ -44,27 +30,53 @@ class UserHelper(ModelHelper):
         "id",
         "last_login",
         "date_joined",
+        "expert_category",
+        "mentoring_specialties",
         ]
     OUTPUT_KEYS = READ_ONLY_KEYS + USER_INPUT_KEYS + ProfileHelper.OUTPUT_KEYS
     INPUT_KEYS = USER_INPUT_KEYS + ProfileHelper.INPUT_KEYS
+    KEY_TRANSLATIONS = {
+        "first_name": "full_name",
+        "last_name": "short_name",
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UserHelper, self).__init__(*args, **kwargs)
+        self.profile = get_profile(self.subject)
+
+    @classmethod
+    def translate_key(cls, key):
+        return cls.KEY_TRANSLATIONS.get(key, key)
 
     def field_value(self, field):
-        function = self.field_function(field)
-        if function:
-            return function(self, field)
-        return getattr(self.subject,
-                       self.KEY_TRANSLATIONS.get(field, field))
+        result = super(UserHelper, self).field_value(field)
+        if result is not None:
+            return result
+        return getattr(self.profile, field, None)
 
-    def field_function(self, field):
-        function = OTHER_FUNCTIONS.get(field)
-        if function:
-            return function
-        if field in ProfileHelper.OUTPUT_KEYS:
-            return profile_field
-        return None
+    @property
+    def first_name(self):
+        return self.subject.full_name
 
-    def profile_field(self, field):
-        return profile_field(self, field)
+    @property
+    def last_name(self):
+        return self.subject.short_name
+
+    @property
+    def expert_category(self):
+        profile = get_profile(self.subject)
+        if hasattr(profile, "expert_category"):
+            category = profile.expert_category
+            if category:
+                return category.name
+
+    @property
+    def mentoring_specialties(self):
+        profile = get_profile(self.subject)
+        if hasattr(profile, "mentoring_specialties"):
+            specialties = profile.mentoring_specialties
+            if specialties:
+                return [specialty.name for specialty in specialties.all()]
 
 
 def find_gender(gender):

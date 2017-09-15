@@ -30,22 +30,3 @@ class ProfileHelper(ModelHelper):
         "updated_at",
         ]
     OUTPUT_KEYS = READ_ONLY_KEYS + INPUT_KEYS
-
-
-def profile_field(helper, field):
-    profile = get_profile(helper.subject)
-    if hasattr(profile, field):
-        return getattr(profile, field)
-    return None
-
-
-def expert_category(helper, field):
-    category = helper.profile_field(field)
-    if category:
-        return category.name
-
-
-def mentoring_specialties(helper, field):
-    specialties = helper.profile_field(field)
-    if specialties:
-        return [specialty.name for specialty in specialties.all()]

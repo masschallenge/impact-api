@@ -79,7 +79,7 @@ class UserListView(LoggingMixin, APIView):
         result = {}
         for key in keys:
             if key in user_data:
-                target_key = UserHelper.translate(key)
+                target_key = UserHelper.translate_key(key)
                 result[target_key] = user_data[key]
         return result
 
