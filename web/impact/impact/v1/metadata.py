@@ -1,5 +1,5 @@
 from rest_framework.metadata import SimpleMetadata
-from impact.v1.helpers import OPTIONAL_PROFILE_KEYS
+from impact.v1.helpers import ProfileHelper
 
 
 OPTIONAL_STRING_TYPE = {"type": "string"}
@@ -85,7 +85,7 @@ USER_POST_OPTIONS = {
     "phone": OPTIONAL_STRING_TYPE,
 }
 USER_POST_OPTIONS.update(dict([(key, OPTIONAL_STRING_TYPE)
-                               for key in OPTIONAL_PROFILE_KEYS]))
+                               for key in ProfileHelper.OPTIONAL_KEYS]))
 
 USER_GET_OPTIONS = USER_POST_OPTIONS.copy()
 USER_GET_OPTIONS.update(

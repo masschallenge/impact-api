@@ -1,53 +1,10 @@
-from impact.utils import get_profile
 from impact.v1.helpers.model_helper import ModelHelper
-
-
-REQUIRED_USER_KEYS = [
-    "email",
-    "first_name",
-    "last_name",
-]
-OPTIONAL_USER_KEYS = [
-    "is_active",
-]
-INPUT_USER_KEYS = REQUIRED_USER_KEYS + OPTIONAL_USER_KEYS
-
-READ_ONLY_USER_KEYS = [
-    "id",
-    "last_login",
-    "date_joined",
-]
-OUTPUT_USER_KEYS = READ_ONLY_USER_KEYS + INPUT_USER_KEYS
-
-
-REQUIRED_PROFILE_KEYS = [
-    "gender",
-]
-OPTIONAL_PROFILE_KEYS = [
-    "bio",
-    "company",
-    "facebook_url",
-    "judge_interest",
-    "linked_in_url",
-    "mentor_interest",
-    "office_hours_interest",
-    "office_hours_topics",
-    "personal_website_url",
-    "phone",
-    "referred_by",
-    "speaker_interest",
-    "speaker_topics",
-    "title",
-    "twitter_handle",
-]
-INPUT_PROFILE_KEYS = REQUIRED_PROFILE_KEYS + OPTIONAL_PROFILE_KEYS
-
-READ_ONLY_PROFILE_KEYS = [
-    "updated_at",
-]
-OUTPUT_PROFILE_KEYS = READ_ONLY_PROFILE_KEYS + INPUT_PROFILE_KEYS
-
-ALL_USER_INPUT_KEYS = INPUT_USER_KEYS + INPUT_PROFILE_KEYS
+from impact.v1.helpers.profile_helper import (
+    ProfileHelper,
+    expert_category,
+    mentoring_specialties,
+    profile_field,
+)
 
 VALID_GENDERS = ["f", "m", "o", "p"]
 
@@ -63,45 +20,51 @@ GENDER_TRANSLATIONS = {
 }
 
 
-class UserHelper(ModelHelper):
-    def __init__(self, user):
-        self.subject = user
+OTHER_FUNCTIONS = {
+    "expert_category": expert_category,
+    "mentoring_specialties": mentoring_specialties,
+}
 
+
+class UserHelper(ModelHelper):
     KEY_TRANSLATIONS = {
         "first_name": "full_name",
         "last_name": "short_name",  # Yes, this is correct
         }
+    REQUIRED_KEYS = [
+        "email",
+        "first_name",
+        "last_name",
+        ]
+    OPTIONAL_KEYS = [
+        "is_active",
+        ]
+    USER_INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
+    READ_ONLY_KEYS = [
+        "id",
+        "last_login",
+        "date_joined",
+        ]
+    OUTPUT_KEYS = READ_ONLY_KEYS + USER_INPUT_KEYS + ProfileHelper.OUTPUT_KEYS
+    INPUT_KEYS = USER_INPUT_KEYS + ProfileHelper.INPUT_KEYS
 
-    OUTPUT_KEYS = OUTPUT_USER_KEYS
+    def field_value(self, field):
+        function = self.field_function(field)
+        if function:
+            return function(self, field)
+        return getattr(self.subject,
+                       self.KEY_TRANSLATIONS.get(field, field))
 
-    def serialize(self):
-        result = super(UserHelper, self).serialize()
-        result.update(self.profile_fields(OUTPUT_PROFILE_KEYS))
-        category = self.profile_field("expert_category")
-        if category:
-            result["expert_category"] = category.name
-        specialties = self.profile_field("mentoring_specialties")
-        if specialties:
-            result["mentoring_specialties"] = [
-                specialty.name for specialty in specialties.all()]
-        return result
-
-    def profile(self):
-        return get_profile(self.subject)
-
-    def profile_fields(self, fields):
-        profile = self.profile()
-        result = {}
-        for field in fields:
-            if hasattr(profile, field):
-                result[field] = getattr(profile, field)
-        return result
+    def field_function(self, field):
+        function = OTHER_FUNCTIONS.get(field)
+        if function:
+            return function
+        if field in ProfileHelper.OUTPUT_KEYS:
+            return profile_field
+        return None
 
     def profile_field(self, field):
-        profile = self.profile()
-        if hasattr(profile, field):
-            return getattr(profile, field)
-        return None
+        return profile_field(self, field)
 
 
 def find_gender(gender):

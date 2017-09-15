@@ -19,7 +19,7 @@ class TestUserDetailView(APITestCase):
             response = self.client.get(url)
             assert user.full_name == response.data["first_name"]
             assert user.short_name == response.data["last_name"]
-            assert user.last_login == response.data["last_login"]
+            assert user.last_login == response.data.get("last_login")
             assert user.date_joined == response.data["date_joined"]
             assert (UserHelper(user).profile_field("phone") ==
                     response.data["phone"])

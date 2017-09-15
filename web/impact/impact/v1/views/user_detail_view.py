@@ -8,11 +8,9 @@ from impact.permissions import (
 )
 from impact.utils import get_profile
 from impact.v1.helpers import (
-    ALL_USER_INPUT_KEYS,
     INVALID_GENDER_ERROR,
-    INPUT_PROFILE_KEYS,
-    INPUT_USER_KEYS,
     find_gender,
+    ProfileHelper,
     UserHelper,
 )
 from impact.v1.metadata import ImpactMetadata
@@ -42,13 +40,13 @@ class UserDetailView(LoggingMixin, APIView):
         user = User.objects.get(pk=pk)
         helper = UserHelper(user)
         data = request.data
-        invalid_keys = set(data.keys()) - set(ALL_USER_INPUT_KEYS)
+        invalid_keys = set(data.keys()) - set(UserHelper.INPUT_KEYS)
         if invalid_keys:
             return Response(
                 status=403,
                 data=INVALID_KEYS_ERROR.format(
                     invalid_keys=list(invalid_keys),
-                    valid_keys=ALL_USER_INPUT_KEYS))
+                    valid_keys=UserHelper.INPUT_KEYS))
         if "gender" in data and not find_gender(data.get("gender")):
             return Response(
                 status=403,
@@ -57,9 +55,9 @@ class UserDetailView(LoggingMixin, APIView):
             field = helper.translate(key)
             if key in helper.KEY_TRANSLATIONS:
                 setattr(user, field, data[key])
-            elif key in INPUT_USER_KEYS:
+            elif key in UserHelper.USER_INPUT_KEYS:
                 setattr(user, key, data[key])
-            elif key in INPUT_PROFILE_KEYS:
+            elif key in ProfileHelper.INPUT_KEYS:
                 profile = get_profile(user)
                 setattr(profile, key, data[key])
                 profile.save()

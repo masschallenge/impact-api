@@ -13,13 +13,9 @@ from impact.models import (
 )
 from impact.utils import parse_date
 from impact.v1.helpers import (
-    ALL_USER_INPUT_KEYS,
     find_gender,
-    INPUT_PROFILE_KEYS,
-    INPUT_USER_KEYS,
     INVALID_GENDER_ERROR,
-    REQUIRED_PROFILE_KEYS,
-    REQUIRED_USER_KEYS,
+    ProfileHelper,
     UserHelper,
 )
 from impact.v1.metadata import ImpactMetadata
@@ -60,14 +56,14 @@ class UserListView(LoggingMixin, APIView):
         profile_args = self._profile_args(request.POST)
         self._invalid_keys(request.POST)
         if self.errors:
-            self.errors.append(VALID_KEYS_NOTE.format(ALL_USER_INPUT_KEYS))
+            self.errors.append(VALID_KEYS_NOTE.format(UserHelper.INPUT_KEYS))
             return Response(status=403, data=self.errors)
         user = _construct_user(user_args, profile_args)
         return Response({"id": user.id})
 
     def _user_args(self, dict):
-        self._check_required_keys(dict, REQUIRED_USER_KEYS)
-        results = self._copy_translated_keys(dict, INPUT_USER_KEYS)
+        self._check_required_keys(dict, UserHelper.REQUIRED_KEYS)
+        results = self._copy_translated_keys(dict, UserHelper.USER_INPUT_KEYS)
         email = results.get("email")
         if email and User.objects.filter(email=email).exists():
             self.errors.append(EMAIL_EXISTS_ERROR.format(email))
@@ -88,8 +84,9 @@ class UserListView(LoggingMixin, APIView):
         return result
 
     def _profile_args(self, user_data):
-        self._check_required_keys(user_data, REQUIRED_PROFILE_KEYS)
-        results = self._copy_translated_keys(user_data, INPUT_PROFILE_KEYS)
+        self._check_required_keys(user_data, ProfileHelper.REQUIRED_KEYS)
+        results = self._copy_translated_keys(user_data,
+                                             ProfileHelper.INPUT_KEYS)
         results["gender"] = self._find_gender(results.get("gender"))
         results["privacy_policy_accepted"] = False
         results["newsletter_sender"] = False
@@ -102,7 +99,7 @@ class UserListView(LoggingMixin, APIView):
         return result
 
     def _invalid_keys(self, user_keys):
-        for key in set(user_keys) - set(ALL_USER_INPUT_KEYS):
+        for key in set(user_keys) - set(UserHelper.INPUT_KEYS):
             self.errors.append(INVALID_KEY_ERROR.format(key))
 
     def _results(self, limit, offset):
