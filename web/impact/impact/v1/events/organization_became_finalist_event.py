@@ -23,11 +23,16 @@ class OrganizationBecameFinalistEvent(object):
 
     def serialize(self):
         finalist_time = self._finalist_datetime()
+        program = self.startup_status.program_startup_status.program
         return {
+            "cycle": program.cycle.name,
+            "cycle_id": program.cycle.id,
             "datetime": finalist_time,
-            "event_type": self.EVENT_TYPE,
             "description": self.DESCRIPTION_FORMAT.format(
-                self.startup_status.program_startup_status.program.name)
+                self.startup_status.program_startup_status.program.name),
+            "event_type": self.EVENT_TYPE,
+            "program": program.name,
+            "program_id": program.id,
             }
 
     def _finalist_datetime(self):

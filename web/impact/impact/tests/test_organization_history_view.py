@@ -273,6 +273,8 @@ class TestOrganizationHistoryView(APITestCase):
                                  OrganizationBecameFinalistEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertTrue(program.name in events[0]["description"])
+            self.assertEqual(program.name, events[0]["program"])
+            self.assertEqual(program.cycle.name, events[0]["cycle"])
 
     def test_startup_became_finalist_no_created_at(self):
         startup = StartupFactory()
