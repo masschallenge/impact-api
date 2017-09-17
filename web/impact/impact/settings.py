@@ -63,23 +63,24 @@ class Base(Configuration):
     WSGI_APPLICATION = 'impact.wsgi.application'
 
     INSTALLED_APPS = [
+        'accelerator.apps.AcceleratorConfig',
+        'corsheaders',
         'django.contrib.admin',
+        'django.contrib.admindocs',
         'django.contrib.auth',
-        'simpleuser',
         'django.contrib.contenttypes',
-        'django.contrib.sessions',
         'django.contrib.messages',
-        'django.contrib.staticfiles',
+        'django.contrib.sessions',
         'django.contrib.sites',
+        'django.contrib.staticfiles',
+        'embed_video',
+        'impact',
+        'oauth2_provider',
         'rest_framework',
         'rest_framework.authtoken',
         'rest_framework_swagger',
-        'django.contrib.admindocs',
-        'impact',
-        'oauth2_provider',
-        'corsheaders',
-        'embed_video',
-        'accelerator.apps.AcceleratorConfig',
+        'rest_framework_tracking',
+        'simpleuser',
     ]
     ACCELERATOR_MODELS_ARE_MANAGED = False
 

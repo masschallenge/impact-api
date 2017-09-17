@@ -3,6 +3,7 @@
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_tracking.mixins import LoggingMixin
 
 from drf_auto_endpoint.metadata import AutoMetadataMixin
 from impact.permissions import (
@@ -20,7 +21,7 @@ from impact.utils import parse_date
 from django.db.models import Q
 
 
-class OrganizationListView(APIView, AutoMetadataMixin):
+class OrganizationListView(LoggingMixin, APIView, AutoMetadataMixin):
     permission_classes = (
         V1APIPermissions,
     )

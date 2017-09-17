@@ -3,6 +3,7 @@
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_tracking.mixins import LoggingMixin
 
 from impact.permissions import (
     V1APIPermissions,
@@ -38,7 +39,7 @@ def _organization_is(organization, klass):
     return klass.objects.filter(organization=organization).exists()
 
 
-class OrganizationDetailView(APIView):
+class OrganizationDetailView(LoggingMixin, APIView):
     model = Organization
     model_fields = ["name", "url_slug"]
     derived_field_functions = {"public_inquiry_email": public_inquiry_email,

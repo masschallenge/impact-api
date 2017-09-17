@@ -186,5 +186,6 @@ local_settings.py
 mysql/data/
 web/impact/.coverage
 web/impact/htmlcov/
+db_cache/
 *~
 *.orig

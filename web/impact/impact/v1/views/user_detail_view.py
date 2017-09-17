@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_tracking.mixins import LoggingMixin
+
 from impact.v1.metadata import ImpactMetadata
 from impact.permissions import (
     V1APIPermissions,
@@ -23,7 +25,7 @@ INVALID_KEYS_ERROR = ("Recevied invalid key(s): {invalid_keys}. "
 User = get_user_model()
 
 
-class UserDetailView(APIView):
+class UserDetailView(LoggingMixin, APIView):
     permission_classes = (
         V1APIPermissions,
     )
