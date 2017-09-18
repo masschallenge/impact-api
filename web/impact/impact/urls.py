@@ -20,6 +20,8 @@ from impact.v0.views import (
     StartupDetailView,
 )
 from impact.v1.views import (
+    IndustryDetailView,
+    IndustryListView,
     OrganizationDetailView,
     OrganizationHistoryView,
     OrganizationListView,
@@ -71,6 +73,13 @@ v0_urlpatterns = [
 ]
 
 v1_urlpatterns = [
+    url(r"^industry/(?P<pk>[0-9]+)/$",
+        IndustryDetailView.as_view(),
+        name="industry_detail"),
+    url(r"^industry/$",
+        IndustryListView.as_view(),
+        name="industry"),
+
     url(r"^organization/(?P<pk>[0-9]+)/$",
         OrganizationDetailView.as_view(),
         name="organization_detail"),
