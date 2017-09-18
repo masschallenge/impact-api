@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,6 +12,10 @@ from impact.models import (
     StartupTeamMember,
 )
 from impact.v1.metadata import ImpactMetadata
+from impact.v1.views.utils import (
+    map_data,
+    merge_data_by_id,
+)
 
 
 class UserOrganizationsView(LoggingMixin, APIView):
@@ -22,34 +27,22 @@ class UserOrganizationsView(LoggingMixin, APIView):
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
-        data_by_org_id = {}
-        # Partner data wins over startup data.
         all_data = self.startup_data() + self.partner_data()
-        for data in all_data:
-            id = data["id"]
-            org = data_by_org_id.get(id, {})
-            org.update(data)
-            data_by_org_id[id] = org
-        return Response({"organizations": data_by_org_id.values()})
+        return Response({"organizations": merge_data_by_id(all_data)})
 
     def partner_data(self):
-        # Oldest/lowest id first
-        team = PartnerTeamMember.objects.filter(
-            team_member=self.instance).order_by("partner__id")
-        data = team.values_list("partner__organization_id",
-                                "partner_administrator")
-        return [{"id": id,
-                 "partner_administrator": administrator}
-                for id, administrator in data]
+        return map_data(PartnerTeamMember,
+                        Q(team_member=self.instance),
+                        "partner_id",
+                        ["partner__organization_id",
+                         "partner_administrator"],
+                        ["id", "partner_administrator"])
 
     def startup_data(self):
-        # Oldest/lowest id first
-        team = StartupTeamMember.objects.filter(
-            user=self.instance).order_by("startup__id")
-        data = team.values_list("startup__organization_id",
-                                "startup_administrator",
-                                "primary_contact")
-        return [{"id": id,
-                 "startup_administrator": administrator,
-                 "primary_contact": primary_contact}
-                for id, administrator, primary_contact in data]
+        return map_data(StartupTeamMember,
+                        Q(user=self.instance),
+                        "startup_id",
+                        ["startup__organization_id",
+                         "startup_administrator",
+                         "primary_contact"],
+                        ["id", "startup_administrator", "primary_contact"])
