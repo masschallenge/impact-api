@@ -3,14 +3,30 @@ from impact.v1.helpers import ProfileHelper
 
 
 OPTIONAL_STRING_TYPE = {"type": "string"}
-OPTIONAL_BOOLEAN_TYPE = {"type": "string"}
+OPTIONAL_BOOLEAN_TYPE = {"type": "boolean"}
 OPTIONAL_DATE_TYPE = OPTIONAL_STRING_TYPE
 OPTIONAL_LIST_TYPE = {"type": "field"}
 OPTIONAL_ID_TYPE = {"type": "integer"}
 READ_ONLY_LIST_TYPE = {"type": "field", "read_only": True}
 
+
+INDUSTRY_DETAIL_ACTIONS = {
+    "GET": {
+        "id": {
+            "type": "integer",
+            "required": False,
+            "read_only": True,
+            "label": "ID"
+        },
+        "name": OPTIONAL_STRING_TYPE,
+        "full_name": OPTIONAL_STRING_TYPE,
+        "parent_id": OPTIONAL_ID_TYPE,
+    }
+}
+INDUSTRY_ACTIONS = INDUSTRY_DETAIL_ACTIONS
+    
 ORGANIZATION_DETAIL_ACTIONS = {
-    'GET': {
+    "GET": {
         "id": {
             "type": "integer",
             "required": False,
@@ -66,9 +82,16 @@ USER_POST_OPTIONS = {
     "is_active": OPTIONAL_BOOLEAN_TYPE,
     "gender": OPTIONAL_STRING_TYPE,
     "phone": OPTIONAL_STRING_TYPE,
+    "additional_industry_ids": OPTIONAL_LIST_TYPE,
+    "expert_category": OPTIONAL_STRING_TYPE,
+    "mentoring_specialties": OPTIONAL_LIST_TYPE,
+    "primary_industry_id": OPTIONAL_ID_TYPE,
+    "updated_at": OPTIONAL_DATE_TYPE,
 }
+USER_POST_OPTIONS.update(dict([(key, OPTIONAL_BOOLEAN_TYPE)
+                               for key in ProfileHelper.OPTIONAL_BOOLEAN_KEYS]))
 USER_POST_OPTIONS.update(dict([(key, OPTIONAL_STRING_TYPE)
-                               for key in ProfileHelper.OPTIONAL_KEYS]))
+                               for key in ProfileHelper.OPTIONAL_STRING_KEYS]))
 
 USER_GET_OPTIONS = USER_POST_OPTIONS.copy()
 USER_GET_OPTIONS.update(
@@ -107,14 +130,16 @@ USER_DETAIL_ACTIONS = {
 
 
 METADATA_MAP = {
-    'Organization Detail': ORGANIZATION_DETAIL_ACTIONS,
-    'Organization History': ORGANIZATION_HISTORY_ACTIONS,
-    'Organization List': ORGANIZATION_ACTIONS,
-    'Organization Users': ORGANIZATION_USER_ACTIONS,
-    'User Detail': USER_DETAIL_ACTIONS,
-    'User List': USER_ACTIONS,
-    'User Organizations': USER_ORGANIZATION_ACTIONS,
-    'User History': USER_HISTORY_ACTIONS,
+    "Industry Detail": INDUSTRY_DETAIL_ACTIONS,
+    "Industry List": INDUSTRY_ACTIONS,
+    "Organization Detail": ORGANIZATION_DETAIL_ACTIONS,
+    "Organization History": ORGANIZATION_HISTORY_ACTIONS,
+    "Organization List": ORGANIZATION_ACTIONS,
+    "Organization Users": ORGANIZATION_USER_ACTIONS,
+    "User Detail": USER_DETAIL_ACTIONS,
+    "User List": USER_ACTIONS,
+    "User Organizations": USER_ORGANIZATION_ACTIONS,
+    "User History": USER_HISTORY_ACTIONS,
 }
 
 
@@ -127,6 +152,6 @@ class ImpactMetadata(SimpleMetadata):
     def determine_metadata(self, request, view):
         view_name = view.get_view_name()
         metadata = super().determine_metadata(request, view)
-        metadata['actions'] = METADATA_MAP.get(view_name)
+        metadata["actions"] = METADATA_MAP.get(view_name)
 
         return metadata

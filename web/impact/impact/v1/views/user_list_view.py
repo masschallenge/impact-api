@@ -1,7 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework_tracking.mixins import LoggingMixin
 
+from impact.permissions import (
+    V1APIPermissions,
+)
 from impact.models import (
     BaseProfile,
     MemberProfile
@@ -13,7 +18,8 @@ from impact.v1.helpers import (
     ProfileHelper,
     UserHelper,
 )
-from impact.v1.views.list_view import ListView
+from impact.v1.metadata import ImpactMetadata
+from impact.v1.views.base_list_view import BaseListView
 
 
 EMAIL_EXISTS_ERROR = "User with email {} already exists"
@@ -23,9 +29,7 @@ VALID_KEYS_NOTE = "Valid keys are: {}"
 User = get_user_model()
 
 
-class UserListView(ListView):
-    helper_class = UserHelper
-
+class UserListView(BaseListView):
     def post(self, request):
         user_args = self._user_args(request.POST)
         profile_args = self._profile_args(request.POST)

@@ -18,23 +18,26 @@ class ProfileHelper(ModelHelper):
     REQUIRED_KEYS = [
         "gender",
         ]
-    OPTIONAL_KEYS = [
+    OPTIONAL_STRING_KEYS = [
         "bio",
         "company",
         "facebook_url",
-        "judge_interest",
         "linked_in_url",
-        "mentor_interest",
-        "office_hours_interest",
         "office_hours_topics",
         "personal_website_url",
         "phone",
         "referred_by",
-        "speaker_interest",
         "speaker_topics",
         "title",
         "twitter_handle",
         ]
+    OPTIONAL_BOOLEAN_KEYS = [
+        "judge_interest",
+        "mentor_interest",
+        "office_hours_interest",
+        "speaker_interest",
+        ]
+    OPTIONAL_KEYS = OPTIONAL_BOOLEAN_KEYS + OPTIONAL_STRING_KEYS
     INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
 
     READ_ONLY_KEYS = [
