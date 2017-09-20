@@ -28,6 +28,7 @@ class TestAcceleratorRoutes(TestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(TestAcceleratorRoutes, cls).setUpClass()
         ContentTypeFactory(app_label='mc', model='startup')
         ContentTypeFactory(app_label='mc', model='startupstatus')
         ContentTypeFactory(app_label='mc', model='organization')
@@ -36,6 +37,7 @@ class TestAcceleratorRoutes(TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        super(TestAcceleratorRoutes, cls).tearDownClass()
         ContentType.objects.filter(
             app_label='mc',
             model__in=[
