@@ -4,23 +4,10 @@ from impact.v1.helpers import ProfileHelper
 
 OPTIONAL_STRING_TYPE = {"type": "string"}
 OPTIONAL_BOOLEAN_TYPE = {"type": "string"}
-
-ORGANIZATION_ACTIONS = {
-    'GET': {
-        "id": {
-            "type": "integer",
-            "required": False,
-            "read_only": True,
-            "label": "ID"
-        },
-        "name": OPTIONAL_STRING_TYPE,
-        "url_slug": OPTIONAL_STRING_TYPE,
-        "public_inquiry_email": OPTIONAL_STRING_TYPE,
-        "is_startup": OPTIONAL_BOOLEAN_TYPE,
-        "is_partner": OPTIONAL_BOOLEAN_TYPE,
-        "updated_at": OPTIONAL_STRING_TYPE
-    }
-}
+OPTIONAL_DATE_TYPE = OPTIONAL_STRING_TYPE
+OPTIONAL_LIST_TYPE = {"type": "field"}
+OPTIONAL_ID_TYPE = {"type": "integer"}
+READ_ONLY_LIST_TYPE = {"type": "field", "read_only": True}
 
 ORGANIZATION_DETAIL_ACTIONS = {
     'GET': {
@@ -32,47 +19,43 @@ ORGANIZATION_DETAIL_ACTIONS = {
         },
         "name": OPTIONAL_STRING_TYPE,
         "url_slug": OPTIONAL_STRING_TYPE,
+        "additional_industry_ids": OPTIONAL_LIST_TYPE,
+        "date_founded": OPTIONAL_DATE_TYPE,
+        "facebook_url": OPTIONAL_STRING_TYPE,
+        "full_elevator_pitch": OPTIONAL_STRING_TYPE,
+        "primary_industry_id": OPTIONAL_ID_TYPE,
         "public_inquiry_email": OPTIONAL_STRING_TYPE,
+        "linked_in_url": OPTIONAL_STRING_TYPE,
+        "location_city": OPTIONAL_STRING_TYPE,
+        "location_national": OPTIONAL_STRING_TYPE,
+        "location_postcode": OPTIONAL_STRING_TYPE,
+        "location_regional": OPTIONAL_STRING_TYPE,
+        "short_pitch": OPTIONAL_STRING_TYPE,
+        "twitter_handle": OPTIONAL_STRING_TYPE,
+        "video_elevator_pitch_url": OPTIONAL_STRING_TYPE,
+        "website_url": OPTIONAL_STRING_TYPE,
         "is_startup": OPTIONAL_BOOLEAN_TYPE,
         "is_partner": OPTIONAL_BOOLEAN_TYPE,
-        "updated_at": OPTIONAL_STRING_TYPE
+        "updated_at": OPTIONAL_DATE_TYPE
     }
 }
 
+ORGANIZATION_ACTIONS = ORGANIZATION_DETAIL_ACTIONS
+
 ORGANIZATION_HISTORY_ACTIONS = {
-    "GET": {
-        "history": {
-            "type": "field",
-            "read_only": True,
-        }
-    }
+    "GET": {"history": READ_ONLY_LIST_TYPE}
 }
 
 USER_HISTORY_ACTIONS = {
-    "GET": {
-        "history": {
-            "type": "field",
-            "read_only": True,
-        }
-    }
+    "GET": {"history": READ_ONLY_LIST_TYPE}
 }
 
 USER_ORGANIZATION_ACTIONS = {
-    'GET': {
-        'organizations': {
-            'type': 'list',
-            "read_only": True,
-        }
-    }
+    "GET": {"organizations": READ_ONLY_LIST_TYPE}
 }
 
 ORGANIZATION_USER_ACTIONS = {
-    'GET': {
-        'users': {
-            'type': 'list',
-            "read_only": True,
-        }
-    }
+    "GET": {"users": READ_ONLY_LIST_TYPE}
 }
 
 
