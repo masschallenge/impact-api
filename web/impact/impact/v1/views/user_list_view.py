@@ -1,12 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_tracking.mixins import LoggingMixin
 
-from impact.permissions import (
-    V1APIPermissions,
-)
 from impact.models import (
     BaseProfile,
     MemberProfile
@@ -18,7 +13,6 @@ from impact.v1.helpers import (
     ProfileHelper,
     UserHelper,
 )
-from impact.v1.metadata import ImpactMetadata
 from impact.v1.views.base_list_view import BaseListView
 
 

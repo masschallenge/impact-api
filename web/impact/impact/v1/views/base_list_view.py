@@ -6,11 +6,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_tracking.mixins import LoggingMixin
 
-from drf_auto_endpoint.metadata import AutoMetadataMixin
 from impact.permissions import (
     V1APIPermissions,
 )
-from impact.serializers import GeneralSerializer
 from impact.v1.metadata import ImpactMetadata
 from impact.utils import parse_date
 from django.db.models import Q

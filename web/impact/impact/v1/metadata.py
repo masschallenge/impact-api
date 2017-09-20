@@ -24,7 +24,7 @@ INDUSTRY_DETAIL_ACTIONS = {
     }
 }
 INDUSTRY_ACTIONS = INDUSTRY_DETAIL_ACTIONS
-    
+
 ORGANIZATION_DETAIL_ACTIONS = {
     "GET": {
         "id": {
@@ -88,10 +88,12 @@ USER_POST_OPTIONS = {
     "primary_industry_id": OPTIONAL_ID_TYPE,
     "updated_at": OPTIONAL_DATE_TYPE,
 }
-USER_POST_OPTIONS.update(dict([(key, OPTIONAL_BOOLEAN_TYPE)
-                               for key in ProfileHelper.OPTIONAL_BOOLEAN_KEYS]))
-USER_POST_OPTIONS.update(dict([(key, OPTIONAL_STRING_TYPE)
-                               for key in ProfileHelper.OPTIONAL_STRING_KEYS]))
+USER_POST_OPTIONS.update(dict([
+            (key, OPTIONAL_BOOLEAN_TYPE)
+            for key in ProfileHelper.OPTIONAL_BOOLEAN_KEYS]))
+USER_POST_OPTIONS.update(dict([
+            (key, OPTIONAL_STRING_TYPE)
+            for key in ProfileHelper.OPTIONAL_STRING_KEYS]))
 
 USER_GET_OPTIONS = USER_POST_OPTIONS.copy()
 USER_GET_OPTIONS.update(
