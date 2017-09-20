@@ -15,3 +15,7 @@ class ModelHelper(object):
         if result is not None:
             return result
         return getattr(self.subject, field, None)
+
+    @classmethod
+    def all_objects(cls):
+        return cls.MODEL.objects.all()

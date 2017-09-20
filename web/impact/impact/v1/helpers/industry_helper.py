@@ -1,7 +1,10 @@
+from impact.models import Industry
 from impact.v1.helpers.model_helper import ModelHelper
 
 
 class IndustryHelper(ModelHelper):
+    MODEL = Industry
+
     REQUIRED_KEYS = ["name"]
     OPTIONAL_KEYS = ["parent_id"]
     INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS

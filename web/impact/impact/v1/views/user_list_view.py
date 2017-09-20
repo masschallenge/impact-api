@@ -19,6 +19,7 @@ from impact.v1.helpers import (
     UserHelper,
 )
 from impact.v1.metadata import ImpactMetadata
+from impact.v1.views.list_view import ListView
 
 
 EMAIL_EXISTS_ERROR = "User with email {} already exists"
@@ -28,28 +29,8 @@ VALID_KEYS_NOTE = "Valid keys are: {}"
 User = get_user_model()
 
 
-class UserListView(LoggingMixin, APIView):
-    permission_classes = (
-        V1APIPermissions,
-    )
-    metadata_class = ImpactMetadata
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.errors = []
-
-    def get(self, request):
-        limit = int(request.GET.get('limit', 10))
-        offset = int(request.GET.get('offset', 0))
-        base_url = request.build_absolute_uri().split("?")[0]
-        results = self._results(limit, offset)
-        result = {
-            "count": len(results),
-            "next": _url(base_url, limit, offset + limit),
-            "previous": _url(base_url, limit, offset - limit),
-            "results": results
-        }
-        return Response(result)
+class UserListView(ListView):
+    helper_class = UserHelper
 
     def post(self, request):
         user_args = self._user_args(request.POST)
@@ -140,13 +121,6 @@ def _filter_profiles_by_date(queryset, updated_at_gt, updated_at_lt):
             Q(memberprofile__updated_at__lte=updated_at_gt)
         )
     return queryset
-
-
-def _url(base_url, limit, offset):
-    if offset >= 0:
-        return base_url + "?limit={limit}&offset={offset}".format(
-            limit=limit, offset=offset)
-    return None
 
 
 def _construct_user(user_args, profile_args):

@@ -4,6 +4,7 @@
 from django.urls import reverse
 
 from impact.tests.factories import (
+    IndustryFactory,
     OrganizationFactory,
     PartnerFactory,
     StartupFactory,
@@ -25,6 +26,20 @@ class TestOrganizationDetailView(APITestCase):
                     startup.public_inquiry_email)
             assert response.data["is_startup"] is True
             assert response.data["is_partner"] is False
+
+    def test_get_startup_with_industries(self):
+        primary_industry = IndustryFactory()
+        additional_industries = IndustryFactory.create_batch(2)
+        startup = StartupFactory(
+            primary_industry=primary_industry,
+            additional_industry_categories=additional_industries)
+        with self.login(username=self.basic_user().username):
+            url = reverse("organization_detail",
+                          args=[startup.organization.id])
+            response = self.client.get(url)
+            assert response.data["primary_industry_id"] == primary_industry.id
+            assert all([industry.id in response.data["additional_industry_ids"]
+                        for industry in additional_industries])
 
     def test_get_partner(self):
         partner = PartnerFactory()

@@ -4,7 +4,10 @@
 from django.urls import reverse
 
 from impact.tests.contexts import UserContext
-from impact.tests.factories import MentoringSpecialtiesFactory
+from impact.tests.factories import (
+    IndustryFactory,
+    MentoringSpecialtiesFactory,
+)
 from impact.tests.api_test_case import APITestCase
 from impact.v1.helpers import UserHelper
 
@@ -76,3 +79,17 @@ class TestUserDetailView(APITestCase):
             response = self.client.get(url)
             assert category.name == response.data["expert_category"]
             assert specialty.name in response.data["mentoring_specialties"]
+
+    def test_get_expert_with_industries(self):
+        primary_industry = IndustryFactory()
+        additional_industries = IndustryFactory.create_batch(2)
+        context = UserContext(user_type="EXPERT",
+                              primary_industry=primary_industry,
+                              additional_industries=additional_industries)
+        user = context.user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            response = self.client.get(url)
+            assert response.data["primary_industry_id"] == primary_industry.id
+            assert all([industry.id in response.data["additional_industry_ids"]
+                        for industry in additional_industries])

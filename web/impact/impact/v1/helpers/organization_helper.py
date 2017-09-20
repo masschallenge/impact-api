@@ -1,15 +1,20 @@
+from impact.models import Organization
 from impact.v1.helpers.model_helper import ModelHelper
 
 
 class OrganizationHelper(ModelHelper):
+    MODEL = Organization
+
     REQUIRED_KEYS = [
         "name",
         "url_slug",
         ]
     OPTIONAL_KEYS = [
+        "additional_industry_ids",
         "date_founded",
         "facebook_url",
         "full_elevator_pitch",
+        "primary_industry_id",
         "public_inquiry_email",
         "linked_in_url",
         "location_city",
@@ -42,6 +47,13 @@ class OrganizationHelper(ModelHelper):
     @property
     def is_partner(self):
         return self.partner is not None
+
+    @property
+    def additional_industry_ids(self):
+        if self.startup:
+            categories = self.startup.additional_industry_categories
+            if categories.exists():
+                return list(categories.values_list("id", flat=True))
 
     def field_value(self, field):
         result = super(OrganizationHelper, self).field_value(field)
