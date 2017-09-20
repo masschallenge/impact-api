@@ -44,7 +44,11 @@ class TestAcceleratorRoutes(TestCase):
                 'programrole',
                 'recommendationtag']).delete()
 
-    def _grant_permissions(self, user, model_name, permissions=['change', 'view', 'add']):
+    def _grant_permissions(
+            self,
+            user,
+            model_name,
+            permissions=['change', 'view', 'add']):
         for action in permissions:
             permission = PermissionFactory.create(
                 codename='{action}_{model_name}'.format(
@@ -89,8 +93,11 @@ class TestAcceleratorRoutes(TestCase):
                 "user": perm_user.id,
                 "primary_industry": industry.id
             }, **view_kwargs)
+            org_query = Startup.objects.filter(organization=org)
             self.assertTrue(
-                Startup.objects.filter(organization=org).exists())
+                org_query.exists())
+            self.assertTrue(
+                org_query.first().primary_industry.id == industry.id)
 
     def test_api_object_list(self):
         StartupFactory.create_batch(size=4, is_visible=1)
@@ -136,13 +143,11 @@ class TestAcceleratorRoutes(TestCase):
             self.response_403(self.get(url_name, **view_kwargs))
 
         perm_user = self.make_user(
-            'perm_user@test.com', perms=["mc.view_startup"])
-        perm = PermissionFactory.create(codename='change_startup')
-        view_perm = PermissionFactory.create(codename='view_startup')
-        perm_user.user_permissions.add(perm)
-        perm_user.user_permissions.add(startup_permission)
-        perm_user.user_permissions.add(view_perm)
-        perm_user.save()
+            'perm_user@test.com')
+        self._grant_permissions(
+            perm_user,
+            model_name='startup',
+            permissions=['view'])
         with self.login(perm_user):
             response = self.get(url_name, **view_kwargs)
             self.response_200(response)
