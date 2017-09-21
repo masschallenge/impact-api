@@ -57,11 +57,8 @@ class OrganizationHelper(ModelHelper):
 
     def field_value(self, field):
         result = super(OrganizationHelper, self).field_value(field)
-        if result is not None:
-            return result
-        if self.startup:
+        if result is None and self.startup:
             result = getattr(self.startup, field, None)
-        if result is not None:
-            return result
-        if self.partner:
-            return getattr(self.partner, field, None)
+        if result is None and self.partner:
+            result = getattr(self.partner, field, None)
+        return result
