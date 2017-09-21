@@ -8,13 +8,13 @@ from rest_framework_tracking.mixins import LoggingMixin
 from impact.permissions import (
     V1APIPermissions,
 )
-from impact.models import Organization
-from impact.v1.helpers import OrganizationHelper
+from impact.models import Industry
+from impact.v1.helpers import IndustryHelper
 from impact.v1.metadata import ImpactMetadata
 
 
-class OrganizationDetailView(LoggingMixin, APIView):
-    model = Organization
+class IndustryDetailView(LoggingMixin, APIView):
+    model = Industry
     metadata_class = ImpactMetadata
 
     permission_classes = (
@@ -26,4 +26,4 @@ class OrganizationDetailView(LoggingMixin, APIView):
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
-        return Response(OrganizationHelper(self.instance).serialize())
+        return Response(IndustryHelper(self.instance).serialize())

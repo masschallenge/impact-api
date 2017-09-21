@@ -33,11 +33,16 @@ class BaseUserRoleGrantEvent(object):
 
     def serialize(self):
         earliest, latest = self._user_event_datetime()
+        program = self.program_role_grant.program_role.program
         return {
+            "cycle": program.cycle.name,
+            "cycle_id": program.cycle.id,
             "datetime": earliest,
-            "latest_datetime": latest,
-            "event_type": self.EVENT_TYPE,
             "description": self.description(),
+            "event_type": self.EVENT_TYPE,
+            "latest_datetime": latest,
+            "program": program.name,
+            "program_id": program.id,
             }
 
     def _user_event_datetime(self):

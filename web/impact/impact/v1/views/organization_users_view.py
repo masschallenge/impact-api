@@ -1,3 +1,4 @@
+from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_tracking.mixins import LoggingMixin
@@ -11,6 +12,10 @@ from impact.models import (
     StartupTeamMember,
 )
 from impact.v1.metadata import ImpactMetadata
+from impact.v1.views.utils import (
+    map_data,
+    coalesce_dictionaries,
+)
 
 
 class OrganizationUsersView(LoggingMixin, APIView):
@@ -22,17 +27,21 @@ class OrganizationUsersView(LoggingMixin, APIView):
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
-        users = set(list(self.partner_users()) + list(self.startup_users()))
-        result = {"users": list(users)}
-        return Response(result)
+        all_data = self.startup_data() + self.partner_data()
+        return Response({"users": coalesce_dictionaries(all_data)})
 
-    def partner_users(self):
+    def partner_data(self):
+        return map_data(PartnerTeamMember,
+                        Q(partner__organization=self.instance),
+                        "partner__id",
+                        ["team_member_id", "partner_administrator"],
+                        ["id", "partner_administrator"])
 
-        team = PartnerTeamMember.objects.filter(
-            partner__organization=self.instance)
-        return team.values_list('team_member_id', flat=True)
-
-    def startup_users(self):
-        team = StartupTeamMember.objects.filter(
-            startup__organization=self.instance)
-        return team.values_list('user_id', flat=True)
+    def startup_data(self):
+        return map_data(StartupTeamMember,
+                        Q(startup__organization=self.instance),
+                        "startup__id",
+                        ["user_id",
+                         "startup_administrator",
+                         "primary_contact"],
+                        ["id", "startup_administrator", "primary_contact"])

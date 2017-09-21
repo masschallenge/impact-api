@@ -1,3 +1,4 @@
+from django.db.models import Q
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,6 +12,10 @@ from impact.models import (
     StartupTeamMember,
 )
 from impact.v1.metadata import ImpactMetadata
+from impact.v1.views.utils import (
+    coalesce_dictionaries,
+    map_data,
+)
 
 
 class UserOrganizationsView(LoggingMixin, APIView):
@@ -22,17 +27,22 @@ class UserOrganizationsView(LoggingMixin, APIView):
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
-        organizations = set(list(self.partner_organizations()) +
-                            list(self.startup_organizations()))
-        result = {"organizations": list(organizations)}
-        return Response(result)
+        all_data = self.startup_data() + self.partner_data()
+        return Response({"organizations": coalesce_dictionaries(all_data)})
 
-    def partner_organizations(self):
-        team = PartnerTeamMember.objects.filter(
-            team_member=self.instance)
-        return team.values_list('partner__organization_id', flat=True)
+    def partner_data(self):
+        return map_data(PartnerTeamMember,
+                        Q(team_member=self.instance),
+                        "partner_id",
+                        ["partner__organization_id",
+                         "partner_administrator"],
+                        ["id", "partner_administrator"])
 
-    def startup_organizations(self):
-        team = StartupTeamMember.objects.filter(
-            user=self.instance)
-        return team.values_list('startup__organization_id', flat=True)
+    def startup_data(self):
+        return map_data(StartupTeamMember,
+                        Q(user=self.instance),
+                        "startup_id",
+                        ["startup__organization_id",
+                         "startup_administrator",
+                         "primary_contact"],
+                        ["id", "startup_administrator", "primary_contact"])
