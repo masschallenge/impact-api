@@ -21,6 +21,8 @@ from impact.tests.factories import ContentTypeFactory
 from impact.tests.factories import PermissionFactory
 from accelerator.models import Startup
 
+VIEWS_PER_MODEL = 4
+
 
 class TestAcceleratorRoutes(TestCase):
     client_class = APIClient
@@ -167,5 +169,5 @@ class TestAcceleratorRoutes(TestCase):
         model_count = len(accelerate_models)
         # we should have two detail and list views per model
         self.assertEquals(
-            model_count * 4,
+            model_count * VIEWS_PER_MODEL,
             url_count)
