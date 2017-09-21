@@ -74,7 +74,7 @@ class ProfileHelper(ModelHelper):
 
 
 def find_gender(gender):
-    if not hasattr(gender, "lower"):
+    if not isinstance(gender, str):
         return None
     gender = GENDER_TRANSLATIONS.get(gender.lower(), gender)
     if gender in VALID_GENDERS:
