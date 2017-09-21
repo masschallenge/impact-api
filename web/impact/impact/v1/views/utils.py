@@ -1,10 +1,12 @@
-def merge_data_by_id(data):
+def coalesce_dictionaries(data, merge_field="id"):
+    "Takes a sequence of dictionaries, merges those that share the
+    same merge_field, and returns a list of resulting dictionaries"
     result = {}
     for datum in data:
-        id = datum["id"]
-        item = result.get(id, {})
+        merge_id = datum[merge_field]
+        item = result.get(merge_id, {})
         item.update(datum)
-        result[id] = item
+        result[merge_id] = item
     return result.values()
 
 
