@@ -1,6 +1,6 @@
 def coalesce_dictionaries(data, merge_field="id"):
-    "Takes a sequence of dictionaries, merges those that share the
-    same merge_field, and returns a list of resulting dictionaries"
+    """Takes a sequence of dictionaries, merges those that share the
+    same merge_field, and returns a list of resulting dictionaries"""
     result = {}
     for datum in data:
         merge_id = datum[merge_field]
