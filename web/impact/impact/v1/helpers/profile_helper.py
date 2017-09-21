@@ -1,13 +1,13 @@
 from impact.v1.helpers.model_helper import ModelHelper
 
-VALID_GENDERS = ["f", "m", "o", "p"]
-
 GENDER_TRANSLATIONS = {
     "female": "f",
     "male": "m",
     "other": "o",
     "prefer not to state": "p",
 }
+
+VALID_GENDERS = GENDER_TRANSLATIONS.values()
 
 INVALID_GENDER_ERROR = ("Invalid gender: '{}'. Valid values are "
                         "'f' or 'female', 'm' or 'male', "
