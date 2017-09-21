@@ -13,8 +13,8 @@ from impact.models import (
 )
 from impact.v1.metadata import ImpactMetadata
 from impact.v1.views.utils import (
+    coalesce_dictionaries,
     map_data,
-    merge_data_by_id,
 )
 
 
@@ -28,7 +28,7 @@ class UserOrganizationsView(LoggingMixin, APIView):
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
         all_data = self.startup_data() + self.partner_data()
-        return Response({"organizations": merge_data_by_id(all_data)})
+        return Response({"organizations": coalesce_dictionaries(all_data)})
 
     def partner_data(self):
         return map_data(PartnerTeamMember,

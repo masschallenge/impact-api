@@ -14,7 +14,7 @@ from impact.models import (
 from impact.v1.metadata import ImpactMetadata
 from impact.v1.views.utils import (
     map_data,
-    merge_data_by_id,
+    coalesce_dictionaries,
 )
 
 
@@ -28,7 +28,7 @@ class OrganizationUsersView(LoggingMixin, APIView):
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
         all_data = self.startup_data() + self.partner_data()
-        return Response({"users": merge_data_by_id(all_data)})
+        return Response({"users": coalesce_dictionaries(all_data)})
 
     def partner_data(self):
         return map_data(PartnerTeamMember,
