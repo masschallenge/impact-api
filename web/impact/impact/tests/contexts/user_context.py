@@ -5,13 +5,17 @@ from impact.tests.factories import (
     BaseProfileFactory,
     EntrepreneurProfileFactory,
     ExpertProfileFactory,
+    IndustryFactory,
     MemberProfileFactory,
     UserFactory,
 )
 
 
 class UserContext(object):
-    def __init__(self, user_type="ENTREPRENEUR"):
+    def __init__(self,
+                 user_type="ENTREPRENEUR",
+                 primary_industry=None,
+                 additional_industries=None):
         user = UserFactory()
         self.user = user
         self.baseprofile = BaseProfileFactory(user=user, user_type=user_type)
@@ -19,7 +23,12 @@ class UserContext(object):
             self.profile = EntrepreneurProfileFactory(user=user)
             user.entrepreneurprofile = self.profile
         elif user_type == "EXPERT":
-            self.profile = ExpertProfileFactory(user=self.user)
+            self.primary_industry = primary_industry or IndustryFactory()
+            self.additional_industries = additional_industries or []
+            self.profile = ExpertProfileFactory(
+                user=self.user,
+                primary_industry_expertise=self.primary_industry,
+                additional_industry_expertise=self.additional_industries)
             user.expertprofile = self.profile
         elif user_type == "MEMBER":
             self.profile = MemberProfileFactory(user=self.user)

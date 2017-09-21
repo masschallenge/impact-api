@@ -12,7 +12,7 @@ from impact.tests.factories import (
 )
 import datetime
 from impact.tests.api_test_case import APITestCase
-from impact.v1.views.organization_list_view import serialize_org
+from impact.v1.helpers import OrganizationHelper
 import simplejson as json
 import pytz
 
@@ -26,7 +26,7 @@ class TestOrganizationListView(APITestCase):
             url = reverse("organization")
             response = self.client.get(url)
             assert response.data['count'] == count
-            assert all([serialize_org(startup.organization)
+            assert all([OrganizationHelper(startup.organization).serialize()
                         in response.data['results']
                         for startup in startups])
 
@@ -37,7 +37,7 @@ class TestOrganizationListView(APITestCase):
             url = reverse("organization")
             response = self.client.get(url)
             assert response.data['count'] == count
-            assert all([serialize_org(partner.organization)
+            assert all([OrganizationHelper(partner.organization).serialize()
                         in response.data['results']
                         for partner in partners])
 
