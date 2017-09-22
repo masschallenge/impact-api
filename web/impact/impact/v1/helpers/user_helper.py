@@ -35,24 +35,10 @@ USER_POST_OPTIONS.update(dict([
 USER_GET_OPTIONS = USER_POST_OPTIONS.copy()
 USER_GET_OPTIONS.update(
     {
-        "id": {
-            "type": "integer",
-            "required": False,
-            "read_only": True,
-            "label": "ID"
-        },
-        "updated_at": {
-            "type": "string",
-            "read_only": True
-        },
-        "last_login": {
-            "type": "string",
-            "read_only": True
-        },
-        "date_joined": {
-            "type": "string",
-            "read_only": True
-        },
+        "id": PK_TYPE,
+        "updated_at": READ_ONLY_STRING,
+        "last_login": READ_ONLY_STRING,
+        "date_joined": READ_ONLY_STRING,
     })
 
 

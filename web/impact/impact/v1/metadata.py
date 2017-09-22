@@ -1,11 +1,11 @@
 from rest_framework.metadata import SimpleMetadata
 
 
-OPTIONAL_STRING_TYPE = {"type": "string"}
 OPTIONAL_BOOLEAN_TYPE = {"type": "boolean"}
-OPTIONAL_DATE_TYPE = OPTIONAL_STRING_TYPE
-OPTIONAL_LIST_TYPE = {"type": "field"}
 OPTIONAL_ID_TYPE = {"type": "integer"}
+OPTIONAL_LIST_TYPE = {"type": "field"}
+OPTIONAL_STRING_TYPE = {"type": "string"}
+OPTIONAL_DATE_TYPE = OPTIONAL_STRING_TYPE
 PK_TYPE = {
     "type": "integer",
     "required": False,
@@ -14,6 +14,7 @@ PK_TYPE = {
 }
 
 READ_ONLY_LIST_TYPE = {"type": "field", "read_only": True}
+READ_ONLY_STRING_TYPE = {"type": "string", "read_only": True}
 
 
 class ImpactMetadata(SimpleMetadata):
