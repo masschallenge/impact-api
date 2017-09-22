@@ -23,6 +23,13 @@ from accelerator.models import Startup
 
 VIEWS_PER_MODEL = 4
 
+MC_CONTENTTYPES = [
+    'startup',
+    'organization',
+    'programrole',
+    'recommendationtag'
+]
+
 
 class TestAcceleratorRoutes(TestCase):
     client_class = APIClient
@@ -31,22 +38,15 @@ class TestAcceleratorRoutes(TestCase):
     @classmethod
     def setUpClass(cls):
         super(TestAcceleratorRoutes, cls).setUpClass()
-        ContentTypeFactory(app_label='mc', model='startup')
-        ContentTypeFactory(app_label='mc', model='startupstatus')
-        ContentTypeFactory(app_label='mc', model='organization')
-        ContentTypeFactory(app_label='mc', model='recommendationtag')
-        ContentTypeFactory(app_label='mc', model='programrole')
+        for model in MC_CONTENTTYPES:
+            ContentTypeFactory(app_label='mc', model=model)
 
     @classmethod
     def tearDownClass(cls):
         super(TestAcceleratorRoutes, cls).tearDownClass()
         ContentType.objects.filter(
             app_label='mc',
-            model__in=[
-                'startup',
-                'organization',
-                'programrole',
-                'recommendationtag']).delete()
+            model__in=MC_CONTENTTYPES).delete()
 
     def _grant_permissions(
             self,
