@@ -1,6 +1,0 @@
-from .startup_factory import StartupFactory
-from .currency_factory import CurrencyFactory
-from .industry_factory import IndustryFactory
-from .organization_factory import OrganizationFactory
-from .recommendationtag_factory import RecommendationTagFactory
-from .jobposting_factory import JobPostingFactory

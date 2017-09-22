@@ -6,10 +6,14 @@ from impact.urls import accelerator_router
 from django.apps import apps
 from rest_framework.test import APIClient
 from django.contrib.contenttypes.models import ContentType
-from impact.tests.factories.accelerator import (
+
+from accelerator.tests.factories import (
     StartupFactory,
     IndustryFactory,
-    OrganizationFactory)
+)
+from accelerator.tests.factories.organization_factory import (
+    OrganizationFactory
+)
 from django.contrib.auth.models import Permission
 import simplejson as json
 
