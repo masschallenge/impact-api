@@ -7,7 +7,10 @@ from rest_framework.views import APIView
 from impact.permissions import (
     V1APIPermissions,
 )
-from impact.v1.metadata import ImpactMetadata
+from impact.v1.metadata import (
+    ImpactMetadata,
+    READ_ONLY_LIST_TYPE,
+)
 
 
 class BaseHistoryView(APIView):
@@ -16,6 +19,8 @@ class BaseHistoryView(APIView):
     permission_classes = (
         V1APIPermissions,
     )
+
+    METADATA_ACTIONS = {"GET": {"history": READ_ONLY_LIST_TYPE}}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

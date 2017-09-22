@@ -20,6 +20,9 @@ class OrganizationDetailView(LoggingMixin, APIView):
     permission_classes = (
         V1APIPermissions,
     )
+    METADATA_ACTIONS = {
+        "GET": OrganizationHelper.DETAIL_METADATA
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

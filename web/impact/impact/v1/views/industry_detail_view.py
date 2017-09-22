@@ -21,6 +21,10 @@ class IndustryDetailView(LoggingMixin, APIView):
         V1APIPermissions,
     )
 
+    METADATA_ACTIONS = {
+        "GET": IndustryHelper.DETAIL_METADATA
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
