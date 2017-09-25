@@ -42,31 +42,27 @@ class BaseListView(LoggingMixin, APIView):
 
     def _results(self, limit, offset):
         queryset = self.helper_class.all_objects()
-        updated_at_gt = self.request.query_params.get('updated_at__gt', None)
-        updated_at_lt = self.request.query_params.get('updated_at__lt', None)
-        if updated_at_gt or updated_at_lt:
-            queryset = _filter_by_date(queryset, updated_at_gt, updated_at_lt)
+        updated_at_after = self.request.query_params.get(
+            'updated_at.after', None)
+        updated_at_before = self.request.query_params.get(
+            'updated_at.before', None)
+        if updated_at_after or updated_at_before:
+            queryset = _filter_by_date(queryset,
+                                       updated_at_after,
+                                       updated_at_before)
         count = queryset.count()
         return (count,
                 [self.helper_class(obj).serialize()
                  for obj in queryset[offset:offset + limit]])
 
 
-def _filter_by_date(queryset, updated_at_gt, updated_at_lt):
-    updated_at_gt = parse_date(updated_at_gt)
-    updated_at_lt = parse_date(updated_at_lt)
-    if updated_at_lt:
-        queryset = queryset.filter(
-            Q(updated_at__isnull=False)
-        ).exclude(
-            Q(updated_at__gte=updated_at_lt)
-        )
-    if updated_at_gt:
-        queryset.filter(
-            Q(updated_at__isnull=False)
-        ).exclude(
-            Q(updated_at__lte=updated_at_gt)
-        )
+def _filter_by_date(queryset, updated_at_after, updated_at_before):
+    updated_at_after = parse_date(updated_at_after)
+    updated_at_before = parse_date(updated_at_before)
+    if updated_at_after:
+        queryset = queryset.filter(Q(updated_at__gte=updated_at_after))
+    if updated_at_before:
+        queryset = queryset.exclude(Q(updated_at__gt=updated_at_before))
     return queryset
 
 

@@ -1,20 +1,19 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+import datetime
+import pytz
+
 from django.urls import reverse
-from impact.models import (
-    Organization
-)
+
 from impact.tests.factories import (
     PartnerFactory,
     OrganizationFactory,
     StartupFactory,
 )
-import datetime
 from impact.tests.api_test_case import APITestCase
+from impact.utils import override_updated_at
 from impact.v1.helpers import OrganizationHelper
-import simplejson as json
-import pytz
 
 
 class TestOrganizationListView(APITestCase):
@@ -50,41 +49,49 @@ class TestOrganizationListView(APITestCase):
             assert response.data['count'] == count
             assert len(response.data['results']) == limit
 
-    def test_updated_at_lt_datetime_filter(self):
-        count = 5
-        organizations = OrganizationFactory.create_batch(count)
-        response = ""
-        lastweek = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=7)
-        Organization.objects.filter(id__in=[
-            organizations[0].id,
-            organizations[1].id]).update(
-            updated_at=lastweek)
+    def test_updated_at_before_datetime_filter(self):
+        updated_none = _org_for_date(None)
+        week_ago = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=7)
+        one_day = datetime.timedelta(days=1)
+        updated_before = _org_for_date(week_ago - one_day)
+        updated_exactly = _org_for_date(week_ago)
+        updated_after = _org_for_date(week_ago + one_day)
         with self.login(username=self.basic_user().username):
-            url = "{base_url}?updated_at__lt={datestr}".format(
+            url = "{base_url}?updated_at.before={datestr}".format(
                 base_url=reverse("organization"),
-                datestr=lastweek.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+                datestr=week_ago.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
             response = self.client.get(url)
-        json_response = json.loads(response.content)
-        self.assertEqual(json_response['count'], 0)
+            assert _contains_org(updated_none, response.data)
+            assert _contains_org(updated_before, response.data)
+            assert _contains_org(updated_exactly, response.data)
+            assert not _contains_org(updated_after, response.data)
 
-    def test_updated_at_gt_datetime_filter(self):
-        count = 5
-        organizations = OrganizationFactory.create_batch(count)
-        response = ""
-        lastweek = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=7)
-        Organization.objects.filter(id__in=[
-            organizations[0].id,
-            organizations[1].id]).update(
-            updated_at=lastweek)
+    def test_updated_at_after_datetime_filter(self):
+        updated_none = _org_for_date(None)
+        week_ago = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=7)
+        one_day = datetime.timedelta(days=1)
+        updated_before = _org_for_date(week_ago - one_day)
+        updated_exactly = _org_for_date(week_ago)
+        updated_after = _org_for_date(week_ago + one_day)
         with self.login(username=self.basic_user().username):
-            url = "{base_url}?updated_at__gt={datestr}".format(
+            url = "{base_url}?updated_at.after={datestr}".format(
                 base_url=reverse("organization"),
-                datestr=lastweek.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+                datestr=week_ago.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
             response = self.client.get(url)
-        json_response = json.loads(response.content)
-        contains_organization = False
-        for result in json_response['results']:
-            if result['id'] == organizations[0].id:
-                contains_organization = True
-                break
-        self.assertTrue(contains_organization)
+            assert not _contains_org(updated_none, response.data)
+            assert not _contains_org(updated_before, response.data)
+            assert _contains_org(updated_exactly, response.data)
+            assert _contains_org(updated_after, response.data)
+
+
+def _org_for_date(date):
+    org = OrganizationFactory()
+    override_updated_at(org, date)
+    return org
+
+
+def _contains_org(org, data):
+    for result in data["results"]:
+        if result["id"] == org.id:
+            return True
+    return False

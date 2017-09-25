@@ -1,20 +1,20 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+import pytz
+import datetime
+
 from django.urls import reverse
 from django.contrib.auth import get_user_model
-from impact.models import (
-    EntrepreneurProfile,
-    ExpertProfile,
-    MemberProfile
-)
-import pytz
+
 from impact.tests.factories import StartupTeamMemberFactory
 from impact.tests.contexts import UserContext
 from impact.tests.api_test_case import APITestCase
-import simplejson as json
+from impact.utils import (
+    get_profile,
+    override_updated_at,
+)
 from impact.v1.views.user_list_view import EMAIL_EXISTS_ERROR
-import datetime
 
 EXAMPLE_USER = {
     "first_name": "First",
@@ -84,51 +84,50 @@ class TestUserListView(APITestCase):
             assert response.status_code == 403
             assert EMAIL_EXISTS_ERROR.format(user.email) in response.data
 
-    def test_updated_at_lt_datetime_filter(self):
-        user = UserContext().user
-        user2 = UserContext().user
-        user3 = UserContext().user
-        StartupTeamMemberFactory(user=user)
-        StartupTeamMemberFactory(user=user2)
-        StartupTeamMemberFactory(user=user3)
-        response = ""
-        lastweek = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=7)
-        EntrepreneurProfile.objects.filter(user__id=user.id).update(
-            updated_at=lastweek)
+    def test_updated_at_before_datetime_filter(self):
+        updated_none = _user_for_date(None)
+        week_ago = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=7)
+        one_day = datetime.timedelta(days=1)
+        updated_before = _user_for_date(week_ago - one_day)
+        updated_exactly = _user_for_date(week_ago)
+        updated_after = _user_for_date(week_ago + one_day)
         with self.login(username=self.basic_user().username):
-            url = "{base_url}?updated_at__lt={datestr}".format(
+            url = "{base_url}?updated_at.before={datestr}".format(
                 base_url=reverse("user"),
-                datestr=lastweek.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+                datestr=week_ago.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
             response = self.client.get(url)
-        json_response = json.loads(response.content)
-        self.assertEqual(json_response['count'], 0)
+            assert _contains_user(updated_none, response.data)
+            assert _contains_user(updated_before, response.data)
+            assert _contains_user(updated_exactly, response.data)
+            assert not _contains_user(updated_after, response.data)
 
-    def test_updated_at_gt_datetime_filter(self):
-        user = UserContext().user
-        user2 = UserContext().user
-        user3 = UserContext().user
-        StartupTeamMemberFactory(user=user)
-        StartupTeamMemberFactory(user=user2)
-        StartupTeamMemberFactory(user=user3)
-        response = ""
-        lastweek = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=7)
-        EntrepreneurProfile.objects.all().update(
-            updated_at=datetime.datetime.now(pytz.utc))
-        ExpertProfile.objects.all().update(
-            updated_at=datetime.datetime.now(pytz.utc))
-        MemberProfile.objects.all().update(
-            updated_at=datetime.datetime.now(pytz.utc))
-        EntrepreneurProfile.objects.filter(user__id=user.id).update(
-            updated_at=lastweek)
+    def test_updated_at_after_datetime_filter(self):
+        updated_none = _user_for_date(None)
+        week_ago = datetime.datetime.now(pytz.utc) - datetime.timedelta(days=7)
+        one_day = datetime.timedelta(days=1)
+        updated_before = _user_for_date(week_ago - one_day)
+        updated_exactly = _user_for_date(week_ago)
+        updated_after = _user_for_date(week_ago + one_day)
         with self.login(username=self.basic_user().username):
-            url = "{base_url}?updated_at__gt={datestr}".format(
+            url = "{base_url}?updated_at.after={datestr}".format(
                 base_url=reverse("user"),
-                datestr=lastweek.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+                datestr=week_ago.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
             response = self.client.get(url)
-        response_json = json.loads(response.content)
-        contains_user = False
-        for result in response_json['results']:
-            if result['id'] == user.id:
-                contains_user = True
-                break
-        self.assertTrue(contains_user)
+            assert not _contains_user(updated_none, response.data)
+            assert not _contains_user(updated_before, response.data)
+            assert _contains_user(updated_exactly, response.data)
+            assert _contains_user(updated_after, response.data)
+
+
+def _user_for_date(date):
+    user = UserContext().user
+    StartupTeamMemberFactory(user=user)
+    override_updated_at(get_profile(user), date)
+    return user
+
+
+def _contains_user(user, data):
+    for result in data["results"]:
+        if result["id"] == user.id:
+            return True
+    return False
