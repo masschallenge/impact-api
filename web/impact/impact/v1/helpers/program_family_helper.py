@@ -1,7 +1,6 @@
 from impact.models import ProgramFamily
 from impact.v1.helpers.model_helper import ModelHelper
 from impact.v1.metadata import (
-    OPTIONAL_ID_TYPE,
     OPTIONAL_STRING_TYPE,
     PK_TYPE,
 )

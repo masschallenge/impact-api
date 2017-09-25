@@ -22,8 +22,8 @@ class BaseHistoryView(APIView):
 
     METADATA_ACTIONS = {"GET": {"history": READ_ONLY_LIST_TYPE}}
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+#    def __init__(self, *args, **kwargs):
+#        super().__init__(*args, **kwargs)
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
