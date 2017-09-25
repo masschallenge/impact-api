@@ -31,9 +31,9 @@ class BaseListView(LoggingMixin, APIView):
         limit = int(request.GET.get('limit', 10))
         offset = int(request.GET.get('offset', 0))
         base_url = request.build_absolute_uri().split("?")[0]
-        results = self._results(limit, offset)
+        count, results = self._results(limit, offset)
         result = {
-            "count": len(results),
+            "count": count,
             "next": _url(base_url, limit, offset + limit),
             "previous": _url(base_url, limit, offset - limit),
             "results": results,
@@ -46,8 +46,10 @@ class BaseListView(LoggingMixin, APIView):
         updated_at_lt = self.request.query_params.get('updated_at__lt', None)
         if updated_at_gt or updated_at_lt:
             queryset = _filter_by_date(queryset, updated_at_gt, updated_at_lt)
-        return [self.helper_class(obj).serialize()
-                for obj in queryset[offset:offset + limit]]
+        count = queryset.count()
+        return (count,
+                [self.helper_class(obj).serialize()
+                 for obj in queryset[offset:offset + limit]])
 
 
 def _filter_by_date(queryset, updated_at_gt, updated_at_lt):

@@ -84,9 +84,10 @@ class UserListView(BaseListView):
                 queryset,
                 updated_at_gt,
                 updated_at_lt)
-        return [
-            UserHelper(user).serialize()
-            for user in queryset[offset:offset + limit]]
+        count = queryset.count()
+        return (count,
+                [UserHelper(user).serialize()
+                 for user in queryset[offset:offset + limit]])
 
 
 def _filter_profiles_by_date(queryset, updated_at_gt, updated_at_lt):
