@@ -9,6 +9,8 @@ from impact.v1.metadata import (
     OPTIONAL_DATE_TYPE,
     OPTIONAL_LIST_TYPE,
     OPTIONAL_ID_TYPE,
+    PK_TYPE,
+    READ_ONLY_STRING_TYPE,
 )
 
 
@@ -36,9 +38,9 @@ USER_GET_OPTIONS = USER_POST_OPTIONS.copy()
 USER_GET_OPTIONS.update(
     {
         "id": PK_TYPE,
-        "updated_at": READ_ONLY_STRING,
-        "last_login": READ_ONLY_STRING,
-        "date_joined": READ_ONLY_STRING,
+        "updated_at": READ_ONLY_STRING_TYPE,
+        "last_login": READ_ONLY_STRING_TYPE,
+        "date_joined": READ_ONLY_STRING_TYPE,
     })
 
 
