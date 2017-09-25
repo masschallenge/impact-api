@@ -37,15 +37,20 @@ from django.apps import apps
 
 
 accelerator_router = routers.DefaultRouter()
-accelerator_router.register('Currency', GeneralViewSet,
-                            base_name="accelerator.Currency")
-
 simpleuser_router = routers.DefaultRouter()
+
 simpleuser_router.register('User', GeneralViewSet, base_name='User')
 
 for model in apps.get_models('impact'):
     if model._meta.app_label == 'impact':
         schema_router.register(model, url=model.__name__)
+
+
+for model in apps.get_models('accelerator'):
+    if model._meta.app_label == 'accelerator' and hasattr(model, "Meta"):
+        accelerator_router.register(
+            model.__name__, GeneralViewSet,
+            base_name="accelerator.{model}".format(model=model.__name__))
 
 account_urlpatterns = [
     url(r'^', include('registration.backends.simple.urls')),
