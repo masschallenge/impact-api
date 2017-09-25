@@ -32,10 +32,25 @@ class TestUserListView(APITestCase):
         user2 = UserContext().user
         with self.login(username=self.basic_user().username):
             url = reverse("user")
+            user_count = User.objects.count()
             response = self.client.get(url)
+            results = response.data["results"]
+            assert user_count == min(len(results), 10)
             emails = [result["email"] for result in response.data["results"]]
             assert user1.email in emails
             assert user2.email in emails
+            assert user_count == response.data["count"]
+
+    def test_get_with_limit(self):
+        UserContext().user
+        UserContext().user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user") + "?limit=1"
+            user_count = User.objects.count()
+            response = self.client.get(url)
+            results = response.data["results"]
+            assert 1 == len(results)
+            assert user_count == response.data["count"]
 
     def test_post(self):
         with self.login(username=self.basic_user().username):

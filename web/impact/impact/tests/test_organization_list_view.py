@@ -18,7 +18,6 @@ import pytz
 
 
 class TestOrganizationListView(APITestCase):
-
     def test_get_startup(self):
         count = 5
         startups = StartupFactory.create_batch(count)
@@ -40,6 +39,16 @@ class TestOrganizationListView(APITestCase):
             assert all([OrganizationHelper(partner.organization).serialize()
                         in response.data['results']
                         for partner in partners])
+
+    def test_get_with_limit(self):
+        count = 5
+        StartupFactory.create_batch(count)
+        with self.login(username=self.basic_user().username):
+            limit = 2
+            url = reverse("organization") + "?limit=%s" % limit
+            response = self.client.get(url)
+            assert response.data['count'] == count
+            assert len(response.data['results']) == limit
 
     def test_updated_at_lt_datetime_filter(self):
         count = 5
