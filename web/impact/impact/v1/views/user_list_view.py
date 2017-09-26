@@ -24,6 +24,11 @@ User = get_user_model()
 
 
 class UserListView(BaseListView):
+    METADATA_ACTIONS = {
+        "GET": UserHelper.DETAIL_GET_METADATA,
+        "POST": UserHelper.LIST_POST_METADATA,
+        }
+
     def post(self, request):
         user_args = self._user_args(request.POST)
         profile_args = self._profile_args(request.POST)

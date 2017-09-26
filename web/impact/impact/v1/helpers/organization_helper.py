@@ -1,10 +1,41 @@
 from impact.models import Organization
 from impact.v1.helpers.model_helper import ModelHelper
+from impact.v1.metadata import (
+    OPTIONAL_STRING_TYPE,
+    OPTIONAL_BOOLEAN_TYPE,
+    OPTIONAL_DATE_TYPE,
+    OPTIONAL_LIST_TYPE,
+    OPTIONAL_ID_TYPE,
+    PK_TYPE,
+)
 
 
 class OrganizationHelper(ModelHelper):
     MODEL = Organization
 
+    DETAIL_METADATA = {
+        "id": PK_TYPE,
+        "name": OPTIONAL_STRING_TYPE,
+        "url_slug": OPTIONAL_STRING_TYPE,
+        "additional_industry_ids": OPTIONAL_LIST_TYPE,
+        "date_founded": OPTIONAL_DATE_TYPE,
+        "facebook_url": OPTIONAL_STRING_TYPE,
+        "full_elevator_pitch": OPTIONAL_STRING_TYPE,
+        "primary_industry_id": OPTIONAL_ID_TYPE,
+        "public_inquiry_email": OPTIONAL_STRING_TYPE,
+        "linked_in_url": OPTIONAL_STRING_TYPE,
+        "location_city": OPTIONAL_STRING_TYPE,
+        "location_national": OPTIONAL_STRING_TYPE,
+        "location_postcode": OPTIONAL_STRING_TYPE,
+        "location_regional": OPTIONAL_STRING_TYPE,
+        "short_pitch": OPTIONAL_STRING_TYPE,
+        "twitter_handle": OPTIONAL_STRING_TYPE,
+        "video_elevator_pitch_url": OPTIONAL_STRING_TYPE,
+        "website_url": OPTIONAL_STRING_TYPE,
+        "is_startup": OPTIONAL_BOOLEAN_TYPE,
+        "is_partner": OPTIONAL_BOOLEAN_TYPE,
+        "updated_at": OPTIONAL_DATE_TYPE,
+    }
     REQUIRED_KEYS = [
         "name",
         "url_slug",

@@ -29,6 +29,11 @@ class UserDetailView(LoggingMixin, APIView):
     )
     metadata_class = ImpactMetadata
 
+    METADATA_ACTIONS = {
+        "GET": UserHelper.DETAIL_GET_METADATA,
+        "PATCH": UserHelper.DETAIL_PATCH_METADATA,
+        }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

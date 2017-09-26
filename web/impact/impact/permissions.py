@@ -33,6 +33,15 @@ class V1APIPermissions(BasePermission):
             name=settings.V1_API_GROUP).exists()
 
 
+class V1ConfidentialAPIPermissions(BasePermission):
+
+    authenticated_users_only = True
+
+    def has_permission(self, request, view):
+        return request.user.groups.filter(
+            name=settings.V1_CONFIDENTIAL_API_GROUP).exists()
+
+
 class DynamicModelPermissions(BasePermission):
     perms_map = {
         'GET': ['%(app)s.view_%(model_name)s'],
