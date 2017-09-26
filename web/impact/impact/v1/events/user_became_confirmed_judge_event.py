@@ -32,6 +32,6 @@ class UserBecameConfirmedJudgeEvent(BaseUserRoleGrantEvent):
         if self.judging_round:
             result.update({
                     "judging_round_id": self.judging_round.id,
-                    "judging_round_name": str(self.judging_round),
+                    "judging_round_name": self.judging_round.short_name(),
                     })
         return result
