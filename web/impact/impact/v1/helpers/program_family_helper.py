@@ -26,7 +26,3 @@ class ProgramFamilyHelper(ModelHelper):
     INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
     READ_ONLY_KEYS = ["id"]
     OUTPUT_KEYS = READ_ONLY_KEYS + INPUT_KEYS
-
-    @property
-    def full_name(self):
-        return str(self.subject)
