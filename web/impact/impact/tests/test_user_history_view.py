@@ -6,6 +6,7 @@ from django.urls import reverse
 from impact.models import UserRole
 from impact.tests.factories import (
     JudgingRoundFactory,
+    NewsletterReceiptFactory,
     ProgramCycleFactory,
     ProgramRoleGrantFactory,
     StartupTeamMemberFactory,
@@ -23,6 +24,7 @@ from impact.v1.events import (
     UserBecameFinalistEvent,
     UserCreatedEvent,
     UserJoinedStartupEvent,
+    UserReceivedNewsletterEvent,
 )
 
 
@@ -175,6 +177,8 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(format_string.format(name=jr.short_name(),
                                                   id=jr.id),
                              events[0]["description"])
+            self.assertEqual(jr.id, events[0]["judging_round_id"])
+            self.assertEqual(jr.short_name(), events[0]["judging_round_name"])
 
     def test_user_became_confirmed_judge_with_cycle_based_judging_round(self):
         prg = ProgramRoleGrantFactory(
@@ -203,3 +207,17 @@ class TestUserHistoryView(APITestCase):
                                  UserBecameConfirmedMentorEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(prg.created_at, events[0]["datetime"])
+
+    def test_user_received_newsletter(self):
+        receipt = NewsletterReceiptFactory()
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_history", args=[receipt.recipient.id])
+            response = self.client.get(url)
+            events = find_events(response.data["results"],
+                                 UserReceivedNewsletterEvent.EVENT_TYPE)
+            self.assertEqual(1, len(events))
+            self.assertEqual(receipt.created_at, events[0]["datetime"])
+            self.assertEqual(receipt.newsletter.name,
+                             events[0]["newsletter_name"])
+            self.assertEqual(receipt.newsletter.from_addr,
+                             events[0]["newsletter_from_address"])

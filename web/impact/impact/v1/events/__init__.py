@@ -20,3 +20,6 @@ from impact.v1.events.user_became_finalist_event import (
 )
 from impact.v1.events.user_created_event import UserCreatedEvent
 from impact.v1.events.user_joined_startup_event import UserJoinedStartupEvent
+from impact.v1.events.user_received_newsletter_event import (
+    UserReceivedNewsletterEvent,
+)
