@@ -10,15 +10,28 @@ class UserBecameConfirmedJudgeEvent(BaseUserRoleGrantEvent):
     EVENT_TYPE = "became confirmed judge"
     USER_ROLE = UserRole.JUDGE
 
-    def description(self):
-        program_role = self.program_role_grant.program_role
-        label = program_role.user_label
+    def __init__(self, program_role_grant):
+        super(UserBecameConfirmedJudgeEvent, self).__init__(program_role_grant)
+        self.judging_round = None
+        label = program_role_grant.program_role.user_label
         if label:
-            judging_round = label.rounds_confirmed_for.first()
-            if judging_round:
-                return self.JUDGING_ROUND_FORMAT.format(
-                    name=judging_round.short_name(),
-                    id=judging_round.id)
+            self.judging_round = label.rounds_confirmed_for.first()
+
+    def description(self):
+        if self.judging_round:
+            return self.JUDGING_ROUND_FORMAT.format(
+                name=self.judging_round.short_name(),
+                id=self.judging_round.id)
+        program_role = self.program_role_grant.program_role
         return self.PROGRAM_ROLE_FORMAT.format(
             name=program_role.name,
             id=program_role.id)
+
+    def serialize(self):
+        result = super(UserBecameConfirmedJudgeEvent, self).serialize()
+        if self.judging_round:
+            result.update({
+                    "judging_round_id": self.judging_round.id,
+                    "judging_round_name": str(self.judging_round),
+                    })
+        return result

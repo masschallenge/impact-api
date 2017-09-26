@@ -175,6 +175,8 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(format_string.format(name=jr.short_name(),
                                                   id=jr.id),
                              events[0]["description"])
+            self.assertEqual(jr.id, events[0]["judging_round_id"])
+            self.assertEqual(str(jr), events[0]["judging_round_name"])
 
     def test_user_became_confirmed_judge_with_cycle_based_judging_round(self):
         prg = ProgramRoleGrantFactory(
