@@ -9,6 +9,7 @@ from impact.v1.events import (
     UserBecameFinalistEvent,
     UserCreatedEvent,
     UserJoinedStartupEvent,
+    UserReceivedNewsletterEvent,
 )
 
 User = get_user_model()
@@ -22,4 +23,5 @@ class UserHistoryView(BaseHistoryView):
                      UserBecameConfirmedMentorEvent,
                      UserBecameFinalistEvent,
                      UserCreatedEvent,
-                     UserJoinedStartupEvent]
+                     UserJoinedStartupEvent,
+                     UserReceivedNewsletterEvent]
