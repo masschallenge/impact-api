@@ -221,7 +221,7 @@ endif
 
 deploy: IMAGE_TAG?=$(shell if [ "${RELEASE_TAG}" == "" ]; then echo "${IMAGE_TAG}"; else echo "${RELEASE_TAG}"; fi;)
 deploy:
-	@ecs deploy $(ENVIRONMENT) impact --image web $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG) --image redis $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
+	@ecs deploy --ignore-warnings $(ENVIRONMENT) impact --image web $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG) --image redis $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
 
 release: IMAGE_TAG?=$(shell if [ "${RELEASE_TAG}" == "" ]; then echo "${IMAGE_TAG}"; else echo "${RELEASE_TAG}"; fi;)
 release:
