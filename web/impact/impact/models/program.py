@@ -3,6 +3,7 @@
 
 
 from django.db import models
+from django.utils import timezone
 from impact.models.mc_model import MCModel
 from impact.models.named_group import NamedGroup
 from impact.models.program_family import ProgramFamily
@@ -33,7 +34,6 @@ REFUND_CODE_SUPPORT_VALUES = (
 
 
 class Program(MCModel):
-
     """a masschallenge program"""
 
     objects = ProgramManager()
@@ -111,11 +111,13 @@ class Program(MCModel):
         max_length=30,
         default="",
     )
-    accepting_company_overviews = models.BooleanField(default=False)
+    # accepting_company_overviews = models.BooleanField(default=False)  # todo: remove
     mentor_program_group = models.ForeignKey(
         NamedGroup,
         blank=True,
         null=True)
+    overview_start_date = models.DateTimeField(blank=True, null=True)
+    overview_deadline_date = models.DateTimeField(blank=True, null=True)
 
     class Meta(MCModel.Meta):
         db_table = 'mc_program'
@@ -128,3 +130,12 @@ class Program(MCModel):
 
     def family_abbr(self):
         return self.program_family.url_slug.upper()
+
+    @property
+    def accepting_company_overviews(self):
+        if self.overview_start_date:
+            if self.overview_deadline_date:
+                return (self.overview_start_date <= timezone.now() <
+                        self.overview_deadline_date)
+            return self.overview_start_date <= timezone.now()
+        return False

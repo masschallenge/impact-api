@@ -19,7 +19,6 @@ from .program_cycle_factory import ProgramCycleFactory
 
 
 class ProgramFactory(DjangoModelFactory):
-
     class Meta:
         model = Program
 
@@ -55,5 +54,6 @@ class ProgramFactory(DjangoModelFactory):
     refund_code_support = "enabled"
     many_codes_per_partner = False
     url_slug = Sequence(lambda n: "p{0}".format(n))
-    accepting_company_overviews = False
     mentor_program_group = None
+    overview_start_date = None
+    overview_deadline_date = None
