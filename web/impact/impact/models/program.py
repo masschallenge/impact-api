@@ -11,7 +11,6 @@ from impact.models.program_manager import ProgramManager
 from impact.models.program_cycle import ProgramCycle
 from impact.models.utils import is_managed
 
-
 ACTIVE_PROGRAM_STATUS = "active"
 ENDED_PROGRAM_STATUS = "ended"
 HIDDEN_PROGRAM_STATUS = "hidden"
@@ -111,7 +110,8 @@ class Program(MCModel):
         max_length=30,
         default="",
     )
-    # accepting_company_overviews = models.BooleanField(default=False)  # todo: remove
+    # accepting_company_overviews =
+    #  models.BooleanField(default=False)  # todo: remove
     mentor_program_group = models.ForeignKey(
         NamedGroup,
         blank=True,
@@ -130,12 +130,3 @@ class Program(MCModel):
 
     def family_abbr(self):
         return self.program_family.url_slug.upper()
-
-    @property
-    def accepting_company_overviews(self):
-        if self.overview_start_date:
-            if self.overview_deadline_date:
-                return (self.overview_start_date <= timezone.now() <
-                        self.overview_deadline_date)
-            return self.overview_start_date <= timezone.now()
-        return False
