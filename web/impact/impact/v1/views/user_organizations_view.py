@@ -11,7 +11,10 @@ from impact.models import (
     PartnerTeamMember,
     StartupTeamMember,
 )
-from impact.v1.metadata import ImpactMetadata
+from impact.v1.metadata import (
+    ImpactMetadata,
+    READ_ONLY_LIST_TYPE,
+)
 from impact.v1.views.utils import (
     coalesce_dictionaries,
     map_data,
@@ -24,6 +27,10 @@ class UserOrganizationsView(LoggingMixin, APIView):
     )
     metadata_class = ImpactMetadata
     model = get_user_model()
+
+    METADATA_ACTIONS = {
+        "GET": {"organizations": READ_ONLY_LIST_TYPE},
+        }
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)

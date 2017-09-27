@@ -3,11 +3,12 @@
 
 import simplejson as json
 from oauth2_provider.models import get_application_model
-
 from rest_framework.test import APIClient
 from test_plus.test import TestCase
-from django.contrib.auth.models import Group
+
 from django.conf import settings
+from django.contrib.auth.models import Group
+
 from impact.tests.factories import UserFactory
 
 OAuth_App = get_application_model()

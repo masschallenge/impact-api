@@ -2,9 +2,10 @@ class ModelHelper(object):
     def __init__(self, subject):
         self.subject = subject
 
-    def serialize(self):
+    def serialize(self, fields=None):
+        fields = fields or self.OUTPUT_KEYS
         result = {}
-        for field in self.OUTPUT_KEYS:
+        for field in fields:
             value = self.field_value(field)
             if value is not None:
                 result[field] = value

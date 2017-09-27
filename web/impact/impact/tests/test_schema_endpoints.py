@@ -3,12 +3,10 @@
 
 from django.urls import reverse
 from impact.tests.api_test_case import APITestCase
-from impact.v1.metadata import (
-    ORGANIZATION_ACTIONS,
-    USER_ORGANIZATION_ACTIONS,
-    ORGANIZATION_USER_ACTIONS,
-    USER_ACTIONS
-)
+from impact.v1.views.organization_detail_view import OrganizationDetailView
+from impact.v1.views.organization_users_view import OrganizationUsersView
+from impact.v1.views.user_organizations_view import UserOrganizationsView
+from impact.v1.views.user_detail_view import UserDetailView
 from impact.tests.factories import (
     StartupFactory
 )
@@ -26,7 +24,7 @@ class TestSchemaEndpoints(APITestCase):
             response = self.client.options(url)
         response_json = json.loads(response.content)
         self.assertTrue(
-            ORGANIZATION_ACTIONS[
+            OrganizationDetailView.METADATA_ACTIONS[
                 'GET'].keys() == response_json['actions']['GET'].keys()
         )
 
@@ -39,7 +37,7 @@ class TestSchemaEndpoints(APITestCase):
             response = self.client.options(url)
         response_json = json.loads(response.content)
         self.assertTrue(
-            ORGANIZATION_USER_ACTIONS[
+            OrganizationUsersView.METADATA_ACTIONS[
                 'GET'].keys() == response_json['actions']['GET'].keys()
         )
 
@@ -52,7 +50,7 @@ class TestSchemaEndpoints(APITestCase):
             response = self.client.options(url)
         response_json = json.loads(response.content)
         self.assertTrue(
-            USER_ORGANIZATION_ACTIONS[
+            UserOrganizationsView.METADATA_ACTIONS[
                 'GET'].keys() == response_json['actions']['GET'].keys()
         )
 
@@ -65,6 +63,6 @@ class TestSchemaEndpoints(APITestCase):
             response = self.client.options(url)
         response_json = json.loads(response.content)
         self.assertTrue(
-            USER_ACTIONS[
+            UserDetailView.METADATA_ACTIONS[
                 'GET'].keys() == response_json['actions']['GET'].keys()
         )

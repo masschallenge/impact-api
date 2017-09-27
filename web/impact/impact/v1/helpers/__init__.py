@@ -5,6 +5,7 @@ from impact.v1.helpers.profile_helper import (
     ProfileHelper,
     find_gender,
 )
+from impact.v1.helpers.program_family_helper import ProgramFamilyHelper
 from impact.v1.helpers.user_helper import (
     UserHelper,
 )

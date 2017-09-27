@@ -7,7 +7,10 @@ from rest_framework.views import APIView
 from impact.permissions import (
     V1APIPermissions,
 )
-from impact.v1.metadata import ImpactMetadata
+from impact.v1.metadata import (
+    ImpactMetadata,
+    READ_ONLY_LIST_TYPE,
+)
 
 
 class BaseHistoryView(APIView):
@@ -17,8 +20,7 @@ class BaseHistoryView(APIView):
         V1APIPermissions,
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    METADATA_ACTIONS = {"GET": {"history": READ_ONLY_LIST_TYPE}}
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
@@ -27,6 +29,8 @@ class BaseHistoryView(APIView):
             events = events + event_class.events(self.instance)
         result = {
             "results": sorted([event.serialize() for event in events],
-                              key=lambda e: e["datetime"])
+                              key=lambda e: (e["datetime"],
+                                             e.get("latest_datetime",
+                                                   e["datetime"])))
         }
         return Response(result)
