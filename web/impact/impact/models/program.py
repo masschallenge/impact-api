@@ -3,7 +3,6 @@
 
 
 from django.db import models
-from django.utils import timezone
 from impact.models.mc_model import MCModel
 from impact.models.named_group import NamedGroup
 from impact.models.program_family import ProgramFamily
