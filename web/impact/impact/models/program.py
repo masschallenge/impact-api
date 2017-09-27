@@ -110,8 +110,6 @@ class Program(MCModel):
         max_length=30,
         default="",
     )
-    # accepting_company_overviews =
-    #  models.BooleanField(default=False)  # todo: remove
     mentor_program_group = models.ForeignKey(
         NamedGroup,
         blank=True,
