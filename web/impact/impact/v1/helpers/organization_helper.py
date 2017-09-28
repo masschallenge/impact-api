@@ -82,7 +82,7 @@ class OrganizationHelper(ModelHelper):
     @property
     def additional_industry_ids(self):
         if self.startup:
-            categories = self.startup.additional_industry_categories
+            categories = self.startup.additional_industries
             if categories.exists():
                 return list(categories.values_list("id", flat=True))
 

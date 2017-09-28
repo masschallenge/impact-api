@@ -27,8 +27,8 @@ class UserContext(object):
             self.additional_industries = additional_industries or []
             self.profile = ExpertProfileFactory(
                 user=self.user,
-                primary_industry_expertise=self.primary_industry,
-                additional_industry_expertise=self.additional_industries)
+                primary_industry=self.primary_industry,
+                additional_industries=self.additional_industries)
             user.expertprofile = self.profile
         elif user_type == "MEMBER":
             self.profile = MemberProfileFactory(user=self.user)

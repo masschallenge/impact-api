@@ -73,7 +73,7 @@ class StartupDetailView(LoggingMixin, APIView):
         return {
             "additional_industries": [
                 industry.name for industry in
-                startup.additional_industry_categories.all()],
+                startup.additional_industries.all()],
             "facebook_url": startup.facebook_url,
             "full_elevator_pitch": startup.full_elevator_pitch,
             "is_visible": startup.is_visible,

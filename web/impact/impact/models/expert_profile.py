@@ -90,12 +90,12 @@ class ExpertProfile(MCModel):
         verbose_name="Functional Expertise",
         related_name="experts",
         blank=True)
-    primary_industry_expertise = models.ForeignKey(
+    primary_industry = models.ForeignKey(
         Industry,
         verbose_name="Primary Industry Expertise",
         related_name="experts",
         limit_choices_to={'level__exact': 0})
-    additional_industry_expertise = models.ManyToManyField(
+    additional_industries = models.ManyToManyField(
         Industry,
         verbose_name="Additional Industry Expertise",
         related_name="secondary_experts",

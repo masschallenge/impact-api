@@ -32,7 +32,7 @@ class TestOrganizationDetailView(APITestCase):
         additional_industries = IndustryFactory.create_batch(2)
         startup = StartupFactory(
             primary_industry=primary_industry,
-            additional_industry_categories=additional_industries)
+            additional_industries=additional_industries)
         with self.login(username=self.basic_user().username):
             url = reverse("organization_detail",
                           args=[startup.organization.id])

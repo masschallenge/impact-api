@@ -24,7 +24,7 @@ class ExpertProfileFactory(CoreProfileFactory):
     title = Sequence(lambda x: "Expert title %d" % x)
     company = Sequence(lambda x: "Expert Company %d" % x)
     expert_category = SubFactory(ExpertCategoryFactory)
-    primary_industry_expertise = SubFactory(IndustryFactory)
+    primary_industry = SubFactory(IndustryFactory)
     privacy_email = "finalists and staff"
     privacy_phone = "finalists and staff"
     privacy_web = "finalists and staff"
@@ -54,12 +54,12 @@ class ExpertProfileFactory(CoreProfileFactory):
                 self.functional_expertise.add(expertise)
 
     @post_generation
-    def additional_industry_expertise(self, create, extracted, **kwargs):
+    def additional_industries(self, create, extracted, **kwargs):
         if not create:
             return
         if extracted:
             for industry in extracted:
-                self.additional_industry_expertise.add(industry)
+                self.additional_industries.add(industry)
 
     @post_generation
     def mentoring_specialties(self, create, extracted, **kwargs):

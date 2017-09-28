@@ -48,7 +48,7 @@ class Startup(MCModel):
         Industry,
         verbose_name="Primary Industry categorization",
         related_name="startups")
-    additional_industry_categories = models.ManyToManyField(
+    additional_industries = models.ManyToManyField(
         Industry,
         verbose_name="Related Industries",
         related_name="secondary_startups",
