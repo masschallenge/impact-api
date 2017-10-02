@@ -13,22 +13,36 @@ INVALID_GENDER_ERROR = ("Invalid gender: '{}'. Valid values are "
                         "'f' or 'female', 'm' or 'male', "
                         "'o' or 'other', and 'p' or 'prefer not to state'")
 
+VALID_EXPERT_CATEGORIES = [
+    "Executive",
+    "Investor",
+    "Lawyer",
+    "Other",
+]
+
+INVALID_EXPERT_CATEGORY_ERROR = ("Invalid expert category: '{}'. Valid "
+                                 "values are 'Executive', 'Investor', "
+                                 "'Lawyer', and 'Other'")
+
 
 class ProfileHelper(ModelHelper):
     REQUIRED_KEYS = [
+        "company",
+        "email",
+        "expert_category",
         "gender",
+        "phone",
+        "primary_industry_id",
+        "title",
         ]
     OPTIONAL_STRING_KEYS = [
         "bio",
-        "company",
         "facebook_url",
         "linked_in_url",
         "office_hours_topics",
         "personal_website_url",
-        "phone",
         "referred_by",
         "speaker_topics",
-        "title",
         "twitter_handle",
         ]
     OPTIONAL_BOOLEAN_KEYS = [
@@ -42,9 +56,7 @@ class ProfileHelper(ModelHelper):
 
     READ_ONLY_KEYS = [
         "additional_industry_ids",
-        "expert_category",
         "mentoring_specialties",
-        "primary_industry_id",
         "updated_at",
         ]
     OUTPUT_KEYS = READ_ONLY_KEYS + INPUT_KEYS
@@ -62,8 +74,13 @@ class ProfileHelper(ModelHelper):
     def expert_category(self):
         if hasattr(self.subject, "expert_category"):
             category = self.subject.expert_category
-            if category:
+            if category.name in VALID_EXPERT_CATEGORIES:
                 return category.name
+            # should only be on the post
+            return Response(
+                status=403,
+                data=INVALID_EXPERT_CATEGORY_ERROR.format(
+                    data.get("expert_category")))
 
     @property
     def mentoring_specialties(self):

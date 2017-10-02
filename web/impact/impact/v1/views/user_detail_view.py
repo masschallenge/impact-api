@@ -8,6 +8,7 @@ from impact.permissions import (
 )
 from impact.utils import get_profile
 from impact.v1.helpers import (
+    INVALID_EXPERT_CATEGORY_ERROR,
     INVALID_GENDER_ERROR,
     find_gender,
     ProfileHelper,
