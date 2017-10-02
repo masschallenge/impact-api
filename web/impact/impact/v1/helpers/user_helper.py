@@ -26,6 +26,7 @@ USER_POST_OPTIONS = {
     "mentoring_specialties": OPTIONAL_LIST_TYPE,
     "primary_industry_id": OPTIONAL_ID_TYPE,
     "updated_at": OPTIONAL_DATE_TYPE,
+    "user_type": OPTIONAL_STRING_TYPE,
 }
 USER_POST_OPTIONS.update(dict([
             (key, OPTIONAL_BOOLEAN_TYPE)
