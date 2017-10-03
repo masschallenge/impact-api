@@ -26,6 +26,8 @@ class TestUserDetailView(APITestCase):
             assert user.date_joined == response.data["date_joined"]
             assert (UserHelper(user).field_value("phone") ==
                     response.data["phone"])
+            assert (UserHelper(user).field_value("user_type") ==
+                    response.data["user_type"])
 
     def test_patch(self):
         context = UserContext()

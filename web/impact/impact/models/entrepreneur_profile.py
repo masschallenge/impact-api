@@ -10,6 +10,7 @@ from impact.models.utils import is_managed
 
 class EntrepreneurProfile(MCModel):
     user = models.OneToOneField(User)
+    user_type = 'entrepreneur'
     phone = models.CharField(max_length=20)
     linked_in_url = models.CharField(max_length=200)
     facebook_url = models.CharField(max_length=200)

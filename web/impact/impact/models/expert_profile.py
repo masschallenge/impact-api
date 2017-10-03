@@ -55,6 +55,7 @@ INVITED_JUDGE_ALERT = (
 
 class ExpertProfile(MCModel):
     user = models.OneToOneField(User)
+    user_type = 'expert'
     phone = models.CharField(max_length=20)
     linked_in_url = models.CharField(max_length=200)
     facebook_url = models.CharField(max_length=200)

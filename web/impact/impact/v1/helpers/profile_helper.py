@@ -44,6 +44,7 @@ class ProfileHelper(ModelHelper):
         "referred_by",
         "speaker_topics",
         "twitter_handle",
+        "user_type",
         ]
     OPTIONAL_BOOLEAN_KEYS = [
         "judge_interest",
