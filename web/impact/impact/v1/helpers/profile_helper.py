@@ -75,13 +75,8 @@ class ProfileHelper(ModelHelper):
     def expert_category(self):
         if hasattr(self.subject, "expert_category"):
             category = self.subject.expert_category
-            if category.name in VALID_EXPERT_CATEGORIES:
+            if category:
                 return category.name
-            # should only be on the post
-            return Response(
-                status=403,
-                data=INVALID_EXPERT_CATEGORY_ERROR.format(
-                    data.get("expert_category")))
 
     @property
     def mentoring_specialties(self):
@@ -90,6 +85,14 @@ class ProfileHelper(ModelHelper):
             if specialties:
                 return [specialty.name for specialty in specialties.all()]
 
+    @gender.setter
+    def gender(self, value):
+        if not isinstance(gender, str):
+            raise ValueError(INVALID_GENDER_ERROR.format(value))
+        gender = GENDER_TRANSLATIONS.get(gender.lower(), gender)
+        if gender not in VALID_GENDERS:
+            raise ValueError(INVALID_GENDER_ERROR.format(value))
+        self.gender = value
 
 def find_gender(gender):
     if not isinstance(gender, str):

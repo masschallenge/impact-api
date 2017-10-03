@@ -17,6 +17,11 @@ class ModelHelper(object):
             return result
         return getattr(self.subject, field, None)
 
+    def field_setter(self, field, value):
+        if getattr(self, field).fset:
+            return value
+        return getattr(self.subject, field, None)
+
     @classmethod
     def all_objects(cls):
         return cls.MODEL.objects.all()

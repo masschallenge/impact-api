@@ -87,6 +87,12 @@ class UserHelper(ModelHelper):
             return result
         return ProfileHelper(self.profile).field_value(field)
 
+# if key in UserHelper.USER_INPUT_KEYS:
+#                 setattr(user, field, value)
+#             elif key in ProfileHelper.INPUT_KEYS:
+#                 profile = get_profile(user)
+#                 setattr(profile, field, value)
+#                 profile.save()
     @property
     def first_name(self):
         return self.subject.full_name
