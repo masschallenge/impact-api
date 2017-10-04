@@ -50,12 +50,12 @@ class StartupFactory(DjangoModelFactory):
     landing_page = None
 
     @post_generation
-    def additional_industry_categories(self, create, extracted, **kwargs):
+    def additional_industries(self, create, extracted, **kwargs):
         if not create:
             return
         if extracted:
             for industry in extracted:
-                self.additional_industry_categories.add(industry)
+                self.additional_industries.add(industry)
 
     @post_generation
     def recommendation_tags(self, create, extracted, **kwargs):
