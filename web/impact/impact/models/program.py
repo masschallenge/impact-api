@@ -10,7 +10,6 @@ from impact.models.program_manager import ProgramManager
 from impact.models.program_cycle import ProgramCycle
 from impact.models.utils import is_managed
 
-
 ACTIVE_PROGRAM_STATUS = "active"
 ENDED_PROGRAM_STATUS = "ended"
 HIDDEN_PROGRAM_STATUS = "hidden"
@@ -33,7 +32,6 @@ REFUND_CODE_SUPPORT_VALUES = (
 
 
 class Program(MCModel):
-
     """a masschallenge program"""
 
     objects = ProgramManager()
@@ -111,11 +109,12 @@ class Program(MCModel):
         max_length=30,
         default="",
     )
-    accepting_company_overviews = models.BooleanField(default=False)
     mentor_program_group = models.ForeignKey(
         NamedGroup,
         blank=True,
         null=True)
+    overview_start_date = models.DateTimeField(blank=True, null=True)
+    overview_deadline_date = models.DateTimeField(blank=True, null=True)
 
     class Meta(MCModel.Meta):
         db_table = 'mc_program'
