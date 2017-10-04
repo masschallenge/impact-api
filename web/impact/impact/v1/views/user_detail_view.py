@@ -6,14 +6,7 @@ from rest_framework_tracking.mixins import LoggingMixin
 from impact.permissions import (
     V1APIPermissions,
 )
-from impact.utils import get_profile
-from impact.v1.helpers import (
-    INVALID_EXPERT_CATEGORY_ERROR,
-    INVALID_GENDER_ERROR,
-    find_gender,
-    ProfileHelper,
-    UserHelper,
-)
+from impact.v1.helpers import UserHelper
 from impact.v1.metadata import ImpactMetadata
 
 
@@ -53,27 +46,15 @@ class UserDetailView(LoggingMixin, APIView):
                 data=INVALID_KEYS_ERROR.format(
                     invalid_keys=list(invalid_keys),
                     valid_keys=UserHelper.INPUT_KEYS))
-        # if "gender" in data and not find_gender(data.get("gender")):
-        #     return Response(
-        #         status=403,
-        #         data=INVALID_GENDER_ERROR.format(data.get("gender")))
+        valid_data = {}
         for key, value in data.items():
             field = helper.translate_key(key)
-            helper.validate(field, value)
+            valid_data[field] = helper.validate(field, value)
         if helper.errors:
             return Response(
                 status=403,
                 data=helper.errors)
-        for key, value in data.items():
-            field = helper.translate_key(key)
+        for field, value in valid_data.items():
             helper.field_setter(field, value)
-
-            # field_setter(helper, field, value)
-            # if key in UserHelper.USER_INPUT_KEYS:
-            #     setattr(user, field, value)
-            # elif key in ProfileHelper.INPUT_KEYS:
-            #     profile = get_profile(user)
-            #     setattr(profile, field, value)
-            #     profile.save()
-        user.save()
+        helper.save()
         return Response(status=200)

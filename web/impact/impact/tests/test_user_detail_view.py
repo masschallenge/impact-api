@@ -9,6 +9,7 @@ from impact.tests.factories import (
     MentoringSpecialtiesFactory,
 )
 from impact.tests.api_test_case import APITestCase
+from impact.utils import get_profile
 from impact.v1.helpers import UserHelper
 
 
@@ -32,11 +33,12 @@ class TestUserDetailView(APITestCase):
     def test_patch(self):
         context = UserContext()
         user = context.user
+        profile = get_profile(user)
         with self.login(username=self.basic_user().username):
             url = reverse("user_detail", args=[user.id])
             is_active = not user.is_active
             first_name = "David"
-            phone = "+1-555-555-5555"
+            phone = "+1-555-555-1234"
             bio = "I'm an awesome API!"
             data = {
                 "is_active": is_active,
@@ -45,10 +47,12 @@ class TestUserDetailView(APITestCase):
                 "phone": phone,
                 "bio": bio,
                 }
-            self.client.patch(url, data)
+            response = self.client.patch(url, data)
             user.refresh_from_db()
+            profile.refresh_from_db()
             assert user.is_active == is_active
             assert user.full_name == first_name
+            assert UserHelper(user).field_value("gender") == "m"
             assert UserHelper(user).field_value("phone") == phone
             assert UserHelper(user).field_value("bio") == bio
 
@@ -70,7 +74,8 @@ class TestUserDetailView(APITestCase):
             bad_gender = "bad gender"
             response = self.client.patch(url, {"gender": bad_gender})
             assert response.status_code == 403
-            assert bad_gender in response.data
+            assert any(bad_gender in datum
+                       for datum in response.data)
 
     def test_expert_fields(self):
         context = UserContext(user_type="EXPERT")

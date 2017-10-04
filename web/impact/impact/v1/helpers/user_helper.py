@@ -75,7 +75,7 @@ class UserHelper(ModelHelper):
 
     def __init__(self, *args, **kwargs):
         super(UserHelper, self).__init__(*args, **kwargs)
-        self.profile = get_profile(self.subject)
+        self.profile_helper = ProfileHelper(get_profile(self.subject))
 
     @classmethod
     def translate_key(cls, key):
@@ -85,19 +85,25 @@ class UserHelper(ModelHelper):
         result = super(UserHelper, self).field_value(field)
         if result is not None:
             return result
-        return ProfileHelper(self.profile).field_value(field)
+        return self.profile_helper.field_value(field)
 
     def field_setter(self, field, value):
         if field in ProfileHelper.INPUT_KEYS:
-            setattr(self.profile, field, value)
+            self.profile_helper.field_setter(field, value)
         else:
             super(UserHelper, self).field_setter(field, value)
-# if key in UserHelper.USER_INPUT_KEYS:
-#                 setattr(user, field, value)
-#             elif key in ProfileHelper.INPUT_KEYS:
-#                 profile = get_profile(user)
-#                 setattr(profile, field, value)
-#                 profile.save()
+
+    def validate(self, field, value):
+        if field in ProfileHelper.INPUT_KEYS:
+            result = self.profile_helper.validate(field, value)
+            self.errors += self.profile_helper.errors
+            return result
+        return super(UserHelper, self).validate(field, value)
+
+    def save(self):
+        self.profile_helper.save()
+        super(UserHelper, self).save()
+
     @property
     def first_name(self):
         return self.subject.full_name

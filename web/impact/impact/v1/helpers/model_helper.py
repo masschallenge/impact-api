@@ -21,7 +21,8 @@ class ModelHelper(object):
         return getattr(self.subject, field, None)
 
     def field_setter(self, field, value):
-        if getattr(self.__class__, field).fset:
+        attr = getattr(self.__class__, field, None)
+        if attr and attr.fset:
             setattr(self, field, value)
         else:
             setattr(self.subject, field, value)
@@ -29,7 +30,11 @@ class ModelHelper(object):
     def validate(self, field, value):
         validator = self.VALIDATORS.get(field)
         if validator:
-            validator(self, value)
+            return validator(self, value)
+        return value
+
+    def save(self):
+        self.subject.save()
 
     @classmethod
     def all_objects(cls):

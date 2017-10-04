@@ -27,17 +27,20 @@ INVALID_EXPERT_CATEGORY_ERROR = ("Invalid expert category: '{}'. Valid "
 INVALID_BIO_ERROR = ("Invalid bio: '{}'.")
 
 
-def validate_bio(helper, value):
-    if (not isinstance(value, str) or
-        helper.subject.user_type not in ["Expert", "Entrepreneur"]):
-            helper.errors.append(INVALID_BIO_ERROR.format(value))
+def validate_bio(helper, bio):
+    if (not isinstance(bio, str) or
+            helper.subject.user_type not in ["expert", "entrepreneur"]):
+        helper.errors.append(INVALID_BIO_ERROR.format(bio))
+    return bio
 
-def validate_gender(helper, value):
+
+def validate_gender(helper, gender):
     if not isinstance(gender, str):
-        helper.errors.append(INVALID_GENDER_ERROR.format(value))
+        helper.errors.append(INVALID_GENDER_ERROR.format(gender))
     gender = GENDER_TRANSLATIONS.get(gender.lower(), gender)
     if gender not in VALID_GENDERS:
-        helper.errors.append(INVALID_GENDER_ERROR.format(value))
+        helper.errors.append(INVALID_GENDER_ERROR.format(gender))
+    return gender
 
 
 class ProfileHelper(ModelHelper):
