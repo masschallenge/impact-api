@@ -1,6 +1,9 @@
 class ModelHelper(object):
+    VALIDATORS = {}
+
     def __init__(self, subject):
         self.subject = subject
+        self.errors = []
 
     def serialize(self, fields=None):
         fields = fields or self.OUTPUT_KEYS
@@ -18,9 +21,15 @@ class ModelHelper(object):
         return getattr(self.subject, field, None)
 
     def field_setter(self, field, value):
-        if getattr(self, field).fset:
-            return value
-        return getattr(self.subject, field, None)
+        if getattr(self.__class__, field).fset:
+            setattr(self, field, value)
+        else:
+            setattr(self.subject, field, value)
+
+    def validate(self, field, value):
+        validator = self.VALIDATORS.get(field)
+        if validator:
+            validator(self, value)
 
     @classmethod
     def all_objects(cls):

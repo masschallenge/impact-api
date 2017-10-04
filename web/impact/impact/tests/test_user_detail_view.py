@@ -37,17 +37,20 @@ class TestUserDetailView(APITestCase):
             is_active = not user.is_active
             first_name = "David"
             phone = "+1-555-555-5555"
+            bio = "I'm an awesome API!"
             data = {
                 "is_active": is_active,
                 "first_name": first_name,
                 "gender": "Male",
                 "phone": phone,
+                "bio": bio,
                 }
             self.client.patch(url, data)
             user.refresh_from_db()
             assert user.is_active == is_active
             assert user.full_name == first_name
             assert UserHelper(user).field_value("phone") == phone
+            assert UserHelper(user).field_value("bio") == bio
 
     def test_patch_invalid_key(self):
         context = UserContext()

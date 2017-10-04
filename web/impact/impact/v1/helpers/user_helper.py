@@ -87,6 +87,11 @@ class UserHelper(ModelHelper):
             return result
         return ProfileHelper(self.profile).field_value(field)
 
+    def field_setter(self, field, value):
+        if field in ProfileHelper.INPUT_KEYS:
+            setattr(self.profile, field, value)
+        else:
+            super(UserHelper, self).field_setter(field, value)
 # if key in UserHelper.USER_INPUT_KEYS:
 #                 setattr(user, field, value)
 #             elif key in ProfileHelper.INPUT_KEYS:

@@ -59,7 +59,16 @@ class UserDetailView(LoggingMixin, APIView):
         #         data=INVALID_GENDER_ERROR.format(data.get("gender")))
         for key, value in data.items():
             field = helper.translate_key(key)
-            field_setter(helper, field, value)
+            helper.validate(field, value)
+        if helper.errors:
+            return Response(
+                status=403,
+                data=helper.errors)
+        for key, value in data.items():
+            field = helper.translate_key(key)
+            helper.field_setter(field, value)
+
+            # field_setter(helper, field, value)
             # if key in UserHelper.USER_INPUT_KEYS:
             #     setattr(user, field, value)
             # elif key in ProfileHelper.INPUT_KEYS:

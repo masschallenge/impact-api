@@ -24,8 +24,27 @@ INVALID_EXPERT_CATEGORY_ERROR = ("Invalid expert category: '{}'. Valid "
                                  "values are 'Executive', 'Investor', "
                                  "'Lawyer', and 'Other'")
 
+INVALID_BIO_ERROR = ("Invalid bio: '{}'.")
+
+
+def validate_bio(helper, value):
+    if (not isinstance(value, str) or
+        helper.subject.user_type not in ["Expert", "Entrepreneur"]):
+            helper.errors.append(INVALID_BIO_ERROR.format(value))
+
+def validate_gender(helper, value):
+    if not isinstance(gender, str):
+        helper.errors.append(INVALID_GENDER_ERROR.format(value))
+    gender = GENDER_TRANSLATIONS.get(gender.lower(), gender)
+    if gender not in VALID_GENDERS:
+        helper.errors.append(INVALID_GENDER_ERROR.format(value))
+
 
 class ProfileHelper(ModelHelper):
+    VALIDATORS = {
+        "bio": validate_bio,
+        "gender": validate_gender,
+        }
     REQUIRED_KEYS = [
         "company",
         "email",
@@ -85,14 +104,6 @@ class ProfileHelper(ModelHelper):
             if specialties:
                 return [specialty.name for specialty in specialties.all()]
 
-    @gender.setter
-    def gender(self, value):
-        if not isinstance(gender, str):
-            raise ValueError(INVALID_GENDER_ERROR.format(value))
-        gender = GENDER_TRANSLATIONS.get(gender.lower(), gender)
-        if gender not in VALID_GENDERS:
-            raise ValueError(INVALID_GENDER_ERROR.format(value))
-        self.gender = value
 
 def find_gender(gender):
     if not isinstance(gender, str):
