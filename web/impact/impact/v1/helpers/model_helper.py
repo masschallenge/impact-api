@@ -39,3 +39,36 @@ class ModelHelper(object):
     @classmethod
     def all_objects(cls):
         return cls.MODEL.objects.all()
+
+
+def validate_boolean(helper, field, value, error):
+    if not isinstance(value, bool):
+        helper.errors.append(error.format(value))
+    return field
+
+
+def validate_by_role(helper, field, users, error):
+    if (not isinstance(field, str) or
+            helper.subject.user_type not in users):
+        helper.errors.append(error.format(field))
+    return field
+
+
+def validate_choices(helper,
+                     field,
+                     field_group,
+                     error,
+                     translation=None):
+    if not isinstance(field, str):
+        helper.errors.append(error.format(field))
+    if translation:
+        field = translation
+    if field not in field_group:
+        helper.errors.append(error.format(field))
+    return field
+
+
+def validate_regex(helper, field, field_regex, error):
+    if not field_regex.match(field):
+        helper.errors.append(error.format(field))
+    return field

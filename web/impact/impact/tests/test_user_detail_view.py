@@ -47,7 +47,7 @@ class TestUserDetailView(APITestCase):
                 "phone": phone,
                 "bio": bio,
                 }
-            response = self.client.patch(url, data)
+            self.client.patch(url, data)
             user.refresh_from_db()
             profile.refresh_from_db()
             assert user.is_active == is_active
