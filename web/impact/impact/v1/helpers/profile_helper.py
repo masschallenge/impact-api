@@ -86,12 +86,12 @@ class ProfileHelper(ModelHelper):
 
     @property
     def additional_industry_ids(self):
-        return self.subject.additional_industry_expertise.values_list(
+        return self.subject.additional_industries.values_list(
             "id", flat=True)
 
     @property
     def primary_industry_id(self):
-        return self.subject.primary_industry_expertise_id
+        return self.subject.primary_industry_id
 
     @property
     def expert_category(self):
