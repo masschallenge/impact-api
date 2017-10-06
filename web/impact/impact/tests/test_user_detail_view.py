@@ -61,7 +61,7 @@ class TestUserDetailView(APITestCase):
                 "phone": phone,
                 "twitter_handle": twitter_handle,
                 }
-            response = self.client.patch(url, data)
+            self.client.patch(url, data)
             user.refresh_from_db()
             profile.refresh_from_db()
             assert user.email == email
@@ -100,21 +100,21 @@ class TestUserDetailView(APITestCase):
                 "judge_interest": False,
                 "mentor_interest": True,
                 }
-            response = self.client.patch(url, data)
+            self.client.patch(url, data)
             user.refresh_from_db()
             profile.refresh_from_db()
             helper = UserHelper(user)
             assert helper.field_value("company") == company
             assert helper.field_value("expert_category") == expert_category
             assert helper.field_value("title") == title
-            assert (helper.field_value("office_hours_interest") == True)
+            assert (helper.field_value("office_hours_interest") is True)
             assert (helper.field_value("office_hours_topics") ==
                     office_hours_topics)
             assert helper.field_value("referred_by") == referred_by
-            assert helper.field_value("speaker_interest") == True
+            assert helper.field_value("speaker_interest") is True
             assert helper.field_value("speaker_topics") == speaker_topics
-            assert helper.field_value("judge_interest") == False
-            assert helper.field_value("mentor_interest") == True
+            assert helper.field_value("judge_interest") is False
+            assert helper.field_value("mentor_interest") is True
 
     def test_patch_personal_website_url_with_username_and_password_url(self):
         context = UserContext(user_type="ENTREPRENEUR")
@@ -141,7 +141,7 @@ class TestUserDetailView(APITestCase):
                 "company": "iStrtupify",
                 }
             response = self.client.patch(url, data)
-            assert response.status_code ==403
+            assert response.status_code == 403
 
     def test_patch_invalid_key(self):
         context = UserContext()

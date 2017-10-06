@@ -48,7 +48,7 @@ VALID_EXPERT_CATEGORIES = [
 ]
 
 INVALID_INDUSTRY_ID_ERROR = ("Invalid {field}: "
-                       "Expected valid id for an industry resource")
+                             "Expected valid id for an industry resource")
 
 PHONE_REGEX = re.compile(r'^[0-9x.+() -]+$')
 TWITTER_REGEX = re.compile(r'^\S+$')

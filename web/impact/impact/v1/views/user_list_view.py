@@ -2,10 +2,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from rest_framework.response import Response
 
-from impact.models import (
-    BaseProfile,
-    ExpertCategory,
-)
+from impact.models import BaseProfile
 from impact.utils import parse_date
 from impact.v1.helpers import (
     ProfileHelper,

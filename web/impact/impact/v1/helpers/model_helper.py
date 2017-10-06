@@ -62,7 +62,6 @@ class ModelHelper(object):
         return cls.MODEL.objects.all()
 
 
-
 def validate_boolean(helper, field, value):
     result = value
     if isinstance(result, str):
@@ -119,7 +118,8 @@ def validate_email_address(helper, field, value):
     try:
         validate_email(value)
     except ValidationError:
-        helper.errors.append(INVALID_EMAIL_ERROR.format(field=field, value=value))
+        helper.errors.append(INVALID_EMAIL_ERROR.format(field=field,
+                                                        value=value))
     return value
 
 
@@ -127,5 +127,6 @@ def validate_url(helper, field, value):
     try:
         URLValidator(schemes=["http", "https"])(value)
     except ValidationError:
-        helper.errors.append(INVALID_URL_ERROR.format(field=field, value=value))
+        helper.errors.append(INVALID_URL_ERROR.format(field=field,
+                                                      value=value))
     return value
