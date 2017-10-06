@@ -7,6 +7,10 @@ import datetime
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
+from impact.v1.helpers.model_helper import (
+    INVALID_CHOICE_ERROR,
+    format_choices,
+)
 from impact.models import (
     EntrepreneurProfile,
     ExpertProfile,
@@ -27,7 +31,6 @@ from impact.utils import (
 from impact.v1.views.user_list_view import (
     EMAIL_EXISTS_ERROR,
     UNSUPPORTED_KEY_ERROR,
-    invalid_expert_category_error,
 )
 
 EXAMPLE_ENTREPRENEUR = {
@@ -118,7 +121,9 @@ class TestUserListView(APITestCase):
             bad_name = "Bad Category"
             response = self.client.post(
                 url, _example_expert(expert_category=bad_name))
-            error_msg = invalid_expert_category_error(bad_name)
+            error_msg = INVALID_CHOICE_ERROR.format(field="expert_category",
+                                                    value=bad_name,
+                                                    choices=format_choices([]))
             assert error_msg in response.data
 
     def test_post_member(self):

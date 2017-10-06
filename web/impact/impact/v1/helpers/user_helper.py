@@ -1,7 +1,11 @@
 from django.conf import settings
 
 from impact.utils import get_profile
-from impact.v1.helpers.model_helper import ModelHelper
+from impact.v1.helpers.model_helper import (
+    ModelHelper,
+    validate_boolean,
+    validate_string,
+)
 from impact.v1.helpers.profile_helper import ProfileHelper
 from impact.v1.metadata import (
     OPTIONAL_STRING_TYPE,
@@ -47,6 +51,13 @@ USER_GET_OPTIONS.update(
 
 
 class UserHelper(ModelHelper):
+    VALIDATORS = {
+        # "email": validate_email,
+        "short_name": validate_string,
+        "full_name": validate_string,
+        "is_active": validate_boolean,
+        }
+
     MODEL = settings.AUTH_USER_MODEL
 
     DETAIL_GET_METADATA = USER_GET_OPTIONS

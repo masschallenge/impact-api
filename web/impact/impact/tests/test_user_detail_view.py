@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from impact.tests.contexts import UserContext
 from impact.tests.factories import (
+    ExpertCategoryFactory,
     IndustryFactory,
     MentoringSpecialtiesFactory,
 )
@@ -25,9 +26,9 @@ class TestUserDetailView(APITestCase):
             assert user.short_name == response.data["last_name"]
             assert user.last_login == response.data.get("last_login")
             assert user.date_joined == response.data["date_joined"]
-            assert (UserHelper(user).field_value("phone") ==
-                    response.data["phone"])
-            assert (UserHelper(user).field_value("user_type") ==
+            helper = UserHelper(user)
+            assert helper.field_value("phone") == response.data["phone"]
+            assert (helper.field_value("user_type") ==
                     response.data["user_type"])
 
     def test_patch(self):
@@ -47,14 +48,62 @@ class TestUserDetailView(APITestCase):
                 "phone": phone,
                 "bio": bio,
                 }
-            self.client.patch(url, data)
+            response = self.client.patch(url, data)
             user.refresh_from_db()
             profile.refresh_from_db()
             assert user.is_active == is_active
             assert user.full_name == first_name
-            assert UserHelper(user).field_value("gender") == "m"
-            assert UserHelper(user).field_value("phone") == phone
-            assert UserHelper(user).field_value("bio") == bio
+            helper = UserHelper(user)
+            assert helper.field_value("gender") == "m"
+            assert helper.field_value("phone") == phone
+            assert helper.field_value("bio") == bio
+
+    def test_patch_expert_fields(self):
+        context = UserContext(user_type="EXPERT")
+        user = context.user
+        profile = get_profile(user)
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            company = profile.company + ", Inc."
+            expert_category = ExpertCategoryFactory().name
+            title = "Chief " + profile.title
+            office_hours_topics = "Fungi"
+            referred_by = "me"
+            speaker_topics = "Fungi"
+            data = {
+                "company": company,
+                "expert_category": expert_category,
+                "title": title,
+                "office_hours_interest": True,
+                "office_hours_topics": office_hours_topics,
+                "referred_by": referred_by,
+                "speaker_interest": True,
+                "speaker_topics": speaker_topics,
+                "judge_interest": False,
+                }
+            response = self.client.patch(url, data)
+            user.refresh_from_db()
+            profile.refresh_from_db()
+            helper = UserHelper(user)
+            assert helper.field_value("company") == company
+            assert helper.field_value("expert_category") == expert_category
+            assert helper.field_value("title") == title
+            assert (helper.field_value("office_hours_topics") ==
+                    office_hours_topics)
+            assert helper.field_value("referred_by") == referred_by
+            assert helper.field_value("speaker_topics") == speaker_topics
+
+    def test_patch_expert_field_fails_for_entrepreneur(self):
+        context = UserContext(user_type="ENTREPRENEUR")
+        user = context.user
+        profile = get_profile(user)
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            data = {
+                "company": "iStrtupify",
+                }
+            response = self.client.patch(url, data)
+            assert response.status_code ==403
 
     def test_patch_invalid_key(self):
         context = UserContext()
@@ -75,6 +124,28 @@ class TestUserDetailView(APITestCase):
             response = self.client.patch(url, {"gender": bad_gender})
             assert response.status_code == 403
             assert any(bad_gender in datum
+                       for datum in response.data)
+
+    def test_patch_invalid_boolean(self):
+        context = UserContext()
+        user = context.user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            bad_boolean = "Maybe"
+            response = self.client.patch(url, {"is_active": bad_boolean})
+            assert response.status_code == 403
+            assert any(bad_boolean in datum
+                       for datum in response.data)
+
+    def test_patch_invalid_phone(self):
+        context = UserContext()
+        user = context.user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            bad_phone = "Call me!"
+            response = self.client.patch(url, {"phone": bad_phone})
+            assert response.status_code == 403
+            assert any(bad_phone in datum
                        for datum in response.data)
 
     def test_expert_fields(self):

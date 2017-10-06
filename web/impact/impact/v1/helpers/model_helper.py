@@ -1,3 +1,11 @@
+INVALID_BOOLEAN_ERROR = ("Invalid {field}: "
+                         "Expected 'true' or 'false' not {value}")
+INVALID_CHOICE_ERROR = ("Invalid {field}: "
+                        "Expected {choices} not {value}")
+INVALID_REGEX_ERROR = "Invalid {field}: Expected '{value}' to match '{regex}'"
+INVALID_STRING_ERROR = "Invalid {field}: Expected a String not {value}"
+
+
 class ModelHelper(object):
     VALIDATORS = {}
 
@@ -21,16 +29,20 @@ class ModelHelper(object):
         return getattr(self.subject, field, None)
 
     def field_setter(self, field, value):
-        attr = getattr(self.__class__, field, None)
-        if attr and attr.fset:
-            setattr(self, field, value)
-        else:
-            setattr(self.subject, field, value)
+        subject = self.subject
+        # The following lines would allow a helper to
+        # override the subject's setter.  We haven't
+        # needed this yet, so leaving this mechanism
+        # commented out.
+        # attr = getattr(self.__class__, field, None)
+        # if attr and attr.fset:
+        #     subject = self
+        setattr(subject, field, value)
 
     def validate(self, field, value):
         validator = self.VALIDATORS.get(field)
         if validator:
-            return validator(self, value)
+            value = validator(self, field, value)
         return value
 
     def save(self):
@@ -41,34 +53,54 @@ class ModelHelper(object):
         return cls.MODEL.objects.all()
 
 
-def validate_boolean(helper, field, value, error):
-    if not isinstance(value, bool):
-        helper.errors.append(error.format(value))
-    return field
+
+def validate_boolean(helper, field, value):
+    result = value
+    if isinstance(result, str):
+        result = result.lower()
+        if result == 'true':
+            result = True
+        elif result == 'false':
+            result = False
+    if not isinstance(result, bool):
+        helper.errors.append(INVALID_BOOLEAN_ERROR.format(field=field,
+                                                          value=value))
+    return result
 
 
-def validate_by_role(helper, field, users, error):
-    if (not isinstance(field, str) or
-            helper.subject.user_type not in users):
-        helper.errors.append(error.format(field))
-    return field
+def validate_string(helper, field, value):
+    if not isinstance(value, str):
+        helper.errors.append(INVALID_STRING_ERROR.format(field=field,
+                                                         value=value))
+    return value
 
 
-def validate_choices(helper,
-                     field,
-                     field_group,
-                     error,
-                     translation=None):
-    if not isinstance(field, str):
-        helper.errors.append(error.format(field))
-    if translation:
-        field = translation
-    if field not in field_group:
-        helper.errors.append(error.format(field))
-    return field
+def validate_choices(helper, field, value, choices, translations={}):
+    validate_string(helper, field, value)
+    result = translations.get(value, value)
+    if value in choices or result in choices:
+        return result
+    if isinstance(result, str):
+        result = translations.get(result.lower(), result)
+    if result not in choices:
+        helper.errors.append(INVALID_CHOICE_ERROR.format(
+                field=field, value=value, choices=format_choices(choices)))
+    return result
 
 
-def validate_regex(helper, field, field_regex, error):
-    if not field_regex.match(field):
-        helper.errors.append(error.format(field))
-    return field
+def format_choices(choices):
+    choice_list = list(choices)
+    if choice_list:
+        result = "', '".join(choice_list[:-1])
+        if result:
+            result += "' or '"
+        result += "%s'" % choice_list[-1]
+        return "'" + result
+
+
+def validate_regex(helper, field, value, regex):
+    if not regex.match(value):
+        helper.errors.append(INVALID_REGEX_ERROR.format(field=field,
+                                                        value=value,
+                                                        regex=regex))
+    return value

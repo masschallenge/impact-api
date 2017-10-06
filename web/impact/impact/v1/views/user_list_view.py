@@ -8,14 +8,13 @@ from impact.models import (
 )
 from impact.utils import parse_date
 from impact.v1.helpers import (
-    INVALID_GENDER_ERROR,
-    INVALID_USER_TYPE_ERROR,
     ProfileHelper,
     USER_TYPE_TO_PROFILE_MODEL,
     UserHelper,
     VALID_USER_TYPES,
-    find_gender,
-    invalid_expert_category_error,
+    validate_choices,
+    validate_expert_categories,
+    validate_gender,
 )
 from impact.v1.views.base_list_view import BaseListView
 
@@ -77,37 +76,21 @@ class UserListView(BaseListView):
         self._check_required_keys(user_data, ProfileHelper.CORE_REQUIRED_KEYS)
         results = self._copy_translated_keys(user_data,
                                              ProfileHelper.INPUT_KEYS)
-        user_type = self._find_user_type(results.get("user_type"))
+        user_type = validate_choices(
+            self, "user_type", results.get("user_type"), VALID_USER_TYPES)
         if user_type == "expert":
             self._check_required_keys(
                 user_data, ProfileHelper.EXPERT_REQUIRED_KEYS)
-            results["expert_category"] = self._find_expert_category(
-                results.get("expert_category"))
+            results["expert_category"] = validate_expert_categories(
+                self, "expert_category", results.get("expert_category"))
         else:
             self._check_unsupported_keys(
                 user_type, user_data, ProfileHelper.EXPERT_ONLY_KEYS)
-        results["gender"] = self._find_gender(results.get("gender"))
+        results["gender"] = validate_gender(
+            self, "gender", results.get("gender"))
         results["privacy_policy_accepted"] = False
         results["newsletter_sender"] = False
         return results
-
-    def _find_user_type(self, value):
-        if isinstance(value, str) and value.lower() in VALID_USER_TYPES:
-            return value.lower()
-        self.errors.append(INVALID_USER_TYPE_ERROR.format(value))
-        return None
-
-    def _find_expert_category(self, name):
-        result = ExpertCategory.objects.filter(name=name).first()
-        if result is None:
-            self.errors.append(invalid_expert_category_error(name))
-        return result
-
-    def _find_gender(self, user_value):
-        result = find_gender(user_value)
-        if result is None:
-            self.errors.append(INVALID_GENDER_ERROR.format(user_value))
-        return result
 
     def _invalid_keys(self, user_keys):
         for key in set(user_keys) - set(UserHelper.INPUT_KEYS):
