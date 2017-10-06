@@ -1,10 +1,19 @@
+import re
 from impact.v1.helpers.model_helper import (
+    INVALID_CHOICE_ERROR,
     ModelHelper,
-    validate_by_role,
+    format_choices,
+    validate_boolean,
     validate_choices,
     validate_regex,
+    validate_string,
 )
-import re
+from impact.models import (
+    EntrepreneurProfile,
+    ExpertCategory,
+    ExpertProfile,
+    MemberProfile
+)
 
 
 GENDER_TRANSLATIONS = {
@@ -14,11 +23,14 @@ GENDER_TRANSLATIONS = {
     "prefer not to state": "p",
 }
 
-VALID_GENDERS = GENDER_TRANSLATIONS.values()
+USER_TYPE_TO_PROFILE_MODEL = {
+    "entrepreneur": EntrepreneurProfile,
+    "expert": ExpertProfile,
+    "member": MemberProfile,
+}
+VALID_USER_TYPES = USER_TYPE_TO_PROFILE_MODEL.keys()
 
-INVALID_GENDER_ERROR = ("Invalid gender: '{}'. Valid values are "
-                        "'f' or 'female', 'm' or 'male', "
-                        "'o' or 'other', and 'p' or 'prefer not to state'")
+VALID_GENDERS = GENDER_TRANSLATIONS.values()
 
 VALID_EXPERT_CATEGORIES = [
     "Executive",
@@ -27,160 +39,126 @@ VALID_EXPERT_CATEGORIES = [
     "Other",
 ]
 
-INVALID_EXPERT_CATEGORY_ERROR = ("Invalid expert category: '{}'. Valid "
-                                 "values are 'Executive', 'Investor', "
-                                 "'Lawyer', and 'Other'")
-
-INVALID_BIO_ERROR = ("Invalid bio: '{}'.")
-INVALID_COMPANY_ERROR = ("Invalid company: '{}'.")
-INVALID_EMAIL_ERROR = ("Invalid email: '{}'.")
-INVALID_OFFICE_HOURS_TOPICS_ERROR = ("Invalid office hours topics: '{}'.")
-INVALID_PHONE_ERROR = ("Invalid phone: '{}'.")
-INVALID_REFERRED_BY_ERROR = ("Invalid referral: '{}'.")
-INVALID_SPEAKER_TOPICS_ERROR = ("Invalid speaker topics: '{}'.")
-INVALID_TITLE_ERROR = ("Invalid title: '{}'.")
-
-INVALID_IS_ACTIVE_ERROR = ("Invalid is_active: '{}'.")
-INVALID_JUDGE_INTEREST_ERROR = ("Invalid judge interest: '{}'.")
-INVALID_MENTOR_INTEREST_ERROR = ("Invalid mentor interest: '{}'.")
-INVALID_OFFICE_HOURS_INTEREST_ERROR = ("Invalid office hours interest: '{}'.")
-INVALID_SPEAKER_INTEREST_ERROR = ("Invalid speaker interest: '{}'.")
-
 PHONE_REGEX = re.compile(r'^[0-9x.+() -]+$')
 # EMAIL_REGEX = re.compile(r'^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$')
 
-
-def validate_bio(helper, bio):
-    users = ["expert", "entrepreneur"]
-    return validate_by_role(helper, bio, users, INVALID_BIO_ERROR)
+EXPERT_ONLY = ["expert"]
+NON_MEMBER = ["expert", "entrepreneur"]
 
 
-def validate_company(helper, company):
-    users = "expert"
-    return validate_by_role(helper, company, users, INVALID_COMPANY_ERROR)
+def _validate_expert_only_boolean(helper, field, value):
+    validate_boolean(helper, field, value)
+    return _validate_by_user_type(helper, field, value, EXPERT_ONLY)
+
+
+def _validate_expert_only_string(helper, field, value):
+    validate_string(helper, field, value)
+    return _validate_by_user_type(helper, field, value, EXPERT_ONLY)
+
+
+def _validate_non_member_string(helper, field, value):
+    validate_string(helper, field, value)
+    return _validate_by_user_type(helper, field, value, NON_MEMBER)
+
+
+def _validate_by_user_type(helper, field, value, user_types):
+    validate_string(helper, field, value)
+    if helper.subject.user_type not in user_types:
+        helper.errors.append(INVALID_CHOICE_ERROR.format(
+                field=field,
+                value=helper.subject.user_type,
+                choices=format_choices(user_types)))
+    return value
 
 
 # def validate_email(helper, email):
 #     return validate_regex(helper, email, EMAIL_REGEX, INVALID_EMAIL_ERROR)
 
 
-# def validate_expert_categories(helper, expert_category):
-#     return validate_choices(helper,
-#                             expert_category,
-#                             VALID_EXPERT_CATEGORIES,
-#                             INVALID_EXPERT_CATEGORY_ERROR)
-
-
-def validate_gender(helper, gender):
-    if not isinstance(gender, str):
-        translation = None
-    else:
-        translation = GENDER_TRANSLATIONS.get(gender.lower(), gender)
+def validate_expert_categories(helper, field, value):
+    translations = dict([(category.name, category)
+                         for category in ExpertCategory.objects.all()])
     return validate_choices(helper,
-                            gender,
+                            field,
+                            value,
+                            translations.keys(),
+                            translations)
+
+
+def validate_gender(helper, field, value):
+    return validate_choices(helper,
+                            field,
+                            value,
                             VALID_GENDERS,
-                            INVALID_GENDER_ERROR,
-                            translation)
+                            GENDER_TRANSLATIONS)
 
 
-def validate_phone(helper, phone):
-    return validate_regex(helper, phone, PHONE_REGEX, INVALID_PHONE_ERROR)
-
-
-def validate_title(helper, title):
-    users = "expert"
-    return validate_by_role(helper, title, users, INVALID_TITLE_ERROR)
-
-
-def validate_office_hours_topics(helper, office_hours_topics):
-    users = "expert"
-    return validate_by_role(helper,
-                            office_hours_topics,
-                            users,
-                            INVALID_OFFICE_HOURS_TOPICS_ERROR)
-
-
-def validate_referred_by(helper, referred_by):
-    users = "expert"
-    return validate_by_role(helper,
-                            referred_by,
-                            users,
-                            INVALID_REFERRED_BY_ERROR)
-
-
-def validate_speaker_topics(helper, speaker_topics):
-    users = "expert"
-    return validate_by_role(helper,
-                            speaker_topics,
-                            users,
-                            INVALID_SPEAKER_TOPICS_ERROR)
-
-
-def validate_is_active(helper, is_active):
-    pass
-
-
-def validate_judge_interest(helper, judge_interest):
-    pass
-
-
-def validate_mentor_interest(helper, mentor_interest):
-    pass
-
-
-def validate_office_hours_interest(helper, office_hours_interest):
-    pass
-
-
-def validate_speaker_interest(helper, speaker_interest):
-    pass
+def validate_phone(helper, field, value):
+    return validate_regex(helper, field, value, PHONE_REGEX)
 
 
 class ProfileHelper(ModelHelper):
     VALIDATORS = {
-        "bio": validate_bio,
-        "company": validate_company,
-        # "email": validate_email,
-        # "expert_category": validate_expert_categories,
+        "bio": _validate_non_member_string,
+        "company": _validate_expert_only_string,
+        "expert_category": validate_expert_categories,
         "gender": validate_gender,
-        "is_active": validate_is_active,
-        "judge_interest": validate_judge_interest,
-        "mentor_interest": validate_mentor_interest,
-        "office_hours_interest": validate_office_hours_interest,
-        "office_hours_topics": validate_office_hours_topics,
+        "judge_interest": _validate_expert_only_boolean,
+        "mentor_interest": _validate_expert_only_string,
+        "office_hours_interest": _validate_expert_only_boolean,
+        "office_hours_topics": _validate_expert_only_string,
         "phone": validate_phone,
-        "referred_by": validate_referred_by,
-        "speaker_interest": validate_speaker_interest,
-        "speaker_topics": validate_speaker_topics,
-        "title": validate_title,
+        "referred_by": _validate_expert_only_string,
+        "speaker_interest": _validate_expert_only_boolean,
+        "speaker_topics": _validate_expert_only_string,
+        "title": _validate_expert_only_string,
         }
-    REQUIRED_KEYS = [
-        "company",
-        "email",
-        "expert_category",
-        "gender",
-        "phone",
-        "primary_industry_id",
-        "title",
-        ]
-    OPTIONAL_STRING_KEYS = [
-        "bio",
+    CORE_OPTIONAL_KEYS = [
         "facebook_url",
         "linked_in_url",
+        ]
+    CORE_REQUIRED_KEYS = [
+        "gender",
+        "user_type",
+        ]
+    ENTREPRENEUR_OPTIONAL_KEYS = [
+        "bio",
+        ]
+    EXPERT_OPTIONAL_KEYS = [
+        "bio",
         "office_hours_topics",
         "personal_website_url",
         "referred_by",
         "speaker_topics",
         "twitter_handle",
-        "user_type",
         ]
-    OPTIONAL_BOOLEAN_KEYS = [
+    EXPERT_OPTIONAL_BOOLEAN_KEYS = [
         "judge_interest",
         "mentor_interest",
         "office_hours_interest",
         "speaker_interest",
         ]
-    OPTIONAL_KEYS = OPTIONAL_BOOLEAN_KEYS + OPTIONAL_STRING_KEYS
+    EXPERT_REQUIRED_KEYS = [
+        "company",
+        "expert_category",
+        "home_program_family_id",
+        "phone",
+        "primary_industry_id",
+        "title",
+        ]
+    EXPERT_KEYS = (EXPERT_REQUIRED_KEYS +
+                   EXPERT_OPTIONAL_BOOLEAN_KEYS +
+                   EXPERT_REQUIRED_KEYS)
+    ENTREPRENEUR_KEYS = ENTREPRENEUR_OPTIONAL_KEYS
+    EXPERT_ONLY_KEYS = list(set(EXPERT_KEYS) - set(ENTREPRENEUR_KEYS))
+    OPTIONAL_BOOLEAN_KEYS = EXPERT_OPTIONAL_BOOLEAN_KEYS
+    OPTIONAL_KEYS = list(set(
+            CORE_OPTIONAL_KEYS + ENTREPRENEUR_OPTIONAL_KEYS +
+            EXPERT_OPTIONAL_BOOLEAN_KEYS + EXPERT_OPTIONAL_KEYS))
+    OPTIONAL_STRING_KEYS = list(set(
+            CORE_OPTIONAL_KEYS + ENTREPRENEUR_OPTIONAL_KEYS +
+            EXPERT_OPTIONAL_KEYS))
+    REQUIRED_KEYS = CORE_REQUIRED_KEYS + EXPERT_REQUIRED_KEYS
     INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
 
     READ_ONLY_KEYS = [
@@ -195,9 +173,9 @@ class ProfileHelper(ModelHelper):
         return self.subject.additional_industries.values_list(
             "id", flat=True)
 
-    @property
-    def primary_industry_id(self):
-        return self.subject.primary_industry_id
+#     @property
+#     def primary_industry_id(self):
+#         return self.subject.primary_industry_id
 
     @property
     def expert_category(self):
@@ -212,12 +190,3 @@ class ProfileHelper(ModelHelper):
             specialties = self.subject.mentoring_specialties
             if specialties:
                 return [specialty.name for specialty in specialties.all()]
-
-
-def find_gender(gender):
-    if not isinstance(gender, str):
-        return None
-    gender = GENDER_TRANSLATIONS.get(gender.lower(), gender)
-    if gender in VALID_GENDERS:
-        return gender
-    return None

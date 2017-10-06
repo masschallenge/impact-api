@@ -4,22 +4,29 @@ from rest_framework.response import Response
 
 from impact.models import (
     BaseProfile,
-    MemberProfile
+    ExpertCategory,
 )
 from impact.utils import parse_date
 from impact.v1.helpers import (
-    find_gender,
     INVALID_GENDER_ERROR,
+    INVALID_USER_TYPE_ERROR,
     ProfileHelper,
+    USER_TYPE_TO_PROFILE_MODEL,
     UserHelper,
+    VALID_USER_TYPES,
+    find_gender,
+    invalid_expert_category_error,
 )
 from impact.v1.views.base_list_view import BaseListView
 
 
 EMAIL_EXISTS_ERROR = "User with email {} already exists"
 INVALID_KEY_ERROR = "'{}' is not a valid key."
-KEY_ERROR = "'{}' is required"
+REQUIRED_KEY_ERROR = "'{}' is required"
+UNSUPPORTED_KEY_ERROR = "'{key}' is not supported for {type}"
 VALID_KEYS_NOTE = "Valid keys are: {}"
+
+
 User = get_user_model()
 
 
@@ -51,7 +58,12 @@ class UserListView(BaseListView):
 
     def _check_required_keys(self, user_keys, required_keys):
         for key in set(required_keys) - set(user_keys):
-            self.errors.append(KEY_ERROR.format(key))
+            self.errors.append(REQUIRED_KEY_ERROR.format(key))
+
+    def _check_unsupported_keys(self, user_type, user_keys, unsupported_keys):
+        for key in set(unsupported_keys).intersection(set(user_keys)):
+            self.errors.append(UNSUPPORTED_KEY_ERROR.format(key=key,
+                                                            type=user_type))
 
     def _copy_translated_keys(self, user_data, keys):
         result = {}
@@ -62,13 +74,34 @@ class UserListView(BaseListView):
         return result
 
     def _profile_args(self, user_data):
-        self._check_required_keys(user_data, ProfileHelper.REQUIRED_KEYS)
+        self._check_required_keys(user_data, ProfileHelper.CORE_REQUIRED_KEYS)
         results = self._copy_translated_keys(user_data,
                                              ProfileHelper.INPUT_KEYS)
+        user_type = self._find_user_type(results.get("user_type"))
+        if user_type == "expert":
+            self._check_required_keys(
+                user_data, ProfileHelper.EXPERT_REQUIRED_KEYS)
+            results["expert_category"] = self._find_expert_category(
+                results.get("expert_category"))
+        else:
+            self._check_unsupported_keys(
+                user_type, user_data, ProfileHelper.EXPERT_ONLY_KEYS)
         results["gender"] = self._find_gender(results.get("gender"))
         results["privacy_policy_accepted"] = False
         results["newsletter_sender"] = False
         return results
+
+    def _find_user_type(self, value):
+        if isinstance(value, str) and value.lower() in VALID_USER_TYPES:
+            return value.lower()
+        self.errors.append(INVALID_USER_TYPE_ERROR.format(value))
+        return None
+
+    def _find_expert_category(self, name):
+        result = ExpertCategory.objects.filter(name=name).first()
+        if result is None:
+            self.errors.append(invalid_expert_category_error(name))
+        return result
 
     def _find_gender(self, user_value):
         result = find_gender(user_value)
@@ -116,7 +149,9 @@ def _filter_profiles_by_date(queryset, updated_at_after, updated_at_before):
 
 def _construct_user(user_args, profile_args):
     user = User.objects.create_user(**user_args)
-    BaseProfile.objects.create(user=user, user_type="MEMBER")
+    user_type = profile_args.pop("user_type")
+    BaseProfile.objects.create(user=user, user_type=user_type.upper())
     profile_args["user"] = user
-    MemberProfile.objects.create(**profile_args)
+    klass = USER_TYPE_TO_PROFILE_MODEL[user_type]
+    klass.objects.create(**profile_args)
     return user

@@ -27,6 +27,7 @@ USER_POST_OPTIONS = {
     "primary_industry_id": OPTIONAL_ID_TYPE,
     "updated_at": OPTIONAL_DATE_TYPE,
     "user_type": OPTIONAL_STRING_TYPE,
+    "home_program_family_id": OPTIONAL_ID_TYPE,
 }
 USER_POST_OPTIONS.update(dict([
             (key, OPTIONAL_BOOLEAN_TYPE)
