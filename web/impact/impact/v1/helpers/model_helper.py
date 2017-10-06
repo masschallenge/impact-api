@@ -110,7 +110,7 @@ def validate_regex(helper, field, value, regex):
     if not regex.match(value):
         helper.errors.append(INVALID_REGEX_ERROR.format(field=field,
                                                         value=value,
-                                                        regex=regex))
+                                                        regex=regex.pattern))
     return value
 
 
