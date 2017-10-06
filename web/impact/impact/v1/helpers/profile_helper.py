@@ -165,6 +165,7 @@ class ProfileHelper(ModelHelper):
         "facebook_url",
         "linked_in_url",
         "personal_website_url",
+        "phone",
         "twitter_handle",
         ]
     CORE_REQUIRED_KEYS = [
@@ -198,7 +199,9 @@ class ProfileHelper(ModelHelper):
                    EXPERT_OPTIONAL_BOOLEAN_KEYS +
                    EXPERT_REQUIRED_KEYS)
     ENTREPRENEUR_KEYS = ENTREPRENEUR_OPTIONAL_KEYS
-    EXPERT_ONLY_KEYS = list(set(EXPERT_KEYS) - set(ENTREPRENEUR_KEYS))
+    CORE_KEYS = CORE_OPTIONAL_KEYS + CORE_REQUIRED_KEYS
+    EXPERT_ONLY_KEYS = list(set(EXPERT_KEYS) -
+                            set(ENTREPRENEUR_KEYS + CORE_KEYS))
     OPTIONAL_BOOLEAN_KEYS = EXPERT_OPTIONAL_BOOLEAN_KEYS
     OPTIONAL_KEYS = list(set(
             CORE_OPTIONAL_KEYS + ENTREPRENEUR_OPTIONAL_KEYS +
