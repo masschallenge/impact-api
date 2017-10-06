@@ -4,6 +4,7 @@ from impact.utils import get_profile
 from impact.v1.helpers.model_helper import (
     ModelHelper,
     validate_boolean,
+    validate_email_address,
     validate_string,
 )
 from impact.v1.helpers.profile_helper import ProfileHelper
@@ -52,10 +53,10 @@ USER_GET_OPTIONS.update(
 
 class UserHelper(ModelHelper):
     VALIDATORS = {
-        # "email": validate_email,
-        "short_name": validate_string,
+        "email": validate_email_address,
         "full_name": validate_string,
         "is_active": validate_boolean,
+        "short_name": validate_string,
         }
 
     MODEL = settings.AUTH_USER_MODEL

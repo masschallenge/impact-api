@@ -1,9 +1,18 @@
+from django.core.exceptions import ValidationError
+from django.core.validators import (
+    URLValidator,
+    validate_email,
+)
+
 INVALID_BOOLEAN_ERROR = ("Invalid {field}: "
                          "Expected 'true' or 'false' not {value}")
 INVALID_CHOICE_ERROR = ("Invalid {field}: "
                         "Expected {choices} not {value}")
+INVALID_EMAIL_ERROR = ("Invalid {field}: "
+                       "Expected '{value}' to be valid email address")
 INVALID_REGEX_ERROR = "Invalid {field}: Expected '{value}' to match '{regex}'"
 INVALID_STRING_ERROR = "Invalid {field}: Expected a String not {value}"
+INVALID_URL_ERROR = "Invalid {field}: Expected '{value}' to be a valid URL"
 
 
 class ModelHelper(object):
@@ -103,4 +112,20 @@ def validate_regex(helper, field, value, regex):
         helper.errors.append(INVALID_REGEX_ERROR.format(field=field,
                                                         value=value,
                                                         regex=regex))
+    return value
+
+
+def validate_email_address(helper, field, value):
+    try:
+        validate_email(value)
+    except ValidationError:
+        helper.errors.append(INVALID_EMAIL_ERROR.format(field=field, value=value))
+    return value
+
+
+def validate_url(helper, field, value):
+    try:
+        URLValidator(schemes=["http", "https"])(value)
+    except ValidationError:
+        helper.errors.append(INVALID_URL_ERROR.format(field=field, value=value))
     return value

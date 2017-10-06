@@ -1,17 +1,25 @@
 import re
+from django.core.exceptions import (
+    ObjectDoesNotExist,
+    ValidationError,
+)
+from django.core.validators import RegexValidator
 from impact.v1.helpers.model_helper import (
     INVALID_CHOICE_ERROR,
+    INVALID_URL_ERROR,
     ModelHelper,
     format_choices,
     validate_boolean,
     validate_choices,
     validate_regex,
     validate_string,
+    validate_url,
 )
 from impact.models import (
     EntrepreneurProfile,
     ExpertCategory,
     ExpertProfile,
+    Industry,
     MemberProfile
 )
 
@@ -39,30 +47,33 @@ VALID_EXPERT_CATEGORIES = [
     "Other",
 ]
 
+INVALID_INDUSTRY_ID_ERROR = ("Invalid {field}: "
+                       "Expected valid id for an industry resource")
+
 PHONE_REGEX = re.compile(r'^[0-9x.+() -]+$')
+TWITTER_REGEX = re.compile(r'^\S+$')
 # EMAIL_REGEX = re.compile(r'^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$')
 
 EXPERT_ONLY = ["expert"]
 NON_MEMBER = ["expert", "entrepreneur"]
 
 
-def _validate_expert_only_boolean(helper, field, value):
+def validate_expert_only_boolean(helper, field, value):
     validate_boolean(helper, field, value)
-    return _validate_by_user_type(helper, field, value, EXPERT_ONLY)
+    return validate_by_user_type(helper, field, value, EXPERT_ONLY)
 
 
-def _validate_expert_only_string(helper, field, value):
+def validate_expert_only_string(helper, field, value):
     validate_string(helper, field, value)
-    return _validate_by_user_type(helper, field, value, EXPERT_ONLY)
+    return validate_by_user_type(helper, field, value, EXPERT_ONLY)
 
 
-def _validate_non_member_string(helper, field, value):
+def validate_non_member_string(helper, field, value):
     validate_string(helper, field, value)
-    return _validate_by_user_type(helper, field, value, NON_MEMBER)
+    return validate_by_user_type(helper, field, value, NON_MEMBER)
 
 
-def _validate_by_user_type(helper, field, value, user_types):
-    validate_string(helper, field, value)
+def validate_by_user_type(helper, field, value, user_types):
     if helper.subject.user_type not in user_types:
         helper.errors.append(INVALID_CHOICE_ERROR.format(
                 field=field,
@@ -71,8 +82,26 @@ def _validate_by_user_type(helper, field, value, user_types):
     return value
 
 
-# def validate_email(helper, email):
-#     return validate_regex(helper, email, EMAIL_REGEX, INVALID_EMAIL_ERROR)
+def validate_personal_website_url(helper, field, value):
+    # This is essentially copied from mc.models.utils in accelerate.
+    # This logic should move to a shared library once we decide to
+    # do that.  See AC-4946.
+    schema = "^[hH][tT][tT][pP][sS]?://"
+    netloc_element = "([^/:@]+(:[^/@]+)?@)?([\w-]+)"
+    dot = "\."
+
+    url_regex = "{schema}({netloc_element}{dot})+{netloc_element}".format(
+        schema=schema,
+        netloc_element=netloc_element,
+        dot=dot
+    )
+
+    try:
+        RegexValidator(regex=url_regex)(value)
+    except ValidationError:
+        helper.errors.append(INVALID_URL_ERROR.format(field=field,
+                                                      value=value))
+    return value
 
 
 def validate_expert_categories(helper, field, value):
@@ -97,25 +126,46 @@ def validate_phone(helper, field, value):
     return validate_regex(helper, field, value, PHONE_REGEX)
 
 
+def validate_twitter_handle(helper, field, value):
+    return validate_regex(helper, field, value, TWITTER_REGEX)
+
+
+def validate_primary_industry_id(helper, field, value):
+    try:
+        value = int(value)
+        Industry.objects.get(id=value)
+    except (ValueError, ObjectDoesNotExist):
+        helper.errors.append(INVALID_INDUSTRY_ID_ERROR.format(field=field,
+                                                              value=value))
+    return validate_by_user_type(helper, field, value, EXPERT_ONLY)
+
+
 class ProfileHelper(ModelHelper):
     VALIDATORS = {
-        "bio": _validate_non_member_string,
-        "company": _validate_expert_only_string,
+        "bio": validate_non_member_string,
+        "company": validate_expert_only_string,
         "expert_category": validate_expert_categories,
+        "facebook_url": validate_url,
         "gender": validate_gender,
-        "judge_interest": _validate_expert_only_boolean,
-        "mentor_interest": _validate_expert_only_string,
-        "office_hours_interest": _validate_expert_only_boolean,
-        "office_hours_topics": _validate_expert_only_string,
+        "judge_interest": validate_expert_only_boolean,
+        "linked_in_url": validate_url,
+        "mentor_interest": validate_expert_only_string,
+        "office_hours_interest": validate_expert_only_boolean,
+        "office_hours_topics": validate_expert_only_string,
+        "personal_website_url": validate_personal_website_url,
         "phone": validate_phone,
-        "referred_by": _validate_expert_only_string,
-        "speaker_interest": _validate_expert_only_boolean,
-        "speaker_topics": _validate_expert_only_string,
-        "title": _validate_expert_only_string,
+        "primary_industry_id": validate_primary_industry_id,
+        "referred_by": validate_expert_only_string,
+        "speaker_interest": validate_expert_only_boolean,
+        "speaker_topics": validate_expert_only_string,
+        "title": validate_expert_only_string,
+        "twitter_handle": validate_twitter_handle,
         }
     CORE_OPTIONAL_KEYS = [
         "facebook_url",
         "linked_in_url",
+        "personal_website_url",
+        "twitter_handle",
         ]
     CORE_REQUIRED_KEYS = [
         "gender",
@@ -127,10 +177,8 @@ class ProfileHelper(ModelHelper):
     EXPERT_OPTIONAL_KEYS = [
         "bio",
         "office_hours_topics",
-        "personal_website_url",
         "referred_by",
         "speaker_topics",
-        "twitter_handle",
         ]
     EXPERT_OPTIONAL_BOOLEAN_KEYS = [
         "judge_interest",
@@ -172,10 +220,6 @@ class ProfileHelper(ModelHelper):
     def additional_industry_ids(self):
         return self.subject.additional_industries.values_list(
             "id", flat=True)
-
-#     @property
-#     def primary_industry_id(self):
-#         return self.subject.primary_industry_id
 
     @property
     def expert_category(self):
