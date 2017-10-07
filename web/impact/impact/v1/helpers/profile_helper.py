@@ -20,7 +20,8 @@ from impact.models import (
     ExpertCategory,
     ExpertProfile,
     Industry,
-    MemberProfile
+    MemberProfile,
+    ProgramFamily,
 )
 
 
@@ -49,6 +50,8 @@ VALID_EXPERT_CATEGORIES = [
 
 INVALID_INDUSTRY_ID_ERROR = ("Invalid {field}: "
                              "Expected valid id for an industry resource")
+INVALID_PROGRAM_FAMILY_ID_ERROR = (
+    "Invalid {field}: Expected valid id for an program family resource")
 
 PHONE_REGEX = re.compile(r'^[0-9x.+() -]+$')
 TWITTER_REGEX = re.compile(r'^\S+$')
@@ -140,6 +143,16 @@ def validate_primary_industry_id(helper, field, value):
     return validate_by_user_type(helper, field, value, EXPERT_ONLY)
 
 
+def validate_home_program_family_id(helper, field, value):
+    try:
+        value = int(value)
+        ProgramFamily.objects.get(id=value)
+    except (ValueError, ObjectDoesNotExist):
+        helper.errors.append(INVALID_PROGRAM_FAMILY_ID_ERROR.format(
+                field=field, value=value))
+    return validate_by_user_type(helper, field, value, EXPERT_ONLY)
+
+
 class ProfileHelper(ModelHelper):
     VALIDATORS = {
         "bio": validate_non_member_string,
@@ -147,6 +160,7 @@ class ProfileHelper(ModelHelper):
         "expert_category": validate_expert_categories,
         "facebook_url": validate_url,
         "gender": validate_gender,
+        "home_program_family_id": validate_home_program_family_id,
         "judge_interest": validate_expert_only_boolean,
         "linked_in_url": validate_url,
         "mentor_interest": validate_expert_only_string,

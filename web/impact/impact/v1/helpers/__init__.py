@@ -8,6 +8,7 @@ from impact.v1.helpers.model_helper import (
 from impact.v1.helpers.organization_helper import OrganizationHelper
 from impact.v1.helpers.profile_helper import (
     INVALID_INDUSTRY_ID_ERROR,
+    INVALID_PROGRAM_FAMILY_ID_ERROR,
     ProfileHelper,
     USER_TYPE_TO_PROFILE_MODEL,
     VALID_USER_TYPES,

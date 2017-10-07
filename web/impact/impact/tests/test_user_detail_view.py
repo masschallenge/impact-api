@@ -8,11 +8,13 @@ from impact.tests.factories import (
     ExpertCategoryFactory,
     IndustryFactory,
     MentoringSpecialtiesFactory,
+    ProgramFamilyFactory,
 )
 from impact.tests.api_test_case import APITestCase
 from impact.utils import get_profile
 from impact.v1.helpers import (
     INVALID_INDUSTRY_ID_ERROR,
+    INVALID_PROGRAM_FAMILY_ID_ERROR,
     UserHelper,
 )
 
@@ -221,17 +223,23 @@ class TestUserDetailView(APITestCase):
             assert any(bad_value in datum
                        for datum in response.data)
 
-    def test_patch_primary_industry_id(self):
+    def test_patch_ids(self):
         context = UserContext(user_type="EXPERT")
         user = context.user
         profile = get_profile(user)
         industry = IndustryFactory()
+        program_family = ProgramFamilyFactory()
         with self.login(username=self.basic_user().username):
             url = reverse("user_detail", args=[user.id])
-            self.client.patch(url, {"primary_industry_id": industry.id})
+            self.client.patch(url, {
+                    "home_program_family_id": program_family.id,
+                    "primary_industry_id": industry.id,
+                    })
             user.refresh_from_db()
             profile.refresh_from_db()
             helper = UserHelper(user)
+            assert (helper.field_value("home_program_family_id") ==
+                    program_family.id)
             assert helper.field_value("primary_industry_id") == industry.id
 
     def test_patch_invalid_primary_industry_id(self):
@@ -240,9 +248,13 @@ class TestUserDetailView(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("user_detail", args=[user.id])
             bad_value = 0
-            response = self.client.patch(url,
-                                         {"primary_industry_id": bad_value})
+            response = self.client.patch(url, {
+                    "home_program_family_id": bad_value,
+                    "primary_industry_id": bad_value,
+                    })
             assert response.status_code == 403
+            error_msg = INVALID_PROGRAM_FAMILY_ID_ERROR.format(
+                field="home_program_family_id")
             error_msg = INVALID_INDUSTRY_ID_ERROR.format(
                 field="primary_industry_id")
             assert error_msg in response.data

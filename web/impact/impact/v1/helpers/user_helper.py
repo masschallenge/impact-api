@@ -11,7 +11,6 @@ from impact.v1.helpers.profile_helper import ProfileHelper
 from impact.v1.metadata import (
     OPTIONAL_STRING_TYPE,
     OPTIONAL_BOOLEAN_TYPE,
-    OPTIONAL_DATE_TYPE,
     OPTIONAL_LIST_TYPE,
     OPTIONAL_ID_TYPE,
     PK_TYPE,
@@ -19,27 +18,28 @@ from impact.v1.metadata import (
 )
 
 
-USER_POST_OPTIONS = {
+USER_PATCH_OPTIONS = {
     "first_name": OPTIONAL_STRING_TYPE,
     "last_name": OPTIONAL_STRING_TYPE,
     "email": OPTIONAL_STRING_TYPE,
     "is_active": OPTIONAL_BOOLEAN_TYPE,
     "gender": OPTIONAL_STRING_TYPE,
     "phone": OPTIONAL_STRING_TYPE,
-    "additional_industry_ids": OPTIONAL_LIST_TYPE,
+    "company": OPTIONAL_STRING_TYPE,
+    "title": OPTIONAL_STRING_TYPE,
     "expert_category": OPTIONAL_STRING_TYPE,
-    "mentoring_specialties": OPTIONAL_LIST_TYPE,
     "primary_industry_id": OPTIONAL_ID_TYPE,
-    "updated_at": OPTIONAL_DATE_TYPE,
-    "user_type": OPTIONAL_STRING_TYPE,
     "home_program_family_id": OPTIONAL_ID_TYPE,
 }
-USER_POST_OPTIONS.update(dict([
+
+USER_PATCH_OPTIONS.update(dict([
             (key, OPTIONAL_BOOLEAN_TYPE)
             for key in ProfileHelper.OPTIONAL_BOOLEAN_KEYS]))
-USER_POST_OPTIONS.update(dict([
+USER_PATCH_OPTIONS.update(dict([
             (key, OPTIONAL_STRING_TYPE)
             for key in ProfileHelper.OPTIONAL_STRING_KEYS]))
+USER_POST_OPTIONS = USER_PATCH_OPTIONS.copy()
+USER_POST_OPTIONS["user_type"] = OPTIONAL_STRING_TYPE
 
 USER_GET_OPTIONS = USER_POST_OPTIONS.copy()
 USER_GET_OPTIONS.update(
@@ -48,6 +48,8 @@ USER_GET_OPTIONS.update(
         "updated_at": READ_ONLY_STRING_TYPE,
         "last_login": READ_ONLY_STRING_TYPE,
         "date_joined": READ_ONLY_STRING_TYPE,
+        "additional_industry_ids": OPTIONAL_LIST_TYPE,
+        "mentoring_specialties": OPTIONAL_LIST_TYPE,
     })
 
 
@@ -62,7 +64,7 @@ class UserHelper(ModelHelper):
     MODEL = settings.AUTH_USER_MODEL
 
     DETAIL_GET_METADATA = USER_GET_OPTIONS
-    DETAIL_PATCH_METADATA = USER_POST_OPTIONS
+    DETAIL_PATCH_METADATA = USER_PATCH_OPTIONS
     LIST_POST_METADATA = USER_POST_OPTIONS
 
     REQUIRED_KEYS = [
