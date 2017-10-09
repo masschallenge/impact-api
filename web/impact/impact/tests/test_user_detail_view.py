@@ -211,6 +211,20 @@ class TestUserDetailView(APITestCase):
             assert any(bad_value in datum
                        for datum in response.data)
 
+    def test_patch_no_duplicate_error_msg(self):
+        context = UserContext()
+        user = context.user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            bad_value = "This is *not* a valid url"
+            response = self.client.patch(url,
+                                         {"facebook_url": bad_value,
+                                          "phone": "1234567890"})
+            assert response.status_code == 403
+            assert len(response.data) == 1
+            assert any(bad_value in datum
+                       for datum in response.data)
+
     def test_patch_invalid_personal_website_url(self):
         context = UserContext()
         user = context.user
@@ -268,6 +282,7 @@ class TestUserDetailView(APITestCase):
             assert response.status_code == 403
             error_msg = INVALID_PROGRAM_FAMILY_ID_ERROR.format(
                 field="home_program_family_id")
+            assert error_msg in response.data
             error_msg = INVALID_INDUSTRY_ID_ERROR.format(
                 field="primary_industry_id")
             assert error_msg in response.data

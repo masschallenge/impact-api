@@ -110,6 +110,7 @@ class UserHelper(ModelHelper):
 
     def validate(self, field, value):
         if field in ProfileHelper.INPUT_KEYS:
+            self.profile_helper.errors = []
             result = self.profile_helper.validate(field, value)
             self.errors += self.profile_helper.errors
             return result
