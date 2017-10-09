@@ -124,9 +124,10 @@ def validate_email_address(helper, field, value):
 
 
 def validate_url(helper, field, value):
-    try:
-        URLValidator(schemes=["http", "https"])(value)
-    except ValidationError:
-        helper.errors.append(INVALID_URL_ERROR.format(field=field,
-                                                      value=value))
+    if value:
+        try:
+            URLValidator(schemes=["http", "https"])(value)
+        except ValidationError:
+            helper.errors.append(INVALID_URL_ERROR.format(field=field,
+                                                          value=value))
     return value

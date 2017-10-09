@@ -242,6 +242,19 @@ class TestUserDetailView(APITestCase):
                     program_family.id)
             assert helper.field_value("primary_industry_id") == industry.id
 
+    def test_patch_blank_url(self):
+        context = UserContext()
+        user = context.user
+        profile = get_profile(user)
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            empty_value = ""
+            self.client.patch(url, {"facebook_url": empty_value})
+            user.refresh_from_db()
+            profile.refresh_from_db()
+            helper = UserHelper(user)
+            assert helper.field_value("facebook_url") == empty_value
+
     def test_patch_invalid_primary_industry_id(self):
         context = UserContext(user_type="EXPERT")
         user = context.user
