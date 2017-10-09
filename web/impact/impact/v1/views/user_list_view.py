@@ -9,6 +9,7 @@ from impact.v1.helpers import (
     USER_TYPE_TO_PROFILE_MODEL,
     UserHelper,
     VALID_USER_TYPES,
+    validate_boolean,
     validate_choices,
     validate_expert_categories,
     validate_gender,
@@ -66,7 +67,10 @@ class UserListView(BaseListView):
         for key in keys:
             if key in user_data:
                 target_key = UserHelper.translate_key(key)
-                result[target_key] = user_data[key]
+                value = user_data[key]
+                if target_key in ProfileHelper.OPTIONAL_BOOLEAN_KEYS:
+                    value = validate_boolean(self, key, value)
+                result[target_key] = value
         return result
 
     def _profile_args(self, user_data):

@@ -49,6 +49,7 @@ EXAMPLE_EXPERT = {
     "phone": "123-456-7890",
     "title": "Chief Expert",
     "user_type": "expert",
+    "speaker_interest": "true",
 }
 EXAMPLE_MEMBER = {
     "email": "member@example.com",
