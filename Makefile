@@ -1,4 +1,5 @@
 IMAGE_TAG = $(shell git rev-parse --abbrev-ref HEAD)
+DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
 
 targets = \
   bash \
