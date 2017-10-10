@@ -38,7 +38,7 @@ EXAMPLE_ENTREPRENEUR = {
     "first_name": "Entre",
     "gender": "f",
     "last_name": "Preneur",
-    "user_type": "entrepreneur",
+    "user_type": EntrepreneurProfile.user_type,
 }
 EXAMPLE_EXPERT = {
     "company": "Expert, Co.",
@@ -48,7 +48,7 @@ EXAMPLE_EXPERT = {
     "last_name": "Pert",
     "phone": "123-456-7890",
     "title": "Chief Expert",
-    "user_type": "expert",
+    "user_type": ExpertProfile.user_type,
     "speaker_interest": "true",
 }
 EXAMPLE_MEMBER = {
@@ -56,7 +56,7 @@ EXAMPLE_MEMBER = {
     "first_name": "Mem",
     "gender": "o",
     "last_name": "Ber",
-    "user_type": "member",
+    "user_type": MemberProfile.user_type,
 }
 User = get_user_model()
 
@@ -101,7 +101,7 @@ class TestUserListView(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("user")
             data = _example_expert()
-            data["user_type"] = "entrepreneur"
+            data["user_type"] = EntrepreneurProfile.user_type
             response = self.client.post(url, data)
             error_msg = UNSUPPORTED_KEY_ERROR.format(key="company",
                                                      type=data["user_type"])

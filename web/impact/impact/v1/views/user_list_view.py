@@ -2,7 +2,11 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from rest_framework.response import Response
 
-from impact.models import BaseProfile
+from impact.models import (
+    BaseProfile,
+    ExpertProfile,
+    MemberProfile,
+)
 from impact.utils import parse_date
 from impact.v1.helpers import (
     ProfileHelper,
@@ -80,7 +84,7 @@ class UserListView(BaseListView):
                                              ProfileHelper.INPUT_KEYS)
         user_type = validate_choices(
             self, "user_type", results.get("user_type"), VALID_USER_TYPES)
-        if user_type == "expert":
+        if user_type == ExpertProfile.user_type:
             self._check_required_keys(
                 user_data, ProfileHelper.EXPERT_REQUIRED_KEYS)
             results["expert_category"] = validate_expert_categories(
@@ -88,7 +92,7 @@ class UserListView(BaseListView):
         else:
             self._check_unsupported_keys(
                 user_type, user_data, ProfileHelper.EXPERT_ONLY_KEYS)
-            if user_type == "member":
+            if user_type == MemberProfile.user_type:
                 self._check_unsupported_keys(
                     user_type,
                     user_data,

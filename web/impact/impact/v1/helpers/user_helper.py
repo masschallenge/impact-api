@@ -1,5 +1,9 @@
 from django.conf import settings
 
+from impact.models import (
+    EntrepreneurProfile,
+    ExpertProfile,
+)
 from impact.utils import get_profile
 from impact.v1.helpers.model_helper import (
     ModelHelper,
@@ -137,8 +141,8 @@ def valid_keys_note(user_type, post=False):
         keys += ProfileHelper.CORE_KEYS
     else:
         keys += ProfileHelper.CORE_PATCH_KEYS
-    if not user_type or user_type == "expert":
+    if not user_type or user_type == ExpertProfile.user_type:
         keys += ProfileHelper.EXPERT_KEYS
-    if not user_type or user_type == "entrepreneur":
+    if not user_type or user_type == EntrepreneurProfile.user_type:
         keys += ProfileHelper.ENTREPRENEUR_KEYS
     return VALID_KEYS_NOTE.format(keys)

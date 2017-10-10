@@ -9,9 +9,13 @@ from impact.models.mc_model import MCModel
 from impact.models.utils import is_managed
 
 
-USER_TYPES = (('EXPERT', 'Expert'),
-              ('ENTREPRENEUR', 'Entrepreneur'),
-              ('MEMBER', 'Member'))
+BASE_ENTREPRENEUR_TYPE = "ENTREPRENEUR"
+BASE_EXPERT_TYPE = "EXPERT"
+BASE_MEMBER_TYPE = "MEMBER"
+
+USER_TYPES = ((BASE_EXPERT_TYPE, 'Expert'),
+              (BASE_ENTREPRENEUR_TYPE, 'Entrepreneur'),
+              (BASE_MEMBER_TYPE, 'Member'))
 
 
 class BaseProfile(MCModel):
@@ -27,8 +31,8 @@ class BaseProfile(MCModel):
         managed = is_managed(db_table)
 
     def __str__(self):
-        fn = self.user.first_name
-        ln = self.user.last_name
+        fn = self.user.full_name
+        ln = self.user.short_name
         if fn and ln:
             identifier = "%s %s" % (fn, ln)
         else:

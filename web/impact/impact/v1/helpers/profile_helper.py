@@ -33,9 +33,9 @@ GENDER_TRANSLATIONS = {
 }
 
 USER_TYPE_TO_PROFILE_MODEL = {
-    "entrepreneur": EntrepreneurProfile,
-    "expert": ExpertProfile,
-    "member": MemberProfile,
+    EntrepreneurProfile.user_type: EntrepreneurProfile,
+    ExpertProfile.user_type: ExpertProfile,
+    MemberProfile.user_type: MemberProfile,
 }
 VALID_USER_TYPES = USER_TYPE_TO_PROFILE_MODEL.keys()
 
@@ -55,10 +55,9 @@ INVALID_PROGRAM_FAMILY_ID_ERROR = (
 
 PHONE_REGEX = re.compile(r'^[0-9x.+() -]+$')
 TWITTER_REGEX = re.compile(r'^\S+$')
-# EMAIL_REGEX = re.compile(r'^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$')
 
-EXPERT_ONLY = ["expert"]
-NON_MEMBER = ["expert", "entrepreneur"]
+EXPERT_ONLY = [ExpertProfile.user_type]
+NON_MEMBER = [ExpertProfile.user_type, EntrepreneurProfile.user_type]
 
 
 def validate_expert_only_boolean(helper, field, value):
