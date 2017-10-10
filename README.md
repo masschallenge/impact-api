@@ -266,6 +266,8 @@ Deploying to an environment is a matter of running ecs-deploy:
 An example of this might look like this: 
 `make deploy DOCKER_REGISTRY=997386117669.dkr.ecr.us-east-1.amazonaws.com IMAGE_TAG=AC-4034 ENVIRONMENT=staging`
 
+(NOTE - The value for the DOCKER_REGISTRY can be grabbed from the ecr page (https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories/impact-api#images;tagStatus=ALL) listed as the "Repository URI" for the impact-api image or from running the following bash command ```aws ecr describe-repositories | grep "repositoryUri" | awk -F':repository' '{print $1}' | awk -F'\"repositoryUri\":' '{print $2}' | awk -F'/' '{print $1}'```)
+
 A successful deploy will yield output that looks like the following:
 
 ```
