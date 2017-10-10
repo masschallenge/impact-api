@@ -210,6 +210,7 @@ class ProfileHelper(ModelHelper):
         "title",
         ]
     EXPERT_KEYS = (EXPERT_REQUIRED_KEYS +
+                   EXPERT_OPTIONAL_KEYS +
                    EXPERT_OPTIONAL_BOOLEAN_KEYS +
                    EXPERT_REQUIRED_KEYS)
     ENTREPRENEUR_KEYS = ENTREPRENEUR_OPTIONAL_KEYS
