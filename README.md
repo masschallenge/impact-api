@@ -264,17 +264,17 @@ Deploying to an environment is a matter of running ecs-deploy:
 `make deploy DOCKER_REGISTRY=$(REGISTRY) IMAGE_TAG=$(RELEASE_TAG) ENVIRONMENT=$(DEPLOY_ENVIRONMENT)`
 
 An example of this might look like this: 
-`make deploy DOCKER_REGISTRY=997386117669.dkr.ecr.us-east-1.amazonaws.com IMAGE_TAG=AC-4034 ENVIRONMENT=staging`
+`make deploy DOCKER_REGISTRY=$(REGISTRY) IMAGE_TAG=AC-4034 ENVIRONMENT=staging`
 
-(NOTE - The value for the DOCKER_REGISTRY can be grabbed from the ecr page (https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories/impact-api#images;tagStatus=ALL) listed as the "Repository URI" for the impact-api image or from running the following bash command ```aws ecr describe-repositories | grep "repositoryUri" | awk -F':repository' '{print $1}' | awk -F'\"repositoryUri\":' '{print $2}' | awk -F'/' '{print $1}'```)
+(NOTE - The value for the DOCKER_REGISTRY can be grabbed from the ecr page (https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories/impact-api#images;tagStatus=ALL) listed as the "Repository URI" for the impact-api image or from running the following bash command ```aws ecr  describe-repositories --repository-name impact-api  | cut -d"\"" -f4 | cut -d"/" -f1  | grep -i "amazonaws.com"```)
 
 A successful deploy will yield output that looks like the following:
 
 ```
 Updating task definition
-Changed image of container 'nginx' to: "997386117669.dkr.ecr.us-east-1.amazonaws.com/nginx:AC-4034" (was: "997386117669.dkr.ecr.us-east-1.amazonaws.com/nginx:AC-4034")
-Changed image of container 'redis' to: "997386117669.dkr.ecr.us-east-1.amazonaws.com/redis:AC-4034" (was: "997386117669.dkr.ecr.us-east-1.amazonaws.com/redis:AC-4034")
-Changed image of container 'web' to: "997386117669.dkr.ecr.us-east-1.amazonaws.com/impact-api:AC-4034" (was: "997386117669.dkr.ecr.us-east-1.amazonaws.com/impact-api:AC-4034")
+Changed image of container 'nginx' to: "<registry url>/nginx:AC-4034" (was: "<registry url>/nginx:AC-4034")
+Changed image of container 'redis' to: "<registry url>/redis:AC-4034" (was: "<registry url>/redis:AC-4034")
+Changed image of container 'web' to: "<registry url>/impact-api:AC-4034" (was: "<registry url>/impact-api:AC-4034")
 
 Creating new task definition revision
 Successfully created revision: 189
