@@ -13,6 +13,7 @@ from impact.v1.helpers import (
 from impact.v1.metadata import ImpactMetadata
 
 INVALID_KEYS_ERROR = "Recevied invalid key(s): {invalid_keys}."
+NO_USER_ERROR = "Unable to find user with an id of {}"
 
 User = get_user_model()
 
@@ -36,7 +37,9 @@ class UserDetailView(LoggingMixin, APIView):
         return Response(UserHelper(user).serialize())
 
     def patch(self, request, pk):
-        user = User.objects.get(pk=pk)
+        user = User.objects.filter(pk=pk).first()
+        if not user:
+            return Response(status=404, data=NO_USER_ERROR.format(pk))
         helper = UserHelper(user)
         data = request.data
         keys = set(data.keys())

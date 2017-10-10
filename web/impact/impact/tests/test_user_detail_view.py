@@ -23,6 +23,8 @@ from impact.models.base_profile import (
     BASE_EXPERT_TYPE,
     BASE_MEMBER_TYPE,
 )
+from impact.models import User
+from impact.v1.views.user_detail_view import NO_USER_ERROR
 
 
 class TestUserDetailView(APITestCase):
@@ -83,6 +85,15 @@ class TestUserDetailView(APITestCase):
             assert helper.field_value("personal_website_url") == website_url
             assert helper.field_value("phone") == phone
             assert helper.field_value("twitter_handle") == twitter_handle
+
+    def test_bad_id(self):
+        with self.login(username=self.basic_user().username):
+            highest_user = User.objects.order_by("-id").first()
+            id = highest_user.id + 1
+            url = reverse("user_detail", args=[id])
+            response = self.client.patch(url, {})
+            assert response.status_code == 404
+            assert response.data == NO_USER_ERROR.format(id)
 
     def test_patch_expert_fields(self):
         context = UserContext(user_type=BASE_EXPERT_TYPE)
