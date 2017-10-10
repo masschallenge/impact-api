@@ -16,6 +16,7 @@ from impact.v1.helpers import (
     INVALID_INDUSTRY_ID_ERROR,
     INVALID_PROGRAM_FAMILY_ID_ERROR,
     UserHelper,
+    VALID_KEYS_NOTE,
 )
 
 
@@ -144,6 +145,24 @@ class TestUserDetailView(APITestCase):
                 }
             response = self.client.patch(url, data)
             assert response.status_code == 403
+            valid_note = _valid_note(response.data)
+            assert "company" not in valid_note
+            assert "bio" in valid_note
+
+    def test_patch_bio_fails_for_member(self):
+        context = UserContext(user_type="MEMBER")
+        user = context.user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            bio = "I'm an awesome API!"
+            data = {
+                "bio": bio,
+                }
+            response = self.client.patch(url, data)
+            assert response.status_code == 403
+            valid_note = _valid_note(response.data)
+            assert "bio" not in valid_note
+            assert "first_name" in valid_note
 
     def test_patch_invalid_key(self):
         context = UserContext()
@@ -153,7 +172,8 @@ class TestUserDetailView(APITestCase):
             bad_value = "bad key"
             response = self.client.patch(url, {bad_value: True})
             assert response.status_code == 403
-            assert bad_value in response.data
+            assert any(bad_value in datum
+                       for datum in response.data)
 
     def test_patch_invalid_gender(self):
         context = UserContext()
@@ -221,7 +241,7 @@ class TestUserDetailView(APITestCase):
                                          {"facebook_url": bad_value,
                                           "phone": "1234567890"})
             assert response.status_code == 403
-            assert len(response.data) == 1
+            assert len(response.data) == len(set(response.data))
             assert any(bad_value in datum
                        for datum in response.data)
 
@@ -286,6 +306,7 @@ class TestUserDetailView(APITestCase):
             error_msg = INVALID_INDUSTRY_ID_ERROR.format(
                 field="primary_industry_id")
             assert error_msg in response.data
+            assert "home_program_family_id" in _valid_note(response.data)
 
     def test_expert_fields(self):
         context = UserContext(user_type="EXPERT")
@@ -313,3 +334,11 @@ class TestUserDetailView(APITestCase):
             assert response.data["primary_industry_id"] == primary_industry.id
             assert all([industry.id in response.data["additional_industry_ids"]
                         for industry in additional_industries])
+
+
+def _valid_note(messages):
+    note_prefix = VALID_KEYS_NOTE.format("")
+    for msg in messages:
+        if msg.startswith(note_prefix):
+            return msg
+    return ""

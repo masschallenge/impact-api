@@ -18,4 +18,6 @@ from impact.v1.helpers.profile_helper import (
 from impact.v1.helpers.program_family_helper import ProgramFamilyHelper
 from impact.v1.helpers.user_helper import (
     UserHelper,
+    VALID_KEYS_NOTE,
+    valid_keys_note,
 )

@@ -186,6 +186,7 @@ class ProfileHelper(ModelHelper):
         "gender",
         "user_type",
         ]
+    CORE_PATCH_KEYS = CORE_OPTIONAL_KEYS + ["gender"]
     ENTREPRENEUR_OPTIONAL_KEYS = [
         "bio",
         ]

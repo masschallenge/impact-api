@@ -9,6 +9,7 @@ from impact.v1.helpers import (
     USER_TYPE_TO_PROFILE_MODEL,
     UserHelper,
     VALID_USER_TYPES,
+    valid_keys_note,
     validate_boolean,
     validate_choices,
     validate_expert_categories,
@@ -21,7 +22,6 @@ EMAIL_EXISTS_ERROR = "User with email {} already exists"
 INVALID_KEY_ERROR = "'{}' is not a valid key."
 REQUIRED_KEY_ERROR = "'{}' is required"
 UNSUPPORTED_KEY_ERROR = "'{key}' is not supported for {type}"
-VALID_KEYS_NOTE = "Valid keys are: {}"
 
 
 User = get_user_model()
@@ -38,7 +38,8 @@ class UserListView(BaseListView):
         profile_args = self._profile_args(request.POST)
         self._invalid_keys(request.POST)
         if self.errors:
-            self.errors.append(VALID_KEYS_NOTE.format(UserHelper.INPUT_KEYS))
+            note = valid_keys_note(profile_args.get("user_type"), post=True)
+            self.errors.append(note)
             return Response(status=403, data=self.errors)
         user = _construct_user(user_args, profile_args)
         return Response({"id": user.id})

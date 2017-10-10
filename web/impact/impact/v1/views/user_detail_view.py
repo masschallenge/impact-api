@@ -6,13 +6,13 @@ from rest_framework_tracking.mixins import LoggingMixin
 from impact.permissions import (
     V1APIPermissions,
 )
-from impact.v1.helpers import UserHelper
+from impact.v1.helpers import (
+    UserHelper,
+    valid_keys_note,
+)
 from impact.v1.metadata import ImpactMetadata
 
-
-INVALID_KEYS_ERROR = ("Recevied invalid key(s): {invalid_keys}. "
-                      "Valid keys are: {valid_keys}.")
-
+INVALID_KEYS_ERROR = "Recevied invalid key(s): {invalid_keys}."
 
 User = get_user_model()
 
@@ -39,22 +39,24 @@ class UserDetailView(LoggingMixin, APIView):
         user = User.objects.get(pk=pk)
         helper = UserHelper(user)
         data = request.data
-        invalid_keys = set(data.keys()) - set(UserHelper.INPUT_KEYS)
+        keys = set(data.keys())
+        invalid_keys = keys.difference(UserHelper.INPUT_KEYS)
         if invalid_keys:
-            return Response(
-                status=403,
-                data=INVALID_KEYS_ERROR.format(
-                    invalid_keys=list(invalid_keys),
-                    valid_keys=UserHelper.INPUT_KEYS))
+            helper.errors += [
+                INVALID_KEYS_ERROR.format(invalid_keys=list(invalid_keys))]
+        valid_keys = set(data.keys()).intersection(UserHelper.INPUT_KEYS)
         valid_data = {}
-        for key, value in data.items():
+        for key in valid_keys:
             field = helper.translate_key(key)
-            valid_data[field] = helper.validate(field, value)
+            valid_data[field] = helper.validate(field, data[key])
         if helper.errors:
-            return Response(
-                status=403,
-                data=helper.errors)
+            return _error_response(helper)
         for field, value in valid_data.items():
             helper.field_setter(field, value)
         helper.save()
         return Response(status=200)
+
+
+def _error_response(helper):
+    note = valid_keys_note(helper.profile_helper.subject.user_type)
+    return Response(status=403, data=helper.errors + [note])

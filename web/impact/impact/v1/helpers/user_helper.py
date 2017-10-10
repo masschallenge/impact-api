@@ -18,6 +18,8 @@ from impact.v1.metadata import (
 )
 
 
+VALID_KEYS_NOTE = "Valid keys are: {}"
+
 USER_PATCH_OPTIONS = {
     "first_name": OPTIONAL_STRING_TYPE,
     "last_name": OPTIONAL_STRING_TYPE,
@@ -127,3 +129,16 @@ class UserHelper(ModelHelper):
     @property
     def last_name(self):
         return self.subject.short_name
+
+
+def valid_keys_note(user_type, post=False):
+    keys = UserHelper.USER_INPUT_KEYS.copy()
+    if post:
+        keys += ProfileHelper.CORE_KEYS
+    else:
+        keys += ProfileHelper.CORE_PATCH_KEYS
+    if not user_type or user_type == "expert":
+        keys += ProfileHelper.EXPERT_KEYS
+    if not user_type or user_type == "entrepreneur":
+        keys += ProfileHelper.ENTREPRENEUR_KEYS
+    return VALID_KEYS_NOTE.format(keys)
