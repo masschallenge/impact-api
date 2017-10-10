@@ -230,6 +230,9 @@ Steps for creating access keys can be found here: http://docs.aws.amazon.com/IAM
 
 At the end of this process you should know both your access key and secret key.
 
+You can confirm that you have minimally required version if the following command returns any output:
+```ecs deploy --help | grep "ignore-warnings"```
+
 Once the CLI tools are installed and configured, you need to configure your local AWS tools with the access key and secret key by running:
 
 `aws configure`
