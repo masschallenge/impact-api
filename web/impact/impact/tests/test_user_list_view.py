@@ -136,6 +136,16 @@ class TestUserListView(APITestCase):
             assert user.email == EXAMPLE_MEMBER["email"]
             assert MemberProfile.objects.get(user=user)
 
+    def test_post_member_with_bio(self):
+        with self.login(username=self.basic_user().username):
+            url = reverse("user")
+            data = {"bio": "I have a bio!"}
+            data.update(EXAMPLE_MEMBER)
+            response = self.client.post(url, data)
+            error_msg = UNSUPPORTED_KEY_ERROR.format(key="bio",
+                                                     type=data["user_type"])
+            assert error_msg in response.data
+
     def test_post_without_required_field(self):
         with self.login(username=self.basic_user().username):
             url = reverse("user")

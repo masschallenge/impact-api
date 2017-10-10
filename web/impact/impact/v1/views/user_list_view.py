@@ -88,6 +88,11 @@ class UserListView(BaseListView):
         else:
             self._check_unsupported_keys(
                 user_type, user_data, ProfileHelper.EXPERT_ONLY_KEYS)
+            if user_type == "member":
+                self._check_unsupported_keys(
+                    user_type,
+                    user_data,
+                    ProfileHelper.ENTREPRENEUR_OPTIONAL_KEYS)
         results["gender"] = validate_gender(
             self, "gender", results.get("gender"))
         results["privacy_policy_accepted"] = False
