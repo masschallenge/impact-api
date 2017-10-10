@@ -35,6 +35,7 @@ from impact.v1.views.user_list_view import (
 
 EXAMPLE_ENTREPRENEUR = {
     "email": "entrepreneur@example.com",
+    "is_active": "true",
     "first_name": "Entre",
     "gender": "f",
     "last_name": "Preneur",
@@ -43,6 +44,7 @@ EXAMPLE_ENTREPRENEUR = {
 EXAMPLE_EXPERT = {
     "company": "Expert, Co.",
     "email": "expert@example.com",
+    "is_active": "true",
     "first_name": "Ex",
     "gender": "f",
     "last_name": "Pert",
@@ -53,6 +55,7 @@ EXAMPLE_EXPERT = {
 }
 EXAMPLE_MEMBER = {
     "email": "member@example.com",
+    "is_active": "false",
     "first_name": "Mem",
     "gender": "o",
     "last_name": "Ber",

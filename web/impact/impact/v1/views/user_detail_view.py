@@ -54,7 +54,7 @@ class UserDetailView(LoggingMixin, APIView):
         for field, value in valid_data.items():
             helper.field_setter(field, value)
         helper.save()
-        return Response(status=200)
+        return Response(status=204)
 
 
 def _error_response(helper):

@@ -73,7 +73,7 @@ class UserListView(BaseListView):
             if key in user_data:
                 target_key = UserHelper.translate_key(key)
                 value = user_data[key]
-                if target_key in ProfileHelper.OPTIONAL_BOOLEAN_KEYS:
+                if target_key in UserHelper.ALL_BOOLEAN_KEYS:
                     value = validate_boolean(self, key, value)
                 result[target_key] = value
         return result

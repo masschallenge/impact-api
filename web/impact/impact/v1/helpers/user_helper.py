@@ -78,9 +78,10 @@ class UserHelper(ModelHelper):
         "first_name",
         "last_name",
         ]
-    OPTIONAL_KEYS = [
+    OPTIONAL_BOOLEAN_KEYS = [
         "is_active",
         ]
+    OPTIONAL_KEYS = OPTIONAL_BOOLEAN_KEYS
     USER_INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
     READ_ONLY_KEYS = [
         "date_joined",
@@ -89,6 +90,8 @@ class UserHelper(ModelHelper):
         ]
     OUTPUT_KEYS = READ_ONLY_KEYS + USER_INPUT_KEYS + ProfileHelper.OUTPUT_KEYS
     INPUT_KEYS = USER_INPUT_KEYS + ProfileHelper.INPUT_KEYS
+    ALL_BOOLEAN_KEYS = (OPTIONAL_BOOLEAN_KEYS +
+                        ProfileHelper.OPTIONAL_BOOLEAN_KEYS)
     KEY_TRANSLATIONS = {
         "first_name": "full_name",
         "last_name": "short_name",
