@@ -220,11 +220,7 @@ endif
 	@docker-compose run --rm web ./manage.py grant_permissions $(PERMISSION_USER) $(PERMISSION_CLASSES)
 
 deploy: IMAGE_TAG?=$(shell if [ "${RELEASE_TAG}" == "" ]; then echo "${IMAGE_TAG}"; else echo "${RELEASE_TAG}"; fi;)
-deploy: AVAILABLE_TAGS?=$(shell aws ecr list-images  --repository-name impact-api --filter tagStatus=TAGGED | grep -i imageTag | awk -F':' '{print $$2}')
-deploy: EXISTING_TAG?= $(shell echo ${AVAILABLE_TAGS} | grep -i ${IMAGE_TAG})
-
 deploy:
-	@if [ "${EXISTING_TAG}" == "" ]; then echo "no such tag ${IMAGE_TAG} - available tags are: ${AVAILABLE_TAGS}"; else echo "found image with tag ${IMAGE_TAG}"; fi;
 	@ecs deploy --ignore-warnings $(ENVIRONMENT) impact --image web $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG) --image redis $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
 
 release: IMAGE_TAG?=$(shell if [ "${RELEASE_TAG}" == "" ]; then echo "${IMAGE_TAG}"; else echo "${RELEASE_TAG}"; fi;)
