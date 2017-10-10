@@ -9,6 +9,7 @@ from django.contrib.auth import get_user_model
 
 from impact.v1.helpers.model_helper import (
     INVALID_CHOICE_ERROR,
+    INVALID_URL_ERROR,
     format_choices,
 )
 from impact.models import (
@@ -130,6 +131,16 @@ class TestUserListView(APITestCase):
                                                     choices=format_choices([]))
             assert error_msg in response.data
 
+    def test_post_expert_with_bad_url(self):
+        with self.login(username=self.basic_user().username):
+            url = reverse("user")
+            bad_url = "Bad URL"
+            response = self.client.post(
+                url, _example_expert(personal_website_url=bad_url))
+            error_msg = INVALID_URL_ERROR.format(field="personal_website_url",
+                                                 value=bad_url)
+            assert error_msg in response.data
+
     def test_post_member(self):
         with self.login(username=self.basic_user().username):
             url = reverse("user")
@@ -222,11 +233,14 @@ def _contains_user(user, data):
     return False
 
 
-def _example_expert(expert_category=None):
-    result = {
-        "home_program_family_id": ProgramFamilyFactory().id,
-        "primary_industry_id": IndustryFactory().id,
-        "expert_category": expert_category or ExpertCategoryFactory().name,
-        }
+def _example_expert(**kwargs):
+    result = EXAMPLE_MEMBER.copy()
+    result.update(kwargs)
+    if "home_program_family_id" not in result:
+        result["home_program_family_id"] = ProgramFamilyFactory().id
+    if "primary_industry_id" not in result:
+        result["primary_industry_id"] = IndustryFactory().id
+    if "expert_category" not in result:
+        result["expert_category"] = ExpertCategoryFactory().name
     result.update(EXAMPLE_EXPERT)
     return result

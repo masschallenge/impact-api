@@ -14,10 +14,7 @@ from impact.v1.helpers import (
     UserHelper,
     VALID_USER_TYPES,
     valid_keys_note,
-    validate_boolean,
     validate_choices,
-    validate_expert_categories,
-    validate_gender,
 )
 from impact.v1.views.base_list_view import BaseListView
 
@@ -56,6 +53,7 @@ class UserListView(BaseListView):
             self.errors.append(EMAIL_EXISTS_ERROR.format(email))
         if "is_active" not in results:
             results["is_active"] = False
+        self._validate_args(results, UserHelper.VALIDATORS)
         return results
 
     def _check_required_keys(self, user_keys, required_keys):
@@ -73,8 +71,6 @@ class UserListView(BaseListView):
             if key in user_data:
                 target_key = UserHelper.translate_key(key)
                 value = user_data[key]
-                if target_key in UserHelper.ALL_BOOLEAN_KEYS:
-                    value = validate_boolean(self, key, value)
                 result[target_key] = value
         return result
 
@@ -82,26 +78,31 @@ class UserListView(BaseListView):
         self._check_required_keys(user_data, ProfileHelper.CORE_REQUIRED_KEYS)
         results = self._copy_translated_keys(user_data,
                                              ProfileHelper.INPUT_KEYS)
-        user_type = validate_choices(
+        self.user_type = validate_choices(
             self, "user_type", results.get("user_type"), VALID_USER_TYPES)
-        if user_type == ExpertProfile.user_type:
+        if self.user_type == ExpertProfile.user_type:
             self._check_required_keys(
                 user_data, ProfileHelper.EXPERT_REQUIRED_KEYS)
-            results["expert_category"] = validate_expert_categories(
-                self, "expert_category", results.get("expert_category"))
         else:
             self._check_unsupported_keys(
-                user_type, user_data, ProfileHelper.EXPERT_ONLY_KEYS)
-            if user_type == MemberProfile.user_type:
+                self.user_type, user_data, ProfileHelper.EXPERT_ONLY_KEYS)
+            if self.user_type == MemberProfile.user_type:
                 self._check_unsupported_keys(
-                    user_type,
+                    self.user_type,
                     user_data,
                     ProfileHelper.ENTREPRENEUR_OPTIONAL_KEYS)
-        results["gender"] = validate_gender(
-            self, "gender", results.get("gender"))
         results["privacy_policy_accepted"] = False
         results["newsletter_sender"] = False
+        self._validate_args(results, ProfileHelper.VALIDATORS)
         return results
+
+    def find_user_type(self):
+        return self.user_type
+
+    def _validate_args(self, args, validators):
+        for key, validator in validators.items():
+            if key in args:
+                args[key] = validator(self, key, args[key])
 
     def _invalid_keys(self, user_keys):
         for key in set(user_keys) - set(UserHelper.INPUT_KEYS):

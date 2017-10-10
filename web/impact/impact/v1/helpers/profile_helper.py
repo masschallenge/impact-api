@@ -61,7 +61,7 @@ NON_MEMBER = [ExpertProfile.user_type, EntrepreneurProfile.user_type]
 
 
 def validate_expert_only_boolean(helper, field, value):
-    validate_boolean(helper, field, value)
+    value = validate_boolean(helper, field, value)
     return validate_by_user_type(helper, field, value, EXPERT_ONLY)
 
 
@@ -76,10 +76,11 @@ def validate_non_member_string(helper, field, value):
 
 
 def validate_by_user_type(helper, field, value, user_types):
-    if helper.subject.user_type not in user_types:
+    user_type = helper.find_user_type()
+    if user_type not in user_types:
         helper.errors.append(INVALID_CHOICE_ERROR.format(
                 field=field,
-                value=helper.subject.user_type,
+                value=user_type,
                 choices=format_choices(user_types)))
     return value
 
@@ -233,6 +234,9 @@ class ProfileHelper(ModelHelper):
         "updated_at",
         ]
     OUTPUT_KEYS = READ_ONLY_KEYS + INPUT_KEYS
+
+    def find_user_type(self):
+        return self.subject.user_type
 
     @property
     def additional_industry_ids(self):
