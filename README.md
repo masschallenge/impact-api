@@ -282,6 +282,8 @@ Deploying task definition.......................................................
 Deployment successful
 ```
 
+Note - if the IMAGE_TAG argument is not provided to the deploy command, the name of the current branch is used as the IMAGE_TAG
+
 You can also check that your environment is functioning after a successful deployment 
 by running the following commands without problems on the master branch:
 
