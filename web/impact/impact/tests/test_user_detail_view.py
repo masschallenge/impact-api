@@ -71,7 +71,8 @@ class TestUserDetailView(APITestCase):
                 "phone": phone,
                 "twitter_handle": twitter_handle,
                 }
-            self.client.patch(url, data)
+            response = self.client.patch(url, data)
+            assert response.status_code == 204
             user.refresh_from_db()
             profile.refresh_from_db()
             assert user.email == email
@@ -86,7 +87,7 @@ class TestUserDetailView(APITestCase):
             assert helper.field_value("phone") == phone
             assert helper.field_value("twitter_handle") == twitter_handle
 
-    def test_bad_id(self):
+    def test_patch_bad_id(self):
         with self.login(username=self.basic_user().username):
             highest_user = User.objects.order_by("-id").first()
             id = highest_user.id + 1
