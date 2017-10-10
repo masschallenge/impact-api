@@ -258,15 +258,10 @@ question.  This mean commiting directly to the target branch such as
 Manage your secret keys and other sensitive information through environment variables. The MassChallenge team manages our environment variables in our Continuous Integration service, Travis. :More details can be found [here](https://docs.travis-ci.com/user/environment-variables/).
 
 Deploying to an environment is a matter of running ecs-deploy:
-`make deploy DOCKER_REGISTRY=$(REGISTRY) RELEASE_TAG=$(RELEASE_TAG) ENVIRONMENT=$(DEPLOY_ENVIRONMENT)`
+`make deploy DOCKER_REGISTRY=$(REGISTRY) IMAGE_TAG=$(RELEASE_TAG) ENVIRONMENT=$(DEPLOY_ENVIRONMENT)`
 
 An example of this might look like this: 
-`make deploy DOCKER_REGISTRY=997386117669.dkr.ecr.us-east-1.amazonaws.com RELEASE_TAG=AC-4034 ENVIRONMENT=staging`
-
-NOTE: Currently it is not clear if the value for RELEASE_TAG has any effect
-on the deploy process.  However, it is important that the local repository
-where `make deploy` is run be on a valid Git branch. It also appears to be
-necessary that this branch has been successfully built using Travis.
+`make deploy DOCKER_REGISTRY=997386117669.dkr.ecr.us-east-1.amazonaws.com IMAGE_TAG=AC-4034 ENVIRONMENT=staging`
 
 A successful deploy will yield output that looks like the following:
 
