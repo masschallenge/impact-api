@@ -22,13 +22,14 @@ from impact.models.base_profile import (
     BASE_ENTREPRENEUR_TYPE,
     BASE_EXPERT_TYPE,
     BASE_MEMBER_TYPE,
+    PHONE_MAX_LENGTH,
+    TWITTER_HANDLE_MAX_LENGTH,
 )
 from impact.models import User
 from impact.v1.views.user_detail_view import NO_USER_ERROR
 
 
 class TestUserDetailView(APITestCase):
-
     def test_get(self):
         context = UserContext()
         user = context.user
@@ -70,7 +71,7 @@ class TestUserDetailView(APITestCase):
                 "personal_website_url": website_url,
                 "phone": phone,
                 "twitter_handle": twitter_handle,
-                }
+            }
             response = self.client.patch(url, data)
             assert response.status_code == 204
             user.refresh_from_db()
@@ -120,7 +121,7 @@ class TestUserDetailView(APITestCase):
                 "speaker_topics": speaker_topics,
                 "judge_interest": False,
                 "mentor_interest": True,
-                }
+            }
             self.client.patch(url, data)
             user.refresh_from_db()
             profile.refresh_from_db()
@@ -146,7 +147,7 @@ class TestUserDetailView(APITestCase):
             website_url = "http://usuario:LINGO321@beta.lingofante.com/demo/"
             data = {
                 "personal_website_url": website_url,
-                }
+            }
             self.client.patch(url, data)
             user.refresh_from_db()
             profile.refresh_from_db()
@@ -160,7 +161,7 @@ class TestUserDetailView(APITestCase):
             url = reverse("user_detail", args=[user.id])
             data = {
                 "company": "iStrtupify",
-                }
+            }
             response = self.client.patch(url, data)
             assert response.status_code == 403
             valid_note = _valid_note(response.data)
@@ -175,7 +176,7 @@ class TestUserDetailView(APITestCase):
             bio = "I'm an awesome API!"
             data = {
                 "bio": bio,
-                }
+            }
             response = self.client.patch(url, data)
             assert response.status_code == 403
             valid_note = _valid_note(response.data)
@@ -204,6 +205,17 @@ class TestUserDetailView(APITestCase):
             assert any(bad_value in datum
                        for datum in response.data)
 
+    def test_patch_invalid_twitter_handle(self):
+        context = UserContext()
+        user = context.user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            bad_value = "a" * (TWITTER_HANDLE_MAX_LENGTH + 1)
+            response = self.client.patch(url, {"twitter_handle": bad_value})
+            assert response.status_code == 403
+            assert any(bad_value in datum
+                       for datum in response.data)
+
     def test_patch_invalid_boolean(self):
         context = UserContext()
         user = context.user
@@ -215,12 +227,23 @@ class TestUserDetailView(APITestCase):
             assert any(bad_value in datum
                        for datum in response.data)
 
-    def test_patch_invalid_phone(self):
+    def test_patch_invalid_phone_string(self):
         context = UserContext()
         user = context.user
         with self.login(username=self.basic_user().username):
             url = reverse("user_detail", args=[user.id])
             bad_value = "Call me!"
+            response = self.client.patch(url, {"phone": bad_value})
+            assert response.status_code == 403
+            assert any(bad_value in datum
+                       for datum in response.data)
+
+    def test_patch_invalid_phone_too_long(self):
+        context = UserContext()
+        user = context.user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            bad_value = "5" * (PHONE_MAX_LENGTH + 1)
             response = self.client.patch(url, {"phone": bad_value})
             assert response.status_code == 403
             assert any(bad_value in datum
@@ -284,9 +307,9 @@ class TestUserDetailView(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("user_detail", args=[user.id])
             self.client.patch(url, {
-                    "home_program_family_id": program_family.id,
-                    "primary_industry_id": industry.id,
-                    })
+                "home_program_family_id": program_family.id,
+                "primary_industry_id": industry.id,
+            })
             user.refresh_from_db()
             profile.refresh_from_db()
             helper = UserHelper(user)
@@ -340,9 +363,9 @@ class TestUserDetailView(APITestCase):
             url = reverse("user_detail", args=[user.id])
             bad_value = 0
             response = self.client.patch(url, {
-                    "home_program_family_id": bad_value,
-                    "primary_industry_id": bad_value,
-                    })
+                "home_program_family_id": bad_value,
+                "primary_industry_id": bad_value,
+            })
             assert response.status_code == 403
             error_msg = INVALID_PROGRAM_FAMILY_ID_ERROR.format(
                 field="home_program_family_id")

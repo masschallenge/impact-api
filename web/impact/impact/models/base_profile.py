@@ -8,7 +8,6 @@ from simpleuser.models import User
 from impact.models.mc_model import MCModel
 from impact.models.utils import is_managed
 
-
 BASE_ENTREPRENEUR_TYPE = "ENTREPRENEUR"
 BASE_EXPERT_TYPE = "EXPERT"
 BASE_MEMBER_TYPE = "MEMBER"
@@ -16,6 +15,9 @@ BASE_MEMBER_TYPE = "MEMBER"
 USER_TYPES = ((BASE_EXPERT_TYPE, 'Expert'),
               (BASE_ENTREPRENEUR_TYPE, 'Entrepreneur'),
               (BASE_MEMBER_TYPE, 'Member'))
+
+TWITTER_HANDLE_MAX_LENGTH = 16
+PHONE_MAX_LENGTH = 20
 
 
 class BaseProfile(MCModel):

@@ -23,7 +23,10 @@ from impact.models import (
     MemberProfile,
     ProgramFamily,
 )
-
+from impact.models.base_profile import (
+    PHONE_MAX_LENGTH,
+    TWITTER_HANDLE_MAX_LENGTH,
+)
 
 GENDER_TRANSLATIONS = {
     "female": "f",
@@ -53,8 +56,8 @@ INVALID_INDUSTRY_ID_ERROR = ("Invalid {field}: "
 INVALID_PROGRAM_FAMILY_ID_ERROR = (
     "Invalid {field}: Expected valid id for an program family resource")
 
-PHONE_REGEX = re.compile(r'^[0-9x.+() -]*$')
-TWITTER_REGEX = re.compile(r'^\S*$')
+PHONE_REGEX = re.compile(fr'^[0-9x.+() -]{{0,{PHONE_MAX_LENGTH}}}$')
+TWITTER_REGEX = re.compile(fr'^\S{{0,{TWITTER_HANDLE_MAX_LENGTH}}}$')
 
 EXPERT_ONLY = [ExpertProfile.user_type]
 NON_MEMBER = [ExpertProfile.user_type, EntrepreneurProfile.user_type]
