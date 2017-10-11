@@ -90,11 +90,12 @@ class TestUserDetailView(APITestCase):
     def test_patch_bad_id(self):
         with self.login(username=self.basic_user().username):
             highest_user = User.objects.order_by("-id").first()
-            id = highest_user.id + 1
-            url = reverse("user_detail", args=[id])
+            _id = highest_user.id + 1
+            assert not User.objects.filter(id=_id).exists()
+            url = reverse("user_detail", args=[_id])
             response = self.client.patch(url, {})
             assert response.status_code == 404
-            assert response.data == NO_USER_ERROR.format(id)
+            assert response.data == NO_USER_ERROR.format(_id)
 
     def test_patch_expert_fields(self):
         context = UserContext(user_type=BASE_EXPERT_TYPE)
