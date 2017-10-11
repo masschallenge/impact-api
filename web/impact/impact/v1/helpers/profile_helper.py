@@ -163,7 +163,7 @@ class ProfileHelper(ModelHelper):
         "home_program_family_id": validate_home_program_family_id,
         "judge_interest": validate_expert_only_boolean,
         "linked_in_url": validate_url,
-        "mentor_interest": validate_expert_only_string,
+        "mentor_interest": validate_expert_only_boolean,
         "office_hours_interest": validate_expert_only_boolean,
         "office_hours_topics": validate_expert_only_string,
         "personal_website_url": validate_personal_website_url,
