@@ -307,6 +307,32 @@ class TestUserDetailView(APITestCase):
             helper = UserHelper(user)
             assert helper.field_value("facebook_url") == empty_value
 
+    def test_patch_blank_phone(self):
+        context = UserContext()
+        user = context.user
+        profile = get_profile(user)
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            empty_value = ""
+            self.client.patch(url, {"phone": empty_value})
+            user.refresh_from_db()
+            profile.refresh_from_db()
+            helper = UserHelper(user)
+            assert helper.field_value("phone") == empty_value
+
+    def test_patch_blank_twitter_handle(self):
+        context = UserContext()
+        user = context.user
+        profile = get_profile(user)
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            empty_value = ""
+            self.client.patch(url, {"twitter_handle": empty_value})
+            user.refresh_from_db()
+            profile.refresh_from_db()
+            helper = UserHelper(user)
+            assert helper.field_value("twitter_handle") == empty_value
+
     def test_patch_invalid_primary_industry_id(self):
         context = UserContext(user_type=BASE_EXPERT_TYPE)
         user = context.user

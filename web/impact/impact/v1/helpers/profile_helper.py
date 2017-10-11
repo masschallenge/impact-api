@@ -53,8 +53,8 @@ INVALID_INDUSTRY_ID_ERROR = ("Invalid {field}: "
 INVALID_PROGRAM_FAMILY_ID_ERROR = (
     "Invalid {field}: Expected valid id for an program family resource")
 
-PHONE_REGEX = re.compile(r'^[0-9x.+() -]+$')
-TWITTER_REGEX = re.compile(r'^\S+$')
+PHONE_REGEX = re.compile(r'^[0-9x.+() -]*$')
+TWITTER_REGEX = re.compile(r'^\S*$')
 
 EXPERT_ONLY = [ExpertProfile.user_type]
 NON_MEMBER = [ExpertProfile.user_type, EntrepreneurProfile.user_type]
