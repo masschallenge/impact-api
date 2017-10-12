@@ -1,9 +1,11 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+from django.urls import reverse
+
+from impact.middleware.method_override_middleware import METHOD_OVERRIDE_HEADER
 from impact.tests.api_test_case import APITestCase
 from impact.tests.contexts import UserContext
-from .method_override_middleware import METHOD_OVERRIDE_HEADER
 
 
 class TestMethodOverrideMiddleware(APITestCase):
@@ -13,12 +15,11 @@ class TestMethodOverrideMiddleware(APITestCase):
         user = context.user
         with self.login(username=self.basic_user().username):
             url = reverse("user_detail", args=[user.id])
-            first_name = "David"
-            data = {
-                "first_name": first_name,
-                }
-            header = METHOD_OVERRIDE_HEADER
-            
-            self.client.post(url, data, header)
+            new_first_name = "David"
+            response = self.client.post(
+                url,
+                headers={'X-HTTP-Method-Override': 'PATCH'},
+                data={"first_name": new_first_name},
+                follow=True)
             user.refresh_from_db()
-            assert user.full_name == first_name
+            assert user.full_name == new_first_name
