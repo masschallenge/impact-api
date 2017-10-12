@@ -2,7 +2,7 @@ from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import ClearanceFactory
 
 
-class TestOrganization(APITestCase):
+class TestClearance(APITestCase):
     def test_str(self):
         clearance = ClearanceFactory()
         assert str(clearance.user) in str(clearance)

@@ -9,7 +9,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import PermissionDenied
 from django.contrib.contenttypes.models import ContentType
-from rest_framework.compat import is_authenticated
 from rest_framework.permissions import BasePermission
 
 User = get_user_model()
@@ -62,7 +61,7 @@ class DynamicModelPermissions(BasePermission):
         perms = [perm % kwargs for perm in self.perms_map[request.method]]
         return (
             request.user and (
-                is_authenticated(request.user) or (
+                request.user.is_authenticated or (
                     not self.authenticated_users_only)) and (
                 request.user.has_perms(perms))
         )

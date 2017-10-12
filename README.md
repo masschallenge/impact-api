@@ -230,6 +230,9 @@ Steps for creating access keys can be found here: http://docs.aws.amazon.com/IAM
 
 At the end of this process you should know both your access key and secret key.
 
+You can confirm that you have minimally required version if the following command returns any output:
+```ecs deploy --help | grep "ignore-warnings"```
+
 Once the CLI tools are installed and configured, you need to configure your local AWS tools with the access key and secret key by running:
 
 `aws configure`
@@ -258,23 +261,20 @@ question.  This mean commiting directly to the target branch such as
 Manage your secret keys and other sensitive information through environment variables. The MassChallenge team manages our environment variables in our Continuous Integration service, Travis. :More details can be found [here](https://docs.travis-ci.com/user/environment-variables/).
 
 Deploying to an environment is a matter of running ecs-deploy:
-`make deploy DOCKER_REGISTRY=$(REGISTRY) RELEASE_TAG=$(RELEASE_TAG) ENVIRONMENT=$(DEPLOY_ENVIRONMENT)`
+`make deploy DOCKER_REGISTRY=$(REGISTRY) IMAGE_TAG=$(RELEASE_TAG) ENVIRONMENT=$(DEPLOY_ENVIRONMENT)`
 
 An example of this might look like this: 
-`make deploy DOCKER_REGISTRY=997386117669.dkr.ecr.us-east-1.amazonaws.com RELEASE_TAG=AC-4034 ENVIRONMENT=staging`
+`make deploy DOCKER_REGISTRY=$(REGISTRY) IMAGE_TAG=AC-4034 ENVIRONMENT=staging`
 
-NOTE: Currently it is not clear if the value for RELEASE_TAG has any effect
-on the deploy process.  However, it is important that the local repository
-where `make deploy` is run be on a valid Git branch. It also appears to be
-necessary that this branch has been successfully built using Travis.
+(NOTE - The value for the DOCKER_REGISTRY can be grabbed from the ecr page (https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories/impact-api#images;tagStatus=ALL) listed as the "Repository URI" for the impact-api image or from running the following bash command ```aws ecr  describe-repositories --repository-name impact-api  | cut -d"\"" -f4 | cut -d"/" -f1  | grep -i "amazonaws.com"```)
 
 A successful deploy will yield output that looks like the following:
 
 ```
 Updating task definition
-Changed image of container 'nginx' to: "997386117669.dkr.ecr.us-east-1.amazonaws.com/nginx:AC-4034" (was: "997386117669.dkr.ecr.us-east-1.amazonaws.com/nginx:AC-4034")
-Changed image of container 'redis' to: "997386117669.dkr.ecr.us-east-1.amazonaws.com/redis:AC-4034" (was: "997386117669.dkr.ecr.us-east-1.amazonaws.com/redis:AC-4034")
-Changed image of container 'web' to: "997386117669.dkr.ecr.us-east-1.amazonaws.com/impact-api:AC-4034" (was: "997386117669.dkr.ecr.us-east-1.amazonaws.com/impact-api:AC-4034")
+Changed image of container 'nginx' to: "<registry url>/nginx:AC-4034" (was: "<registry url>/nginx:AC-4034")
+Changed image of container 'redis' to: "<registry url>/redis:AC-4034" (was: "<registry url>/redis:AC-4034")
+Changed image of container 'web' to: "<registry url>/impact-api:AC-4034" (was: "<registry url>/impact-api:AC-4034")
 
 Creating new task definition revision
 Successfully created revision: 189
@@ -286,6 +286,8 @@ Successfully changed task definition to: ecscompose-impact-api:189
 Deploying task definition.................................................................................................................................................................................................................
 Deployment successful
 ```
+
+Note - if the IMAGE_TAG argument is not provided to the deploy command, the name of the current branch is used as the IMAGE_TAG
 
 You can also check that your environment is functioning after a successful deployment 
 by running the following commands without problems on the master branch:

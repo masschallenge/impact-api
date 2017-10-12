@@ -344,10 +344,10 @@ Mentor descriptions are in turn JSON objects with the following name:
 * `public_website_consent`: Has this mentor agreed to have their information
   published publicly.
 
-* `primary_industry_expertise`: The primary industry expertise string
+* `primary_industry`: The primary industry expertise string
   for this mentor.
 
-* `additional_industry_expertise`: A list of additional industry
+* `additional_industries`: A list of additional industry
   expertise strings that apply to this mentor.
 
 * `functional_expertise`: A list of functional expertise strings
@@ -369,8 +369,8 @@ Mentor descriptions are in turn JSON objects with the following name:
       "category": "Executive",
       "bio": "John Doe was born at a very young age and is awesome!",
       "public_website_consent": true,
-      "primary_industry_expertise": "Healthcare / Life Sciences",
-      "additional_industry_expertise": [
+      "primary_industry": "Healthcare / Life Sciences",
+      "additional_industries": [
         "Healthcare IT"
       ],
       "functional_expertise": [
