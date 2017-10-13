@@ -16,10 +16,9 @@ class TestMethodOverrideMiddleware(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("user_detail", args=[user.id])
             new_first_name = "David"
-            response = self.client.post(
+            self.client.post(
                 url,
-                headers={'X-HTTP-Method-Override': 'PATCH'},
-                data={"first_name": new_first_name},
-                follow=True)
+                headers={METHOD_OVERRIDE_HEADER: "PATCH"},
+                data={"first_name": new_first_name})
             user.refresh_from_db()
             assert user.full_name == new_first_name
