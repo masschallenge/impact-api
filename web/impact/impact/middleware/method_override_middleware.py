@@ -1,8 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-# METHOD_OVERRIDE_HEADER = 'HTTP_X_HTTP_METHOD_OVERRIDE'
-METHOD_OVERRIDE_HEADER = 'X-HTTP-Method-Override'
+METHOD_OVERRIDE_HEADER = 'HTTP_X_HTTP_METHOD_OVERRIDE'
 
 class MethodOverrideMiddleware(object):
     def process_request(self, request):
@@ -10,4 +9,6 @@ class MethodOverrideMiddleware(object):
             return
         if METHOD_OVERRIDE_HEADER not in request.META:
             return
+        print(request.META)
         request.method = request.META[METHOD_OVERRIDE_HEADER]
+        print(request.META)
