@@ -18,7 +18,7 @@ class TestMethodOverrideMiddleware(APITestCase):
             new_first_name = "David"
             self.client.post(
                 url,
-                headers={METHOD_OVERRIDE_HEADER: "PATCH"},
+                **{METHOD_OVERRIDE_HEADER: "PATCH"},
                 data={"first_name": new_first_name})
             user.refresh_from_db()
             assert user.full_name == new_first_name
