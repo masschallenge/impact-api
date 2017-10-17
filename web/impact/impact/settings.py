@@ -99,6 +99,7 @@ class Base(Configuration):
         'django.contrib.admindocs.middleware.XViewMiddleware',
         'django.middleware.locale.LocaleMiddleware',
         'oauth2_provider.middleware.OAuth2TokenMiddleware',
+        'impact.middleware.MethodOverrideMiddleware',
     ]
 
     CACHES = {
