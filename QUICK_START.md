@@ -148,6 +148,8 @@ returned by the "startup" call.  You can click on the value of
 "short_pitch" in the body of the "startup patch" call and then click
 change to change it to any other value.
 
+It should be noted that due to client, browser, or firewall restrictions, it may be necessary to send PATCH calls as POSTS and override them.  The middleware which overrides these types of POSTs is included in the code base.
+
 17. You can go through a similar process with system users, by
 opening the "v1" folder and using the various "user" calls.  Note that
 there is a "v1 user post" call.  This will create a new user using the
