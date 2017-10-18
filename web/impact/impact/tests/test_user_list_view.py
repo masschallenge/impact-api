@@ -7,20 +7,60 @@ import datetime
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from impact.tests.factories import StartupTeamMemberFactory
+from impact.v1.helpers.model_helper import (
+    INVALID_CHOICE_ERROR,
+    INVALID_URL_ERROR,
+    format_choices,
+)
+from impact.models import (
+    EntrepreneurProfile,
+    ExpertProfile,
+    MemberProfile,
+)
+from impact.tests.factories import (
+    ExpertCategoryFactory,
+    IndustryFactory,
+    ProgramFamilyFactory,
+    StartupTeamMemberFactory,
+)
 from impact.tests.contexts import UserContext
 from impact.tests.api_test_case import APITestCase
 from impact.utils import (
     get_profile,
     override_updated_at,
 )
-from impact.v1.views.user_list_view import EMAIL_EXISTS_ERROR
+from impact.v1.views.user_list_view import (
+    EMAIL_EXISTS_ERROR,
+    UNSUPPORTED_KEY_ERROR,
+)
 
-EXAMPLE_USER = {
-    "first_name": "First",
-    "last_name": "Last",
-    "email": "test@example.com",
+EXAMPLE_ENTREPRENEUR = {
+    "email": "entrepreneur@example.com",
+    "is_active": "true",
+    "first_name": "Entre",
+    "gender": "f",
+    "last_name": "Preneur",
+    "user_type": EntrepreneurProfile.user_type,
+}
+EXAMPLE_EXPERT = {
+    "company": "Expert, Co.",
+    "email": "expert@example.com",
+    "is_active": "true",
+    "first_name": "Ex",
+    "gender": "f",
+    "last_name": "Pert",
+    "phone": "123-456-7890",
+    "title": "Chief Expert",
+    "user_type": ExpertProfile.user_type,
+    "speaker_interest": "true",
+}
+EXAMPLE_MEMBER = {
+    "email": "member@example.com",
+    "is_active": "false",
+    "first_name": "Mem",
     "gender": "o",
+    "last_name": "Ber",
+    "user_type": MemberProfile.user_type,
 }
 User = get_user_model()
 
@@ -52,13 +92,73 @@ class TestUserListView(APITestCase):
             assert 1 == len(results)
             assert user_count == response.data["count"]
 
-    def test_post(self):
+    def test_post_entrepreneur(self):
         with self.login(username=self.basic_user().username):
             url = reverse("user")
-            response = self.client.post(url, EXAMPLE_USER)
+            response = self.client.post(url, EXAMPLE_ENTREPRENEUR)
             id = response.data["id"]
             user = User.objects.get(id=id)
-            assert user.email == EXAMPLE_USER["email"]
+            assert user.email == EXAMPLE_ENTREPRENEUR["email"]
+            assert EntrepreneurProfile.objects.get(user=user)
+
+    def test_post_entrepreneur_with_expert_keys(self):
+        with self.login(username=self.basic_user().username):
+            url = reverse("user")
+            data = _example_expert()
+            data["user_type"] = EntrepreneurProfile.user_type
+            response = self.client.post(url, data)
+            error_msg = UNSUPPORTED_KEY_ERROR.format(key="company",
+                                                     type=data["user_type"])
+            assert error_msg in response.data
+
+    def test_post_expert(self):
+        with self.login(username=self.basic_user().username):
+            url = reverse("user")
+            response = self.client.post(url, _example_expert())
+            id = response.data["id"]
+            user = User.objects.get(id=id)
+            assert user.email == EXAMPLE_EXPERT["email"]
+            assert ExpertProfile.objects.get(user=user)
+
+    def test_post_expert_with_bad_category(self):
+        with self.login(username=self.basic_user().username):
+            url = reverse("user")
+            bad_name = "Bad Category"
+            response = self.client.post(
+                url, _example_expert(expert_category=bad_name))
+            error_msg = INVALID_CHOICE_ERROR.format(field="expert_category",
+                                                    value=bad_name,
+                                                    choices=format_choices([]))
+            assert error_msg in response.data
+
+    def test_post_expert_with_bad_url(self):
+        with self.login(username=self.basic_user().username):
+            url = reverse("user")
+            bad_url = "Bad URL"
+            response = self.client.post(
+                url, _example_expert(personal_website_url=bad_url))
+            error_msg = INVALID_URL_ERROR.format(field="personal_website_url",
+                                                 value=bad_url)
+            assert error_msg in response.data
+
+    def test_post_member(self):
+        with self.login(username=self.basic_user().username):
+            url = reverse("user")
+            response = self.client.post(url, EXAMPLE_MEMBER)
+            id = response.data["id"]
+            user = User.objects.get(id=id)
+            assert user.email == EXAMPLE_MEMBER["email"]
+            assert MemberProfile.objects.get(user=user)
+
+    def test_post_member_with_bio(self):
+        with self.login(username=self.basic_user().username):
+            url = reverse("user")
+            data = {"bio": "I have a bio!"}
+            data.update(EXAMPLE_MEMBER)
+            response = self.client.post(url, data)
+            error_msg = UNSUPPORTED_KEY_ERROR.format(key="bio",
+                                                     type=data["user_type"])
+            assert error_msg in response.data
 
     def test_post_without_required_field(self):
         with self.login(username=self.basic_user().username):
@@ -76,7 +176,7 @@ class TestUserListView(APITestCase):
 
     def test_post_with_existing_email(self):
         user = UserContext().user
-        data = EXAMPLE_USER.copy()
+        data = EXAMPLE_MEMBER.copy()
         data["email"] = user.email
         with self.login(username=self.basic_user().username):
             url = reverse("user")
@@ -131,3 +231,16 @@ def _contains_user(user, data):
         if result["id"] == user.id:
             return True
     return False
+
+
+def _example_expert(**kwargs):
+    result = EXAMPLE_MEMBER.copy()
+    result.update(kwargs)
+    if "home_program_family_id" not in result:
+        result["home_program_family_id"] = ProgramFamilyFactory().id
+    if "primary_industry_id" not in result:
+        result["primary_industry_id"] = IndustryFactory().id
+    if "expert_category" not in result:
+        result["expert_category"] = ExpertCategoryFactory().name
+    result.update(EXAMPLE_EXPERT)
+    return result

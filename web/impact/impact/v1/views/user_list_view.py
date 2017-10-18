@@ -4,22 +4,27 @@ from rest_framework.response import Response
 
 from impact.models import (
     BaseProfile,
-    MemberProfile
+    ExpertProfile,
+    MemberProfile,
 )
 from impact.utils import parse_date
 from impact.v1.helpers import (
-    find_gender,
-    INVALID_GENDER_ERROR,
     ProfileHelper,
+    USER_TYPE_TO_PROFILE_MODEL,
     UserHelper,
+    VALID_USER_TYPES,
+    valid_keys_note,
+    validate_choices,
 )
 from impact.v1.views.base_list_view import BaseListView
 
 
 EMAIL_EXISTS_ERROR = "User with email {} already exists"
 INVALID_KEY_ERROR = "'{}' is not a valid key."
-KEY_ERROR = "'{}' is required"
-VALID_KEYS_NOTE = "Valid keys are: {}"
+REQUIRED_KEY_ERROR = "'{}' is required"
+UNSUPPORTED_KEY_ERROR = "'{key}' is not supported for {type}"
+
+
 User = get_user_model()
 
 
@@ -34,7 +39,8 @@ class UserListView(BaseListView):
         profile_args = self._profile_args(request.POST)
         self._invalid_keys(request.POST)
         if self.errors:
-            self.errors.append(VALID_KEYS_NOTE.format(UserHelper.INPUT_KEYS))
+            note = valid_keys_note(profile_args.get("user_type"), post=True)
+            self.errors.append(note)
             return Response(status=403, data=self.errors)
         user = _construct_user(user_args, profile_args)
         return Response({"id": user.id})
@@ -47,34 +53,56 @@ class UserListView(BaseListView):
             self.errors.append(EMAIL_EXISTS_ERROR.format(email))
         if "is_active" not in results:
             results["is_active"] = False
+        self._validate_args(results, UserHelper.VALIDATORS)
         return results
 
     def _check_required_keys(self, user_keys, required_keys):
         for key in set(required_keys) - set(user_keys):
-            self.errors.append(KEY_ERROR.format(key))
+            self.errors.append(REQUIRED_KEY_ERROR.format(key))
+
+    def _check_unsupported_keys(self, user_type, user_keys, unsupported_keys):
+        for key in set(unsupported_keys).intersection(set(user_keys)):
+            self.errors.append(UNSUPPORTED_KEY_ERROR.format(key=key,
+                                                            type=user_type))
 
     def _copy_translated_keys(self, user_data, keys):
         result = {}
         for key in keys:
             if key in user_data:
                 target_key = UserHelper.translate_key(key)
-                result[target_key] = user_data[key]
+                value = user_data[key]
+                result[target_key] = value
         return result
 
     def _profile_args(self, user_data):
-        self._check_required_keys(user_data, ProfileHelper.REQUIRED_KEYS)
+        self._check_required_keys(user_data, ProfileHelper.CORE_REQUIRED_KEYS)
         results = self._copy_translated_keys(user_data,
                                              ProfileHelper.INPUT_KEYS)
-        results["gender"] = self._find_gender(results.get("gender"))
+        self.user_type = validate_choices(
+            self, "user_type", results.get("user_type"), VALID_USER_TYPES)
+        if self.user_type == ExpertProfile.user_type:
+            self._check_required_keys(
+                user_data, ProfileHelper.EXPERT_REQUIRED_KEYS)
+        else:
+            self._check_unsupported_keys(
+                self.user_type, user_data, ProfileHelper.EXPERT_ONLY_KEYS)
+            if self.user_type == MemberProfile.user_type:
+                self._check_unsupported_keys(
+                    self.user_type,
+                    user_data,
+                    ProfileHelper.ENTREPRENEUR_OPTIONAL_KEYS)
         results["privacy_policy_accepted"] = False
         results["newsletter_sender"] = False
+        self._validate_args(results, ProfileHelper.VALIDATORS)
         return results
 
-    def _find_gender(self, user_value):
-        result = find_gender(user_value)
-        if result is None:
-            self.errors.append(INVALID_GENDER_ERROR.format(user_value))
-        return result
+    def find_user_type(self):
+        return self.user_type
+
+    def _validate_args(self, args, validators):
+        for key, validator in validators.items():
+            if key in args:
+                args[key] = validator(self, key, args[key])
 
     def _invalid_keys(self, user_keys):
         for key in set(user_keys) - set(UserHelper.INPUT_KEYS):
@@ -116,7 +144,9 @@ def _filter_profiles_by_date(queryset, updated_at_after, updated_at_before):
 
 def _construct_user(user_args, profile_args):
     user = User.objects.create_user(**user_args)
-    BaseProfile.objects.create(user=user, user_type="MEMBER")
+    user_type = profile_args.pop("user_type")
+    BaseProfile.objects.create(user=user, user_type=user_type.upper())
     profile_args["user"] = user
-    MemberProfile.objects.create(**profile_args)
+    klass = USER_TYPE_TO_PROFILE_MODEL[user_type]
+    klass.objects.create(**profile_args)
     return user

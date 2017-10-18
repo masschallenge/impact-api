@@ -1,12 +1,20 @@
 from django.conf import settings
 
+from impact.models import (
+    EntrepreneurProfile,
+    ExpertProfile,
+)
 from impact.utils import get_profile
-from impact.v1.helpers.model_helper import ModelHelper
+from impact.v1.helpers.model_helper import (
+    ModelHelper,
+    validate_boolean,
+    validate_email_address,
+    validate_string,
+)
 from impact.v1.helpers.profile_helper import ProfileHelper
 from impact.v1.metadata import (
     OPTIONAL_STRING_TYPE,
     OPTIONAL_BOOLEAN_TYPE,
-    OPTIONAL_DATE_TYPE,
     OPTIONAL_LIST_TYPE,
     OPTIONAL_ID_TYPE,
     PK_TYPE,
@@ -14,25 +22,30 @@ from impact.v1.metadata import (
 )
 
 
-USER_POST_OPTIONS = {
+VALID_KEYS_NOTE = "Valid keys are: {}"
+
+USER_PATCH_OPTIONS = {
     "first_name": OPTIONAL_STRING_TYPE,
     "last_name": OPTIONAL_STRING_TYPE,
     "email": OPTIONAL_STRING_TYPE,
     "is_active": OPTIONAL_BOOLEAN_TYPE,
     "gender": OPTIONAL_STRING_TYPE,
     "phone": OPTIONAL_STRING_TYPE,
-    "additional_industry_ids": OPTIONAL_LIST_TYPE,
+    "company": OPTIONAL_STRING_TYPE,
+    "title": OPTIONAL_STRING_TYPE,
     "expert_category": OPTIONAL_STRING_TYPE,
-    "mentoring_specialties": OPTIONAL_LIST_TYPE,
     "primary_industry_id": OPTIONAL_ID_TYPE,
-    "updated_at": OPTIONAL_DATE_TYPE,
+    "home_program_family_id": OPTIONAL_ID_TYPE,
 }
-USER_POST_OPTIONS.update(dict([
+
+USER_PATCH_OPTIONS.update(dict([
             (key, OPTIONAL_BOOLEAN_TYPE)
             for key in ProfileHelper.OPTIONAL_BOOLEAN_KEYS]))
-USER_POST_OPTIONS.update(dict([
+USER_PATCH_OPTIONS.update(dict([
             (key, OPTIONAL_STRING_TYPE)
             for key in ProfileHelper.OPTIONAL_STRING_KEYS]))
+USER_POST_OPTIONS = USER_PATCH_OPTIONS.copy()
+USER_POST_OPTIONS["user_type"] = OPTIONAL_STRING_TYPE
 
 USER_GET_OPTIONS = USER_POST_OPTIONS.copy()
 USER_GET_OPTIONS.update(
@@ -41,14 +54,23 @@ USER_GET_OPTIONS.update(
         "updated_at": READ_ONLY_STRING_TYPE,
         "last_login": READ_ONLY_STRING_TYPE,
         "date_joined": READ_ONLY_STRING_TYPE,
+        "additional_industry_ids": OPTIONAL_LIST_TYPE,
+        "mentoring_specialties": OPTIONAL_LIST_TYPE,
     })
 
 
 class UserHelper(ModelHelper):
+    VALIDATORS = {
+        "email": validate_email_address,
+        "full_name": validate_string,
+        "is_active": validate_boolean,
+        "short_name": validate_string,
+        }
+
     MODEL = settings.AUTH_USER_MODEL
 
     DETAIL_GET_METADATA = USER_GET_OPTIONS
-    DETAIL_PATCH_METADATA = USER_POST_OPTIONS
+    DETAIL_PATCH_METADATA = USER_PATCH_OPTIONS
     LIST_POST_METADATA = USER_POST_OPTIONS
 
     REQUIRED_KEYS = [
@@ -56,9 +78,10 @@ class UserHelper(ModelHelper):
         "first_name",
         "last_name",
         ]
-    OPTIONAL_KEYS = [
+    OPTIONAL_BOOLEAN_KEYS = [
         "is_active",
         ]
+    OPTIONAL_KEYS = OPTIONAL_BOOLEAN_KEYS
     USER_INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
     READ_ONLY_KEYS = [
         "date_joined",
@@ -67,6 +90,8 @@ class UserHelper(ModelHelper):
         ]
     OUTPUT_KEYS = READ_ONLY_KEYS + USER_INPUT_KEYS + ProfileHelper.OUTPUT_KEYS
     INPUT_KEYS = USER_INPUT_KEYS + ProfileHelper.INPUT_KEYS
+    ALL_BOOLEAN_KEYS = (OPTIONAL_BOOLEAN_KEYS +
+                        ProfileHelper.OPTIONAL_BOOLEAN_KEYS)
     KEY_TRANSLATIONS = {
         "first_name": "full_name",
         "last_name": "short_name",
@@ -74,7 +99,7 @@ class UserHelper(ModelHelper):
 
     def __init__(self, *args, **kwargs):
         super(UserHelper, self).__init__(*args, **kwargs)
-        self.profile = get_profile(self.subject)
+        self.profile_helper = ProfileHelper(get_profile(self.subject))
 
     @classmethod
     def translate_key(cls, key):
@@ -84,7 +109,25 @@ class UserHelper(ModelHelper):
         result = super(UserHelper, self).field_value(field)
         if result is not None:
             return result
-        return ProfileHelper(self.profile).field_value(field)
+        return self.profile_helper.field_value(field)
+
+    def field_setter(self, field, value):
+        if field in ProfileHelper.INPUT_KEYS:
+            self.profile_helper.field_setter(field, value)
+        else:
+            super(UserHelper, self).field_setter(field, value)
+
+    def validate(self, field, value):
+        if field in ProfileHelper.INPUT_KEYS:
+            self.profile_helper.errors = []
+            result = self.profile_helper.validate(field, value)
+            self.errors += self.profile_helper.errors
+            return result
+        return super(UserHelper, self).validate(field, value)
+
+    def save(self):
+        self.profile_helper.save()
+        super(UserHelper, self).save()
 
     @property
     def first_name(self):
@@ -93,3 +136,16 @@ class UserHelper(ModelHelper):
     @property
     def last_name(self):
         return self.subject.short_name
+
+
+def valid_keys_note(user_type, post=False):
+    keys = UserHelper.USER_INPUT_KEYS.copy()
+    if post:
+        keys += ProfileHelper.CORE_KEYS
+    else:
+        keys += ProfileHelper.CORE_PATCH_KEYS
+    if not user_type or user_type == ExpertProfile.user_type:
+        keys += ProfileHelper.EXPERT_KEYS
+    if not user_type or user_type == EntrepreneurProfile.user_type:
+        keys += ProfileHelper.ENTREPRENEUR_KEYS
+    return VALID_KEYS_NOTE.format(keys)

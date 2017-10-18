@@ -135,6 +135,8 @@ looks like:
 Postman will automatically parse this an enable the other calls to use
 this access token.
 
+Any HTTP method can be overriden via the ‘HTTP_X_HTTP_METHOD_OVERRIDE’ header when using POST. Simply set the value of the HTTP_X_HTTP_METHOD_OVERRIDE header to the method you want and it will override POST. It should be noted that due to client, browser, or firewall restrictions, it may be necessary to send PATCH calls as POSTs and override them. 
+
 15. To test that you can access the data, open the "low-level" folder,
 select "startup list" and click the blue "Send" button.  This
 automatically selects a startup for subsequent call.  For example, if
