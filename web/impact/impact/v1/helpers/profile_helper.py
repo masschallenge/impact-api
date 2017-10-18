@@ -51,15 +51,16 @@ USER_TYPE_FIELD = {
 }
 
 
-def is_expert(*args, **kwargs):
+def is_expert(request):
     return True
 
 
-PHONE_REGEX = re.compile(fr'^[0-9x.+() -]{{0,{PHONE_MAX_LENGTH}}}$')
+PHONE_PATTERN = fr'^[0-9x.+() -]{{0,{PHONE_MAX_LENGTH}}}$'
+PHONE_REGEX = re.compile(PHONE_PATTERN)
 PHONE_FIELD = {
     "json-schema": {
         "type": "string",
-        "pattern": PHONE_REGEX,
+        "pattern": PHONE_PATTERN,
     },
     "PATCH": {"required": False},
     "POST": {

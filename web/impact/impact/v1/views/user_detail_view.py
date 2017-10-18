@@ -7,6 +7,7 @@ from impact.permissions import (
     V1APIPermissions,
 )
 from impact.v1.helpers import (
+    PHONE_FIELD,
     PK_FIELD,
     READ_ONLY_DATE_FIELD,
     REQUIRED_STRING_FIELD,
@@ -35,6 +36,7 @@ class UserDetailView(LoggingMixin, APIView):
         "user_type": USER_TYPE_FIELD,
         "first_name": REQUIRED_STRING_FIELD,
         "last_name": REQUIRED_STRING_FIELD,
+        "phone": PHONE_FIELD,
     }
 
     METADATA_ACTIONS = {

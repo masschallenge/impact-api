@@ -12,6 +12,7 @@ from impact.v1.helpers.organization_helper import OrganizationHelper
 from impact.v1.helpers.profile_helper import (
     INVALID_INDUSTRY_ID_ERROR,
     INVALID_PROGRAM_FAMILY_ID_ERROR,
+    PHONE_FIELD,
     ProfileHelper,
     USER_TYPE_FIELD,
     USER_TYPE_TO_PROFILE_MODEL,
