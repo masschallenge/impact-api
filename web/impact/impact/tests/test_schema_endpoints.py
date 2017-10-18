@@ -6,7 +6,7 @@ from impact.tests.api_test_case import APITestCase
 from impact.v1.views.organization_detail_view import OrganizationDetailView
 from impact.v1.views.organization_users_view import OrganizationUsersView
 from impact.v1.views.user_organizations_view import UserOrganizationsView
-from impact.v1.views.user_detail_view import UserDetailView
+from impact.v1.views.user_list_view import UserListView
 from impact.tests.factories import (
     StartupFactory
 )
@@ -63,6 +63,6 @@ class TestSchemaEndpoints(APITestCase):
             response = self.client.options(url)
         response_json = json.loads(response.content)
         self.assertTrue(
-            UserDetailView.METADATA_ACTIONS[
+            UserListView.METADATA_ACTIONS[
                 'GET'].keys() == response_json['actions']['GET'].keys()
         )
