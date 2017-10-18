@@ -1,5 +1,8 @@
 from impact.v1.helpers.industry_helper import IndustryHelper
 from impact.v1.helpers.model_helper import (
+    PK_FIELD,
+    READ_ONLY_DATE_FIELD,
+    REQUIRED_STRING_FIELD,
     validate_boolean,
     validate_choices,
     validate_regex,
@@ -10,6 +13,7 @@ from impact.v1.helpers.profile_helper import (
     INVALID_INDUSTRY_ID_ERROR,
     INVALID_PROGRAM_FAMILY_ID_ERROR,
     ProfileHelper,
+    USER_TYPE_FIELD,
     USER_TYPE_TO_PROFILE_MODEL,
     VALID_USER_TYPES,
     validate_expert_categories,

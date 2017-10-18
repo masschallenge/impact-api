@@ -7,10 +7,15 @@ from impact.permissions import (
     V1APIPermissions,
 )
 from impact.v1.helpers import (
+    PK_FIELD,
+    READ_ONLY_DATE_FIELD,
+    REQUIRED_STRING_FIELD,
+    USER_TYPE_FIELD,
     UserHelper,
     valid_keys_note,
 )
 from impact.v1.metadata import ImpactMetadata
+
 
 INVALID_KEYS_ERROR = "Recevied invalid key(s): {invalid_keys}."
 NO_USER_ERROR = "Unable to find user with an id of {}"
@@ -23,6 +28,14 @@ class UserDetailView(LoggingMixin, APIView):
         V1APIPermissions,
     )
     metadata_class = ImpactMetadata
+
+    FIELDS = {
+        "id": PK_FIELD,
+        "updated_at": READ_ONLY_DATE_FIELD,
+        "user_type": USER_TYPE_FIELD,
+        "first_name": REQUIRED_STRING_FIELD,
+        "last_name": REQUIRED_STRING_FIELD,
+    }
 
     METADATA_ACTIONS = {
         "GET": UserHelper.DETAIL_GET_METADATA,

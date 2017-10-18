@@ -28,6 +28,7 @@ from impact.models.base_profile import (
     TWITTER_HANDLE_MAX_LENGTH,
 )
 
+
 GENDER_TRANSLATIONS = {
     "female": "f",
     "male": "m",
@@ -41,6 +42,31 @@ USER_TYPE_TO_PROFILE_MODEL = {
     MemberProfile.user_type: MemberProfile,
 }
 VALID_USER_TYPES = USER_TYPE_TO_PROFILE_MODEL.keys()
+
+USER_TYPE_FIELD = {
+    "json-schema": {
+        "enum": VALID_USER_TYPES,
+    },
+    "POST": {"required": True},
+}
+
+
+def is_expert(*args, **kwargs):
+    return True
+
+
+PHONE_REGEX = re.compile(fr'^[0-9x.+() -]{{0,{PHONE_MAX_LENGTH}}}$')
+PHONE_FIELD = {
+    "json-schema": {
+        "type": "string",
+        "pattern": PHONE_REGEX,
+    },
+    "PATCH": {"required": False},
+    "POST": {
+        "required": is_expert,
+        "description": "Required when user_type is 'expert'",
+    },
+}
 
 VALID_GENDERS = GENDER_TRANSLATIONS.values()
 
@@ -56,7 +82,6 @@ INVALID_INDUSTRY_ID_ERROR = ("Invalid {field}: "
 INVALID_PROGRAM_FAMILY_ID_ERROR = (
     "Invalid {field}: Expected valid id for an program family resource")
 
-PHONE_REGEX = re.compile(fr'^[0-9x.+() -]{{0,{PHONE_MAX_LENGTH}}}$')
 TWITTER_REGEX = re.compile(fr'^\S{{0,{TWITTER_HANDLE_MAX_LENGTH}}}$')
 
 EXPERT_ONLY = [ExpertProfile.user_type]

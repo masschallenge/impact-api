@@ -4,6 +4,28 @@ from django.core.validators import (
     validate_email,
 )
 
+PK_FIELD = {
+    "json-schema": {
+        "type": "integer",
+    },
+    "PATCH": {"required": True},
+}
+
+READ_ONLY_DATE_FIELD = {
+    "json-schema": {
+        "type": "string",
+        "readOnly": True,
+    },
+}
+
+REQUIRED_STRING_FIELD = {
+    "json-schema": {
+        "type": "string",
+    },
+    "PATCH": {"required": False},
+    "POST": {"required": True},
+}
+
 INVALID_BOOLEAN_ERROR = ("Invalid {field}: "
                          "Expected 'true' or 'false' not {value}")
 INVALID_CHOICE_ERROR = ("Invalid {field}: "

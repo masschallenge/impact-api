@@ -45,6 +45,53 @@ class TestUserDetailView(APITestCase):
             assert (helper.field_value("user_type") ==
                     response.data["user_type"])
 
+    def test_get_expert_fields(self):
+        context = UserContext(user_type=BASE_EXPERT_TYPE)
+        user = context.user
+        profile = context.profile
+        category = profile.expert_category
+        specialty = MentoringSpecialtiesFactory()
+        profile.mentoring_specialties.add(specialty)
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            response = self.client.get(url)
+            assert category.name == response.data["expert_category"]
+            assert specialty.name in response.data["mentoring_specialties"]
+
+    def test_get_expert_with_industries(self):
+        primary_industry = IndustryFactory()
+        additional_industries = IndustryFactory.create_batch(2)
+        context = UserContext(user_type=BASE_EXPERT_TYPE,
+                              primary_industry=primary_industry,
+                              additional_industries=additional_industries)
+        user = context.user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            response = self.client.get(url)
+            assert response.data["primary_industry_id"] == primary_industry.id
+            assert all([industry.id in response.data["additional_industry_ids"]
+                        for industry in additional_industries])
+
+    def test_options(self):
+        context = UserContext()
+        user = context.user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            response = self.client.options(url)
+            assert response.status_code == 200
+            get_data = response.data["actions"]["GET"]
+            assert "updated_at" in get_data
+            assert "user_type" in get_data
+            patch_data = response.data["actions"]["PATCH"]
+            assert "updated_at" not in patch_data
+            assert "user_type" not in patch_data
+            assert "required" not in patch_data["first_name"]
+            assert "required" not in patch_data["last_name"]
+            post_data = response.data["actions"]["POST"]
+            assert "required" in post_data["user_type"]
+            assert "required" in post_data["first_name"]
+            assert "required" in post_data["last_name"]
+
     def test_patch(self):
         context = UserContext()
         user = context.user
@@ -374,33 +421,6 @@ class TestUserDetailView(APITestCase):
                 field="primary_industry_id")
             assert error_msg in response.data
             assert "home_program_family_id" in _valid_note(response.data)
-
-    def test_expert_fields(self):
-        context = UserContext(user_type=BASE_EXPERT_TYPE)
-        user = context.user
-        profile = context.profile
-        category = profile.expert_category
-        specialty = MentoringSpecialtiesFactory()
-        profile.mentoring_specialties.add(specialty)
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_detail", args=[user.id])
-            response = self.client.get(url)
-            assert category.name == response.data["expert_category"]
-            assert specialty.name in response.data["mentoring_specialties"]
-
-    def test_get_expert_with_industries(self):
-        primary_industry = IndustryFactory()
-        additional_industries = IndustryFactory.create_batch(2)
-        context = UserContext(user_type=BASE_EXPERT_TYPE,
-                              primary_industry=primary_industry,
-                              additional_industries=additional_industries)
-        user = context.user
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_detail", args=[user.id])
-            response = self.client.get(url)
-            assert response.data["primary_industry_id"] == primary_industry.id
-            assert all([industry.id in response.data["additional_industry_ids"]
-                        for industry in additional_industries])
 
 
 def _valid_note(messages):
