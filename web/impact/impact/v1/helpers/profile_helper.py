@@ -65,6 +65,7 @@ PHONE_FIELD = {
     },
 }
 
+
 VALID_GENDERS = GENDER_TRANSLATIONS.values()
 
 VALID_EXPERT_CATEGORIES = [
@@ -73,6 +74,27 @@ VALID_EXPERT_CATEGORIES = [
     "Lawyer",
     "Other",
 ]
+
+PRIMARY_INDUSTRY_ID_FIELD = {
+    "json-schema": {"type": "integer"},
+    "GET": {
+        "included": "could_be_expert",
+        "descrption": "Only when user_type is 'expert'",
+    },
+    "PATCH": {
+        "required": False,
+        "allowed": "is_expert",
+        "description": ("Allowed only when user_type is 'expert' and a "
+                        "matching Industry object exists"),
+    },
+    "POST": {
+        "required": "is_expert",
+        "allowed": "could_be_expert",
+        "description": ("Required and allowed only when user_type is "
+                        "'expert' and a matching Industry object exists"),
+    },
+}
+
 
 INVALID_INDUSTRY_ID_ERROR = ("Invalid {field}: "
                              "Expected valid id for an industry resource")

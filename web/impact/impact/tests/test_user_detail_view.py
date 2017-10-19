@@ -11,6 +11,12 @@ from impact.tests.factories import (
     ProgramFamilyFactory,
 )
 from impact.tests.api_test_case import APITestCase
+from impact.tests.utils import (
+    assert_fields,
+    assert_fields_missing,
+    assert_fields_not_required,
+    assert_fields_required,
+)
 from impact.utils import get_profile
 from impact.v1.helpers import (
     INVALID_INDUSTRY_ID_ERROR,
@@ -79,28 +85,19 @@ class TestUserDetailView(APITestCase):
             url = reverse("user_detail", args=[user.id])
             response = self.client.options(url)
             assert response.status_code == 200
-            _assert_fields(["updated_at", "user_type", "phone"],
-                           response.data["actions"]["GET"])
-            patch_data = response.data["actions"]["PATCH"]
-            _assert_required(["id"], patch_data)
-            _assert_not_required(["first_name", "last_name", "phone"],
-                                 patch_data)
-            _assert_fields_missing(["updated_at", "user_type"],
-                                   patch_data)
-            post_data = response.data["actions"]["POST"]
-            _assert_required(["user_type", "first_name", "last_name"],
-                             post_data)
-            _assert_not_required(["phone"], post_data)
-
-    def test_phone_required_for_expert_post(self):
-        context = UserContext(user_type=BASE_EXPERT_TYPE)
-        user = context.user
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_detail", args=[user.id])
-            response = self.client.options(url)
-            assert response.status_code == 200
-            _assert_required(["phone"],
-                             response.data["actions"]["POST"])
+            get_data = response.data["actions"]["GET"]
+            assert get_data["type"] == "object"
+            get_options = get_data["properties"]
+            assert_fields(["updated_at", "user_type", "phone"], get_options)
+            assert_fields_missing(["primary_industry_id"], get_options)
+            patch_options = response.data["actions"]["PATCH"]["properties"]
+            assert_fields_required(["id"], patch_options)
+            assert_fields_not_required(["first_name", "last_name", "phone"],
+                                       patch_options)
+            assert_fields_missing(
+                ["updated_at", "user_type", "primary_industry_id"],
+                patch_options)
+            assert_fields_missing(["POST"], response.data["actions"])
 
     def test_patch(self):
         context = UserContext()
@@ -439,20 +436,3 @@ def _valid_note(messages):
         if msg.startswith(note_prefix):
             return msg
     return ""
-
-
-def _assert_fields(fields, data):
-    for field in fields:
-        assert field in data, "%s missing" % field
-
-def _assert_fields_missing(fields, data):
-    for field in fields:
-        assert field not in data, "%s present" % field
-
-def _assert_required(fields, data):
-    for field in fields:
-        assert "required" in data[field], "%s not required" % field
-
-def _assert_not_required(fields, data):
-    for field in fields:
-        assert "required" not in data[field], "%s required" % field

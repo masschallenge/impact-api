@@ -3,6 +3,7 @@
 
 from django.urls import reverse
 from impact.tests.api_test_case import APITestCase
+from impact.v1.helpers import USER_FIELDS
 from impact.v1.views.organization_detail_view import OrganizationDetailView
 from impact.v1.views.organization_users_view import OrganizationUsersView
 from impact.v1.views.user_organizations_view import UserOrganizationsView
@@ -62,7 +63,5 @@ class TestSchemaEndpoints(APITestCase):
             url = reverse("user")
             response = self.client.options(url)
         response_json = json.loads(response.content)
-        self.assertTrue(
-            UserListView.METADATA_ACTIONS[
-                'GET'].keys() == response_json['actions']['GET'].keys()
-        )
+        self.assertEqual(USER_FIELDS.keys(),
+                         response_json["actions"]["GET"]["item"]["properties"].keys())

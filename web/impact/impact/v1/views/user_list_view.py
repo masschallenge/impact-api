@@ -10,6 +10,7 @@ from impact.models import (
 from impact.utils import parse_date
 from impact.v1.helpers import (
     ProfileHelper,
+    USER_FIELDS,
     USER_TYPE_TO_PROFILE_MODEL,
     UserHelper,
     VALID_USER_TYPES,
@@ -29,10 +30,15 @@ User = get_user_model()
 
 
 class UserListView(BaseListView):
-    METADATA_ACTIONS = {
-        "GET": UserHelper.DETAIL_GET_METADATA,
-        "POST": UserHelper.LIST_POST_METADATA,
-        }
+    def metadata(self):
+        return self.options_from_fields(USER_FIELDS, ["GET_LIST", "POST"])
+
+    def description_check(self, check_name):
+        if check_name == "is_expert":
+            return False
+        if check_name == "could_be_expert":
+            return True
+        return check_name
 
     def post(self, request):
         user_args = self._user_args(request.POST)

@@ -30,3 +30,23 @@ def match_errors(data, errors):
 def find_events(history, event_type):
     return [event for event in history
             if event["event_type"] == event_type]
+
+
+def assert_fields(fields, data):
+    for field in fields:
+        assert field in data, "%s missing" % field
+
+
+def assert_fields_missing(fields, data):
+    for field in fields:
+        assert field not in data, "%s present" % field
+
+
+def assert_fields_required(fields, data):
+    for field in fields:
+        assert "required" in data[field], "%s not required" % field
+
+
+def assert_fields_not_required(fields, data):
+    for field in fields:
+        assert "required" not in data[field], "%s required" % field

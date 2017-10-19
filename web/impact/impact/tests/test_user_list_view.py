@@ -17,14 +17,19 @@ from impact.models import (
     ExpertProfile,
     MemberProfile,
 )
+from impact.tests.api_test_case import APITestCase
+from impact.tests.contexts import UserContext
 from impact.tests.factories import (
     ExpertCategoryFactory,
     IndustryFactory,
     ProgramFamilyFactory,
     StartupTeamMemberFactory,
 )
-from impact.tests.contexts import UserContext
-from impact.tests.api_test_case import APITestCase
+from impact.tests.utils import (
+    assert_fields,
+    assert_fields_not_required,
+    assert_fields_required,
+)
 from impact.utils import (
     get_profile,
     override_updated_at,
@@ -91,6 +96,23 @@ class TestUserListView(APITestCase):
             results = response.data["results"]
             assert 1 == len(results)
             assert user_count == response.data["count"]
+
+    def test_options(self):
+        with self.login(username=self.basic_user().username):
+            url = reverse("user")
+            response = self.client.options(url)
+            assert response.status_code == 200
+            get_options = response.data["actions"]["GET"]["item"]["properties"]
+            assert_fields(["updated_at",
+                           "user_type",
+                           "phone",
+                           "primary_industry_id"],
+                          get_options)
+            post_options = response.data["actions"]["POST"]["properties"]
+            assert_fields_required(["user_type", "first_name", "last_name"],
+                                   post_options)
+            assert_fields_not_required(["phone", "primary_industry_id"],
+                                       post_options)
 
     def test_post_entrepreneur(self):
         with self.login(username=self.basic_user().username):

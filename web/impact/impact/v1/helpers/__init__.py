@@ -13,6 +13,7 @@ from impact.v1.helpers.profile_helper import (
     INVALID_INDUSTRY_ID_ERROR,
     INVALID_PROGRAM_FAMILY_ID_ERROR,
     PHONE_FIELD,
+    PRIMARY_INDUSTRY_ID_FIELD,
     ProfileHelper,
     USER_TYPE_FIELD,
     USER_TYPE_TO_PROFILE_MODEL,
@@ -22,6 +23,7 @@ from impact.v1.helpers.profile_helper import (
 )
 from impact.v1.helpers.program_family_helper import ProgramFamilyHelper
 from impact.v1.helpers.user_helper import (
+    USER_FIELDS,
     UserHelper,
     VALID_KEYS_NOTE,
     valid_keys_note,

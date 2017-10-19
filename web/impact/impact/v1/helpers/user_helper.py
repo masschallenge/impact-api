@@ -10,8 +10,16 @@ from impact.v1.helpers.model_helper import (
     validate_boolean,
     validate_email_address,
     validate_string,
+    PK_FIELD,
+    READ_ONLY_DATE_FIELD,
+    REQUIRED_STRING_FIELD,
 )
-from impact.v1.helpers.profile_helper import ProfileHelper
+from impact.v1.helpers.profile_helper import (
+    PHONE_FIELD,
+    PRIMARY_INDUSTRY_ID_FIELD,
+    ProfileHelper,
+    USER_TYPE_FIELD,
+)
 from impact.v1.metadata import (
     OPTIONAL_STRING_TYPE,
     OPTIONAL_BOOLEAN_TYPE,
@@ -57,6 +65,16 @@ USER_GET_OPTIONS.update(
         "additional_industry_ids": OPTIONAL_LIST_TYPE,
         "mentoring_specialties": OPTIONAL_LIST_TYPE,
     })
+
+USER_FIELDS = {
+    "id": PK_FIELD,
+    "updated_at": READ_ONLY_DATE_FIELD,
+    "user_type": USER_TYPE_FIELD,
+    "first_name": REQUIRED_STRING_FIELD,
+    "last_name": REQUIRED_STRING_FIELD,
+    "phone": PHONE_FIELD,
+    "primary_industry_id": PRIMARY_INDUSTRY_ID_FIELD,
+}
 
 
 class UserHelper(ModelHelper):
