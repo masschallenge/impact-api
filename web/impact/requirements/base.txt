@@ -7,6 +7,7 @@ coreapi
 hiredis==0.2.0
 markdown # Markdown support for the browsable API.
 mysqlclient
+oauthlib==2.0.4
 
 # Misc
 gunicorn
