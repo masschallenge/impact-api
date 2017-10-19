@@ -79,18 +79,28 @@ class TestUserDetailView(APITestCase):
             url = reverse("user_detail", args=[user.id])
             response = self.client.options(url)
             assert response.status_code == 200
-            get_data = response.data["actions"]["GET"]
-            assert "updated_at" in get_data
-            assert "user_type" in get_data
+            _assert_fields(["updated_at", "user_type", "phone"],
+                           response.data["actions"]["GET"])
             patch_data = response.data["actions"]["PATCH"]
-            assert "updated_at" not in patch_data
-            assert "user_type" not in patch_data
-            assert "required" not in patch_data["first_name"]
-            assert "required" not in patch_data["last_name"]
+            _assert_required(["id"], patch_data)
+            _assert_not_required(["first_name", "last_name", "phone"],
+                                 patch_data)
+            _assert_fields_missing(["updated_at", "user_type"],
+                                   patch_data)
             post_data = response.data["actions"]["POST"]
-            assert "required" in post_data["user_type"]
-            assert "required" in post_data["first_name"]
-            assert "required" in post_data["last_name"]
+            _assert_required(["user_type", "first_name", "last_name"],
+                             post_data)
+            _assert_not_required(["phone"], post_data)
+
+    def test_phone_required_for_expert_post(self):
+        context = UserContext(user_type=BASE_EXPERT_TYPE)
+        user = context.user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            response = self.client.options(url)
+            assert response.status_code == 200
+            _assert_required(["phone"],
+                             response.data["actions"]["POST"])
 
     def test_patch(self):
         context = UserContext()
@@ -429,3 +439,20 @@ def _valid_note(messages):
         if msg.startswith(note_prefix):
             return msg
     return ""
+
+
+def _assert_fields(fields, data):
+    for field in fields:
+        assert field in data, "%s missing" % field
+
+def _assert_fields_missing(fields, data):
+    for field in fields:
+        assert field not in data, "%s present" % field
+
+def _assert_required(fields, data):
+    for field in fields:
+        assert "required" in data[field], "%s not required" % field
+
+def _assert_not_required(fields, data):
+    for field in fields:
+        assert "required" not in data[field], "%s required" % field
