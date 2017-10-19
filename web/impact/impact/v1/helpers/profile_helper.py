@@ -51,10 +51,6 @@ USER_TYPE_FIELD = {
 }
 
 
-def is_expert(request):
-    return True
-
-
 PHONE_PATTERN = fr'^[0-9x.+() -]{{0,{PHONE_MAX_LENGTH}}}$'
 PHONE_REGEX = re.compile(PHONE_PATTERN)
 PHONE_FIELD = {
@@ -64,7 +60,7 @@ PHONE_FIELD = {
     },
     "PATCH": {"required": False},
     "POST": {
-        "required": is_expert,
+        "required": "is_expert",
         "description": "Required when user_type is 'expert'",
     },
 }
@@ -285,3 +281,6 @@ class ProfileHelper(ModelHelper):
             specialties = self.subject.mentoring_specialties
             if specialties:
                 return [specialty.name for specialty in specialties.all()]
+
+    def is_expert(self):
+        return self.subject.user_type == ExpertProfile.user_type

@@ -45,17 +45,32 @@ class UserDetailView(LoggingMixin, APIView):
         }
 
     def __init__(self, *args, **kwargs):
+        self.user = None
         super().__init__(*args, **kwargs)
 
+    def options(self, request, pk):
+        self.user = User.objects.get(pk=pk)
+        return super().options(request, pk)
+
+    def description_check(self, check_name):
+        if check_name == "is_expert":
+            return self.could_be_expert()
+        return check_name
+
+    def could_be_expert(self):
+        if self.user:
+            return UserHelper(self.user).profile_helper.is_expert()
+        return True
+
     def get(self, request, pk):
-        user = User.objects.get(pk=pk)
-        return Response(UserHelper(user).serialize())
+        self.user = User.objects.get(pk=pk)
+        return Response(UserHelper(self.user).serialize())
 
     def patch(self, request, pk):
-        user = User.objects.filter(pk=pk).first()
-        if not user:
+        self.user = User.objects.filter(pk=pk).first()
+        if not self.user:
             return Response(status=404, data=NO_USER_ERROR.format(pk))
-        helper = UserHelper(user)
+        helper = UserHelper(self.user)
         data = request.data
         keys = set(data.keys())
         invalid_keys = keys.difference(UserHelper.INPUT_KEYS)
