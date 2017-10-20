@@ -34,9 +34,9 @@ class UserListView(BaseListView):
         return self.options_from_fields(USER_FIELDS, ["GET_LIST", "POST"])
 
     def description_check(self, check_name):
-        if check_name == "is_expert":
+        if check_name in ["is_expert", "is_non_member"]:
             return False
-        if check_name == "could_be_expert":
+        if check_name in ["could_be_expert", "could_be_non_member"]:
             return True
         return check_name
 

@@ -11,6 +11,15 @@ PK_FIELD = {
     "PATCH": {"required": True},
 }
 
+BOOLEAN_FIELD = {
+    "json-schema": {
+        "type": "boolean",
+    },
+    "PATCH": {"required": False},
+    "POST": {"required": False},
+    "default": False,
+}
+
 READ_ONLY_DATE_FIELD = {
     "json-schema": {
         "type": "string",
@@ -25,6 +34,25 @@ REQUIRED_STRING_FIELD = {
     "PATCH": {"required": False},
     "POST": {"required": True},
 }
+
+EMAIL_FIELD = {
+    "json-schema": {
+        "type": "string",
+        "description": "Must be valid email per the Django EmailValidator",
+    },
+    "PATCH": {"required": False},
+    "POST": {"required": True},
+}
+
+URL_FIELD = {
+    "json-schema": {
+        "type": "string",
+        "description": "Must be valid URL per the Django URLValidator",
+    },
+    "PATCH": {"required": False},
+    "POST": {"required": False},
+}
+
 
 INVALID_BOOLEAN_ERROR = ("Invalid {field}: "
                          "Expected 'true' or 'false' not {value}")

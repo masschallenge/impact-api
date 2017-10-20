@@ -39,10 +39,15 @@ class UserDetailView(ImpactView):
     def description_check(self, check_name):
         if check_name in ["is_expert", "could_be_expert"]:
             return self.could_be_expert()
+        if check_name in ["is_non_member", "could_be_non_member"]:
+            return self.could_be_non_member()
         return check_name
 
     def could_be_expert(self):
         return UserHelper(self.user).profile_helper.is_expert()
+
+    def could_be_non_member(self):
+        return UserHelper(self.user).profile_helper.is_non_member()
 
     def get(self, request, pk):
         self.user = User.objects.get(pk=pk)

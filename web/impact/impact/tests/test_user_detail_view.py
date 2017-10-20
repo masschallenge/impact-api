@@ -34,6 +34,59 @@ from impact.models.base_profile import (
 from impact.models import User
 from impact.v1.views.user_detail_view import NO_USER_ERROR
 
+DATE_FIELDS = [
+    "date_joined",
+    "last_login",
+    "updated_at",
+]
+
+WRITE_ONCE_FIELDS = [
+    "user_type",
+]
+
+NON_PATCH_FIELDS = DATE_FIELDS + WRITE_ONCE_FIELDS
+
+MUTABLE_FIELDS = [
+    "email",
+    "is_active",
+    "facebook_url",
+    "gender",
+    "linked_in_url",
+    "personal_website_url",
+    "phone",
+    "twitter_handle",
+]
+
+NON_MEMBER_MUTABLE_FIELDS = ["bio"]
+
+ENTREPRENEUR_PATCH_FIELDS = MUTABLE_FIELDS + NON_MEMBER_MUTABLE_FIELDS
+ENTREPRENEUR_GET_FIELDS = (DATE_FIELDS +
+                           ENTREPRENEUR_PATCH_FIELDS +
+                           WRITE_ONCE_FIELDS)
+
+EXPERT_ONLY_MUTABLE_FIELDS = [
+    "company",
+    "expert_category",
+    "home_program_family_id",
+    "judge_interest",
+    "mentor_interest",
+    "office_hours_interest",
+    "office_hours_topics",
+    "primary_industry_id",
+    "referred_by",
+    "speaker_interest",
+    "speaker_topics",
+    "title",
+]
+
+EXPERT_READ_ONLY_FIELDS = [
+    "additional_industry_ids",
+    "mentoring_specialties",
+]
+
+EXPERT_MUTABLE_FIELDS = EXPERT_ONLY_MUTABLE_FIELDS + NON_MEMBER_MUTABLE_FIELDS
+EXPERT_ONLY_FIELDS = EXPERT_ONLY_MUTABLE_FIELDS + EXPERT_READ_ONLY_FIELDS
+
 
 class TestUserDetailView(APITestCase):
     def test_get(self):
@@ -88,16 +141,37 @@ class TestUserDetailView(APITestCase):
             get_data = response.data["actions"]["GET"]
             assert get_data["type"] == "object"
             get_options = get_data["properties"]
-            assert_fields(["updated_at", "user_type", "phone"], get_options)
-            assert_fields_missing(["primary_industry_id"], get_options)
+            assert_fields(ENTREPRENEUR_GET_FIELDS, get_options)
+            assert_fields_missing(EXPERT_ONLY_FIELDS, get_options)
             patch_options = response.data["actions"]["PATCH"]["properties"]
             assert_fields_required(["id"], patch_options)
-            assert_fields_not_required(["first_name", "last_name", "phone"],
+            assert_fields_not_required(ENTREPRENEUR_PATCH_FIELDS,
                                        patch_options)
-            assert_fields_missing(
-                ["updated_at", "user_type", "primary_industry_id"],
-                patch_options)
+            assert_fields_missing(NON_PATCH_FIELDS, patch_options)
+            assert_fields_missing(EXPERT_ONLY_FIELDS, patch_options)
             assert_fields_missing(["POST"], response.data["actions"])
+
+    def test_expert_options(self):
+        context = UserContext(user_type=BASE_EXPERT_TYPE)
+        user = context.user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            response = self.client.options(url)
+            get_options = response.data["actions"]["GET"]["properties"]
+            assert_fields(EXPERT_ONLY_FIELDS, get_options)
+            patch_options = response.data["actions"]["PATCH"]["properties"]
+            assert_fields(EXPERT_ONLY_MUTABLE_FIELDS, patch_options)
+
+    def test_member_options(self):
+        context = UserContext(user_type=BASE_MEMBER_TYPE)
+        user = context.user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            response = self.client.options(url)
+            get_options = response.data["actions"]["GET"]["properties"]
+            assert_fields_missing(NON_MEMBER_MUTABLE_FIELDS, get_options)
+            patch_options = response.data["actions"]["PATCH"]["properties"]
+            assert_fields_missing(NON_MEMBER_MUTABLE_FIELDS, patch_options)
 
     def test_patch(self):
         context = UserContext()

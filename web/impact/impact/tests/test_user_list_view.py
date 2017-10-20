@@ -7,11 +7,6 @@ import datetime
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from impact.v1.helpers.model_helper import (
-    INVALID_CHOICE_ERROR,
-    INVALID_URL_ERROR,
-    format_choices,
-)
 from impact.models import (
     EntrepreneurProfile,
     ExpertProfile,
@@ -25,6 +20,14 @@ from impact.tests.factories import (
     ProgramFamilyFactory,
     StartupTeamMemberFactory,
 )
+from impact.tests.test_user_detail_view import (
+    ENTREPRENEUR_GET_FIELDS,
+    EXPERT_MUTABLE_FIELDS,
+    EXPERT_ONLY_FIELDS,
+    MUTABLE_FIELDS,
+    NON_MEMBER_MUTABLE_FIELDS,
+    WRITE_ONCE_FIELDS,
+)
 from impact.tests.utils import (
     assert_fields,
     assert_fields_not_required,
@@ -33,6 +36,11 @@ from impact.tests.utils import (
 from impact.utils import (
     get_profile,
     override_updated_at,
+)
+from impact.v1.helpers.model_helper import (
+    INVALID_CHOICE_ERROR,
+    INVALID_URL_ERROR,
+    format_choices,
 )
 from impact.v1.views.user_list_view import (
     EMAIL_EXISTS_ERROR,
@@ -67,6 +75,17 @@ EXAMPLE_MEMBER = {
     "last_name": "Ber",
     "user_type": MemberProfile.user_type,
 }
+REQUIRED_POST_FIELDS = set([
+        "email",
+        "first_name",
+        "gender",
+        "last_name",
+        "user_type",
+])
+ALL_POST_FIELDS = set(EXPERT_MUTABLE_FIELDS +
+                      MUTABLE_FIELDS +
+                      NON_MEMBER_MUTABLE_FIELDS +
+                      WRITE_ONCE_FIELDS)
 User = get_user_model()
 
 
@@ -103,15 +122,11 @@ class TestUserListView(APITestCase):
             response = self.client.options(url)
             assert response.status_code == 200
             get_options = response.data["actions"]["GET"]["item"]["properties"]
-            assert_fields(["updated_at",
-                           "user_type",
-                           "phone",
-                           "primary_industry_id"],
-                          get_options)
+            assert_fields(ENTREPRENEUR_GET_FIELDS, get_options)
+            assert_fields(EXPERT_ONLY_FIELDS, get_options)
             post_options = response.data["actions"]["POST"]["properties"]
-            assert_fields_required(["user_type", "first_name", "last_name"],
-                                   post_options)
-            assert_fields_not_required(["phone", "primary_industry_id"],
+            assert_fields_required(REQUIRED_POST_FIELDS, post_options)
+            assert_fields_not_required(ALL_POST_FIELDS - REQUIRED_POST_FIELDS,
                                        post_options)
 
     def test_post_entrepreneur(self):

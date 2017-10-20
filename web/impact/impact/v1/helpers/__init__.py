@@ -10,8 +10,13 @@ from impact.v1.helpers.model_helper import (
 )
 from impact.v1.helpers.organization_helper import OrganizationHelper
 from impact.v1.helpers.profile_helper import (
+    ADDITIONAL_INDUSTRY_IDS_FIELD,
+    EXPERT_BOOLEAN_FIELD,
+    EXPERT_STRING_FIELD,
+    GENDER_FIELD,
     INVALID_INDUSTRY_ID_ERROR,
     INVALID_PROGRAM_FAMILY_ID_ERROR,
+    NON_MEMBER_STRING_FIELD,
     PHONE_FIELD,
     PRIMARY_INDUSTRY_ID_FIELD,
     ProfileHelper,

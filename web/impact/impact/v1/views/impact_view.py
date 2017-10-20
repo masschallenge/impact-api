@@ -48,8 +48,10 @@ class ImpactView(LoggingMixin, APIView):
         return result
 
     def _description_to_json_schema(self, json_schema, method_options):
-        if not (self.description_check(method_options.get("included", True)) and
-                self.description_check(method_options.get("allowed", True))):
+        if not (self.description_check(
+                    method_options.get("included", True)) and
+                self.description_check(
+                    method_options.get("allowed", True))):
             return None
         result = json_schema.copy()
         if self.description_check(method_options.get("required", False)):
