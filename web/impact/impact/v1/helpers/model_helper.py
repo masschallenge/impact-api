@@ -20,7 +20,14 @@ BOOLEAN_FIELD = {
     "default": False,
 }
 
-READ_ONLY_DATE_FIELD = {
+READ_ONLY_ID_FIELD = {
+    "json-schema": {
+        "type": "integer",
+        "readOnly": True,
+    },
+}
+
+READ_ONLY_STRING_FIELD = {
     "json-schema": {
         "type": "string",
         "readOnly": True,

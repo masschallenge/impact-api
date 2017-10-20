@@ -1,7 +1,9 @@
-from impact.v1.helpers.industry_helper import IndustryHelper
+from impact.v1.helpers.industry_helper import (
+    INDUSTRY_FIELDS,
+    IndustryHelper,
+)
 from impact.v1.helpers.model_helper import (
     PK_FIELD,
-    READ_ONLY_DATE_FIELD,
     REQUIRED_STRING_FIELD,
     validate_boolean,
     validate_choices,

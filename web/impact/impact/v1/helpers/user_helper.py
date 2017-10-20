@@ -10,7 +10,7 @@ from impact.v1.helpers.model_helper import (
     EMAIL_FIELD,
     ModelHelper,
     PK_FIELD,
-    READ_ONLY_DATE_FIELD,
+    READ_ONLY_STRING_FIELD,
     REQUIRED_STRING_FIELD,
     URL_FIELD,
     validate_boolean,
@@ -38,9 +38,9 @@ VALID_KEYS_NOTE = "Valid keys are: {}"
 
 USER_FIELDS = {
     "id": PK_FIELD,
-    "updated_at": READ_ONLY_DATE_FIELD,
-    "last_login": READ_ONLY_DATE_FIELD,
-    "date_joined": READ_ONLY_DATE_FIELD,
+    "updated_at": READ_ONLY_STRING_FIELD,
+    "last_login": READ_ONLY_STRING_FIELD,
+    "date_joined": READ_ONLY_STRING_FIELD,
     "user_type": USER_TYPE_FIELD,
     "first_name": REQUIRED_STRING_FIELD,
     "last_name": REQUIRED_STRING_FIELD,

@@ -2,10 +2,14 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from impact.v1.views.list_view import ListView
-from impact.v1.helpers import IndustryHelper
-from impact.v1.views.industry_detail_view import IndustryDetailView
+from impact.v1.helpers import (
+    INDUSTRY_FIELDS,
+    IndustryHelper,
+)
 
 
 class IndustryListView(ListView):
     helper_class = IndustryHelper
-    METADATA_ACTIONS = IndustryDetailView.METADATA_ACTIONS
+
+    def metadata(self):
+        return self.options_from_fields(INDUSTRY_FIELDS, ["GET_LIST"])
