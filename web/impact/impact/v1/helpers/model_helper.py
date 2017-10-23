@@ -5,6 +5,7 @@ from django.core.validators import (
     validate_email,
 )
 from impact.models.base_profile import (
+    PHONE_MAX_LENGTH,
     TWITTER_HANDLE_MAX_LENGTH,
 )
 
@@ -85,6 +86,17 @@ EMAIL_FIELD = {
     "POST": {"required": False},
 }
 REQUIRED_EMAIL_FIELD = merge_fields(POST_REQUIRED, EMAIL_FIELD)
+
+PHONE_PATTERN = fr'^[0-9x.+() -]{{0,{PHONE_MAX_LENGTH}}}$'
+PHONE_REGEX = re.compile(PHONE_PATTERN)
+PHONE_FIELD = {
+    "json-schema": {
+        "type": "string",
+        "pattern": PHONE_PATTERN,
+    },
+    "PATCH": {"required": False},
+    "POST": {"required": False},
+}
 
 URL_FIELD = merge_fields(
     STRING_FIELD,

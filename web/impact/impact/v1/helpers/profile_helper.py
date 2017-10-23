@@ -1,4 +1,3 @@
-import re
 from django.core.exceptions import (
     ObjectDoesNotExist,
     ValidationError,
@@ -9,6 +8,8 @@ from impact.v1.helpers.model_helper import (
     INVALID_CHOICE_ERROR,
     INVALID_URL_ERROR,
     ModelHelper,
+    PHONE_FIELD,
+    PHONE_REGEX,
     TWITTER_REGEX,
     format_choices,
     merge_fields,
@@ -26,7 +27,6 @@ from impact.models import (
     MemberProfile,
     ProgramFamily,
 )
-from impact.models.base_profile import PHONE_MAX_LENGTH
 
 
 EXPERT_BOOLEAN_FIELD = {
@@ -87,21 +87,14 @@ USER_TYPE_FIELD = {
     "POST": {"required": True},
 }
 
-
-PHONE_PATTERN = fr'^[0-9x.+() -]{{0,{PHONE_MAX_LENGTH}}}$'
-PHONE_REGEX = re.compile(PHONE_PATTERN)
-PHONE_FIELD = {
-    "json-schema": {
-        "type": "string",
-        "pattern": PHONE_PATTERN,
-    },
-    "PATCH": {"required": False},
-    "POST": {
-        "required": "is_expert",
-        "description": "Required when user_type is 'expert'",
-    },
-}
-
+EXPERT_PHONE_FIELD = merge_fields(
+    PHONE_FIELD,
+    {
+        "POST": {
+            "required": "is_expert",
+            "description": "Required when user_type is 'expert'",
+        }
+    })
 
 VALID_GENDERS = GENDER_TRANSLATIONS.values()
 

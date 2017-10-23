@@ -23,11 +23,11 @@ class IndustryDetailView(ImpactView):
         V1APIPermissions,
     )
 
-    def metadata(self):
-        return self.options_from_fields(INDUSTRY_FIELDS, ["GET"])
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    def metadata(self):
+        return self.options_from_fields(INDUSTRY_FIELDS, ["GET"])
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
