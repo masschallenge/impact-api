@@ -1,7 +1,7 @@
-# from abc import (
-#     ABCMeta,
-#     abstractmethod,
-# )
+from abc import (
+    ABCMeta,
+    abstractmethod,
+)
 from rest_framework.views import APIView
 from rest_framework_tracking.mixins import LoggingMixin
 
@@ -21,13 +21,11 @@ def _json_array(item):
 
 
 class ImpactView(LoggingMixin, APIView):
-    # Working towards enabling this.  Currently causes a problem with
-    # OrganizationDetailView
-    #     __metaclass__ = ABCMeta
-    #
-    #     @abstractmethod
-    #     def metadata(self):
-    #         pass  # pragma: no cover
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
+    def metadata(self):
+        pass  # pragma: no cover
 
     def description_check(self, check_name):
         return check_name

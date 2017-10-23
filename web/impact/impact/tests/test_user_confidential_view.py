@@ -7,6 +7,8 @@ from django.urls import reverse
 
 from impact.tests.factories import ExpertFactory
 from impact.tests.api_test_case import APITestCase
+from impact.tests.utils import assert_fields
+from impact.v1.views.user_confidential_view import UserConfidentialView
 
 TEST_EXPERT_GROUP = "11"
 TEST_INTERNAL_NOTES = "Amazing!"
@@ -38,3 +40,15 @@ class TestUserConfidentialView(APITestCase):
                              response.data["expert_group"])
             self.assertEqual(TEST_INTERNAL_NOTES,
                              response.data["internal_notes"])
+
+    def test_options(self):
+        user = ExpertFactory(profile__expert_group=TEST_EXPERT_GROUP,
+                             profile__internal_notes=TEST_INTERNAL_NOTES)
+        with self.login(username=self.privileged_user().username):
+            url = reverse("user_confidential", args=[user.id])
+            response = self.client.options(url)
+            assert response.status_code == 200
+            get_data = response.data["actions"]["GET"]
+            assert get_data["type"] == "object"
+            get_options = get_data["properties"]
+            assert_fields(UserConfidentialView.CONFIDENTIAL_KEYS, get_options)
