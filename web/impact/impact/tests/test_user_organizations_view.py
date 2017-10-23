@@ -9,6 +9,9 @@ from impact.tests.factories import (
 )
 
 from impact.tests.api_test_case import APITestCase
+from impact.tests.utils import assert_fields
+
+USER_ORGANIZATIONS_GET_FIELDS = ["organizations"]
 
 
 class TestUserOrganizationsView(APITestCase):
@@ -33,3 +36,12 @@ class TestUserOrganizationsView(APITestCase):
                         if org["id"] == partner_org_id]
             self.assertEqual(len(partners), 1)
             self.assertEqual(partners[0]["partner_administrator"], False)
+
+    def test_options(self):
+        user = StartupTeamMemberFactory(startup_administrator=True).user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_organizations", args=[user.id])
+            response = self.client.options(url)
+            assert response.status_code == 200
+            get_options = response.data["actions"]["GET"]["properties"]
+            assert_fields(USER_ORGANIZATIONS_GET_FIELDS, get_options)

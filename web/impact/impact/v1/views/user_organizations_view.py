@@ -11,26 +11,28 @@ from impact.models import (
     PartnerTeamMember,
     StartupTeamMember,
 )
-from impact.v1.metadata import (
-    ImpactMetadata,
-    READ_ONLY_LIST_TYPE,
-)
+from impact.v1.metadata import ImpactMetadata
+from impact.v1.views.impact_view import ImpactView
 from impact.v1.views.utils import (
     coalesce_dictionaries,
     map_data,
 )
+from impact.v1.helpers import INTEGER_ARRAY_FIELD
+
+USER_ORGANIZATIONS_FIELDS = {
+    "organizations": INTEGER_ARRAY_FIELD,
+}
 
 
-class UserOrganizationsView(LoggingMixin, APIView):
+class UserOrganizationsView(ImpactView):
     permission_classes = (
         V1APIPermissions,
     )
     metadata_class = ImpactMetadata
     model = get_user_model()
 
-    METADATA_ACTIONS = {
-        "GET": {"organizations": READ_ONLY_LIST_TYPE},
-        }
+    def metadata(self):
+        return self.options_from_fields(USER_ORGANIZATIONS_FIELDS, ["GET"])
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
