@@ -20,8 +20,5 @@ READ_ONLY_STRING_TYPE = {"type": "string", "read_only": True}
 class ImpactMetadata(SimpleMetadata):
     def determine_metadata(self, request, view):
         metadata = super().determine_metadata(request, view)
-        if hasattr(view, "metadata"):
-            metadata["actions"] = view.metadata()
-        else:
-            metadata["actions"] = view.METADATA_ACTIONS
+        metadata["actions"] = view.metadata()
         return metadata
