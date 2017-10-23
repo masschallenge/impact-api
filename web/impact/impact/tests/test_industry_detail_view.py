@@ -5,13 +5,14 @@ from django.urls import reverse
 
 from impact.tests.factories import IndustryFactory
 from impact.tests.api_test_case import APITestCase
+from impact.tests.utils import assert_fields
+
 INDUSTRY_GET_FIELDS = [
     "id",
     "name",
     "full_name",
     "parent_id",
 ]
-from impact.tests.utils import assert_fields
 
 
 class TestIndustryDetailView(APITestCase):
