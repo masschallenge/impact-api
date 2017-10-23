@@ -1,8 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import (
-    URLValidator,
     validate_email,
 )
+from accelerator.utils import url_validator
 
 INVALID_BOOLEAN_ERROR = ("Invalid {field}: "
                          "Expected 'true' or 'false' not {value}")
@@ -92,7 +92,9 @@ def validate_choices(helper, field, value, choices, translations={}):
         result = translations.get(result.lower(), result)
     if result not in choices:
         helper.errors.append(INVALID_CHOICE_ERROR.format(
-                field=field, value=value, choices=format_choices(choices)))
+            field=field,
+            value=value,
+            choices=format_choices(choices)))
     return result
 
 
@@ -126,7 +128,8 @@ def validate_email_address(helper, field, value):
 def validate_url(helper, field, value):
     if value:
         try:
-            URLValidator(schemes=["http", "https"])(value)
+            validator = url_validator()
+            validator(value)
         except ValidationError:
             helper.errors.append(INVALID_URL_ERROR.format(field=field,
                                                           value=value))
