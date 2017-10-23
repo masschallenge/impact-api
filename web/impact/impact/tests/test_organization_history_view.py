@@ -20,6 +20,7 @@ from impact.tests.factories import (
 
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import (
+    assert_fields,
     days_from_now,
     find_events,
 )
@@ -29,6 +30,7 @@ from impact.v1.events import (
     OrganizationBecameFinalistEvent,
     OrganizationCreatedEvent,
 )
+from impact.v1.views import OrganizationHistoryView
 
 
 class TestOrganizationHistoryView(APITestCase):
@@ -293,3 +295,12 @@ class TestOrganizationHistoryView(APITestCase):
                                  OrganizationBecameFinalistEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(start_date, events[0]["datetime"])
+
+    def test_options(self):
+        startup = StartupFactory()
+        with self.login(username=self.basic_user().username):
+            url = reverse("organization_history", args=[startup.id])
+            response = self.client.options(url)
+            assert response.status_code == 200
+            get_options = response.data["actions"]["GET"]["item"]["properties"]
+            assert_fields(OrganizationHistoryView.fields().keys(), get_options)

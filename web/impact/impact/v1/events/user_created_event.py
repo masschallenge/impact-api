@@ -15,9 +15,5 @@ class UserCreatedEvent(BaseHistoryEvent):
     def events(cls, user):
         return [cls(user)]
 
-    def serialize(self):
-        return {
-            "datetime": self.user.date_joined,
-            "event_type": self.EVENT_TYPE,
-            "description": "",
-            }
+    def calc_datetimes(self):
+        self.earliest = self.user.date_joined

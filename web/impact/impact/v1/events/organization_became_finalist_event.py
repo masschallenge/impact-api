@@ -1,13 +1,27 @@
 from impact.models import StartupRole
 from impact.utils import compose_filter
+from impact.v1.events.base_history_event import BaseHistoryEvent
+from impact.v1.helpers import (
+    INTEGER_FIELD,
+    STRING_FIELD,
+)
 
 
-class OrganizationBecameFinalistEvent(object):
+class OrganizationBecameFinalistEvent(BaseHistoryEvent):
     DESCRIPTION_FORMAT = "Became Finalist for {}"
     EVENT_TYPE = "became finalist"
 
+    CLASS_FIELDS = {
+        "cycle": STRING_FIELD,
+        "cycle_id": INTEGER_FIELD,
+        "program": STRING_FIELD,
+        "program_id": INTEGER_FIELD,
+    }
+
     def __init__(self, startup_status):
+        super(OrganizationBecameFinalistEvent, self).__init__()
         self.startup_status = startup_status
+        self._program = self.startup_status.program_startup_status.program
 
     @classmethod
     def events(cls, organization):
@@ -21,23 +35,23 @@ class OrganizationBecameFinalistEvent(object):
                 result.append(cls(ss))
         return result
 
-    def serialize(self):
-        finalist_time = self._finalist_datetime()
-        program = self.startup_status.program_startup_status.program
-        return {
-            "cycle": program.cycle.name,
-            "cycle_id": program.cycle.id,
-            "datetime": finalist_time,
-            "description": self.DESCRIPTION_FORMAT.format(
-                self.startup_status.program_startup_status.program.name),
-            "event_type": self.EVENT_TYPE,
-            "program": program.name,
-            "program_id": program.id,
-            }
+    def calc_datetimes(self):
+        self.earliest = self.startup_status.created_at
+        if self.earliest is None:
+            self.earliest = self._program.start_date
 
-    def _finalist_datetime(self):
-        result = self.startup_status.created_at
-        if result is None:
-            program = self.startup_status.program_startup_status.program
-            return program.start_date
-        return result
+    def description(self):
+        return self.DESCRIPTION_FORMAT.format(
+            self.startup_status.program_startup_status.program.name)
+
+    def cycle(self):
+        return self._program.cycle.name
+
+    def cycle_id(self):
+        return self._program.cycle.id,
+
+    def program(self):
+        return self._program.name
+
+    def program_id(self):
+        return self._program.id,
