@@ -18,7 +18,7 @@ from impact.v1.helpers.model_helper import (
 STARTUP_FIELD = {
     "GET": {
         "included": "could_be_startup",
-        "description": "Only when is_startup is true",
+        "description": "This field exists only when is_startup is true",
     },
     "PATCH": {"allowed": "is_startup"},
     "POST": {"allowed": "could_be_startup"},

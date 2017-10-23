@@ -35,7 +35,7 @@ EXPERT_BOOLEAN_FIELD = {
     },
     "GET": {
         "included": "could_be_expert",
-        "description": "Only when user_type is 'expert'",
+        "description": "This field exists only when user_type is 'expert'",
     },
     "PATCH": {"required": False, "allowed": "is_expert"},
     "POST": {"required": False, "allowed": "could_be_expert"},
@@ -47,7 +47,7 @@ EXPERT_STRING_FIELD = {
     },
     "GET": {
         "included": "could_be_expert",
-        "description": "Only when user_type is 'expert'",
+        "description": "This field exists only when user_type is 'expert'",
     },
     "PATCH": {"required": False, "allowed": "is_expert"},
     "POST": {"required": False, "allowed": "could_be_expert"},
@@ -59,7 +59,8 @@ NON_MEMBER_STRING_FIELD = {
     },
     "GET": {
         "included": "could_be_non_member",
-        "description": "Only when user_type is 'entrepreneur' or 'expert'",
+        "description": ("This field exists only when user_type is "
+                        "'entrepreneur' or 'expert'"),
     },
     "PATCH": {"required": False, "allowed": "is_non_member"},
     "POST": {"required": False, "allowed": "could_be_non_member"},
@@ -119,7 +120,7 @@ EXPERT_CATEGORY_FIELD = {
     },
     "GET": {
         "included": "could_be_expert",
-        "descrption": "Only when user_type is 'expert'",
+        "description": "This field exists only when user_type is 'expert'",
     },
     "PATCH": {
         "required": False,
@@ -140,7 +141,7 @@ MENTORING_SPECIALTIES_FIELD = {
     },
     "GET": {
         "included": "could_be_expert",
-        "descrption": "Only when user_type is 'expert'",
+        "description": "This field exists only when user_type is 'expert'",
     },
 }
 
@@ -148,7 +149,7 @@ PRIMARY_INDUSTRY_ID_FIELD = {
     "json-schema": {"type": "integer"},
     "GET": {
         "included": "could_be_expert",
-        "descrption": "Only when user_type is 'expert'",
+        "description": "This field exists only when user_type is 'expert'",
     },
     "PATCH": {
         "required": False,
@@ -169,7 +170,7 @@ EXPERT_INTEGER_ARRAY_FIELD = merge_fields(
     {
         "GET": {
             "included": "could_be_expert",
-            "descrption": "Only when user_type is 'expert'",
+            "description": "This field exists only when user_type is 'expert'",
         },
     })
 
@@ -177,7 +178,7 @@ HOME_PROGRAM_FAMILY_ID_FIELD = {
     "json-schema": {"type": "integer"},
     "GET": {
         "included": "could_be_expert",
-        "descrption": "Only when user_type is 'expert'",
+        "description": "This field exists only when user_type is 'expert'",
     },
     "PATCH": {
         "required": False,

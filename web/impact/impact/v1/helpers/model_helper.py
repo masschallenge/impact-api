@@ -24,6 +24,7 @@ def merge_fields(field, extension):
 PK_FIELD = {
     "json-schema": {
         "type": "integer",
+        "readOnly": True,
     },
     "PATCH": {"required": True},
 }
