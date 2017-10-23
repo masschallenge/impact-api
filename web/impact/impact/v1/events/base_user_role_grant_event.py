@@ -9,17 +9,22 @@ from impact.utils import (
     compose_filter,
     next_instance,
 )
+from impact.v1.events.base_history_event import BaseHistoryEvent
+from impact.v1.helpers import (
+    INTEGER_FIELD,
+    STRING_FIELD,
+)
 
 
-class BaseUserRoleGrantEvent(object):
+class BaseUserRoleGrantEvent(BaseHistoryEvent):
     __metaclass__ = ABCMeta
 
-    def __init__(self, program_role_grant):
-        self.program_role_grant = program_role_grant
-
-    @abstractmethod
-    def description(self):
-        pass  # pragma: no cover
+    CLASS_FIELDS = {
+        "cycle_id": INTEGER_FIELD,
+        "cycle": STRING_FIELD,
+        "program_id": INTEGER_FIELD,
+        "program": STRING_FIELD,
+       }
 
     @classmethod
     def events(cls, user):
@@ -31,32 +36,39 @@ class BaseUserRoleGrantEvent(object):
             result.append(cls(prg))
         return result
 
-    def serialize(self):
-        earliest, latest = self._user_event_datetime()
-        program = self.program_role_grant.program_role.program
-        return {
-            "cycle": program.cycle.name,
-            "cycle_id": program.cycle.id,
-            "datetime": earliest,
-            "description": self.description(),
-            "event_type": self.EVENT_TYPE,
-            "latest_datetime": latest,
-            "program": program.name,
-            "program_id": program.id,
-            }
+    def __init__(self, program_role_grant):
+        super(BaseUserRoleGrantEvent, self).__init__()
+        self.program_role_grant = program_role_grant
+        self._program = program_role_grant.program_role.program
 
-    def _user_event_datetime(self):
+    @abstractmethod
+    def description(self):
+        pass  # pragma: no cover
+
+    def cycle(self):
+        return self._program.cycle.name
+
+    def cycle_id(self):
+        return self._program.cycle.id
+
+    def program(self):
+        return self._program.name
+
+    def program_id(self):
+        return self._program.id
+
+    def calc_datetimes(self):
         result = self.program_role_grant.created_at
         if result:
-            return (result, result)
-        program = self.program_role_grant.program_role.program
-        earliest = self.program_role_grant.person.date_joined
-        deadline = program.cycle.application_final_deadline_date
-        if deadline and deadline > earliest:
-            earliest = deadline
-        latest = utc.localize(datetime.now())
+            self.earliest = result
+            self.latest = result
+            return
+        self.earliest = self.program_role_grant.person.date_joined
+        deadline = self._program.cycle.application_final_deadline_date
+        if deadline and deadline > self.earliest:
+            self.earliest = deadline
+        self.latest = utc.localize(datetime.now())
         prg_with_created_at = next_instance(self.program_role_grant,
                                             Q(created_at__isnull=False))
         if prg_with_created_at:
-            latest = prg_with_created_at.created_at
-        return (earliest, latest)
+            self.latest = prg_with_created_at.created_at

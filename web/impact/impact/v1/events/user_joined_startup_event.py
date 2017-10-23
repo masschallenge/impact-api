@@ -5,16 +5,23 @@ from django.db.models import Q
 from impact.utils import (
     next_instance,
 )
+from impact.v1.events.base_history_event import BaseHistoryEvent
 
 User = get_user_model()
 
 
-class UserJoinedStartupEvent(object):
+class UserJoinedStartupEvent(BaseHistoryEvent):
     DESCRIPTION_FORMAT = "Joined {name} ({id})"
     EVENT_TYPE = "joined startup"
 
     def __init__(self, member):
+        super(UserJoinedStartupEvent, self).__init__()
         self.member = member
+
+    def description(self):
+        return self.DESCRIPTION_FORMAT.format(
+            name=self.member.startup.name,
+            id=self.member.startup.organization.id)
 
     @classmethod
     def events(cls, user):
@@ -23,30 +30,18 @@ class UserJoinedStartupEvent(object):
             result.append(cls(stm))
         return result
 
-    def serialize(self):
-        earliest, latest = self._join_time()
-        return {
-            "datetime": earliest,
-            "latest_datetime": latest,
-            "event_type": self.EVENT_TYPE,
-            "description": self.DESCRIPTION_FORMAT.format(
-                name=self.member.startup.name,
-                id=self.member.startup.organization.id)
-            }
-
-    def _join_time(self):
-        member_time = self.member.created_at
-        if member_time:
-            return (member_time, member_time)
-        earliest = self.member.user.date_joined
-        latest = utc.localize(datetime.now())
+    def calc_datetimes(self):
+        self.earliest = self.member.created_at
+        if self.earliest:
+            return
+        self.earliest = self.member.user.date_joined
+        self.latest = utc.localize(datetime.now())
         most_recent_stm = User.objects.filter(
             startupteammember__id__lte=self.member.id
             ).order_by('-date_joined').first()
         if most_recent_stm:
-            earliest = most_recent_stm.date_joined
+            self.earliest = most_recent_stm.date_joined
         stm_with_created_at = next_instance(self.member,
                                             Q(created_at__isnull=False))
         if stm_with_created_at:
-            latest = stm_with_created_at.created_at
-        return (earliest, latest)
+            self.latest = stm_with_created_at.created_at

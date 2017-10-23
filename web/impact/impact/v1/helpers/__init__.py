@@ -3,10 +3,12 @@ from impact.v1.helpers.industry_helper import (
     IndustryHelper,
 )
 from impact.v1.helpers.model_helper import (
+    EMAIL_FIELD,
     INTEGER_ARRAY_FIELD,
     INTEGER_FIELD,
     PK_FIELD,
     REQUIRED_STRING_FIELD,
+    STRING_FIELD,
     validate_boolean,
     validate_choices,
     validate_regex,
