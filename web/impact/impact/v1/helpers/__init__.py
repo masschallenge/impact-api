@@ -3,6 +3,8 @@ from impact.v1.helpers.industry_helper import (
     IndustryHelper,
 )
 from impact.v1.helpers.model_helper import (
+    INTEGER_ARRAY_FIELD,
+    INTEGER_FIELD,
     PK_FIELD,
     REQUIRED_STRING_FIELD,
     validate_boolean,
@@ -10,9 +12,11 @@ from impact.v1.helpers.model_helper import (
     validate_regex,
     validate_string,
 )
-from impact.v1.helpers.organization_helper import OrganizationHelper
+from impact.v1.helpers.organization_helper import (
+    ORGANIZATION_FIELDS,
+    OrganizationHelper,
+)
 from impact.v1.helpers.profile_helper import (
-    ADDITIONAL_INDUSTRY_IDS_FIELD,
     EXPERT_BOOLEAN_FIELD,
     EXPERT_STRING_FIELD,
     GENDER_FIELD,

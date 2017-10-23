@@ -1,41 +1,65 @@
 from impact.models import Organization
-from impact.v1.helpers.model_helper import ModelHelper
-from impact.v1.metadata import (
-    OPTIONAL_STRING_TYPE,
-    OPTIONAL_BOOLEAN_TYPE,
-    OPTIONAL_DATE_TYPE,
-    OPTIONAL_LIST_TYPE,
-    OPTIONAL_ID_TYPE,
-    PK_TYPE,
+from impact.v1.helpers.model_helper import (
+    BOOLEAN_FIELD,
+    EMAIL_FIELD,
+    INTEGER_ARRAY_FIELD,
+    INTEGER_FIELD,
+    ModelHelper,
+    PK_FIELD,
+    READ_ONLY_STRING_FIELD,
+    REQUIRED_STRING_FIELD,
+    STRING_FIELD,
+    TWITTER_FIELD,
+    URL_FIELD,
+    URL_SLUG_FIELD,
+    merge_fields,
 )
+
+STARTUP_FIELD = {
+    "GET": {
+        "included": "could_be_startup",
+        "description": "Only when is_startup is true",
+    },
+    "PATCH": {"allowed": "is_startup"},
+    "POST": {"allowed": "could_be_startup"},
+}
+STARTUP_BOOLEAN_FIELD = merge_fields(STARTUP_FIELD, BOOLEAN_FIELD)
+STARTUP_INTEGER_ARRAY_FIELD = merge_fields(STARTUP_FIELD, INTEGER_ARRAY_FIELD)
+STARTUP_INTEGER_FIELD = merge_fields(STARTUP_FIELD, INTEGER_FIELD)
+STARTUP_STRING_FIELD = merge_fields(STARTUP_FIELD, STRING_FIELD)
+STARTUP_URL_FIELD = merge_fields(STARTUP_FIELD, URL_FIELD)
+
+ORGANIZATION_FIELDS = {
+    "id": PK_FIELD,
+    "is_partner": BOOLEAN_FIELD,
+    "is_startup": BOOLEAN_FIELD,
+    "name": REQUIRED_STRING_FIELD,
+    "public_inquiry_email": EMAIL_FIELD,
+    "twitter_handle": TWITTER_FIELD,
+    "updated_at": READ_ONLY_STRING_FIELD,
+    "url_slug": URL_SLUG_FIELD,
+    "website_url": URL_FIELD,
+
+    # Startup specific fields
+    "additional_industry_ids": STARTUP_INTEGER_ARRAY_FIELD,
+    "date_founded": STARTUP_STRING_FIELD,
+    "facebook_url": STARTUP_URL_FIELD,
+    "full_elevator_pitch": STARTUP_STRING_FIELD,
+    "is_visible": STARTUP_BOOLEAN_FIELD,
+    "linked_in_url": STARTUP_URL_FIELD,
+    "location_city": STARTUP_STRING_FIELD,
+    "location_national": STARTUP_STRING_FIELD,
+    "location_postcode": STARTUP_STRING_FIELD,
+    "location_regional": STARTUP_STRING_FIELD,
+    "primary_industry_id": STARTUP_INTEGER_FIELD,
+    "short_pitch": STARTUP_STRING_FIELD,
+    "video_elevator_pitch_url": STARTUP_URL_FIELD,
+}
 
 
 class OrganizationHelper(ModelHelper):
     MODEL = Organization
 
-    DETAIL_METADATA = {
-        "id": PK_TYPE,
-        "name": OPTIONAL_STRING_TYPE,
-        "url_slug": OPTIONAL_STRING_TYPE,
-        "additional_industry_ids": OPTIONAL_LIST_TYPE,
-        "date_founded": OPTIONAL_DATE_TYPE,
-        "facebook_url": OPTIONAL_STRING_TYPE,
-        "full_elevator_pitch": OPTIONAL_STRING_TYPE,
-        "primary_industry_id": OPTIONAL_ID_TYPE,
-        "public_inquiry_email": OPTIONAL_STRING_TYPE,
-        "linked_in_url": OPTIONAL_STRING_TYPE,
-        "location_city": OPTIONAL_STRING_TYPE,
-        "location_national": OPTIONAL_STRING_TYPE,
-        "location_postcode": OPTIONAL_STRING_TYPE,
-        "location_regional": OPTIONAL_STRING_TYPE,
-        "short_pitch": OPTIONAL_STRING_TYPE,
-        "twitter_handle": OPTIONAL_STRING_TYPE,
-        "video_elevator_pitch_url": OPTIONAL_STRING_TYPE,
-        "website_url": OPTIONAL_STRING_TYPE,
-        "is_startup": OPTIONAL_BOOLEAN_TYPE,
-        "is_partner": OPTIONAL_BOOLEAN_TYPE,
-        "updated_at": OPTIONAL_DATE_TYPE,
-    }
     REQUIRED_KEYS = [
         "name",
         "url_slug",

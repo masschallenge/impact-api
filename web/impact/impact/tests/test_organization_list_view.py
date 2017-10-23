@@ -12,6 +12,13 @@ from impact.tests.factories import (
     StartupFactory,
 )
 from impact.tests.api_test_case import APITestCase
+from impact.tests.test_organization_detail_view import (
+    PARTNER_GET_FIELDS,
+    STARTUP_GET_FIELDS,
+)
+from impact.tests.utils import (
+    assert_fields,
+)
 from impact.utils import override_updated_at
 from impact.v1.helpers import OrganizationHelper
 
@@ -82,6 +89,15 @@ class TestOrganizationListView(APITestCase):
             assert not _contains_org(updated_before, response.data)
             assert _contains_org(updated_exactly, response.data)
             assert _contains_org(updated_after, response.data)
+
+    def test_options(self):
+        with self.login(username=self.basic_user().username):
+            url = reverse("organization")
+            response = self.client.options(url)
+            assert response.status_code == 200
+            get_options = response.data["actions"]["GET"]["item"]["properties"]
+            assert_fields(PARTNER_GET_FIELDS, get_options)
+            assert_fields(STARTUP_GET_FIELDS, get_options)
 
 
 def _org_for_date(date):

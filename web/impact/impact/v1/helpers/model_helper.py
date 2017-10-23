@@ -1,8 +1,24 @@
+import re
 from django.core.exceptions import ValidationError
 from django.core.validators import (
     URLValidator,
     validate_email,
 )
+from impact.models.base_profile import (
+    TWITTER_HANDLE_MAX_LENGTH,
+)
+
+
+def merge_fields(field, extension):
+    if not isinstance(field, dict) or not isinstance(extension, dict):
+        return field
+    result = {}
+    for key, value in field.items():
+        result[key] = merge_fields(value, extension.get(key))
+    for key in set(extension.keys()) - set(field.keys()):
+        result[key] = extension[key]
+    return result
+
 
 PK_FIELD = {
     "json-schema": {
@@ -20,6 +36,21 @@ BOOLEAN_FIELD = {
     "default": False,
 }
 
+INTEGER_ARRAY_FIELD = {
+    "json-schema": {
+        "type": "array",
+        "item": {
+            "type": "integer"
+        },
+    },
+}
+
+INTEGER_FIELD = {
+    "json-schema": {
+        "type": "integer"
+    },
+}
+
 READ_ONLY_ID_FIELD = {
     "json-schema": {
         "type": "integer",
@@ -34,13 +65,16 @@ READ_ONLY_STRING_FIELD = {
     },
 }
 
-REQUIRED_STRING_FIELD = {
+POST_REQUIRED = {"POST": {"required": True}}
+
+STRING_FIELD = {
     "json-schema": {
         "type": "string",
     },
     "PATCH": {"required": False},
-    "POST": {"required": True},
+    "POST": {"required": False},
 }
+REQUIRED_STRING_FIELD = merge_fields(POST_REQUIRED, STRING_FIELD)
 
 EMAIL_FIELD = {
     "json-schema": {
@@ -48,17 +82,25 @@ EMAIL_FIELD = {
         "description": "Must be valid email per the Django EmailValidator",
     },
     "PATCH": {"required": False},
-    "POST": {"required": True},
-}
-
-URL_FIELD = {
-    "json-schema": {
-        "type": "string",
-        "description": "Must be valid URL per the Django URLValidator",
-    },
-    "PATCH": {"required": False},
     "POST": {"required": False},
 }
+REQUIRED_EMAIL_FIELD = merge_fields(POST_REQUIRED, EMAIL_FIELD)
+
+URL_FIELD = merge_fields(
+    STRING_FIELD,
+    {
+        "json-schema": {
+            "description": "Must be valid URL per the Django URLValidator",
+         },
+    })
+
+URL_SLUG_FIELD = merge_fields(STRING_FIELD,
+                              {"json-schema": {"pattern": "^[\w-]+$"}})
+
+TWITTER_PATTERN = fr'^\S{{0,{TWITTER_HANDLE_MAX_LENGTH}}}$'
+TWITTER_REGEX = re.compile(TWITTER_PATTERN)
+TWITTER_FIELD = merge_fields(STRING_FIELD,
+                             {"json-schema": {"pattern": TWITTER_PATTERN}})
 
 
 INVALID_BOOLEAN_ERROR = ("Invalid {field}: "

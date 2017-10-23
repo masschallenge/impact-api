@@ -7,20 +7,21 @@ from impact.models import (
 from impact.utils import get_profile
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
-    EMAIL_FIELD,
+    REQUIRED_EMAIL_FIELD,
     ModelHelper,
     PK_FIELD,
     READ_ONLY_STRING_FIELD,
     REQUIRED_STRING_FIELD,
+    TWITTER_FIELD,
     URL_FIELD,
     validate_boolean,
     validate_email_address,
     validate_string,
 )
 from impact.v1.helpers.profile_helper import (
-    ADDITIONAL_INDUSTRY_IDS_FIELD,
     EXPERT_BOOLEAN_FIELD,
     EXPERT_CATEGORY_FIELD,
+    EXPERT_INTEGER_ARRAY_FIELD,
     EXPERT_STRING_FIELD,
     GENDER_FIELD,
     HOME_PROGRAM_FAMILY_ID_FIELD,
@@ -30,7 +31,6 @@ from impact.v1.helpers.profile_helper import (
     PHONE_FIELD,
     PRIMARY_INDUSTRY_ID_FIELD,
     ProfileHelper,
-    TWITTER_FIELD,
     USER_TYPE_FIELD,
 )
 
@@ -58,11 +58,11 @@ USER_FIELDS = {
     "bio": NON_MEMBER_STRING_FIELD,
     "primary_industry_id": PRIMARY_INDUSTRY_ID_FIELD,
     "home_program_family_id": HOME_PROGRAM_FAMILY_ID_FIELD,
-    "additional_industry_ids": ADDITIONAL_INDUSTRY_IDS_FIELD,
+    "additional_industry_ids": EXPERT_INTEGER_ARRAY_FIELD,
     "gender": GENDER_FIELD,
     "expert_category": EXPERT_CATEGORY_FIELD,
     "mentoring_specialties": MENTORING_SPECIALTIES_FIELD,
-    "email": EMAIL_FIELD,
+    "email": REQUIRED_EMAIL_FIELD,
     "twitter_handle": TWITTER_FIELD,
     "facebook_url": URL_FIELD,
     "linked_in_url": URL_FIELD,

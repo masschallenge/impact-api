@@ -5,10 +5,13 @@ from django.core.exceptions import (
 )
 from django.core.validators import RegexValidator
 from impact.v1.helpers.model_helper import (
+    INTEGER_ARRAY_FIELD,
     INVALID_CHOICE_ERROR,
     INVALID_URL_ERROR,
     ModelHelper,
+    TWITTER_REGEX,
     format_choices,
+    merge_fields,
     validate_boolean,
     validate_choices,
     validate_regex,
@@ -23,10 +26,7 @@ from impact.models import (
     MemberProfile,
     ProgramFamily,
 )
-from impact.models.base_profile import (
-    PHONE_MAX_LENGTH,
-    TWITTER_HANDLE_MAX_LENGTH,
-)
+from impact.models.base_profile import PHONE_MAX_LENGTH
 
 
 EXPERT_BOOLEAN_FIELD = {
@@ -171,18 +171,14 @@ PRIMARY_INDUSTRY_ID_FIELD = {
     },
 }
 
-ADDITIONAL_INDUSTRY_IDS_FIELD = {
-    "json-schema": {
-        "type": "array",
-        "item": {
-            "type": "integer"
+EXPERT_INTEGER_ARRAY_FIELD = merge_fields(
+    INTEGER_ARRAY_FIELD,
+    {
+        "GET": {
+            "included": "could_be_expert",
+            "descrption": "Only when user_type is 'expert'",
         },
-    },
-    "GET": {
-        "included": "could_be_expert",
-        "descrption": "Only when user_type is 'expert'",
-    },
-}
+    })
 
 HOME_PROGRAM_FAMILY_ID_FIELD = {
     "json-schema": {"type": "integer"},
@@ -202,19 +198,6 @@ HOME_PROGRAM_FAMILY_ID_FIELD = {
         "description": ("Required and allowed only when user_type is "
                         "'expert' and a matching ProgramFamily object exists"),
     },
-}
-
-
-TWITTER_PATTERN = fr'^\S{{0,{TWITTER_HANDLE_MAX_LENGTH}}}$'
-TWITTER_REGEX = re.compile(TWITTER_PATTERN)
-
-TWITTER_FIELD = {
-    "json-schema": {
-        "type": "string",
-        "pattern": TWITTER_PATTERN,
-    },
-    "PATCH": {"required": False},
-    "POST": {"required": False},
 }
 
 URL_SCHEMA = "^[hH][tT][tT][pP][sS]?://"

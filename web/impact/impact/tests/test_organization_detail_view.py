@@ -9,8 +9,38 @@ from impact.tests.factories import (
     PartnerFactory,
     StartupFactory,
 )
-
+from impact.tests.utils import (
+    assert_fields,
+)
 from impact.tests.api_test_case import APITestCase
+SHARED_GET_FIELDS = [
+    "id",
+    "is_partner",
+    "is_startup",
+    "name",
+    "public_inquiry_email",
+    "twitter_handle",
+    "updated_at",
+    "url_slug",
+    "website_url",
+]
+STARTUP_ONLY_GET_FIELDS = [
+    "additional_industry_ids",
+    "date_founded",
+    "facebook_url",
+    "full_elevator_pitch",
+    "is_visible",
+    "linked_in_url",
+    "location_city",
+    "location_national",
+    "location_postcode",
+    "location_regional",
+    "primary_industry_id",
+    "short_pitch",
+    "video_elevator_pitch_url",
+]
+PARTNER_GET_FIELDS = SHARED_GET_FIELDS
+STARTUP_GET_FIELDS = SHARED_GET_FIELDS + STARTUP_ONLY_GET_FIELDS
 
 
 class TestOrganizationDetailView(APITestCase):
@@ -80,3 +110,21 @@ class TestOrganizationDetailView(APITestCase):
                     organization.public_inquiry_email)
             assert response.data["is_startup"] is False
             assert response.data["is_partner"] is False
+
+    def test_startup_options(self):
+        organization = StartupFactory().organization
+        with self.login(username=self.basic_user().username):
+            url = reverse("organization_detail", args=[organization.id])
+            response = self.client.options(url)
+            assert response.status_code == 200
+            get_options = response.data["actions"]["GET"]["properties"]
+            assert_fields(STARTUP_GET_FIELDS, get_options)
+
+    def test_partner_options(self):
+        organization = PartnerFactory().organization
+        with self.login(username=self.basic_user().username):
+            url = reverse("organization_detail", args=[organization.id])
+            response = self.client.options(url)
+            assert response.status_code == 200
+            get_options = response.data["actions"]["GET"]["properties"]
+            assert_fields(PARTNER_GET_FIELDS, get_options)
