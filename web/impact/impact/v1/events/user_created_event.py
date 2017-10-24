@@ -8,7 +8,7 @@ class UserCreatedEvent(BaseHistoryEvent):
     EVENT_TYPE = "user created"
 
     def __init__(self, user):
-        super(UserCreatedEvent, self).__init__()
+        super().__init__()
         self.user = user
 
     @classmethod

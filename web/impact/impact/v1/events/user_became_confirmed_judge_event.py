@@ -20,7 +20,7 @@ class UserBecameConfirmedJudgeEvent(BaseUserRoleGrantEvent):
         }
 
     def __init__(self, program_role_grant):
-        super(UserBecameConfirmedJudgeEvent, self).__init__(program_role_grant)
+        super().__init__(program_role_grant)
         self.judging_round = None
         label = program_role_grant.program_role.user_label
         if label:

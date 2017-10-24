@@ -13,7 +13,7 @@ class OrganizationCreatedEvent(BaseHistoryEvent):
     EVENT_TYPE = "organization created"
 
     def __init__(self, organization):
-        super(OrganizationCreatedEvent, self).__init__()
+        super().__init__()
         self.organization = organization
 
     @classmethod

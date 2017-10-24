@@ -103,7 +103,7 @@ class UserHelper(ModelHelper):
         }
 
     def __init__(self, *args, **kwargs):
-        super(UserHelper, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.profile_helper = ProfileHelper(get_profile(self.subject))
 
     @classmethod
@@ -111,7 +111,7 @@ class UserHelper(ModelHelper):
         return cls.KEY_TRANSLATIONS.get(key, key)
 
     def field_value(self, field):
-        result = super(UserHelper, self).field_value(field)
+        result = super().field_value(field)
         if result is not None:
             return result
         return self.profile_helper.field_value(field)
@@ -120,7 +120,7 @@ class UserHelper(ModelHelper):
         if field in ProfileHelper.INPUT_KEYS:
             self.profile_helper.field_setter(field, value)
         else:
-            super(UserHelper, self).field_setter(field, value)
+            super().field_setter(field, value)
 
     def validate(self, field, value):
         if field in ProfileHelper.INPUT_KEYS:
@@ -128,11 +128,11 @@ class UserHelper(ModelHelper):
             result = self.profile_helper.validate(field, value)
             self.errors += self.profile_helper.errors
             return result
-        return super(UserHelper, self).validate(field, value)
+        return super().validate(field, value)
 
     def save(self):
         self.profile_helper.save()
-        super(UserHelper, self).save()
+        super().save()
 
     @property
     def first_name(self):

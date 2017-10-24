@@ -37,7 +37,7 @@ class BaseUserRoleGrantEvent(BaseHistoryEvent):
         return result
 
     def __init__(self, program_role_grant):
-        super(BaseUserRoleGrantEvent, self).__init__()
+        super().__init__()
         self.program_role_grant = program_role_grant
         self._program = program_role_grant.program_role.program
 

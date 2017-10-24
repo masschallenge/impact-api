@@ -18,7 +18,7 @@ class UserReceivedNewsletterEvent(BaseHistoryEvent):
     }
 
     def __init__(self, receipt):
-        super(UserReceivedNewsletterEvent, self).__init__()
+        super().__init__()
         self.receipt = receipt
 
     @classmethod

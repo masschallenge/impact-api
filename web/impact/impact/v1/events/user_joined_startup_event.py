@@ -15,7 +15,7 @@ class UserJoinedStartupEvent(BaseHistoryEvent):
     EVENT_TYPE = "joined startup"
 
     def __init__(self, member):
-        super(UserJoinedStartupEvent, self).__init__()
+        super().__init__()
         self.member = member
 
     def description(self):

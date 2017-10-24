@@ -91,7 +91,7 @@ class OrganizationHelper(ModelHelper):
     OUTPUT_KEYS = READ_ONLY_KEYS + INPUT_KEYS
 
     def __init__(self, *args, **kwargs):
-        super(OrganizationHelper, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.startup = self.subject.startup_set.order_by("-id").first()
         self.partner = self.subject.partner_set.order_by("-id").first()
 
@@ -111,7 +111,7 @@ class OrganizationHelper(ModelHelper):
                 return list(categories.values_list("id", flat=True))
 
     def field_value(self, field):
-        result = super(OrganizationHelper, self).field_value(field)
+        result = super().field_value(field)
         if result is None and self.startup:
             result = getattr(self.startup, field, None)
         if result is None and self.partner:

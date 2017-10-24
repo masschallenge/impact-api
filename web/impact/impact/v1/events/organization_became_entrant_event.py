@@ -44,7 +44,7 @@ class OrganizationBecameEntrantEvent(BaseHistoryEvent):
        }
 
     def __init__(self, application):
-        super(OrganizationBecameEntrantEvent, self).__init__()
+        super().__init__()
         self.application = application
         self.startup = self.application.startup
         self._cycle = self.application.cycle
