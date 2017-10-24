@@ -16,8 +16,10 @@ class OrganizationListView(ListView):
                                         ["GET_LIST", "POST"])
 
     def description_check(self, check_name):
-        if check_name == "is_startup":
-            return False
-        if check_name in "could_be_startup":
+        # This will be needed once we do POST/PATCH for
+        # organizations, but not yet...
+        # if check_name == "is_startup":
+        #     return False
+        if check_name == "could_be_startup":
             return True
         return check_name

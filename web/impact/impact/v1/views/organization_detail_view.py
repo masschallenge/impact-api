@@ -39,9 +39,6 @@ class OrganizationDetailView(ImpactView):
             return OrganizationHelper(self.organization).is_startup
         return check_name
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
         return Response(OrganizationHelper(self.instance).serialize())
