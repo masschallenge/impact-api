@@ -11,6 +11,7 @@ from impact.tests.factories import (
 )
 from impact.tests.utils import (
     assert_fields,
+    assert_fields_missing,
 )
 from impact.tests.api_test_case import APITestCase
 SHARED_GET_FIELDS = [
@@ -128,3 +129,4 @@ class TestOrganizationDetailView(APITestCase):
             assert response.status_code == 200
             get_options = response.data["actions"]["GET"]["properties"]
             assert_fields(PARTNER_GET_FIELDS, get_options)
+            assert_fields_missing(STARTUP_ONLY_GET_FIELDS, get_options)

@@ -14,3 +14,10 @@ class OrganizationListView(ListView):
     def metadata(self):
         return self.options_from_fields(ORGANIZATION_FIELDS,
                                         ["GET_LIST", "POST"])
+
+    def description_check(self, check_name):
+        if check_name == "is_startup":
+            return False
+        if check_name in "could_be_startup":
+            return True
+        return check_name

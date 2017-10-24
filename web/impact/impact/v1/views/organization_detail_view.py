@@ -23,8 +23,21 @@ class OrganizationDetailView(ImpactView):
         V1APIPermissions,
     )
 
+    def __init__(self, *args, **kwargs):
+        self.organization = None
+        super().__init__(*args, **kwargs)
+
     def metadata(self):
         return self.options_from_fields(ORGANIZATION_FIELDS, ["GET"])
+
+    def options(self, request, pk):
+        self.organization = Organization.objects.get(pk=pk)
+        return super().options(request, pk)
+
+    def description_check(self, check_name):
+        if check_name in ["is_startup", "could_be_startup"]:
+            return OrganizationHelper(self.organization).is_startup
+        return check_name
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
