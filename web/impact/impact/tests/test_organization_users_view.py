@@ -10,6 +10,7 @@ from impact.tests.factories import (
 
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
+from impact.v1.views.organization_users_view import ORGANIZATION_USERS_FIELDS
 
 ORGANIZATION_USERS_GET_FIELDS = ["users"]
 
@@ -38,10 +39,12 @@ class TestOrganizationUsersView(APITestCase):
             self.assertFalse(partner_user["partner_administrator"])
 
     def test_options(self):
-        startup = StartupTeamMemberFactory(startup_administrator=True).startup
+        stm = StartupTeamMemberFactory(startup_administrator=True)
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_users", args=[startup.id])
+            url = reverse("organization_users", args=[stm.startup.id])
             response = self.client.options(url)
             assert response.status_code == 200
             get_options = response.data["actions"]["GET"]["properties"]
             assert_fields(ORGANIZATION_USERS_GET_FIELDS, get_options)
+            expected_json = ORGANIZATION_USERS_FIELDS["users"]["json-schema"]
+            assert expected_json == get_options["users"]
