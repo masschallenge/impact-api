@@ -79,8 +79,8 @@ class OrganizationBecameEntrantEvent(BaseHistoryEvent):
                                             "program__name")
         result = []
         preference = 1
-        for id, name in raw_data:
-            result.append({"id": id,
+        for pk, name in raw_data:
+            result.append({"id": pk,
                            "name": name,
                            "preference": preference})
             preference += 1
