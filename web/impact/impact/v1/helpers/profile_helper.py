@@ -29,13 +29,14 @@ from impact.models import (
 )
 
 
+EXPERT_DESCRIPTION = "This field exists only when user_type is 'expert'"
 EXPERT_BOOLEAN_FIELD = {
     "json-schema": {
         "type": "boolean",
     },
     "GET": {
         "included": "could_be_expert",
-        "description": "This field exists only when user_type is 'expert'",
+        "description": EXPERT_DESCRIPTION,
     },
     "PATCH": {"required": False, "allowed": "is_expert"},
     "POST": {"required": False, "allowed": "could_be_expert"},
@@ -47,7 +48,7 @@ EXPERT_STRING_FIELD = {
     },
     "GET": {
         "included": "could_be_expert",
-        "description": "This field exists only when user_type is 'expert'",
+        "description": EXPERT_DESCRIPTION,
     },
     "PATCH": {"required": False, "allowed": "is_expert"},
     "POST": {"required": False, "allowed": "could_be_expert"},
@@ -120,7 +121,7 @@ EXPERT_CATEGORY_FIELD = {
     },
     "GET": {
         "included": "could_be_expert",
-        "description": "This field exists only when user_type is 'expert'",
+        "description": EXPERT_DESCRIPTION,
     },
     "PATCH": {
         "required": False,
@@ -141,7 +142,7 @@ MENTORING_SPECIALTIES_FIELD = {
     },
     "GET": {
         "included": "could_be_expert",
-        "description": "This field exists only when user_type is 'expert'",
+        "description": EXPERT_DESCRIPTION,
     },
 }
 
@@ -171,7 +172,7 @@ EXPERT_INTEGER_ARRAY_FIELD = merge_fields(
     {
         "GET": {
             "included": "could_be_expert",
-            "description": "This field exists only when user_type is 'expert'",
+            "description": EXPERT_DESCRIPTION,
         },
     })
 
