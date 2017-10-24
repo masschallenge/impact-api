@@ -57,7 +57,7 @@ class BaseHistoryEvent(object):
     def serialize(self):
         result = {}
         for key in self.all_fields().keys():
-            value = getattr(self, key)()
+            value = getattr(self, key).__call__()
             if value is not None:
                 result[key] = value
         return result
