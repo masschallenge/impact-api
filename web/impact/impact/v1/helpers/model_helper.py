@@ -243,3 +243,31 @@ def validate_url(helper, field, value):
             helper.errors.append(INVALID_URL_ERROR.format(field=field,
                                                           value=value))
     return value
+
+
+def json_object(properties):
+    return {
+        "type": "object",
+        "properties": properties,
+    }
+
+
+def json_array(item):
+    return {
+        "type": "array",
+        "item": item,
+    }
+
+
+def json_list_wrapper(item):
+    return json_object(
+        {
+            "count": INTEGER_FIELD,
+            "next": URL_FIELD,
+            "previous": URL_FIELD,
+            "results": json_array(item),
+            })
+
+
+def json_simple_list(item):
+    return json_object({"results": json_array(item)})

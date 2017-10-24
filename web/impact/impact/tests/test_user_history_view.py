@@ -230,5 +230,6 @@ class TestUserHistoryView(APITestCase):
             url = reverse("user_history", args=[user.id])
             response = self.client.options(url)
             assert response.status_code == 200
-            get_options = response.data["actions"]["GET"]["item"]["properties"]
+            results = response.data["actions"]["GET"]["properties"]["results"]
+            get_options = results["item"]["properties"]
             assert_fields(UserHistoryView.fields().keys(), get_options)

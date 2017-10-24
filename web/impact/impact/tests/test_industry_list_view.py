@@ -27,5 +27,6 @@ class TestIndustryListView(APITestCase):
             url = reverse("industry")
             response = self.client.options(url)
             assert response.status_code == 200
-            get_options = response.data["actions"]["GET"]["item"]["properties"]
+            results = response.data["actions"]["GET"]["properties"]["results"]
+            get_options = results["item"]["properties"]
             assert_fields(INDUSTRY_GET_FIELDS, get_options)

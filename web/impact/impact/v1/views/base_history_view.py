@@ -18,7 +18,7 @@ class BaseHistoryView(ImpactView):
     )
 
     def metadata(self):
-        return self.options_from_fields(self.fields(), ["GET_LIST"])
+        return self.options_from_fields(self.fields(), ["SIMPLE_LIST"])
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
@@ -36,12 +36,12 @@ class BaseHistoryView(ImpactView):
     @classmethod
     def fields(cls):
         event_types = set()
-        result = {}
+        results = {}
         for klass in cls.event_classes:
             event_types.add(klass.event_type())
-            result.update(klass.all_fields())
-        result.update(event_type_field(event_types))
-        return result
+            results.update(klass.all_fields())
+        results.update(event_type_field(event_types))
+        return results
 
 
 def event_type_field(event_types):

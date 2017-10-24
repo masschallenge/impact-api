@@ -302,5 +302,6 @@ class TestOrganizationHistoryView(APITestCase):
             url = reverse("organization_history", args=[startup.id])
             response = self.client.options(url)
             assert response.status_code == 200
-            get_options = response.data["actions"]["GET"]["item"]["properties"]
+            results = response.data["actions"]["GET"]["properties"]["results"]
+            get_options = results["item"]["properties"]
             assert_fields(OrganizationHistoryView.fields().keys(), get_options)

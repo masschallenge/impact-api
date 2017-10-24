@@ -24,8 +24,8 @@ class TestSchemaEndpoints(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("organization")
             response = self.client.options(url)
-        response_json = json.loads(response.content)
-        properties = response_json["actions"]["GET"]["item"]["properties"]
+        results = response.data["actions"]["GET"]["properties"]["results"]
+        properties = results["item"]["properties"]
         self.assertEqual(ORGANIZATION_FIELDS.keys(), properties.keys())
 
     def test_organization_users_schema_endpoint(self):
@@ -57,6 +57,6 @@ class TestSchemaEndpoints(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("user")
             response = self.client.options(url)
-        response_json = json.loads(response.content)
-        properties = response_json["actions"]["GET"]["item"]["properties"]
+        results = response.data["actions"]["GET"]["properties"]["results"]
+        properties = results["item"]["properties"]
         self.assertEqual(USER_FIELDS.keys(), properties.keys())

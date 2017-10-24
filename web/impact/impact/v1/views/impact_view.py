@@ -4,20 +4,11 @@ from abc import (
 )
 from rest_framework.views import APIView
 from rest_framework_tracking.mixins import LoggingMixin
-
-
-def _json_object(properties):
-    return {
-        "type": "object",
-        "properties": properties,
-    }
-
-
-def _json_array(item):
-    return {
-        "type": "array",
-        "item": item,
-    }
+from impact.v1.helpers import (
+    json_list_wrapper,
+    json_object,
+    json_simple_list,
+)
 
 
 class ImpactView(LoggingMixin, APIView):
@@ -34,17 +25,19 @@ class ImpactView(LoggingMixin, APIView):
         result = {}
         get = self._method_options("GET", fields, default={})
         if "GET" in actions:
-            result["GET"] = _json_object(get)
+            result["GET"] = json_object(get)
         if "GET_LIST" in actions:
-            result["GET"] = _json_array(_json_object(get))
+            result["GET"] = json_list_wrapper(json_object(get))
+        if "SIMPLE_LIST" in actions:
+            result["GET"] = json_simple_list(json_object(get))
         if "PATCH" in actions:
             patch = self._method_options("PATCH", fields)
             if patch:
-                result["PATCH"] = _json_object(patch)
+                result["PATCH"] = json_object(patch)
         if "POST" in actions:
             post = self._method_options("POST", fields)
             if post:
-                result["POST"] = _json_object(post)
+                result["POST"] = json_object(post)
         return result
 
     def _method_options(self, method, fields, default=False):
