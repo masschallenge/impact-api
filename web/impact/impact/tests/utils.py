@@ -44,11 +44,11 @@ def assert_fields_missing(fields, data):
 
 def assert_fields_required(fields, data):
     for field in fields:
-        assert("required" in data[field],
-               "Expected %s to be required" % field)
+        error_msg = "Expected %s to be required" % field
+        assert "required" in data[field], error_msg
 
 
 def assert_fields_not_required(fields, data):
     for field in fields:
-        assert("required" not in data[field],
-               "Expected %s to not be required" % field)
+        error_msg = "Expected %s to not be required" % field
+        assert "required" not in data[field], error_msg
