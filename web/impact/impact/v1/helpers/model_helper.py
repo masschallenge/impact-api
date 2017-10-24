@@ -260,13 +260,11 @@ def json_array(item):
 
 
 def json_list_wrapper(item):
-    return json_object(
-        {
+    return json_object({
             "count": INTEGER_FIELD,
             "next": URL_FIELD,
             "previous": URL_FIELD,
-            "results": json_array(item),
-            })
+            "results": json_array(item)})
 
 
 def json_simple_list(item):
