@@ -149,7 +149,8 @@ PRIMARY_INDUSTRY_ID_FIELD = {
     "json-schema": {"type": "integer"},
     "GET": {
         "included": "could_be_expert",
-        "description": "This field exists only when user_type is 'expert'",
+        "description": ("This field exists only when user_type is 'expert'. "
+                        "Will always be an existing Industry ID."),
     },
     "PATCH": {
         "required": False,
@@ -178,7 +179,8 @@ HOME_PROGRAM_FAMILY_ID_FIELD = {
     "json-schema": {"type": "integer"},
     "GET": {
         "included": "could_be_expert",
-        "description": "This field exists only when user_type is 'expert'",
+        "description": ("This field exists only when user_type is 'expert'. "
+                        "Will always be an existing Program Family ID."),
     },
     "PATCH": {
         "required": False,
