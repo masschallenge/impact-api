@@ -2,18 +2,20 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_tracking.mixins import LoggingMixin
 
 from impact.permissions import (
     V1APIPermissions,
 )
 from impact.models import Industry
-from impact.v1.helpers import IndustryHelper
+from impact.v1.helpers import (
+    INDUSTRY_FIELDS,
+    IndustryHelper,
+)
 from impact.v1.metadata import ImpactMetadata
+from impact.v1.views import ImpactView
 
 
-class IndustryDetailView(LoggingMixin, APIView):
+class IndustryDetailView(ImpactView):
     model = Industry
     metadata_class = ImpactMetadata
 
@@ -21,12 +23,11 @@ class IndustryDetailView(LoggingMixin, APIView):
         V1APIPermissions,
     )
 
-    METADATA_ACTIONS = {
-        "GET": IndustryHelper.DETAIL_METADATA
-    }
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+    def metadata(self):
+        return self.options_from_fields(INDUSTRY_FIELDS, ["GET"])
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)

@@ -1,8 +1,120 @@
+import re
 from django.core.exceptions import ValidationError
 from django.core.validators import (
     URLValidator,
     validate_email,
 )
+from impact.models.base_profile import (
+    PHONE_MAX_LENGTH,
+    TWITTER_HANDLE_MAX_LENGTH,
+)
+
+
+def merge_fields(field, extension):
+    if not isinstance(field, dict) or not isinstance(extension, dict):
+        return field
+    result = {}
+    for key, value in field.items():
+        result[key] = merge_fields(value, extension.get(key))
+    for key in set(extension.keys()) - set(field.keys()):
+        result[key] = extension[key]
+    return result
+
+
+PK_FIELD = {
+    "json-schema": {
+        "type": "integer",
+        "readOnly": True,
+    },
+    "PATCH": {"required": True},
+}
+
+BOOLEAN_FIELD = {
+    "json-schema": {
+        "type": "boolean",
+    },
+    "PATCH": {"required": False},
+    "POST": {"required": False},
+    "default": False,
+}
+
+INTEGER_ARRAY_FIELD = {
+    "json-schema": {
+        "type": "array",
+        "item": {
+            "type": "integer"
+        },
+    },
+}
+
+INTEGER_FIELD = {
+    "json-schema": {
+        "type": "integer"
+    },
+}
+
+READ_ONLY_ID_FIELD = {
+    "json-schema": {
+        "type": "integer",
+        "readOnly": True,
+    },
+}
+
+READ_ONLY_STRING_FIELD = {
+    "json-schema": {
+        "type": "string",
+        "readOnly": True,
+    },
+}
+
+POST_REQUIRED = {"POST": {"required": True}}
+
+STRING_FIELD = {
+    "json-schema": {
+        "type": "string",
+    },
+    "PATCH": {"required": False},
+    "POST": {"required": False},
+}
+REQUIRED_STRING_FIELD = merge_fields(POST_REQUIRED, STRING_FIELD)
+
+EMAIL_FIELD = {
+    "json-schema": {
+        "type": "string",
+        "description": "Must be valid email per the Django EmailValidator",
+    },
+    "PATCH": {"required": False},
+    "POST": {"required": False},
+}
+REQUIRED_EMAIL_FIELD = merge_fields(POST_REQUIRED, EMAIL_FIELD)
+
+PHONE_PATTERN = fr'^[0-9x.+() -]{{0,{PHONE_MAX_LENGTH}}}$'
+PHONE_REGEX = re.compile(PHONE_PATTERN)
+PHONE_FIELD = {
+    "json-schema": {
+        "type": "string",
+        "pattern": PHONE_PATTERN,
+    },
+    "PATCH": {"required": False},
+    "POST": {"required": False},
+}
+
+URL_FIELD = merge_fields(
+    STRING_FIELD,
+    {
+        "json-schema": {
+            "description": "Must be valid URL per the Django URLValidator",
+         },
+    })
+
+URL_SLUG_FIELD = merge_fields(STRING_FIELD,
+                              {"json-schema": {"pattern": "^[a-zA-Z0-9_-]+$"}})
+
+TWITTER_PATTERN = fr'^\S{{0,{TWITTER_HANDLE_MAX_LENGTH}}}$'
+TWITTER_REGEX = re.compile(TWITTER_PATTERN)
+TWITTER_FIELD = merge_fields(STRING_FIELD,
+                             {"json-schema": {"pattern": TWITTER_PATTERN}})
+
 
 INVALID_BOOLEAN_ERROR = ("Invalid {field}: "
                          "Expected 'true' or 'false' not {value}")
@@ -131,3 +243,29 @@ def validate_url(helper, field, value):
             helper.errors.append(INVALID_URL_ERROR.format(field=field,
                                                           value=value))
     return value
+
+
+def json_object(properties):
+    return {
+        "type": "object",
+        "properties": properties,
+    }
+
+
+def json_array(item):
+    return {
+        "type": "array",
+        "item": item,
+    }
+
+
+def json_list_wrapper(item):
+    return json_object({
+            "count": INTEGER_FIELD,
+            "next": URL_FIELD,
+            "previous": URL_FIELD,
+            "results": json_array(item)})
+
+
+def json_simple_list(item, key="results"):
+    return json_object({key: json_array(item)})

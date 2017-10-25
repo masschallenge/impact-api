@@ -3,18 +3,17 @@
 
 from abc import ABCMeta
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_tracking.mixins import LoggingMixin
 
 from impact.permissions import (
     V1APIPermissions,
 )
 from impact.v1.metadata import ImpactMetadata
+from impact.v1.views import ImpactView
 from impact.utils import parse_date
 from django.db.models import Q
 
 
-class BaseListView(LoggingMixin, APIView):
+class BaseListView(ImpactView):
     __metaclass__ = ABCMeta
 
     permission_classes = (

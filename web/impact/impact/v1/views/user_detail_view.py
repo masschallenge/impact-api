@@ -1,16 +1,17 @@
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_tracking.mixins import LoggingMixin
 
 from impact.permissions import (
     V1APIPermissions,
 )
 from impact.v1.helpers import (
+    USER_FIELDS,
     UserHelper,
     valid_keys_note,
 )
 from impact.v1.metadata import ImpactMetadata
+from impact.v1.views import ImpactView
+
 
 INVALID_KEYS_ERROR = "Recevied invalid key(s): {invalid_keys}."
 NO_USER_ERROR = "Unable to find user with an id of {}"
@@ -18,29 +19,45 @@ NO_USER_ERROR = "Unable to find user with an id of {}"
 User = get_user_model()
 
 
-class UserDetailView(LoggingMixin, APIView):
+class UserDetailView(ImpactView):
     permission_classes = (
         V1APIPermissions,
     )
     metadata_class = ImpactMetadata
 
-    METADATA_ACTIONS = {
-        "GET": UserHelper.DETAIL_GET_METADATA,
-        "PATCH": UserHelper.DETAIL_PATCH_METADATA,
-        }
-
     def __init__(self, *args, **kwargs):
+        self.user = None
         super().__init__(*args, **kwargs)
 
+    def metadata(self):
+        return self.options_from_fields(USER_FIELDS, ["GET", "PATCH"])
+
+    def options(self, request, pk):
+        self.user = User.objects.get(pk=pk)
+        return super().options(request, pk)
+
+    def description_check(self, check_name):
+        if check_name in ["is_expert", "could_be_expert"]:
+            return self.could_be_expert()
+        if check_name in ["is_non_member", "could_be_non_member"]:
+            return self.could_be_non_member()
+        return check_name
+
+    def could_be_expert(self):
+        return UserHelper(self.user).profile_helper.is_expert()
+
+    def could_be_non_member(self):
+        return UserHelper(self.user).profile_helper.is_non_member()
+
     def get(self, request, pk):
-        user = User.objects.get(pk=pk)
-        return Response(UserHelper(user).serialize())
+        self.user = User.objects.get(pk=pk)
+        return Response(UserHelper(self.user).serialize())
 
     def patch(self, request, pk):
-        user = User.objects.filter(pk=pk).first()
-        if not user:
+        self.user = User.objects.filter(pk=pk).first()
+        if not self.user:
             return Response(status=404, data=NO_USER_ERROR.format(pk))
-        helper = UserHelper(user)
+        helper = UserHelper(self.user)
         data = request.data
         keys = set(data.keys())
         invalid_keys = keys.difference(UserHelper.INPUT_KEYS)

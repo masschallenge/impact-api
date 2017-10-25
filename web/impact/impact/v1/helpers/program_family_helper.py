@@ -1,23 +1,37 @@
+import re
 from impact.models import ProgramFamily
-from impact.v1.helpers.model_helper import ModelHelper
-from impact.v1.metadata import (
-    OPTIONAL_STRING_TYPE,
-    PK_TYPE,
+from impact.v1.helpers.model_helper import (
+    ModelHelper,
+    PHONE_FIELD,
+    PK_FIELD,
+    REQUIRED_STRING_FIELD,
+    STRING_FIELD,
+    URL_SLUG_FIELD,
 )
+
+EMAIL_DOMAIN_PATTERN = fr'^[a-z][a-z.]+[a-z]$'
+EMAIL_DOMAIN_REGEX = re.compile(EMAIL_DOMAIN_PATTERN)
+EMAIL_DOMAIN_FIELD = {
+    "json-schema": {
+        "type": "string",
+        "pattern": EMAIL_DOMAIN_PATTERN,
+    },
+    "PATCH": {"required": False},
+    "POST": {"required": False},
+}
+
+PROGRAM_FAMILY_FIELDS = {
+    "id": PK_FIELD,
+    "name": REQUIRED_STRING_FIELD,
+    "email_domain": EMAIL_DOMAIN_FIELD,
+    "phone_number": PHONE_FIELD,
+    "short_description": STRING_FIELD,
+    "url_slug": URL_SLUG_FIELD,
+}
 
 
 class ProgramFamilyHelper(ModelHelper):
     MODEL = ProgramFamily
-
-    DETAIL_METADATA = {
-        "id": PK_TYPE,
-        "name": OPTIONAL_STRING_TYPE,
-        "email_domain": OPTIONAL_STRING_TYPE,
-        "phone_number": OPTIONAL_STRING_TYPE,
-        "short_description": OPTIONAL_STRING_TYPE,
-        "url_slug": OPTIONAL_STRING_TYPE,
-        }
-
     REQUIRED_KEYS = ["name"]
     OPTIONAL_KEYS = ["email_domain",
                      "phone_number",
