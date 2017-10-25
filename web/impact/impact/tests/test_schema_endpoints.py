@@ -15,7 +15,6 @@ import simplejson as json
 
 
 class TestSchemaEndpoints(APITestCase):
-
     def test_organization_schema_endpoint(self):
         count = 5
         StartupFactory.create_batch(count)
@@ -34,9 +33,11 @@ class TestSchemaEndpoints(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("organization_users", args=[startups[0].pk])
             response = self.client.options(url)
-        response_json = json.loads(response.content)
-        self.assertEqual(ORGANIZATION_USER_FIELDS.keys(),
-                         response_json["actions"]["GET"]["properties"].keys())
+        response_json = json.loads(response.content, encoding='utf8')
+        self.assertEqual(
+            ORGANIZATION_USER_FIELDS.keys(),
+            response_json["actions"]["GET"]["properties"]["users"]["item"][
+                "properties"].keys())
 
     def test_user_organization_schema_endpoint(self):
         count = 5
@@ -46,8 +47,10 @@ class TestSchemaEndpoints(APITestCase):
             url = reverse("user_organizations", args=[startups[0].user.pk])
             response = self.client.options(url)
         response_json = json.loads(response.content)
-        self.assertEqual(ORGANIZATION_USER_FIELDS.keys(),
-                         response_json["actions"]["GET"]["properties"].keys())
+        self.assertEqual(
+            ORGANIZATION_USER_FIELDS.keys(),
+            response_json["actions"]["GET"]["properties"]["organizations"][
+                "item"]["properties"].keys())
 
     def test_user_schema_endpoint(self):
         count = 5
