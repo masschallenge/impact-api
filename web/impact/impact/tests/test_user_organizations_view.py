@@ -10,7 +10,7 @@ from impact.tests.factories import (
 
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
-from impact.v1.views.user_organizations_view import USER_ORGANIZATIONS_FIELDS
+from impact.v1.helpers import ORGANIZATION_USER_FIELDS
 
 USER_ORGANIZATIONS_GET_FIELDS = ["organizations"]
 
@@ -46,6 +46,6 @@ class TestUserOrganizationsView(APITestCase):
             assert response.status_code == 200
             get_options = response.data["actions"]["GET"]["properties"]
             assert_fields(USER_ORGANIZATIONS_GET_FIELDS, get_options)
-            organization_field = USER_ORGANIZATIONS_FIELDS["organizations"]
+            organization_field = ORGANIZATION_USER_FIELDS["organizations"]
             expected_json = organization_field["json-schema"]
             assert expected_json == get_options["organizations"]

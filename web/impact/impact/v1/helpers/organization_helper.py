@@ -56,7 +56,7 @@ ORGANIZATION_FIELDS = {
     "video_elevator_pitch_url": STARTUP_URL_FIELD,
 }
 
-ORGANIZATION_USERS_FIELDS = {
+ORGANIZATION_USER_FIELDS = {
     "id": PK_FIELD,
     "startup_administrator": BOOLEAN_FIELD,
     "partner_administrator": BOOLEAN_FIELD,

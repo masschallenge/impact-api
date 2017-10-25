@@ -15,7 +15,7 @@ from impact.v1.views.utils import (
     coalesce_dictionaries,
     map_data,
 )
-from impact.v1.helpers import ORGANIZATION_USERS_FIELDS
+from impact.v1.helpers import ORGANIZATION_USER_FIELDS
 
 
 class OrganizationUsersView(ImpactView):
@@ -26,7 +26,7 @@ class OrganizationUsersView(ImpactView):
     model = Organization
 
     def metadata(self):
-        return self.options_from_fields(ORGANIZATION_USERS_FIELDS,
+        return self.options_from_fields(ORGANIZATION_USER_FIELDS,
                                         ["SIMPLE_LIST"],
                                         key="users")
 

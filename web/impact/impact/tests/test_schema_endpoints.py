@@ -7,8 +7,7 @@ from impact.v1.helpers import (
     ORGANIZATION_FIELDS,
     USER_FIELDS,
 )
-from impact.v1.views.organization_users_view import ORGANIZATION_USERS_FIELDS
-from impact.v1.views.user_organizations_view import USER_ORGANIZATIONS_FIELDS
+from impact.v1.helpers import ORGANIZATION_USER_FIELDS
 from impact.tests.factories import (
     StartupFactory
 )
@@ -36,7 +35,7 @@ class TestSchemaEndpoints(APITestCase):
             url = reverse("organization_users", args=[startups[0].pk])
             response = self.client.options(url)
         response_json = json.loads(response.content)
-        self.assertEqual(ORGANIZATION_USERS_FIELDS.keys(),
+        self.assertEqual(ORGANIZATION_USER_FIELDS.keys(),
                          response_json["actions"]["GET"]["properties"].keys())
 
     def test_user_organization_schema_endpoint(self):
@@ -47,7 +46,7 @@ class TestSchemaEndpoints(APITestCase):
             url = reverse("user_organizations", args=[startups[0].user.pk])
             response = self.client.options(url)
         response_json = json.loads(response.content)
-        self.assertEqual(USER_ORGANIZATIONS_FIELDS.keys(),
+        self.assertEqual(ORGANIZATION_USER_FIELDS.keys(),
                          response_json["actions"]["GET"]["properties"].keys())
 
     def test_user_schema_endpoint(self):
