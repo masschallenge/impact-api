@@ -21,7 +21,7 @@ class ImpactView(LoggingMixin, APIView):
     def description_check(self, check_name):
         return check_name
 
-    def options_from_fields(self, fields, actions):
+    def options_from_fields(self, fields, actions, key="results"):
         result = {}
         get = self._method_options("GET", fields, default={})
         if "GET" in actions:
@@ -29,7 +29,7 @@ class ImpactView(LoggingMixin, APIView):
         if "GET_LIST" in actions:
             result["GET"] = json_list_wrapper(json_object(get))
         if "SIMPLE_LIST" in actions:
-            result["GET"] = json_simple_list(json_object(get))
+            result["GET"] = json_simple_list(json_object(get), key=key)
         if "PATCH" in actions:
             patch = self._method_options("PATCH", fields)
             if patch:

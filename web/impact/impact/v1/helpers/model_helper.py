@@ -267,5 +267,5 @@ def json_list_wrapper(item):
             "results": json_array(item)})
 
 
-def json_simple_list(item):
-    return json_object({"results": json_array(item)})
+def json_simple_list(item, key="results"):
+    return json_object({key: json_array(item)})

@@ -56,6 +56,13 @@ ORGANIZATION_FIELDS = {
     "video_elevator_pitch_url": STARTUP_URL_FIELD,
 }
 
+ORGANIZATION_USER_FIELDS = {
+    "id": PK_FIELD,
+    "startup_administrator": BOOLEAN_FIELD,
+    "partner_administrator": BOOLEAN_FIELD,
+    "primary_contact": BOOLEAN_FIELD,
+}
+
 
 class OrganizationHelper(ModelHelper):
     MODEL = Organization

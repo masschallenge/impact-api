@@ -3,6 +3,7 @@ from impact.v1.helpers.industry_helper import (
     IndustryHelper,
 )
 from impact.v1.helpers.model_helper import (
+    BOOLEAN_FIELD,
     EMAIL_FIELD,
     INTEGER_ARRAY_FIELD,
     INTEGER_FIELD,
@@ -21,6 +22,7 @@ from impact.v1.helpers.model_helper import (
 )
 from impact.v1.helpers.organization_helper import (
     ORGANIZATION_FIELDS,
+    ORGANIZATION_USER_FIELDS,
     OrganizationHelper,
 )
 from impact.v1.helpers.profile_helper import (
