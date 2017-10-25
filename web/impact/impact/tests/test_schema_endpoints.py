@@ -33,7 +33,7 @@ class TestSchemaEndpoints(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse("organization_users", args=[startups[0].pk])
             response = self.client.options(url)
-        response_json = json.loads(response.content, encoding='utf8')
+        response_json = json.loads(response.content)
         self.assertEqual(
             ORGANIZATION_USER_FIELDS.keys(),
             response_json["actions"]["GET"]["properties"]["users"]["item"][
