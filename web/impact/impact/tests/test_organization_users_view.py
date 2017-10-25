@@ -46,5 +46,5 @@ class TestOrganizationUsersView(APITestCase):
             assert response.status_code == 200
             get_options = response.data["actions"]["GET"]["properties"]
             assert_fields(ORGANIZATION_USERS_GET_FIELDS, get_options)
-            expected_json = ORGANIZATION_USER_FIELDS["users"]["json-schema"]
-            assert expected_json == get_options["users"]
+            assert (ORGANIZATION_USER_FIELDS.keys() ==
+                    get_options["users"]["item"]["properties"].keys())
