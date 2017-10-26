@@ -194,17 +194,12 @@ def validate_string(helper, field, value):
     return value
 
 
-def validate_choices(helper, field, value, choices, translations={}):
+def validate_choices(helper, field, value, choices):
     validate_string(helper, field, value)
-    result = translations.get(value, value)
-    if value in choices or result in choices:
-        return result
-    if isinstance(result, str):
-        result = translations.get(result.lower(), result)
-    if result not in choices:
+    if value not in choices:
         helper.errors.append(INVALID_CHOICE_ERROR.format(
                 field=field, value=value, choices=format_choices(choices)))
-    return result
+    return value
 
 
 def format_choices(choices):

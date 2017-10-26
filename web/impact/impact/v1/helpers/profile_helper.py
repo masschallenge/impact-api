@@ -6,14 +6,12 @@ from django.core.validators import RegexValidator
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     INTEGER_ARRAY_FIELD,
-    INVALID_CHOICE_ERROR,
     INVALID_URL_ERROR,
     ModelHelper,
     PHONE_FIELD,
     PHONE_REGEX,
     STRING_FIELD,
     TWITTER_REGEX,
-    format_choices,
     merge_fields,
     validate_boolean,
     validate_choices,
@@ -242,11 +240,7 @@ def validate_non_member_string(helper, field, value):
 
 def validate_by_user_type(helper, field, value, user_types):
     user_type = helper.find_user_type()
-    if user_type not in user_types:
-        helper.errors.append(INVALID_CHOICE_ERROR.format(
-                field=field,
-                value=user_type,
-                choices=format_choices(user_types)))
+    validate_choices(helper, field, user_type, user_types)
     return value
 
 
@@ -265,19 +259,14 @@ def validate_personal_website_url(helper, field, value):
 def validate_expert_categories(helper, field, value):
     translations = dict([(category.name, category)
                          for category in ExpertCategory.objects.all()])
-    return validate_choices(helper,
-                            field,
-                            value,
-                            translations.keys(),
-                            translations)
+    result = validate_choices(helper, field, value, translations.keys())
+    return translations.get(result, result)
 
 
 def validate_gender(helper, field, value):
-    return validate_choices(helper,
-                            field,
-                            value,
-                            VALID_GENDERS,
-                            GENDER_TRANSLATIONS)
+    std_value = value.lower()
+    db_value = GENDER_TRANSLATIONS.get(std_value, std_value)
+    return validate_choices(helper, field, db_value, VALID_GENDERS)
 
 
 def validate_phone(helper, field, value):
