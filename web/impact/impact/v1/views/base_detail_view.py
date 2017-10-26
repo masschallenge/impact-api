@@ -20,8 +20,5 @@ class BaseDetailView(ImpactView):
         get = self.method_options("GET", default={})
         if "GET" in self.actions:
             result["GET"] = json_object(get)
-        if "PATCH" in self.actions:
-            patch = self.method_options("PATCH")
-            if patch:
-                result["PATCH"] = json_object(patch)
+        result.update(self.metadata_object_action("PATCH"))
         return result

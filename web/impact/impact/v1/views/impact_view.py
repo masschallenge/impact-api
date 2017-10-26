@@ -37,6 +37,14 @@ class ImpactView(LoggingMixin, APIView):
                                              list_key=list_key)
         return result
 
+    def metadata_object_action(self, action):
+        result = {}
+        if action in self.actions:
+            options = self.method_options(action)
+            if options:
+                result[action] = json_object(options)
+        return result
+
     @classmethod
     def model(cls):
         return cls.helper_class.model
