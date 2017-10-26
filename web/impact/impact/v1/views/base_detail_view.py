@@ -10,8 +10,6 @@ from impact.permissions import (
 from impact.v1.helpers import json_object
 from impact.v1.metadata import ImpactMetadata
 from impact.v1.views import ImpactView
-from impact.utils import parse_date
-from django.db.models import Q
 
 
 class BaseDetailView(ImpactView):
