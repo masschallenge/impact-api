@@ -24,11 +24,11 @@ class OrganizationUsersView(ImpactView):
     )
     metadata_class = ImpactMetadata
     model = Organization
+    list_key = "users"
 
-    def metadata(self):
-        return self.options_from_fields(ORGANIZATION_USER_FIELDS,
-                                        ["SIMPLE_LIST"],
-                                        key="users")
+    @classmethod
+    def fields(self):
+        return ORGANIZATION_USER_FIELDS
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)

@@ -30,10 +30,7 @@ User = get_user_model()
 
 class UserListView(BaseListView):
     helper_class = UserHelper
-
-    @classmethod
-    def actions(self):
-        return ["GET_LIST", "POST"]
+    actions = ["GET", "POST"]
 
     def description_check(self, check_name):
         if check_name in ["is_expert", "is_non_member"]:

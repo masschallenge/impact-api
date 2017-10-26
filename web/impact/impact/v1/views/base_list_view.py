@@ -3,14 +3,18 @@
 
 from abc import ABCMeta
 from rest_framework.response import Response
+from django.db.models import Q
 
 from impact.permissions import (
     V1APIPermissions,
 )
+from impact.v1.helpers import (
+    json_list_wrapper,
+    json_object,
+)
 from impact.v1.metadata import ImpactMetadata
 from impact.v1.views import ImpactView
 from impact.utils import parse_date
-from django.db.models import Q
 
 
 class BaseListView(ImpactView):
@@ -22,9 +26,16 @@ class BaseListView(ImpactView):
 
     metadata_class = ImpactMetadata
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.errors = []
+    def metadata(self):
+        result = {}
+        get = self.method_options("GET", default={})
+        if "GET" in self.actions:
+            result["GET"] = json_list_wrapper(json_object(get))
+        if "POST" in self.actions:
+            post = self.method_options("POST")
+            if post:
+                result["POST"] = json_object(post)
+        return result
 
     def get(self, request):
         limit = int(request.GET.get('limit', 10))
@@ -53,10 +64,6 @@ class BaseListView(ImpactView):
         return (count,
                 [self.serialize(obj)
                  for obj in queryset[offset:offset + limit]])
-
-    @classmethod
-    def serialize(self, obj):
-        return self.helper_class(obj).serialize(self.fields().keys())
 
 
 def _filter_by_date(queryset, updated_at_after, updated_at_before):

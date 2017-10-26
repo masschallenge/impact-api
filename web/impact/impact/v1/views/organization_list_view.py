@@ -2,18 +2,11 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from impact.v1.views.base_list_view import BaseListView
-from impact.v1.helpers import (
-    ORGANIZATION_FIELDS,
-    OrganizationHelper,
-)
+from impact.v1.helpers import OrganizationHelper
 
 
 class OrganizationListView(BaseListView):
     helper_class = OrganizationHelper
-
-    def metadata(self):
-        return self.options_from_fields(ORGANIZATION_FIELDS,
-                                        ["GET_LIST", "POST"])
 
     def description_check(self, check_name):
         # This will be needed once we do POST/PATCH for
