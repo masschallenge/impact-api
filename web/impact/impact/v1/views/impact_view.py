@@ -1,7 +1,8 @@
 from abc import (
     ABCMeta,
-    abstractmethod,
+    # abstractmethod,
 )
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_tracking.mixins import LoggingMixin
 from impact.v1.helpers import (
@@ -14,9 +15,34 @@ from impact.v1.helpers import (
 class ImpactView(LoggingMixin, APIView):
     __metaclass__ = ABCMeta
 
-    @abstractmethod
+#     @abstractmethod
+#     def actions(self):
+#         pass  # pragma: no cover
+
+#     @abstractmethod
+#     def fields(self):
+#         pass  # pragma: no cover
+
     def metadata(self):
-        pass  # pragma: no cover
+        return self.options_from_fields(self.fields(), self.actions())
+
+    @classmethod
+    def model(cls):
+        return cls.helper_class.model
+
+    def get(self, request, pk):
+        if "GET" in self.actions():
+            self.instance = self.model().objects.get(pk=pk)
+            return Response(self.helper_class(self.instance).serialize(
+                    self.fields().keys()))
+
+    @classmethod
+    def fields(self):
+        return self.helper_class.fields()
+
+    @classmethod
+    def actions(self):
+        return ["GET"]
 
     def description_check(self, check_name):
         return check_name

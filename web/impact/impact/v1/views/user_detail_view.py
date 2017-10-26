@@ -5,7 +5,6 @@ from impact.permissions import (
     V1APIPermissions,
 )
 from impact.v1.helpers import (
-    USER_FIELDS,
     UserHelper,
     valid_keys_note,
 )
@@ -20,17 +19,23 @@ User = get_user_model()
 
 
 class UserDetailView(ImpactView):
+    helper_class = UserHelper
+    metadata_class = ImpactMetadata
     permission_classes = (
         V1APIPermissions,
     )
-    metadata_class = ImpactMetadata
+
+    @classmethod
+    def model(cls):
+        return User
 
     def __init__(self, *args, **kwargs):
         self.user = None
         super().__init__(*args, **kwargs)
 
-    def metadata(self):
-        return self.options_from_fields(USER_FIELDS, ["GET", "PATCH"])
+    @classmethod
+    def actions(self):
+        return ["GET", "PATCH"]
 
     def options(self, request, pk):
         self.user = User.objects.get(pk=pk)
@@ -48,10 +53,6 @@ class UserDetailView(ImpactView):
 
     def could_be_non_member(self):
         return UserHelper(self.user).profile_helper.is_non_member()
-
-    def get(self, request, pk):
-        self.user = User.objects.get(pk=pk)
-        return Response(UserHelper(self.user).serialize())
 
     def patch(self, request, pk):
         self.user = User.objects.filter(pk=pk).first()

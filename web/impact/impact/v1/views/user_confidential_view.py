@@ -2,7 +2,6 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from django.contrib.auth import get_user_model
-from rest_framework.response import Response
 
 from impact.permissions import (
     V1ConfidentialAPIPermissions,
@@ -26,18 +25,18 @@ USER_CONFIDENTIAL_FIELDS = {
 
 
 class UserConfidentialView(ImpactView):
+    helper_class = UserHelper
+
     metadata_class = ImpactMetadata
 
     permission_classes = (
         V1ConfidentialAPIPermissions,
     )
 
-    CONFIDENTIAL_KEYS = ["id", "expert_group", "internal_notes"]
+    @classmethod
+    def model(cls):
+        return User
 
-    def metadata(self):
-        return self.options_from_fields(USER_CONFIDENTIAL_FIELDS, ["GET"])
-
-    def get(self, request, pk):
-        user = User.objects.get(id=pk)
-        result = UserHelper(user).serialize(fields=self.CONFIDENTIAL_KEYS)
-        return Response(result)
+    @classmethod
+    def fields(cls):
+        return USER_CONFIDENTIAL_FIELDS

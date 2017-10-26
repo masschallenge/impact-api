@@ -78,7 +78,7 @@ class UserHelper(ModelHelper):
         "short_name": validate_string,
         }
 
-    MODEL = settings.AUTH_USER_MODEL
+    model = settings.AUTH_USER_MODEL
 
     REQUIRED_KEYS = [
         "email",
@@ -90,12 +90,6 @@ class UserHelper(ModelHelper):
         ]
     OPTIONAL_KEYS = OPTIONAL_BOOLEAN_KEYS
     USER_INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
-    READ_ONLY_KEYS = [
-        "date_joined",
-        "id",
-        "last_login",
-        ]
-    OUTPUT_KEYS = READ_ONLY_KEYS + USER_INPUT_KEYS + ProfileHelper.OUTPUT_KEYS
     INPUT_KEYS = USER_INPUT_KEYS + ProfileHelper.INPUT_KEYS
     KEY_TRANSLATIONS = {
         "first_name": "full_name",
@@ -141,6 +135,10 @@ class UserHelper(ModelHelper):
     @property
     def last_name(self):
         return self.subject.short_name
+
+    @classmethod
+    def fields(cls):
+        return USER_FIELDS
 
 
 def valid_keys_note(user_type, post=False):

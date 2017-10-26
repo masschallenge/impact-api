@@ -6,7 +6,7 @@ from impact.tests.factories import IndustryFactory
 from impact.tests.api_test_case import APITestCase
 from impact.tests.test_industry_detail_view import INDUSTRY_GET_FIELDS
 from impact.tests.utils import assert_fields
-from impact.v1.helpers import IndustryHelper
+from impact.v1.views import IndustryListView
 
 
 class TestIndustryListView(APITestCase):
@@ -18,7 +18,7 @@ class TestIndustryListView(APITestCase):
             url = reverse("industry")
             response = self.client.get(url)
             assert response.data['count'] == count
-            assert all([IndustryHelper(industry).serialize()
+            assert all([IndustryListView.serialize(industry)
                         in response.data['results']
                         for industry in industries])
 

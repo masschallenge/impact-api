@@ -10,7 +10,6 @@ from impact.models import (
 from impact.utils import parse_date
 from impact.v1.helpers import (
     ProfileHelper,
-    USER_FIELDS,
     USER_TYPE_TO_PROFILE_MODEL,
     UserHelper,
     VALID_USER_TYPES,
@@ -30,8 +29,11 @@ User = get_user_model()
 
 
 class UserListView(BaseListView):
-    def metadata(self):
-        return self.options_from_fields(USER_FIELDS, ["GET_LIST", "POST"])
+    helper_class = UserHelper
+
+    @classmethod
+    def actions(self):
+        return ["GET_LIST", "POST"]
 
     def description_check(self, check_name):
         if check_name in ["is_expert", "is_non_member"]:
@@ -114,7 +116,13 @@ class UserListView(BaseListView):
         for key in set(user_keys) - set(UserHelper.INPUT_KEYS):
             self.errors.append(INVALID_KEY_ERROR.format(key))
 
-    def _results(self, limit, offset):
+    def results(self, limit, offset):
+        # This is very similar to BaseListView.results, but it
+        # explicitly uses the late loading User model and it
+        # references the existing user profile objects.  Decided not
+        # to address this in AC-4995 because of the upcoming change to
+        # the user related models. Once that is done, this and the
+        # method _fileter_profiles_by_date ideally could go away.
         queryset = User.objects.all()
         updated_at_after = self.request.query_params.get(
             'updated_at.after', None)
@@ -127,7 +135,7 @@ class UserListView(BaseListView):
                 updated_at_before)
         count = queryset.count()
         return (count,
-                [UserHelper(user).serialize()
+                [self.serialize(user)
                  for user in queryset[offset:offset + limit]])
 
 

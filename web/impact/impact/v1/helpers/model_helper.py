@@ -134,8 +134,7 @@ class ModelHelper(object):
         self.subject = subject
         self.errors = []
 
-    def serialize(self, fields=None):
-        fields = fields or self.OUTPUT_KEYS
+    def serialize(self, fields):
         result = {}
         for field in fields:
             value = self.field_value(field)
@@ -171,7 +170,7 @@ class ModelHelper(object):
 
     @classmethod
     def all_objects(cls):
-        return cls.MODEL.objects.all()
+        return cls.model.objects.all()
 
 
 def validate_boolean(helper, field, value):

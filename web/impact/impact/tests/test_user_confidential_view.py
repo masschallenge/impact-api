@@ -51,4 +51,4 @@ class TestUserConfidentialView(APITestCase):
             get_data = response.data["actions"]["GET"]
             assert get_data["type"] == "object"
             get_options = get_data["properties"]
-            assert_fields(UserConfidentialView.CONFIDENTIAL_KEYS, get_options)
+            assert_fields(UserConfidentialView.fields().keys(), get_options)

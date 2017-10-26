@@ -20,7 +20,7 @@ from impact.tests.utils import (
     assert_fields,
 )
 from impact.utils import override_updated_at
-from impact.v1.helpers import OrganizationHelper
+from impact.v1.views import OrganizationListView
 
 
 class TestOrganizationListView(APITestCase):
@@ -31,7 +31,7 @@ class TestOrganizationListView(APITestCase):
             url = reverse("organization")
             response = self.client.get(url)
             assert response.data['count'] == count
-            assert all([OrganizationHelper(startup.organization).serialize()
+            assert all([OrganizationListView.serialize(startup.organization)
                         in response.data['results']
                         for startup in startups])
 
@@ -42,7 +42,7 @@ class TestOrganizationListView(APITestCase):
             url = reverse("organization")
             response = self.client.get(url)
             assert response.data['count'] == count
-            assert all([OrganizationHelper(partner.organization).serialize()
+            assert all([OrganizationListView.serialize(partner.organization)
                         in response.data['results']
                         for partner in partners])
 

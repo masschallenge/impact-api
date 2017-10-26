@@ -8,7 +8,7 @@ from impact.tests.test_program_family_detail_view import (
     PROGRAM_FAMILY_GET_FIELDS,
 )
 from impact.tests.utils import assert_fields
-from impact.v1.helpers import ProgramFamilyHelper
+from impact.v1.views import ProgramFamilyListView
 
 
 class TestProgramFamilyListView(APITestCase):
@@ -19,7 +19,7 @@ class TestProgramFamilyListView(APITestCase):
             url = reverse("program_family")
             response = self.client.get(url)
             assert response.data["count"] == count
-            assert all([ProgramFamilyHelper(program_family).serialize()
+            assert all([ProgramFamilyListView.serialize(program_family)
                         in response.data["results"]
                         for program_family in program_families])
 

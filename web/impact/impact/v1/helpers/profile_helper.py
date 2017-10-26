@@ -383,13 +383,6 @@ class ProfileHelper(ModelHelper):
     REQUIRED_KEYS = CORE_REQUIRED_KEYS + EXPERT_REQUIRED_KEYS
     INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
 
-    READ_ONLY_KEYS = [
-        "additional_industry_ids",
-        "mentoring_specialties",
-        "updated_at",
-        ]
-    OUTPUT_KEYS = READ_ONLY_KEYS + INPUT_KEYS
-
     def find_user_type(self):
         return self.subject.user_type
 
