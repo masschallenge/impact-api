@@ -44,14 +44,16 @@ class APIData(object):
         key = self.data.get(obj_key, None)
         if not required and key is None:
             return None
-        result = None
-        if key:
-            if isinstance(key, int) or key.isdigit():
-                result = obj_class.objects.filter(id=key).first()
-            elif isinstance(key, str):
-                result = obj_class.objects.filter(**{lookup: key}).first()
-        if result:
-            return result
-        else:
+        result = _lookup_object(obj_class, key, lookup)
+        if not result:
             self.record_not_found(key, obj_key)
             return None
+        return result
+
+
+def _lookup_object(obj_class, key, lookup):
+    if key:
+        if isinstance(key, int) or key.isdigit():
+            return obj_class.objects.filter(id=key).first()
+        if isinstance(key, str):
+            return obj_class.objects.filter(**{lookup: key}).first()
