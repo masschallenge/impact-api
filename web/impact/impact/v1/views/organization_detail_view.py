@@ -7,10 +7,10 @@ from impact.permissions import (
 from impact.models import Organization
 from impact.v1.helpers import OrganizationHelper
 from impact.v1.metadata import ImpactMetadata
-from impact.v1.views import ImpactView
+from impact.v1.views.base_detail_view import BaseDetailView
 
 
-class OrganizationDetailView(ImpactView):
+class OrganizationDetailView(BaseDetailView):
     helper_class = OrganizationHelper
     metadata_class = ImpactMetadata
 

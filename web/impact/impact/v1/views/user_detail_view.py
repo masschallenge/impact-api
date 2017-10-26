@@ -9,7 +9,7 @@ from impact.v1.helpers import (
     valid_keys_note,
 )
 from impact.v1.metadata import ImpactMetadata
-from impact.v1.views import ImpactView
+from impact.v1.views.base_detail_view import BaseDetailView
 
 
 INVALID_KEYS_ERROR = "Recevied invalid key(s): {invalid_keys}."
@@ -18,24 +18,17 @@ NO_USER_ERROR = "Unable to find user with an id of {}"
 User = get_user_model()
 
 
-class UserDetailView(ImpactView):
+class UserDetailView(BaseDetailView):
     helper_class = UserHelper
     metadata_class = ImpactMetadata
     permission_classes = (
         V1APIPermissions,
     )
-
-    @classmethod
-    def model(cls):
-        return User
+    actions = ["GET", "PATCH"]
 
     def __init__(self, *args, **kwargs):
         self.user = None
         super().__init__(*args, **kwargs)
-
-    @classmethod
-    def actions(self):
-        return ["GET", "PATCH"]
 
     def options(self, request, pk):
         self.user = User.objects.get(pk=pk)

@@ -13,18 +13,12 @@ from impact.v1.helpers import (
     STRING_FIELD,
 )
 from impact.v1.metadata import ImpactMetadata
-from impact.v1.views.impact_view import ImpactView
+from impact.v1.views.base_detail_view import BaseDetailView
 
 User = get_user_model()
 
-USER_CONFIDENTIAL_FIELDS = {
-    "id": PK_FIELD,
-    "expert_group": INTEGER_FIELD,
-    "internal_notes": STRING_FIELD,
-}
 
-
-class UserConfidentialView(ImpactView):
+class UserConfidentialView(BaseDetailView):
     helper_class = UserHelper
 
     metadata_class = ImpactMetadata
@@ -34,9 +28,9 @@ class UserConfidentialView(ImpactView):
     )
 
     @classmethod
-    def model(cls):
-        return User
-
-    @classmethod
     def fields(cls):
-        return USER_CONFIDENTIAL_FIELDS
+        return {
+            "id": PK_FIELD,
+            "expert_group": INTEGER_FIELD,
+            "internal_notes": STRING_FIELD,
+        }
