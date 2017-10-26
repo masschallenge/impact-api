@@ -4,12 +4,14 @@ from django.core.exceptions import (
 )
 from django.core.validators import RegexValidator
 from impact.v1.helpers.model_helper import (
+    BOOLEAN_FIELD,
     INTEGER_ARRAY_FIELD,
     INVALID_CHOICE_ERROR,
     INVALID_URL_ERROR,
     ModelHelper,
     PHONE_FIELD,
     PHONE_REGEX,
+    STRING_FIELD,
     TWITTER_REGEX,
     format_choices,
     merge_fields,
@@ -29,11 +31,9 @@ from impact.models import (
 )
 
 
-EXPERT_DESCRIPTION = "This field exists only when user_type is 'expert'"
-EXPERT_BOOLEAN_FIELD = {
-    "json-schema": {
-        "type": "boolean",
-    },
+EXPERT_DESCRIPTION = "This field exists only when user_type is 'expert'."
+
+OPTIONAL_EXPERT_FIELD = {
     "GET": {
         "included": "could_be_expert",
         "description": EXPERT_DESCRIPTION,
@@ -42,17 +42,11 @@ EXPERT_BOOLEAN_FIELD = {
     "POST": {"required": False, "allowed": "could_be_expert"},
 }
 
-EXPERT_STRING_FIELD = {
-    "json-schema": {
-        "type": "string",
-    },
-    "GET": {
-        "included": "could_be_expert",
-        "description": EXPERT_DESCRIPTION,
-    },
-    "PATCH": {"required": False, "allowed": "is_expert"},
-    "POST": {"required": False, "allowed": "could_be_expert"},
-}
+EXPERT_BOOLEAN_FIELD = merge_fields(OPTIONAL_EXPERT_FIELD,
+                                    BOOLEAN_FIELD)
+
+EXPERT_STRING_FIELD = merge_fields(OPTIONAL_EXPERT_FIELD,
+                                   STRING_FIELD)
 
 NON_MEMBER_STRING_FIELD = {
     "json-schema": {
@@ -146,26 +140,56 @@ MENTORING_SPECIALTIES_FIELD = {
     },
 }
 
-PRIMARY_INDUSTRY_ID_FIELD = {
-    "json-schema": {"type": "integer"},
+EXPERT_OBJECT_ID_FIELD = {
     "GET": {
         "included": "could_be_expert",
-        "description": ("This field exists only when user_type is 'expert'. "
-                        "Will always be an existing Industry ID."),
     },
     "PATCH": {
         "required": False,
         "allowed": "is_expert",
-        "description": ("Allowed only when user_type is 'expert' and a "
-                        "matching Industry object exists"),
     },
     "POST": {
         "required": "is_expert",
         "allowed": "could_be_expert",
-        "description": ("Required and allowed only when user_type is "
-                        "'expert' and a matching Industry object exists"),
     },
 }
+
+EXPERT_ALLOWED = "Field is allowed only when user_type is 'expert'."
+EXPERT_REQUIRED = "Field is required when user_type is 'expert'."
+RESOURCE_MUST_EXIST = "A matching {classname} resource must exist."
+RESOURCE_WILL_BE = "Field will be an existing {classname} resource id."
+
+
+def get_description(classname):
+    return " ".join([EXPERT_DESCRIPTION,
+                     RESOURCE_WILL_BE.format(classname=classname)])
+
+
+def patch_description(classname):
+    return " ".join([EXPERT_ALLOWED,
+                     RESOURCE_MUST_EXIST.format(classname=classname)])
+
+
+def post_description(classname):
+    return " ".join([EXPERT_REQUIRED,
+                     RESOURCE_MUST_EXIST.format(classname=classname)])
+
+
+def object_id_field(klass):
+    classname = klass.__name__
+    return {
+        "json-schema": {"type": "integer"},
+        "GET": {"description": get_description(classname)},
+        "PATCH": {"description": patch_description(classname)},
+        "POST": {"description": post_description(classname)}
+    }
+
+
+HOME_PROGRAM_FAMILY_ID_FIELD = merge_fields(object_id_field(ProgramFamily),
+                                            EXPERT_OBJECT_ID_FIELD)
+
+PRIMARY_INDUSTRY_ID_FIELD = merge_fields(object_id_field(Industry),
+                                         EXPERT_OBJECT_ID_FIELD)
 
 EXPERT_INTEGER_ARRAY_FIELD = merge_fields(
     INTEGER_ARRAY_FIELD,
@@ -175,27 +199,6 @@ EXPERT_INTEGER_ARRAY_FIELD = merge_fields(
             "description": EXPERT_DESCRIPTION,
         },
     })
-
-HOME_PROGRAM_FAMILY_ID_FIELD = {
-    "json-schema": {"type": "integer"},
-    "GET": {
-        "included": "could_be_expert",
-        "description": ("This field exists only when user_type is 'expert'. "
-                        "Will always be an existing Program Family ID."),
-    },
-    "PATCH": {
-        "required": False,
-        "allowed": "is_expert",
-        "description": ("Allowed only when user_type is 'expert' and a "
-                        "matching ProgramFamily object exists"),
-    },
-    "POST": {
-        "required": "is_expert",
-        "allowed": "could_be_expert",
-        "description": ("Required and allowed only when user_type is "
-                        "'expert' and a matching ProgramFamily object exists"),
-    },
-}
 
 URL_SCHEMA = "^[hH][tT][tT][pP][sS]?://"
 NETLOC_ELEMENT = "([^/:@]+(:[^/@]+)?@)?([\w-]+)"
@@ -216,10 +219,7 @@ PERSONAL_WEBSITE_URL_FIELD = {
 }
 
 
-INVALID_INDUSTRY_ID_ERROR = ("Invalid {field}: "
-                             "Expected valid id for an industry resource")
-INVALID_PROGRAM_FAMILY_ID_ERROR = (
-    "Invalid {field}: Expected valid id for an program family resource")
+INVALID_ID_ERROR = "Invalid {field}: {classname} id"
 
 EXPERT_ONLY = [ExpertProfile.user_type]
 NON_MEMBER = [ExpertProfile.user_type, EntrepreneurProfile.user_type]
@@ -288,24 +288,24 @@ def validate_twitter_handle(helper, field, value):
     return validate_regex(helper, field, value, TWITTER_REGEX)
 
 
-def validate_primary_industry_id(helper, field, value):
+def validate_object_id(klass, helper, field, value):
     try:
         value = int(value)
-        Industry.objects.get(id=value)
+        klass.objects.get(id=value)
     except (ValueError, ObjectDoesNotExist):
-        helper.errors.append(INVALID_INDUSTRY_ID_ERROR.format(field=field,
-                                                              value=value))
+        classname = klass.__name__
+        helper.errors.append(INVALID_ID_ERROR.format(classname=classname,
+                                                     field=field,
+                                                     value=value))
     return validate_by_user_type(helper, field, value, EXPERT_ONLY)
+
+
+def validate_primary_industry_id(helper, field, value):
+    return validate_object_id(Industry, helper, field, value)
 
 
 def validate_home_program_family_id(helper, field, value):
-    try:
-        value = int(value)
-        ProgramFamily.objects.get(id=value)
-    except (ValueError, ObjectDoesNotExist):
-        helper.errors.append(INVALID_PROGRAM_FAMILY_ID_ERROR.format(
-                field=field, value=value))
-    return validate_by_user_type(helper, field, value, EXPERT_ONLY)
+    return validate_object_id(ProgramFamily, helper, field, value)
 
 
 class ProfileHelper(ModelHelper):

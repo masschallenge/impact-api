@@ -19,8 +19,7 @@ from impact.tests.utils import (
 )
 from impact.utils import get_profile
 from impact.v1.helpers import (
-    INVALID_INDUSTRY_ID_ERROR,
-    INVALID_PROGRAM_FAMILY_ID_ERROR,
+    INVALID_ID_ERROR,
     UserHelper,
     VALID_KEYS_NOTE,
 )
@@ -495,11 +494,13 @@ class TestUserDetailView(APITestCase):
                 "primary_industry_id": bad_value,
             })
             assert response.status_code == 403
-            error_msg = INVALID_PROGRAM_FAMILY_ID_ERROR.format(
-                field="home_program_family_id")
+            error_msg = INVALID_ID_ERROR.format(
+                field="home_program_family_id",
+                classname="ProgramFamily")
             assert error_msg in response.data
-            error_msg = INVALID_INDUSTRY_ID_ERROR.format(
-                field="primary_industry_id")
+            error_msg = INVALID_ID_ERROR.format(
+                field="primary_industry_id",
+                classname="Industry")
             assert error_msg in response.data
             assert "home_program_family_id" in _valid_note(response.data)
 
