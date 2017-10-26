@@ -34,34 +34,24 @@ class APIData(object):
         return None
 
     def validate_program(self, required=True):
-        key = self.data.get("ProgramKey", None)
-        if not required and key is None:
-            return None
-        result = None
-        if key:
-            if isinstance(key, int) or key.isdigit():
-                result = Program.objects.filter(id=key).first()
-            elif isinstance(key, str):
-                result = Program.objects.filter(name=key).first()
-        if result:
-            return result
-        else:
-            self.record_not_found(key, "ProgramKey")
-            return None
+        return self._validate_object("ProgramKey", Program, "name", required)
 
     def validate_startup(self, required=True):
-        key = self.data.get("StartupKey", None)
+        return self._validate_object("StartupKey", Startup,
+                                     "organization__url_slug", required)
+
+    def _validate_object(self, obj_key, obj_class, lookup, required):
+        key = self.data.get(obj_key, None)
         if not required and key is None:
             return None
         result = None
         if key:
             if isinstance(key, int) or key.isdigit():
-                result = Startup.objects.filter(id=key).first()
+                result = obj_class.objects.filter(id=key).first()
             elif isinstance(key, str):
-                result = Startup.objects.filter(
-                    organization__url_slug=key).first()
+                result = obj_class.objects.filter(**{lookup: key}).first()
         if result:
             return result
         else:
-            self.record_not_found(key, "StartupKey")
+            self.record_not_found(key, obj_key)
             return None
