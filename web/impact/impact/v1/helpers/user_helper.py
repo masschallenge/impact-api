@@ -1,4 +1,4 @@
-from django.conf import settings
+from django.contrib.auth import get_user_model
 
 from impact.models import (
     EntrepreneurProfile,
@@ -33,6 +33,8 @@ from impact.v1.helpers.profile_helper import (
     ProfileHelper,
     USER_TYPE_FIELD,
 )
+
+User = get_user_model()
 
 VALID_KEYS_NOTE = "Valid keys are: {}"
 
@@ -78,7 +80,7 @@ class UserHelper(ModelHelper):
         "short_name": validate_string,
         }
 
-    model = settings.AUTH_USER_MODEL
+    model = User
 
     REQUIRED_KEYS = [
         "email",
