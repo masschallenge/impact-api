@@ -88,7 +88,7 @@ EMAIL_FIELD = {
 }
 REQUIRED_EMAIL_FIELD = merge_fields(POST_REQUIRED, EMAIL_FIELD)
 
-PHONE_PATTERN = fr'^[0-9x.+() -]{{0,{PHONE_MAX_LENGTH}}}$'
+PHONE_PATTERN = '^[0-9x.+() -]{{0,{}}}$'.format(PHONE_MAX_LENGTH)
 PHONE_REGEX = re.compile(PHONE_PATTERN)
 PHONE_FIELD = {
     "json-schema": {
