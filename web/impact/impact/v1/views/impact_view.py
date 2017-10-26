@@ -4,14 +4,23 @@ from abc import (
 )
 from rest_framework.views import APIView
 from rest_framework_tracking.mixins import LoggingMixin
+from impact.permissions import (
+    V1APIPermissions,
+)
 from impact.v1.helpers import (
     json_object,
     json_simple_list,
 )
+from impact.v1.metadata import ImpactMetadata
 
 
 class ImpactView(LoggingMixin, APIView):
     __metaclass__ = ABCMeta
+
+    permission_classes = (
+        V1APIPermissions,
+    )
+    metadata_class = ImpactMetadata
 
     actions = ["GET"]
 

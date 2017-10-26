@@ -12,7 +12,6 @@ from impact.v1.helpers import (
     UserHelper,
     STRING_FIELD,
 )
-from impact.v1.metadata import ImpactMetadata
 from impact.v1.views.base_detail_view import BaseDetailView
 
 User = get_user_model()
@@ -20,8 +19,6 @@ User = get_user_model()
 
 class UserConfidentialView(BaseDetailView):
     helper_class = UserHelper
-
-    metadata_class = ImpactMetadata
 
     permission_classes = (
         V1ConfidentialAPIPermissions,

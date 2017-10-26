@@ -1,14 +1,10 @@
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 
-from impact.permissions import (
-    V1APIPermissions,
-)
 from impact.v1.helpers import (
     UserHelper,
     valid_keys_note,
 )
-from impact.v1.metadata import ImpactMetadata
 from impact.v1.views.base_detail_view import BaseDetailView
 
 
@@ -20,10 +16,6 @@ User = get_user_model()
 
 class UserDetailView(BaseDetailView):
     helper_class = UserHelper
-    metadata_class = ImpactMetadata
-    permission_classes = (
-        V1APIPermissions,
-    )
     actions = ["GET", "PATCH"]
 
     def __init__(self, *args, **kwargs):

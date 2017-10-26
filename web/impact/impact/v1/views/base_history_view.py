@@ -2,21 +2,10 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from rest_framework.response import Response
-
-from impact.permissions import (
-    V1APIPermissions,
-)
-from impact.v1.metadata import ImpactMetadata
 from impact.v1.views.impact_view import ImpactView
 
 
 class BaseHistoryView(ImpactView):
-    metadata_class = ImpactMetadata
-
-    permission_classes = (
-        V1APIPermissions,
-    )
-
     @classmethod
     def fields(cls):
         event_types = set()

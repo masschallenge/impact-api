@@ -4,22 +4,12 @@
 from abc import ABCMeta
 from rest_framework.response import Response
 
-from impact.permissions import (
-    V1APIPermissions,
-)
 from impact.v1.helpers import json_object
-from impact.v1.metadata import ImpactMetadata
 from impact.v1.views import ImpactView
 
 
 class BaseDetailView(ImpactView):
     __metaclass__ = ABCMeta
-
-    permission_classes = (
-        V1APIPermissions,
-    )
-
-    metadata_class = ImpactMetadata
 
     def get(self, request, pk):
         self.instance = self.model().objects.get(pk=pk)

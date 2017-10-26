@@ -5,26 +5,16 @@ from abc import ABCMeta
 from rest_framework.response import Response
 from django.db.models import Q
 
-from impact.permissions import (
-    V1APIPermissions,
-)
 from impact.v1.helpers import (
     json_list_wrapper,
     json_object,
 )
-from impact.v1.metadata import ImpactMetadata
 from impact.v1.views import ImpactView
 from impact.utils import parse_date
 
 
 class BaseListView(ImpactView):
     __metaclass__ = ABCMeta
-
-    permission_classes = (
-        V1APIPermissions,
-    )
-
-    metadata_class = ImpactMetadata
 
     def metadata(self):
         result = {}
