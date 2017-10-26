@@ -15,6 +15,10 @@ class APIData(object):
     YES = "Y"
     NO = "N"
     YES_NO_VALUES = [YES, NO]
+    KEY_TO_CLASS_LOOKUP = {
+        "ProgramKey": (Program, "name"),
+        "StartupKey": (Startup, "organization__url_slug"),
+    }
 
     def __init__(self, data, *args, **kwargs):
         self.errors = []
@@ -34,26 +38,25 @@ class APIData(object):
         return None
 
     def validate_program(self, required=True):
-        return self._validate_object("ProgramKey", Program, "name", required)
+        return self._validate_object("ProgramKey", required)
 
     def validate_startup(self, required=True):
-        return self._validate_object("StartupKey", Startup,
-                                     "organization__url_slug", required)
+        return self._validate_object("StartupKey", required)
 
-    def _validate_object(self, obj_key, obj_class, lookup, required):
+    def _validate_object(self, obj_key, required):
         key = self.data.get(obj_key, None)
-        if not required and key is None:
+        if key is None:
+            if required:
+                self.record_not_found(key, obj_key)
             return None
-        result = _lookup_object(obj_class, key, lookup)
+        return self._lookup_object(key, obj_key)
+
+    def _lookup_object(self, key, obj_key):
+        obj_class, lookup = self.KEY_TO_CLASS_LOOKUP[obj_key]
+        if isinstance(key, int) or key.isdigit():
+            result = obj_class.objects.filter(id=key).first()
+        elif isinstance(key, str):
+            result = obj_class.objects.filter(**{lookup: key}).first()
         if not result:
             self.record_not_found(key, obj_key)
-            return None
         return result
-
-
-def _lookup_object(obj_class, key, lookup):
-    if key:
-        if isinstance(key, int) or key.isdigit():
-            return obj_class.objects.filter(id=key).first()
-        if isinstance(key, str):
-            return obj_class.objects.filter(**{lookup: key}).first()
