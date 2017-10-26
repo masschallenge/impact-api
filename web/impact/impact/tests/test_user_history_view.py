@@ -14,6 +14,7 @@ from impact.tests.factories import (
 )
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import (
+    assert_fields,
     days_from_now,
     find_events,
 )
@@ -26,6 +27,7 @@ from impact.v1.events import (
     UserJoinedStartupEvent,
     UserReceivedNewsletterEvent,
 )
+from impact.v1.views import UserHistoryView
 
 
 class TestUserHistoryView(APITestCase):
@@ -221,3 +223,13 @@ class TestUserHistoryView(APITestCase):
                              events[0]["newsletter_name"])
             self.assertEqual(receipt.newsletter.from_addr,
                              events[0]["newsletter_from_address"])
+
+    def test_options(self):
+        user = UserFactory()
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_history", args=[user.id])
+            response = self.client.options(url)
+            assert response.status_code == 200
+            results = response.data["actions"]["GET"]["properties"]["results"]
+            get_options = results["item"]["properties"]
+            assert_fields(UserHistoryView.fields().keys(), get_options)

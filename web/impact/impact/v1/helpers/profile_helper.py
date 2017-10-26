@@ -1,14 +1,18 @@
-import re
 from django.core.exceptions import (
     ObjectDoesNotExist,
     ValidationError,
 )
 from django.core.validators import RegexValidator
 from impact.v1.helpers.model_helper import (
+    INTEGER_ARRAY_FIELD,
     INVALID_CHOICE_ERROR,
     INVALID_URL_ERROR,
     ModelHelper,
+    PHONE_FIELD,
+    PHONE_REGEX,
+    TWITTER_REGEX,
     format_choices,
+    merge_fields,
     validate_boolean,
     validate_choices,
     validate_regex,
@@ -23,10 +27,46 @@ from impact.models import (
     MemberProfile,
     ProgramFamily,
 )
-from impact.models.base_profile import (
-    PHONE_MAX_LENGTH,
-    TWITTER_HANDLE_MAX_LENGTH,
-)
+
+
+EXPERT_DESCRIPTION = "This field exists only when user_type is 'expert'"
+EXPERT_BOOLEAN_FIELD = {
+    "json-schema": {
+        "type": "boolean",
+    },
+    "GET": {
+        "included": "could_be_expert",
+        "description": EXPERT_DESCRIPTION,
+    },
+    "PATCH": {"required": False, "allowed": "is_expert"},
+    "POST": {"required": False, "allowed": "could_be_expert"},
+}
+
+EXPERT_STRING_FIELD = {
+    "json-schema": {
+        "type": "string",
+    },
+    "GET": {
+        "included": "could_be_expert",
+        "description": EXPERT_DESCRIPTION,
+    },
+    "PATCH": {"required": False, "allowed": "is_expert"},
+    "POST": {"required": False, "allowed": "could_be_expert"},
+}
+
+NON_MEMBER_STRING_FIELD = {
+    "json-schema": {
+        "type": "string",
+    },
+    "GET": {
+        "included": "could_be_non_member",
+        "description": ("This field exists only when user_type is "
+                        "'entrepreneur' or 'expert'"),
+    },
+    "PATCH": {"required": False, "allowed": "is_non_member"},
+    "POST": {"required": False, "allowed": "could_be_non_member"},
+}
+
 
 GENDER_TRANSLATIONS = {
     "female": "f",
@@ -42,7 +82,31 @@ USER_TYPE_TO_PROFILE_MODEL = {
 }
 VALID_USER_TYPES = USER_TYPE_TO_PROFILE_MODEL.keys()
 
+USER_TYPE_FIELD = {
+    "json-schema": {
+        "enum": VALID_USER_TYPES,
+    },
+    "POST": {"required": True},
+}
+
+EXPERT_PHONE_FIELD = merge_fields(
+    PHONE_FIELD,
+    {
+        "POST": {
+            "required": "is_expert",
+            "description": "Required when user_type is 'expert'",
+        }
+    })
+
 VALID_GENDERS = GENDER_TRANSLATIONS.values()
+
+GENDER_FIELD = {
+    "json-schema": {
+        "enum": VALID_GENDERS,
+    },
+    "POST": {"required": True},
+    "PATCH": {"required": False},
+}
 
 VALID_EXPERT_CATEGORIES = [
     "Executive",
@@ -51,13 +115,111 @@ VALID_EXPERT_CATEGORIES = [
     "Other",
 ]
 
+EXPERT_CATEGORY_FIELD = {
+    "json-schema": {
+        "enum": VALID_EXPERT_CATEGORIES,
+    },
+    "GET": {
+        "included": "could_be_expert",
+        "description": EXPERT_DESCRIPTION,
+    },
+    "PATCH": {
+        "required": False,
+        "allowed": "is_expert",
+        "description": ("Allowed only when user_type is 'expert' and "
+                        "Expert Category is valid"),
+    },
+    "POST": {
+        "required": "is_expert",
+        "allowed": "could_be_expert",
+        "description": "Required when user_type is 'expert'",
+    },
+}
+
+MENTORING_SPECIALTIES_FIELD = {
+    "json-schema": {
+        "type": "string",
+    },
+    "GET": {
+        "included": "could_be_expert",
+        "description": EXPERT_DESCRIPTION,
+    },
+}
+
+PRIMARY_INDUSTRY_ID_FIELD = {
+    "json-schema": {"type": "integer"},
+    "GET": {
+        "included": "could_be_expert",
+        "description": ("This field exists only when user_type is 'expert'. "
+                        "Will always be an existing Industry ID."),
+    },
+    "PATCH": {
+        "required": False,
+        "allowed": "is_expert",
+        "description": ("Allowed only when user_type is 'expert' and a "
+                        "matching Industry object exists"),
+    },
+    "POST": {
+        "required": "is_expert",
+        "allowed": "could_be_expert",
+        "description": ("Required and allowed only when user_type is "
+                        "'expert' and a matching Industry object exists"),
+    },
+}
+
+EXPERT_INTEGER_ARRAY_FIELD = merge_fields(
+    INTEGER_ARRAY_FIELD,
+    {
+        "GET": {
+            "included": "could_be_expert",
+            "description": EXPERT_DESCRIPTION,
+        },
+    })
+
+HOME_PROGRAM_FAMILY_ID_FIELD = {
+    "json-schema": {"type": "integer"},
+    "GET": {
+        "included": "could_be_expert",
+        "description": ("This field exists only when user_type is 'expert'. "
+                        "Will always be an existing Program Family ID."),
+    },
+    "PATCH": {
+        "required": False,
+        "allowed": "is_expert",
+        "description": ("Allowed only when user_type is 'expert' and a "
+                        "matching ProgramFamily object exists"),
+    },
+    "POST": {
+        "required": "is_expert",
+        "allowed": "could_be_expert",
+        "description": ("Required and allowed only when user_type is "
+                        "'expert' and a matching ProgramFamily object exists"),
+    },
+}
+
+URL_SCHEMA = "^[hH][tT][tT][pP][sS]?://"
+NETLOC_ELEMENT = "([^/:@]+(:[^/@]+)?@)?([\w-]+)"
+DOT = "\."
+URL_REGEX = "{schema}({netloc_element}{dot})+{netloc_element}".format(
+    schema=URL_SCHEMA,
+    netloc_element=NETLOC_ELEMENT,
+    dot=DOT
+)
+
+PERSONAL_WEBSITE_URL_FIELD = {
+    "json-schema": {
+        "type": "string",
+        "pattern": URL_REGEX,
+    },
+    "PATCH": {"required": False},
+    "POST": {"required": False},
+}
+
+
 INVALID_INDUSTRY_ID_ERROR = ("Invalid {field}: "
                              "Expected valid id for an industry resource")
 INVALID_PROGRAM_FAMILY_ID_ERROR = (
     "Invalid {field}: Expected valid id for an program family resource")
-
-PHONE_REGEX = re.compile(fr'^[0-9x.+() -]{{0,{PHONE_MAX_LENGTH}}}$')
-TWITTER_REGEX = re.compile(fr'^\S{{0,{TWITTER_HANDLE_MAX_LENGTH}}}$')
 
 EXPERT_ONLY = [ExpertProfile.user_type]
 NON_MEMBER = [ExpertProfile.user_type, EntrepreneurProfile.user_type]
@@ -92,18 +254,8 @@ def validate_personal_website_url(helper, field, value):
     # This is essentially copied from mc.models.utils in accelerate.
     # This logic should move to a shared library once we decide to
     # do that.  See AC-4946.
-    schema = "^[hH][tT][tT][pP][sS]?://"
-    netloc_element = "([^/:@]+(:[^/@]+)?@)?([\w-]+)"
-    dot = "\."
-
-    url_regex = "{schema}({netloc_element}{dot})+{netloc_element}".format(
-        schema=schema,
-        netloc_element=netloc_element,
-        dot=dot
-    )
-
     try:
-        RegexValidator(regex=url_regex)(value)
+        RegexValidator(regex=URL_REGEX)(value)
     except ValidationError:
         helper.errors.append(INVALID_URL_ERROR.format(field=field,
                                                       value=value))
@@ -259,3 +411,9 @@ class ProfileHelper(ModelHelper):
             specialties = self.subject.mentoring_specialties
             if specialties:
                 return [specialty.name for specialty in specialties.all()]
+
+    def is_expert(self):
+        return self.subject.user_type == ExpertProfile.user_type
+
+    def is_non_member(self):
+        return self.subject.user_type != MemberProfile.user_type

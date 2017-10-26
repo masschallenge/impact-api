@@ -41,13 +41,13 @@ class TestAcceleratorRoutes(TestCase):
 
     @classmethod
     def setUpClass(cls):
-        super(TestAcceleratorRoutes, cls).setUpClass()
+        super().setUpClass()
         for model in MC_CONTENTTYPES:
             ContentTypeFactory(app_label='mc', model=model)
 
     @classmethod
     def tearDownClass(cls):
-        super(TestAcceleratorRoutes, cls).tearDownClass()
+        super().tearDownClass()
         ContentType.objects.filter(
             app_label='mc',
             model__in=MC_CONTENTTYPES).delete()

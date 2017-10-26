@@ -1,3 +1,5 @@
+from impact.v1.views.impact_view import ImpactView
+
 from impact.v1.views.industry_detail_view import IndustryDetailView
 from impact.v1.views.industry_list_view import IndustryListView
 

@@ -2,6 +2,10 @@ from impact.models import UserRole
 from impact.v1.events.base_user_role_grant_event import (
     BaseUserRoleGrantEvent,
 )
+from impact.v1.helpers import (
+    INTEGER_FIELD,
+    STRING_FIELD,
+)
 
 
 class UserBecameConfirmedJudgeEvent(BaseUserRoleGrantEvent):
@@ -10,8 +14,13 @@ class UserBecameConfirmedJudgeEvent(BaseUserRoleGrantEvent):
     EVENT_TYPE = "became confirmed judge"
     USER_ROLE = UserRole.JUDGE
 
+    CLASS_FIELDS = {
+        "judging_round_id": INTEGER_FIELD,
+        "judging_round_name": STRING_FIELD,
+        }
+
     def __init__(self, program_role_grant):
-        super(UserBecameConfirmedJudgeEvent, self).__init__(program_role_grant)
+        super().__init__(program_role_grant)
         self.judging_round = None
         label = program_role_grant.program_role.user_label
         if label:
@@ -27,11 +36,10 @@ class UserBecameConfirmedJudgeEvent(BaseUserRoleGrantEvent):
             name=program_role.name,
             id=program_role.id)
 
-    def serialize(self):
-        result = super(UserBecameConfirmedJudgeEvent, self).serialize()
+    def judging_round_id(self):
         if self.judging_round:
-            result.update({
-                    "judging_round_id": self.judging_round.id,
-                    "judging_round_name": self.judging_round.short_name(),
-                    })
-        return result
+            return self.judging_round.id
+
+    def judging_round_name(self):
+        if self.judging_round:
+            return self.judging_round.short_name()
