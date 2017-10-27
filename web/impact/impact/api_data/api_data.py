@@ -15,6 +15,10 @@ class APIData(object):
     YES = "Y"
     NO = "N"
     YES_NO_VALUES = [YES, NO]
+    KEY_TO_CLASS_LOOKUP = {
+        "ProgramKey": (Program, "name"),
+        "StartupKey": (Startup, "organization__url_slug"),
+    }
 
     def __init__(self, data, *args, **kwargs):
         self.errors = []
@@ -34,34 +38,25 @@ class APIData(object):
         return None
 
     def validate_program(self, required=True):
-        key = self.data.get("ProgramKey", None)
-        if not required and key is None:
-            return None
-        result = None
-        if key:
-            if isinstance(key, int) or key.isdigit():
-                result = Program.objects.filter(id=key).first()
-            elif isinstance(key, str):
-                result = Program.objects.filter(name=key).first()
-        if result:
-            return result
-        else:
-            self.record_not_found(key, "ProgramKey")
-            return None
+        return self._validate_object("ProgramKey", required)
 
     def validate_startup(self, required=True):
-        key = self.data.get("StartupKey", None)
-        if not required and key is None:
+        return self._validate_object("StartupKey", required)
+
+    def _validate_object(self, obj_key, required):
+        key = self.data.get(obj_key, None)
+        if key is None:
+            if required:
+                self.record_not_found(key, obj_key)
             return None
-        result = None
-        if key:
-            if isinstance(key, int) or key.isdigit():
-                result = Startup.objects.filter(id=key).first()
-            elif isinstance(key, str):
-                result = Startup.objects.filter(
-                    organization__url_slug=key).first()
-        if result:
-            return result
-        else:
-            self.record_not_found(key, "StartupKey")
-            return None
+        return self._lookup_object(key, obj_key)
+
+    def _lookup_object(self, key, obj_key):
+        obj_class, lookup = self.KEY_TO_CLASS_LOOKUP[obj_key]
+        if isinstance(key, int) or key.isdigit():
+            result = obj_class.objects.filter(id=key).first()
+        elif isinstance(key, str):
+            result = obj_class.objects.filter(**{lookup: key}).first()
+        if not result:
+            self.record_not_found(key, obj_key)
+        return result
