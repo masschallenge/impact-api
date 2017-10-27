@@ -2,6 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 import datetime
+import json
+from jsonschema import Draft4Validator
 import pytz
 
 from django.urls import reverse
@@ -99,6 +101,15 @@ class TestOrganizationListView(APITestCase):
             get_options = results["item"]["properties"]
             assert_fields(PARTNER_GET_FIELDS, get_options)
             assert_fields(STARTUP_GET_FIELDS, get_options)
+
+    def test_options_against_get(self):
+        with self.login(username=self.basic_user().username):
+            url = reverse("organization")
+            options_response = self.client.options(url)
+            schema = options_response.data["actions"]["GET"]
+            validator = Draft4Validator(schema)
+            get_response = self.client.get(url)
+            assert validator.is_valid(json.loads(get_response.content))
 
 
 def _org_for_date(date):

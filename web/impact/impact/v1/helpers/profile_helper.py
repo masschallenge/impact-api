@@ -72,7 +72,7 @@ USER_TYPE_TO_PROFILE_MODEL = {
     ExpertProfile.user_type: ExpertProfile,
     MemberProfile.user_type: MemberProfile,
 }
-VALID_USER_TYPES = USER_TYPE_TO_PROFILE_MODEL.keys()
+VALID_USER_TYPES = list(USER_TYPE_TO_PROFILE_MODEL.keys())
 
 USER_TYPE_FIELD = {
     "json-schema": {
@@ -90,7 +90,7 @@ EXPERT_PHONE_FIELD = merge_fields(
         }
     })
 
-VALID_GENDERS = GENDER_TRANSLATIONS.values()
+VALID_GENDERS = list(GENDER_TRANSLATIONS.values())
 
 GENDER_FIELD = {
     "json-schema": {
@@ -130,7 +130,8 @@ EXPERT_CATEGORY_FIELD = {
 
 MENTORING_SPECIALTIES_FIELD = {
     "json-schema": {
-        "type": "string",
+        "type": "array",
+        "items": {"type": "string"},
     },
     "GET": {
         "included": "could_be_expert",

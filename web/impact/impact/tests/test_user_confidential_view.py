@@ -1,6 +1,9 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+import json
+from jsonschema import Draft4Validator
+
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.urls import reverse
@@ -52,3 +55,14 @@ class TestUserConfidentialView(APITestCase):
             assert get_data["type"] == "object"
             get_options = get_data["properties"]
             assert_fields(UserConfidentialView.fields().keys(), get_options)
+
+    def test_options_against_get(self):
+        user = ExpertFactory(profile__expert_group=TEST_EXPERT_GROUP,
+                             profile__internal_notes=TEST_INTERNAL_NOTES)
+        with self.login(username=self.privileged_user().username):
+            url = reverse("user_confidential", args=[user.id])
+            options_response = self.client.options(url)
+            schema = options_response.data["actions"]["GET"]
+            validator = Draft4Validator(schema)
+            get_response = self.client.get(url)
+            assert validator.is_valid(json.loads(get_response.content))

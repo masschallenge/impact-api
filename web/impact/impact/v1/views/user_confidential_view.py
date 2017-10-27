@@ -5,7 +5,6 @@ from impact.permissions import (
     V1ConfidentialAPIPermissions,
 )
 from impact.v1.helpers import (
-    INTEGER_FIELD,
     PK_FIELD,
     UserHelper,
     STRING_FIELD,
@@ -24,6 +23,6 @@ class UserConfidentialView(BaseDetailView):
     def fields(cls):
         return {
             "id": PK_FIELD,
-            "expert_group": INTEGER_FIELD,
+            "expert_group": STRING_FIELD,
             "internal_notes": STRING_FIELD,
         }

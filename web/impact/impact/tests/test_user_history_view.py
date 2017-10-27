@@ -1,6 +1,9 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+import json
+from jsonschema import Draft4Validator
+
 from django.urls import reverse
 
 from impact.models import UserRole
@@ -233,3 +236,13 @@ class TestUserHistoryView(APITestCase):
             results = response.data["actions"]["GET"]["properties"]["results"]
             get_options = results["item"]["properties"]
             assert_fields(UserHistoryView.fields().keys(), get_options)
+
+    def test_options_against_get(self):
+        user = UserFactory()
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_history", args=[user.id])
+            options_response = self.client.options(url)
+            schema = options_response.data["actions"]["GET"]
+            validator = Draft4Validator(schema)
+            get_response = self.client.get(url)
+            assert validator.is_valid(json.loads(get_response.content))

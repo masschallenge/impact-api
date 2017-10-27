@@ -1,6 +1,9 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+import json
+from jsonschema import Draft4Validator
+
 from django.urls import reverse
 from impact.tests.factories import ProgramFamilyFactory
 from impact.tests.api_test_case import APITestCase
@@ -31,3 +34,12 @@ class TestProgramFamilyListView(APITestCase):
             results = response.data["actions"]["GET"]["properties"]["results"]
             get_options = results["item"]["properties"]
             assert_fields(PROGRAM_FAMILY_GET_FIELDS, get_options)
+
+    def test_options_against_get(self):
+        with self.login(username=self.basic_user().username):
+            url = reverse("program_family")
+            options_response = self.client.options(url)
+            schema = options_response.data["actions"]["GET"]
+            validator = Draft4Validator(schema)
+            get_response = self.client.get(url)
+            assert validator.is_valid(json.loads(get_response.content))

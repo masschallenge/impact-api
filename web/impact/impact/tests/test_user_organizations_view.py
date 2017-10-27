@@ -1,6 +1,8 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+import json
+from jsonschema import Draft4Validator
 from django.urls import reverse
 
 from impact.tests.factories import (
@@ -48,3 +50,13 @@ class TestUserOrganizationsView(APITestCase):
             assert_fields(USER_ORGANIZATIONS_GET_FIELDS, get_options)
             assert (ORGANIZATION_USER_FIELDS.keys() ==
                     get_options["organizations"]["item"]["properties"].keys())
+
+    def test_options_against_get(self):
+        stm = StartupTeamMemberFactory(startup_administrator=True)
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_organizations", args=[stm.user.id])
+            options_response = self.client.options(url)
+            schema = options_response.data["actions"]["GET"]
+            validator = Draft4Validator(schema)
+            get_response = self.client.get(url)
+            assert validator.is_valid(json.loads(get_response.content))

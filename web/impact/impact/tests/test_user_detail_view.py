@@ -1,6 +1,9 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+import json
+from jsonschema import Draft4Validator
+
 from django.urls import reverse
 
 from impact.tests.contexts import UserContext
@@ -171,6 +174,17 @@ class TestUserDetailView(APITestCase):
             assert_fields_missing(NON_MEMBER_MUTABLE_FIELDS, get_options)
             patch_options = response.data["actions"]["PATCH"]["properties"]
             assert_fields_missing(NON_MEMBER_MUTABLE_FIELDS, patch_options)
+
+    def test_options_against_get(self):
+        context = UserContext(user_type=BASE_EXPERT_TYPE)
+        user = context.user
+        with self.login(username=self.basic_user().username):
+            url = reverse("user_detail", args=[user.id])
+            options_response = self.client.options(url)
+            schema = options_response.data["actions"]["GET"]
+            validator = Draft4Validator(schema)
+            get_response = self.client.get(url)
+            assert validator.is_valid(json.loads(get_response.content))
 
     def test_patch(self):
         context = UserContext()

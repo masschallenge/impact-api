@@ -9,7 +9,7 @@ from impact.v1.helpers.model_helper import (
     URL_SLUG_FIELD,
 )
 
-EMAIL_DOMAIN_PATTERN = '^[a-z][a-z.]+[a-z]$'
+EMAIL_DOMAIN_PATTERN = '^[a-z][a-z0-9.]+[a-z]$'
 EMAIL_DOMAIN_REGEX = re.compile(EMAIL_DOMAIN_PATTERN)
 EMAIL_DOMAIN_FIELD = {
     "json-schema": {

@@ -1,8 +1,10 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-import pytz
 import datetime
+import json
+from jsonschema import Draft4Validator
+import pytz
 
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -129,6 +131,15 @@ class TestUserListView(APITestCase):
             assert_fields_required(REQUIRED_POST_FIELDS, post_options)
             assert_fields_not_required(ALL_POST_FIELDS - REQUIRED_POST_FIELDS,
                                        post_options)
+
+    def test_options_against_get(self):
+        with self.login(username=self.basic_user().username):
+            url = reverse("user")
+            options_response = self.client.options(url)
+            schema = options_response.data["actions"]["GET"]
+            validator = Draft4Validator(schema)
+            get_response = self.client.get(url)
+            assert validator.is_valid(json.loads(get_response.content))
 
     def test_post_entrepreneur(self):
         with self.login(username=self.basic_user().username):

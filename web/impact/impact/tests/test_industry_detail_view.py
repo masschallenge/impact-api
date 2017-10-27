@@ -1,6 +1,8 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+import json
+from jsonschema import Draft4Validator
 from django.urls import reverse
 
 from impact.tests.factories import IndustryFactory
@@ -43,3 +45,13 @@ class TestIndustryDetailView(APITestCase):
             assert response.status_code == 200
             get_options = response.data["actions"]["GET"]["properties"]
             assert_fields(INDUSTRY_GET_FIELDS, get_options)
+
+    def test_options_against_get(self):
+        industry = IndustryFactory()
+        with self.login(username=self.basic_user().username):
+            url = reverse("industry_detail", args=[industry.id])
+            options_response = self.client.options(url)
+            schema = options_response.data["actions"]["GET"]
+            validator = Draft4Validator(schema)
+            get_response = self.client.get(url)
+            assert validator.is_valid(json.loads(get_response.content))
