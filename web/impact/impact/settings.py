@@ -28,6 +28,8 @@ class Base(Configuration):
 
     USE_TZ = True
 
+    USE_X_FORWARDED_HOST = True
+
     ALLOWED_HOSTS = [
         '*'
     ]
@@ -208,8 +210,8 @@ class Dev(Base):
     ]
 
     MIDDLEWARE_CLASSES = [
-                             'debug_toolbar.middleware.DebugToolbarMiddleware',
-                         ] + Base.MIDDLEWARE_CLASSES
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    ] + Base.MIDDLEWARE_CLASSES
 
     INSTALLED_APPS = Base.INSTALLED_APPS + [
         'debug_toolbar',
