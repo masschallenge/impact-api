@@ -3,7 +3,9 @@ _Copyright (c) 2017 MassChallenge, Inc._
 
 # Impact API Server
 
-<a href="https://codeclimate.com/github/codeclimate/codeclimate"><img src="https://codeclimate.com/github/codeclimate/codeclimate/badges/gpa.svg" /></a>
+<a href="https://codeclimate.com/github/masschallenge/impact-api/maintainability">
+  <img src="https://api.codeclimate.com/v1/badges/919b52c7bf78bfc67bb6/maintainability" />
+</a>
 
 ## Quickstart
 
