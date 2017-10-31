@@ -21,16 +21,22 @@ from impact.v1.helpers.model_helper import (
     validate_string,
 )
 from impact.v1.helpers.organization_helper import (
+    COULD_BE_STARTUP_CHECK,
+    IS_STARTUP_CHECK,
     ORGANIZATION_FIELDS,
     ORGANIZATION_USER_FIELDS,
     OrganizationHelper,
 )
 from impact.v1.helpers.profile_helper import (
+    COULD_BE_EXPERT_CHECK,
+    COULD_BE_NON_MEMBER_CHECK,
     EXPERT_BOOLEAN_FIELD,
     EXPERT_PHONE_FIELD,
     EXPERT_STRING_FIELD,
     GENDER_FIELD,
     INVALID_ID_ERROR,
+    IS_EXPERT_CHECK,
+    IS_NON_MEMBER_CHECK,
     NON_MEMBER_STRING_FIELD,
     PRIMARY_INDUSTRY_ID_FIELD,
     ProfileHelper,

@@ -9,6 +9,7 @@ from impact.models import (
 )
 from impact.utils import parse_date
 from impact.v1.helpers import (
+    COULD_BE_EXPERT_CHECK,
     ProfileHelper,
     USER_TYPE_TO_PROFILE_MODEL,
     UserHelper,
@@ -24,7 +25,6 @@ INVALID_KEY_ERROR = "'{}' is not a valid key."
 REQUIRED_KEY_ERROR = "'{}' is required"
 UNSUPPORTED_KEY_ERROR = "'{key}' is not supported for {type}"
 
-
 User = get_user_model()
 
 
@@ -34,9 +34,9 @@ class UserListView(BaseListView):
     actions = ["GET", "POST"]
 
     def description_check(self, check_name):
-        if check_name in ["is_expert", "is_non_member"]:
+        if check_name in [IS_EXPERT_CHECK, IS_NON_MEMBER_CHECK]:
             return False
-        if check_name in ["could_be_expert", "could_be_non_member"]:
+        if check_name in [COULD_BE_EXPERT_CHECK, COULD_BE_NON_MEMBER_CHECK]:
             return True
         return check_name
 

@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 
 from impact.v1.helpers import (
+    COULD_BE_EXPERT_CHECK,
+    COULD_BE_NON_MEMBER_CHECK,
     UserHelper,
     valid_keys_note,
 )
@@ -28,9 +30,9 @@ class UserDetailView(BaseDetailView):
         return super().options(request, pk)
 
     def description_check(self, check_name):
-        if check_name in ["is_expert", "could_be_expert"]:
+        if check_name in [IS_EXPERT_CHECK, COULD_BE_EXPERT_CHECK]:
             return self.could_be_expert()
-        if check_name in ["is_non_member", "could_be_non_member"]:
+        if check_name in [IS_NON_MEMBER_CHECK, COULD_BE_NON_MEMBER_CHECK]:
             return self.could_be_non_member()
         return check_name
 

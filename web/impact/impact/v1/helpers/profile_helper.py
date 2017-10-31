@@ -29,15 +29,20 @@ from impact.models import (
 )
 
 
+COULD_BE_EXPERT_CHECK = "could_be_expert"
+COULD_BE_NON_MEMBER_CHECK = "could_be_non_member"
+IS_EXPERT_CHECK = "is_expert"
+IS_NON_MEMBER_CHECK = "is_non_member"
+
 EXPERT_DESCRIPTION = "This field exists only when user_type is 'expert'."
 
 OPTIONAL_EXPERT_FIELD = {
     "GET": {
-        "included": "could_be_expert",
+        "included": COULD_BE_EXPERT_CHECK,
         "description": EXPERT_DESCRIPTION,
     },
-    "PATCH": {"required": False, "allowed": "is_expert"},
-    "POST": {"required": False, "allowed": "could_be_expert"},
+    "PATCH": {"required": False, "allowed": IS_EXPERT_CHECK},
+    "POST": {"required": False, "allowed": COULD_BE_EXPERT_CHECK},
 }
 
 EXPERT_BOOLEAN_FIELD = merge_fields(OPTIONAL_EXPERT_FIELD,
@@ -51,12 +56,12 @@ NON_MEMBER_STRING_FIELD = {
         "type": "string",
     },
     "GET": {
-        "included": "could_be_non_member",
+        "included": COULD_BE_NON_MEMBER_CHECK,
         "description": ("This field exists only when user_type is "
                         "'entrepreneur' or 'expert'"),
     },
-    "PATCH": {"required": False, "allowed": "is_non_member"},
-    "POST": {"required": False, "allowed": "could_be_non_member"},
+    "PATCH": {"required": False, "allowed": IS_NON_MEMBER_CHECK},
+    "POST": {"required": False, "allowed": COULD_BE_NON_MEMBER_CHECK},
 }
 
 
@@ -85,7 +90,7 @@ EXPERT_PHONE_FIELD = merge_fields(
     PHONE_FIELD,
     {
         "POST": {
-            "required": "is_expert",
+            "required": IS_EXPERT_CHECK,
             "description": "Required when user_type is 'expert'",
         }
     })
@@ -112,18 +117,18 @@ EXPERT_CATEGORY_FIELD = {
         "enum": VALID_EXPERT_CATEGORIES,
     },
     "GET": {
-        "included": "could_be_expert",
+        "included": COULD_BE_EXPERT_CHECK,
         "description": EXPERT_DESCRIPTION,
     },
     "PATCH": {
         "required": False,
-        "allowed": "is_expert",
+        "allowed": IS_EXPERT_CHECK,
         "description": ("Allowed only when user_type is 'expert' and "
                         "Expert Category is valid"),
     },
     "POST": {
-        "required": "is_expert",
-        "allowed": "could_be_expert",
+        "required": IS_EXPERT_CHECK,
+        "allowed": COULD_BE_EXPERT_CHECK,
         "description": "Required when user_type is 'expert'",
     },
 }
@@ -134,22 +139,22 @@ MENTORING_SPECIALTIES_FIELD = {
         "items": {"type": "string"},
     },
     "GET": {
-        "included": "could_be_expert",
+        "included": COULD_BE_EXPERT_CHECK,
         "description": EXPERT_DESCRIPTION,
     },
 }
 
 EXPERT_OBJECT_ID_FIELD = {
     "GET": {
-        "included": "could_be_expert",
+        "included": COULD_BE_EXPERT_CHECK,
     },
     "PATCH": {
         "required": False,
-        "allowed": "is_expert",
+        "allowed": IS_EXPERT_CHECK,
     },
     "POST": {
-        "required": "is_expert",
-        "allowed": "could_be_expert",
+        "required": IS_EXPERT_CHECK,
+        "allowed": COULD_BE_EXPERT_CHECK,
     },
 }
 
@@ -194,7 +199,7 @@ EXPERT_INTEGER_ARRAY_FIELD = merge_fields(
     INTEGER_ARRAY_FIELD,
     {
         "GET": {
-            "included": "could_be_expert",
+            "included": COULD_BE_EXPERT_CHECK,
             "description": EXPERT_DESCRIPTION,
         },
     })

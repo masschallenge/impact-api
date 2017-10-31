@@ -15,13 +15,15 @@ from impact.v1.helpers.model_helper import (
     merge_fields,
 )
 
+COULD_BE_STARTUP_CHECK = "could_be_startup"
+IS_STARTUP_CHECK = "is_startup"
 STARTUP_FIELD = {
     "GET": {
-        "included": "could_be_startup",
+        "included": COULD_BE_STARTUP_CHECK,
         "description": "This field exists only when is_startup is true",
     },
-    "PATCH": {"allowed": "is_startup"},
-    "POST": {"allowed": "could_be_startup"},
+    "PATCH": {"allowed": IS_STARTUP_CHECK},
+    "POST": {"allowed": COULD_BE_STARTUP_CHECK},
 }
 STARTUP_BOOLEAN_FIELD = merge_fields(STARTUP_FIELD, BOOLEAN_FIELD)
 STARTUP_INTEGER_ARRAY_FIELD = merge_fields(STARTUP_FIELD, INTEGER_ARRAY_FIELD)

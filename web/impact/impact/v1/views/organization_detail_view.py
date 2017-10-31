@@ -2,7 +2,11 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from impact.models import Organization
-from impact.v1.helpers import OrganizationHelper
+from impact.v1.helpers import (
+    COULD_BE_STARTUP_CHECK,
+    IS_STARTUP_CHECK,
+    OrganizationHelper,
+)
 from impact.v1.views.base_detail_view import BaseDetailView
 
 
@@ -19,6 +23,6 @@ class OrganizationDetailView(BaseDetailView):
         return super().options(request, pk)
 
     def description_check(self, check_name):
-        if check_name in ["is_startup", "could_be_startup"]:
+        if check_name in [IS_STARTUP_CHECK, COULD_BE_STARTUP_CHECK]:
             return OrganizationHelper(self.organization).is_startup
         return check_name
