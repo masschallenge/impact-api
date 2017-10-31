@@ -1,9 +1,7 @@
 from abc import ABCMeta
 from rest_framework.views import APIView
 from rest_framework_tracking.mixins import LoggingMixin
-from impact.permissions import (
-    V1APIPermissions,
-)
+from impact.permissions import V1APIPermissions
 from impact.v1.helpers import (
     json_object,
     json_simple_list,
