@@ -134,10 +134,12 @@ class TestUserListView(APITestCase):
 
     def test_options_against_get(self):
         with self.login(username=self.basic_user().username):
+
             options_response = self.client.options(self.url)
+            get_response = self.client.get(self.url)
+
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)
-            get_response = self.client.get(self.url)
             assert validator.is_valid(json.loads(get_response.content))
 
     def test_post_entrepreneur(self):

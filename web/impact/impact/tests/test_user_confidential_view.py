@@ -61,8 +61,10 @@ class TestUserConfidentialView(APITestCase):
                              profile__internal_notes=TEST_INTERNAL_NOTES)
         with self.login(username=self.privileged_user().username):
             url = reverse(UserConfidentialView.view_name, args=[user.id])
+
             options_response = self.client.options(url)
+            get_response = self.client.get(url)
+
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)
-            get_response = self.client.get(url)
             assert validator.is_valid(json.loads(get_response.content))

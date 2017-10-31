@@ -47,8 +47,10 @@ class TestProgramFamilyDetailView(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse(ProgramFamilyDetailView.view_name,
                           args=[program_family.id])
+
             options_response = self.client.options(url)
+            get_response = self.client.get(url)
+
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)
-            get_response = self.client.get(url)
             assert validator.is_valid(json.loads(get_response.content))

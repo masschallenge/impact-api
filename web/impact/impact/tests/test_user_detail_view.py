@@ -183,10 +183,12 @@ class TestUserDetailView(APITestCase):
         user = context.user
         with self.login(username=self.basic_user().username):
             url = reverse(UserDetailView.view_name, args=[user.id])
+
             options_response = self.client.options(url)
+            get_response = self.client.get(url)
+
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)
-            get_response = self.client.get(url)
             assert validator.is_valid(json.loads(get_response.content))
 
     def test_patch(self):

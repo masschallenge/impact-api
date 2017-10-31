@@ -61,8 +61,10 @@ class TestOrganizationUsersView(APITestCase):
         with self.login(username=self.basic_user().username):
             url = reverse(OrganizationUsersView.view_name,
                           args=[stm.startup.id])
+
             options_response = self.client.options(url)
+            get_response = self.client.get(url)
+
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)
-            get_response = self.client.get(url)
             assert validator.is_valid(json.loads(get_response.content))
