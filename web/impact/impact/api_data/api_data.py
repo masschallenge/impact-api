@@ -49,14 +49,16 @@ class APIData(object):
             if required:
                 self.record_not_found(key, obj_key)
             return None
-        return self._lookup_object(key, obj_key)
+        result = self._lookup_object(key, obj_key)
+        if not result:
+            self.record_not_found(key, obj_key)
+        return result
 
     def _lookup_object(self, key, obj_key):
         obj_class, lookup = self.KEY_TO_CLASS_LOOKUP[obj_key]
+        result = None
         if isinstance(key, int) or key.isdigit():
             result = obj_class.objects.filter(id=key).first()
         elif isinstance(key, str):
             result = obj_class.objects.filter(**{lookup: key}).first()
-        if not result:
-            self.record_not_found(key, obj_key)
         return result
