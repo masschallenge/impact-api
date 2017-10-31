@@ -1,7 +1,4 @@
-from abc import (
-    ABCMeta,
-    # abstractmethod,
-)
+from abc import ABCMeta
 from rest_framework.views import APIView
 from rest_framework_tracking.mixins import LoggingMixin
 from impact.permissions import (
