@@ -158,7 +158,7 @@ class TestStartupDetailView(APITestCase):
                                          "StartupKey": startup.id})
             assert "" == response.data["video_elevator_pitch_url"]
 
-    def test_deleted_startup(self):
+    def test_bad_post(self):
         startup = StartupFactory()
         startup_id = startup.id
         startup.delete()
@@ -170,14 +170,4 @@ class TestStartupDetailView(APITestCase):
                                          "StartupKey": startup_id})
             assert response.status_code == 404
             assert match_errors({"StartupKey": str(startup_id)},
-                                response.data)
-
-    def test_missing_startup(self):
-        program = ProgramFactory()
-        with self.login(username=self.basic_user().username):
-            url = reverse("startup_detail")
-            response = self.client.post(url,
-                                        {"ProgramKey": program.id})
-            assert response.status_code == 404
-            assert match_errors({"StartupKey": "'None'"},
                                 response.data)
