@@ -3,7 +3,6 @@
 
 from abc import ABCMeta
 from rest_framework.response import Response
-from django.db.models import Q
 
 from impact.v1.helpers import (
     json_list_wrapper,
@@ -56,9 +55,9 @@ class BaseListView(ImpactView):
         updated_at_after = parse_date(after)
         updated_at_before = parse_date(before)
         if updated_at_after:
-            qs = qs.filter(Q(updated_at__gte=updated_at_after))
+            qs = qs.filter(updated_at__gte=updated_at_after)
         if updated_at_before:
-            qs = qs.exclude(Q(updated_at__gt=updated_at_before))
+            qs = qs.exclude(updated_at__gt=updated_at_before)
         return qs
 
 
