@@ -6,4 +6,5 @@ from impact.v1.helpers import IndustryHelper
 
 
 class IndustryListView(BaseListView):
+    view_name = "industry"
     helper_class = IndustryHelper

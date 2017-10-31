@@ -6,4 +6,5 @@ from impact.v1.helpers import ProgramFamilyHelper
 
 
 class ProgramFamilyListView(BaseListView):
+    view_name = "program_family"
     helper_class = ProgramFamilyHelper

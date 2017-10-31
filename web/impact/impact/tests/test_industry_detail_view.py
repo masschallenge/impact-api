@@ -8,6 +8,7 @@ from django.urls import reverse
 from impact.tests.factories import IndustryFactory
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
+from impact.v1.views import IndustryDetailView
 
 INDUSTRY_GET_FIELDS = [
     "id",
@@ -21,7 +22,7 @@ class TestIndustryDetailView(APITestCase):
     def test_get_industry(self):
         industry = IndustryFactory()
         with self.login(username=self.basic_user().username):
-            url = reverse("industry_detail", args=[industry.id])
+            url = reverse(IndustryDetailView.view_name, args=[industry.id])
             response = self.client.get(url)
             assert response.data["name"] == industry.name
             assert "parent_id" not in response.data
@@ -31,7 +32,7 @@ class TestIndustryDetailView(APITestCase):
         parent = IndustryFactory()
         industry = IndustryFactory(parent=parent)
         with self.login(username=self.basic_user().username):
-            url = reverse("industry_detail", args=[industry.id])
+            url = reverse(IndustryDetailView.view_name, args=[industry.id])
             response = self.client.get(url)
             assert response.data["name"] == industry.name
             assert response.data["parent_id"] == industry.parent_id
@@ -40,7 +41,7 @@ class TestIndustryDetailView(APITestCase):
     def test_options(self):
         industry = IndustryFactory()
         with self.login(username=self.basic_user().username):
-            url = reverse("industry_detail", args=[industry.id])
+            url = reverse(IndustryDetailView.view_name, args=[industry.id])
             response = self.client.options(url)
             assert response.status_code == 200
             get_options = response.data["actions"]["GET"]["properties"]
@@ -49,7 +50,7 @@ class TestIndustryDetailView(APITestCase):
     def test_options_against_get(self):
         industry = IndustryFactory()
         with self.login(username=self.basic_user().username):
-            url = reverse("industry_detail", args=[industry.id])
+            url = reverse(IndustryDetailView.view_name, args=[industry.id])
             options_response = self.client.options(url)
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)

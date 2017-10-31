@@ -12,6 +12,7 @@ from impact.v1.events import (
 
 
 class OrganizationHistoryView(BaseHistoryView):
+    view_name = "organization_history"
     model = Organization
     event_classes = [OrganizationCreatedEvent,
                      OrganizationBecameEntrantEvent,

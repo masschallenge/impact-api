@@ -15,6 +15,7 @@ User = get_user_model()
 
 
 class UserDetailView(BaseDetailView):
+    view_name = "user_detail"
     helper_class = UserHelper
     actions = ["GET", "PATCH"]
 

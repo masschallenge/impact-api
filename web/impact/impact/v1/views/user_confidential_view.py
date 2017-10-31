@@ -13,6 +13,7 @@ from impact.v1.views.base_detail_view import BaseDetailView
 
 
 class UserConfidentialView(BaseDetailView):
+    view_name = "user_confidential"
     helper_class = UserHelper
 
     permission_classes = (

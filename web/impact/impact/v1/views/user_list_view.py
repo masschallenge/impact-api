@@ -29,6 +29,7 @@ User = get_user_model()
 
 
 class UserListView(BaseListView):
+    view_name = "user"
     helper_class = UserHelper
     actions = ["GET", "POST"]
 

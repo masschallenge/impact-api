@@ -9,6 +9,7 @@ from django.urls import reverse
 from impact.tests.factories import ProgramFamilyFactory
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
+from impact.v1.views import ProgramFamilyDetailView
 
 PROGRAM_FAMILY_GET_FIELDS = [
     "id",
@@ -24,7 +25,8 @@ class TestProgramFamilyDetailView(APITestCase):
     def test_get(self):
         program_family = ProgramFamilyFactory()
         with self.login(username=self.basic_user().username):
-            url = reverse("program_family_detail", args=[program_family.id])
+            url = reverse(ProgramFamilyDetailView.view_name,
+                          args=[program_family.id])
             response = self.client.get(url)
             assert response.data["name"] == program_family.name
             assert (response.data["short_description"] ==
@@ -33,7 +35,8 @@ class TestProgramFamilyDetailView(APITestCase):
     def test_options(self):
         program_family = ProgramFamilyFactory()
         with self.login(username=self.basic_user().username):
-            url = reverse("program_family_detail", args=[program_family.id])
+            url = reverse(ProgramFamilyDetailView.view_name,
+                          args=[program_family.id])
             response = self.client.options(url)
             assert response.status_code == 200
             get_options = response.data["actions"]["GET"]["properties"]
@@ -42,7 +45,8 @@ class TestProgramFamilyDetailView(APITestCase):
     def test_options_against_get(self):
         program_family = ProgramFamilyFactory()
         with self.login(username=self.basic_user().username):
-            url = reverse("program_family_detail", args=[program_family.id])
+            url = reverse(ProgramFamilyDetailView.view_name,
+                          args=[program_family.id])
             options_response = self.client.options(url)
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)

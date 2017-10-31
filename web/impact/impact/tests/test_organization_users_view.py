@@ -13,7 +13,10 @@ from impact.tests.factories import (
 
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
-from impact.v1.views.organization_users_view import ORGANIZATION_USER_FIELDS
+from impact.v1.views.organization_users_view import (
+    ORGANIZATION_USER_FIELDS,
+    OrganizationUsersView,
+)
 
 ORGANIZATION_USERS_GET_FIELDS = ["users"]
 
@@ -28,7 +31,7 @@ class TestOrganizationUsersView(APITestCase):
             partner__organization=startup_team_member.startup.organization)
         partner_user_id = partner_team_member.team_member.id
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_users",
+            url = reverse(OrganizationUsersView.view_name,
                           args=[startup_team_member.startup.organization.id])
             response = self.client.get(url)
             users = response.data["users"]
@@ -44,7 +47,8 @@ class TestOrganizationUsersView(APITestCase):
     def test_options(self):
         stm = StartupTeamMemberFactory(startup_administrator=True)
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_users", args=[stm.startup.id])
+            url = reverse(OrganizationUsersView.view_name,
+                          args=[stm.startup.id])
             response = self.client.options(url)
             assert response.status_code == 200
             get_options = response.data["actions"]["GET"]["properties"]
@@ -55,7 +59,8 @@ class TestOrganizationUsersView(APITestCase):
     def test_options_against_get(self):
         stm = StartupTeamMemberFactory(startup_administrator=True)
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_users", args=[stm.startup.id])
+            url = reverse(OrganizationUsersView.view_name,
+                          args=[stm.startup.id])
             options_response = self.client.options(url)
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)

@@ -7,6 +7,7 @@ from impact.v1.views.base_detail_view import BaseDetailView
 
 
 class OrganizationDetailView(BaseDetailView):
+    view_name = "organization_detail"
     helper_class = OrganizationHelper
 
     def __init__(self, *args, **kwargs):

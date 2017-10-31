@@ -6,6 +6,7 @@ from impact.v1.helpers import OrganizationHelper
 
 
 class OrganizationListView(BaseListView):
+    view_name = "organization"
     helper_class = OrganizationHelper
 
     def description_check(self, check_name):

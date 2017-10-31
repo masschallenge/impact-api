@@ -28,7 +28,7 @@ class TestUserConfidentialView(APITestCase):
     def test_basic_user_cannot_access(self):
         user = ExpertFactory()
         with self.login(username=self.basic_user().username):
-            url = reverse("user_confidential", args=[user.id])
+            url = reverse(UserConfidentialView.view_name, args=[user.id])
             response = self.client.get(url)
             self.assertEqual(403, response.status_code)
 
@@ -36,7 +36,7 @@ class TestUserConfidentialView(APITestCase):
         user = ExpertFactory(profile__expert_group=TEST_EXPERT_GROUP,
                              profile__internal_notes=TEST_INTERNAL_NOTES)
         with self.login(username=self.privileged_user().username):
-            url = reverse("user_confidential", args=[user.id])
+            url = reverse(UserConfidentialView.view_name, args=[user.id])
             response = self.client.get(url)
             self.assertEqual(200, response.status_code)
             self.assertEqual(TEST_EXPERT_GROUP,
@@ -48,7 +48,7 @@ class TestUserConfidentialView(APITestCase):
         user = ExpertFactory(profile__expert_group=TEST_EXPERT_GROUP,
                              profile__internal_notes=TEST_INTERNAL_NOTES)
         with self.login(username=self.privileged_user().username):
-            url = reverse("user_confidential", args=[user.id])
+            url = reverse(UserConfidentialView.view_name, args=[user.id])
             response = self.client.options(url)
             assert response.status_code == 200
             get_data = response.data["actions"]["GET"]
@@ -60,7 +60,7 @@ class TestUserConfidentialView(APITestCase):
         user = ExpertFactory(profile__expert_group=TEST_EXPERT_GROUP,
                              profile__internal_notes=TEST_INTERNAL_NOTES)
         with self.login(username=self.privileged_user().username):
-            url = reverse("user_confidential", args=[user.id])
+            url = reverse(UserConfidentialView.view_name, args=[user.id])
             options_response = self.client.options(url)
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)

@@ -15,6 +15,7 @@ from impact.v1.helpers import ORGANIZATION_USER_FIELDS
 
 
 class OrganizationUsersView(ImpactView):
+    view_name = "organization_users"
     model = Organization
     list_key = "users"
 
