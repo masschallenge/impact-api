@@ -3,6 +3,8 @@ _Copyright (c) 2017 MassChallenge, Inc._
 
 # Impact API Server
 
+<a href="https://codeclimate.com/github/codeclimate/codeclimate"><img src="https://codeclimate.com/github/codeclimate/codeclimate/badges/gpa.svg" /></a>
+
 ## Quickstart
 
 1. Install [Docker](https://docs.docker.com/docker-for-mac/)
