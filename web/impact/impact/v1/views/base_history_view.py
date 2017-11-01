@@ -2,23 +2,19 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from rest_framework.response import Response
-
-from impact.permissions import (
-    V1APIPermissions,
-)
-from impact.v1.metadata import ImpactMetadata
 from impact.v1.views.impact_view import ImpactView
 
 
 class BaseHistoryView(ImpactView):
-    metadata_class = ImpactMetadata
-
-    permission_classes = (
-        V1APIPermissions,
-    )
-
-    def metadata(self):
-        return self.options_from_fields(self.fields(), ["SIMPLE_LIST"])
+    @classmethod
+    def fields(cls):
+        event_types = set()
+        results = {}
+        for klass in cls.event_classes:
+            event_types.add(klass.event_type())
+            results.update(klass.all_fields())
+        results.update(event_type_field(event_types))
+        return results
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
@@ -32,16 +28,6 @@ class BaseHistoryView(ImpactView):
                                                    e["datetime"])))
         }
         return Response(result)
-
-    @classmethod
-    def fields(cls):
-        event_types = set()
-        results = {}
-        for klass in cls.event_classes:
-            event_types.add(klass.event_type())
-            results.update(klass.all_fields())
-        results.update(event_type_field(event_types))
-        return results
 
 
 def event_type_field(event_types):

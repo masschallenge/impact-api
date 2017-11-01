@@ -1,8 +1,10 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-import pytz
 import datetime
+import json
+from jsonschema import Draft4Validator
+import pytz
 
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -45,6 +47,7 @@ from impact.v1.helpers.model_helper import (
 from impact.v1.views.user_list_view import (
     EMAIL_EXISTS_ERROR,
     UNSUPPORTED_KEY_ERROR,
+    UserListView,
 )
 
 EXAMPLE_ENTREPRENEUR = {
@@ -90,14 +93,14 @@ User = get_user_model()
 
 
 class TestUserListView(APITestCase):
+    url = reverse(UserListView.view_name)
 
     def test_get(self):
         user1 = UserContext().user
         user2 = UserContext().user
         with self.login(username=self.basic_user().username):
-            url = reverse("user")
             user_count = User.objects.count()
-            response = self.client.get(url)
+            response = self.client.get(self.url)
             results = response.data["results"]
             assert user_count == min(len(results), 10)
             emails = [result["email"] for result in response.data["results"]]
@@ -109,7 +112,7 @@ class TestUserListView(APITestCase):
         UserContext().user
         UserContext().user
         with self.login(username=self.basic_user().username):
-            url = reverse("user") + "?limit=1"
+            url = self.url + "?limit=1"
             user_count = User.objects.count()
             response = self.client.get(url)
             results = response.data["results"]
@@ -118,8 +121,7 @@ class TestUserListView(APITestCase):
 
     def test_options(self):
         with self.login(username=self.basic_user().username):
-            url = reverse("user")
-            response = self.client.options(url)
+            response = self.client.options(self.url)
             assert response.status_code == 200
             results = response.data["actions"]["GET"]["properties"]["results"]
             get_options = results["item"]["properties"]
@@ -130,10 +132,19 @@ class TestUserListView(APITestCase):
             assert_fields_not_required(ALL_POST_FIELDS - REQUIRED_POST_FIELDS,
                                        post_options)
 
+    def test_options_against_get(self):
+        with self.login(username=self.basic_user().username):
+
+            options_response = self.client.options(self.url)
+            get_response = self.client.get(self.url)
+
+            schema = options_response.data["actions"]["GET"]
+            validator = Draft4Validator(schema)
+            assert validator.is_valid(json.loads(get_response.content))
+
     def test_post_entrepreneur(self):
         with self.login(username=self.basic_user().username):
-            url = reverse("user")
-            response = self.client.post(url, EXAMPLE_ENTREPRENEUR)
+            response = self.client.post(self.url, EXAMPLE_ENTREPRENEUR)
             id = response.data["id"]
             user = User.objects.get(id=id)
             assert user.email == EXAMPLE_ENTREPRENEUR["email"]
@@ -141,18 +152,16 @@ class TestUserListView(APITestCase):
 
     def test_post_entrepreneur_with_expert_keys(self):
         with self.login(username=self.basic_user().username):
-            url = reverse("user")
             data = _example_expert()
             data["user_type"] = EntrepreneurProfile.user_type
-            response = self.client.post(url, data)
+            response = self.client.post(self.url, data)
             error_msg = UNSUPPORTED_KEY_ERROR.format(key="company",
                                                      type=data["user_type"])
             assert error_msg in response.data
 
     def test_post_expert(self):
         with self.login(username=self.basic_user().username):
-            url = reverse("user")
-            response = self.client.post(url, _example_expert())
+            response = self.client.post(self.url, _example_expert())
             id = response.data["id"]
             user = User.objects.get(id=id)
             assert user.email == EXAMPLE_EXPERT["email"]
@@ -160,10 +169,9 @@ class TestUserListView(APITestCase):
 
     def test_post_expert_with_bad_category(self):
         with self.login(username=self.basic_user().username):
-            url = reverse("user")
             bad_name = "Bad Category"
             response = self.client.post(
-                url, _example_expert(expert_category=bad_name))
+                self.url, _example_expert(expert_category=bad_name))
             error_msg = INVALID_CHOICE_ERROR.format(field="expert_category",
                                                     value=bad_name,
                                                     choices=format_choices([]))
@@ -171,18 +179,16 @@ class TestUserListView(APITestCase):
 
     def test_post_expert_with_bad_url(self):
         with self.login(username=self.basic_user().username):
-            url = reverse("user")
             bad_url = "Bad URL"
             response = self.client.post(
-                url, _example_expert(personal_website_url=bad_url))
+                self.url, _example_expert(personal_website_url=bad_url))
             error_msg = INVALID_URL_ERROR.format(field="personal_website_url",
                                                  value=bad_url)
             assert error_msg in response.data
 
     def test_post_member(self):
         with self.login(username=self.basic_user().username):
-            url = reverse("user")
-            response = self.client.post(url, EXAMPLE_MEMBER)
+            response = self.client.post(self.url, EXAMPLE_MEMBER)
             id = response.data["id"]
             user = User.objects.get(id=id)
             assert user.email == EXAMPLE_MEMBER["email"]
@@ -190,25 +196,22 @@ class TestUserListView(APITestCase):
 
     def test_post_member_with_bio(self):
         with self.login(username=self.basic_user().username):
-            url = reverse("user")
             data = {"bio": "I have a bio!"}
             data.update(EXAMPLE_MEMBER)
-            response = self.client.post(url, data)
+            response = self.client.post(self.url, data)
             error_msg = UNSUPPORTED_KEY_ERROR.format(key="bio",
                                                      type=data["user_type"])
             assert error_msg in response.data
 
     def test_post_without_required_field(self):
         with self.login(username=self.basic_user().username):
-            url = reverse("user")
-            response = self.client.post(url, {})
+            response = self.client.post(self.url, {})
             assert response.status_code == 403
 
     def test_post_bad_key(self):
         with self.login(username=self.basic_user().username):
-            url = reverse("user")
             bad_key = "bad key"
-            response = self.client.post(url, {bad_key: True})
+            response = self.client.post(self.url, {bad_key: True})
             assert response.status_code == 403
             assert any([bad_key in error for error in response.data])
 
@@ -217,8 +220,7 @@ class TestUserListView(APITestCase):
         data = EXAMPLE_MEMBER.copy()
         data["email"] = user.email
         with self.login(username=self.basic_user().username):
-            url = reverse("user")
-            response = self.client.post(url, data)
+            response = self.client.post(self.url, data)
             assert response.status_code == 403
             assert EMAIL_EXISTS_ERROR.format(user.email) in response.data
 
@@ -231,7 +233,7 @@ class TestUserListView(APITestCase):
         updated_after = _user_for_date(week_ago + one_day)
         with self.login(username=self.basic_user().username):
             url = "{base_url}?updated_at.before={datestr}".format(
-                base_url=reverse("user"),
+                base_url=self.url,
                 datestr=week_ago.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
             response = self.client.get(url)
             assert _contains_user(updated_none, response.data)
@@ -248,7 +250,7 @@ class TestUserListView(APITestCase):
         updated_after = _user_for_date(week_ago + one_day)
         with self.login(username=self.basic_user().username):
             url = "{base_url}?updated_at.after={datestr}".format(
-                base_url=reverse("user"),
+                base_url=self.url,
                 datestr=week_ago.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
             response = self.client.get(url)
             assert not _contains_user(updated_none, response.data)

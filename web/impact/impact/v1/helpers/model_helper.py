@@ -88,7 +88,7 @@ EMAIL_FIELD = {
 }
 REQUIRED_EMAIL_FIELD = merge_fields(POST_REQUIRED, EMAIL_FIELD)
 
-PHONE_PATTERN = fr'^[0-9x.+() -]{{0,{PHONE_MAX_LENGTH}}}$'
+PHONE_PATTERN = '^[0-9x.+() -]{{0,{}}}$'.format(PHONE_MAX_LENGTH)
 PHONE_REGEX = re.compile(PHONE_PATTERN)
 PHONE_FIELD = {
     "json-schema": {
@@ -110,7 +110,7 @@ URL_FIELD = merge_fields(
 URL_SLUG_FIELD = merge_fields(STRING_FIELD,
                               {"json-schema": {"pattern": "^[a-zA-Z0-9_-]+$"}})
 
-TWITTER_PATTERN = fr'^\S{{0,{TWITTER_HANDLE_MAX_LENGTH}}}$'
+TWITTER_PATTERN = '^\S{{0,{}}}$'.format(TWITTER_HANDLE_MAX_LENGTH)
 TWITTER_REGEX = re.compile(TWITTER_PATTERN)
 TWITTER_FIELD = merge_fields(STRING_FIELD,
                              {"json-schema": {"pattern": TWITTER_PATTERN}})
@@ -134,8 +134,7 @@ class ModelHelper(object):
         self.subject = subject
         self.errors = []
 
-    def serialize(self, fields=None):
-        fields = fields or self.OUTPUT_KEYS
+    def serialize(self, fields):
         result = {}
         for field in fields:
             value = self.field_value(field)
@@ -171,7 +170,7 @@ class ModelHelper(object):
 
     @classmethod
     def all_objects(cls):
-        return cls.MODEL.objects.all()
+        return cls.model.objects.all()
 
 
 def validate_boolean(helper, field, value):
@@ -195,17 +194,12 @@ def validate_string(helper, field, value):
     return value
 
 
-def validate_choices(helper, field, value, choices, translations={}):
+def validate_choices(helper, field, value, choices):
     validate_string(helper, field, value)
-    result = translations.get(value, value)
-    if value in choices or result in choices:
-        return result
-    if isinstance(result, str):
-        result = translations.get(result.lower(), result)
-    if result not in choices:
+    if value not in choices:
         helper.errors.append(INVALID_CHOICE_ERROR.format(
                 field=field, value=value, choices=format_choices(choices)))
-    return result
+    return value
 
 
 def format_choices(choices):
@@ -267,5 +261,5 @@ def json_list_wrapper(item):
             "results": json_array(item)})
 
 
-def json_simple_list(item, key="results"):
-    return json_object({key: json_array(item)})
+def json_simple_list(item, list_key):
+    return json_object({list_key: json_array(item)})

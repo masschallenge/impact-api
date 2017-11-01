@@ -14,6 +14,8 @@ from impact.tests.utils import (
     assert_fields_missing,
 )
 from impact.tests.api_test_case import APITestCase
+from impact.v1.views import OrganizationDetailView
+
 SHARED_GET_FIELDS = [
     "id",
     "is_partner",
@@ -48,7 +50,7 @@ class TestOrganizationDetailView(APITestCase):
     def test_get_startup(self):
         startup = StartupFactory()
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_detail",
+            url = reverse(OrganizationDetailView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
             assert response.data["name"] == startup.organization.name
@@ -65,7 +67,7 @@ class TestOrganizationDetailView(APITestCase):
             primary_industry=primary_industry,
             additional_industries=additional_industries)
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_detail",
+            url = reverse(OrganizationDetailView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
             assert response.data["primary_industry_id"] == primary_industry.id
@@ -75,7 +77,7 @@ class TestOrganizationDetailView(APITestCase):
     def test_get_partner(self):
         partner = PartnerFactory()
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_detail",
+            url = reverse(OrganizationDetailView.view_name,
                           args=[partner.organization.id])
             response = self.client.get(url)
             assert response.data["name"] == partner.organization.name
@@ -89,7 +91,7 @@ class TestOrganizationDetailView(APITestCase):
         partner = PartnerFactory()
 
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_detail",
+            url = reverse(OrganizationDetailView.view_name,
                           args=[partner.organization.id])
             response = self.client.get(url)
             assert response.data["name"] == partner.organization.name
@@ -102,7 +104,7 @@ class TestOrganizationDetailView(APITestCase):
     def test_organization_has_no_startup_nor_partner(self):
         organization = OrganizationFactory()
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_detail",
+            url = reverse(OrganizationDetailView.view_name,
                           args=[organization.id])
             response = self.client.get(url)
             assert response.data["name"] == organization.name
@@ -115,7 +117,8 @@ class TestOrganizationDetailView(APITestCase):
     def test_startup_options(self):
         organization = StartupFactory().organization
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_detail", args=[organization.id])
+            url = reverse(OrganizationDetailView.view_name,
+                          args=[organization.id])
             response = self.client.options(url)
             assert response.status_code == 200
             get_options = response.data["actions"]["GET"]["properties"]
@@ -124,7 +127,8 @@ class TestOrganizationDetailView(APITestCase):
     def test_partner_options(self):
         organization = PartnerFactory().organization
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_detail", args=[organization.id])
+            url = reverse(OrganizationDetailView.view_name,
+                          args=[organization.id])
             response = self.client.options(url)
             assert response.status_code == 200
             get_options = response.data["actions"]["GET"]["properties"]

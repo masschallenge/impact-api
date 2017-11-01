@@ -11,3 +11,4 @@ git+https://github.com/PyCQA/astroid.git#egg=astroid
 git+https://github.com/PyCQA/pylint#egg=pylint
 ipdb==0.8.1
 ipython==4.0.0
+jsonschema

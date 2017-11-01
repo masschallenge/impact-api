@@ -1,6 +1,9 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+import json
+from jsonschema import Draft4Validator
+
 from django.urls import reverse
 
 from impact.models import (
@@ -37,7 +40,7 @@ class TestOrganizationHistoryView(APITestCase):
     def test_startup_created(self):
         startup = StartupFactory()
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history",
+            url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
@@ -50,7 +53,7 @@ class TestOrganizationHistoryView(APITestCase):
         startup.created_at = None
         startup.save()
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history",
+            url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
@@ -63,7 +66,7 @@ class TestOrganizationHistoryView(APITestCase):
         startup.created_at = None
         startup.save()
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history",
+            url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
@@ -80,7 +83,7 @@ class TestOrganizationHistoryView(APITestCase):
         next_created_datetime = days_from_now(-2)
         StartupFactory(created_datetime=next_created_datetime)
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history",
+            url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
@@ -93,7 +96,7 @@ class TestOrganizationHistoryView(APITestCase):
     def test_partner_created(self):
         partner = PartnerFactory()
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history",
+            url = reverse(OrganizationHistoryView.view_name,
                           args=[partner.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
@@ -106,7 +109,7 @@ class TestOrganizationHistoryView(APITestCase):
         partner.created_at = None
         partner.save()
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history",
+            url = reverse(OrganizationHistoryView.view_name,
                           args=[partner.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
@@ -127,7 +130,7 @@ class TestOrganizationHistoryView(APITestCase):
         next_partner.created_at = next_created_at
         next_partner.save()
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history",
+            url = reverse(OrganizationHistoryView.view_name,
                           args=[partner.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
@@ -139,7 +142,7 @@ class TestOrganizationHistoryView(APITestCase):
     def test_organization_created(self):
         org = OrganizationFactory()
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history",
+            url = reverse(OrganizationHistoryView.view_name,
                           args=[org.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
@@ -165,7 +168,7 @@ class TestOrganizationHistoryView(APITestCase):
         startup_status.created_at = days_from_now(-1)
         startup_status.save()
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history",
+            url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
@@ -188,7 +191,7 @@ class TestOrganizationHistoryView(APITestCase):
             cycle=cycle)
         startup = application.startup
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history",
+            url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
@@ -208,7 +211,7 @@ class TestOrganizationHistoryView(APITestCase):
             submission_datetime=None)
         startup = application.startup
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history",
+            url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
@@ -227,7 +230,7 @@ class TestOrganizationHistoryView(APITestCase):
             submission_datetime=None)
         startup = application.startup
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history",
+            url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
@@ -250,7 +253,7 @@ class TestOrganizationHistoryView(APITestCase):
             submission_datetime=None)
         startup = application.startup
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history",
+            url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
@@ -268,7 +271,7 @@ class TestOrganizationHistoryView(APITestCase):
             startup=startup)
         program = startup_status.program_startup_status.program
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history",
+            url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
@@ -288,7 +291,7 @@ class TestOrganizationHistoryView(APITestCase):
         startup_status.created_at = None
         startup_status.save()
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history",
+            url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
@@ -299,9 +302,21 @@ class TestOrganizationHistoryView(APITestCase):
     def test_options(self):
         startup = StartupFactory()
         with self.login(username=self.basic_user().username):
-            url = reverse("organization_history", args=[startup.id])
+            url = reverse(OrganizationHistoryView.view_name, args=[startup.id])
             response = self.client.options(url)
             assert response.status_code == 200
             results = response.data["actions"]["GET"]["properties"]["results"]
             get_options = results["item"]["properties"]
             assert_fields(OrganizationHistoryView.fields().keys(), get_options)
+
+    def test_options_against_get(self):
+        startup = StartupFactory()
+        with self.login(username=self.basic_user().username):
+            url = reverse(OrganizationHistoryView.view_name, args=[startup.id])
+
+            options_response = self.client.options(url)
+            get_response = self.client.get(url)
+
+            schema = options_response.data["actions"]["GET"]
+            validator = Draft4Validator(schema)
+            assert validator.is_valid(json.loads(get_response.content))

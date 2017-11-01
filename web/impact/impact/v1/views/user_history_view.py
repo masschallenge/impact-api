@@ -16,6 +16,7 @@ User = get_user_model()
 
 
 class UserHistoryView(BaseHistoryView):
+    view_name = "user_history"
     model = User
     event_classes = [UserBecameConfirmedJudgeEvent,
                      UserBecameConfirmedMentorEvent,

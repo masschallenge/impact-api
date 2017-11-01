@@ -1,15 +1,11 @@
 from django.db.models import Q
 from rest_framework.response import Response
 
-from impact.permissions import (
-    V1APIPermissions,
-)
 from impact.models import (
     Organization,
     PartnerTeamMember,
     StartupTeamMember,
 )
-from impact.v1.metadata import ImpactMetadata
 from impact.v1.views.impact_view import ImpactView
 from impact.v1.views.utils import (
     coalesce_dictionaries,
@@ -19,16 +15,13 @@ from impact.v1.helpers import ORGANIZATION_USER_FIELDS
 
 
 class OrganizationUsersView(ImpactView):
-    permission_classes = (
-        V1APIPermissions,
-    )
-    metadata_class = ImpactMetadata
+    view_name = "organization_users"
     model = Organization
+    list_key = "users"
 
-    def metadata(self):
-        return self.options_from_fields(ORGANIZATION_USER_FIELDS,
-                                        ["SIMPLE_LIST"],
-                                        key="users")
+    @classmethod
+    def fields(self):
+        return ORGANIZATION_USER_FIELDS
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
