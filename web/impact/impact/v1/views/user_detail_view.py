@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from impact.v1.helpers import (
     COULD_BE_EXPERT_CHECK,
     COULD_BE_NON_MEMBER_CHECK,
+    IS_EXPERT_CHECK,
+    IS_NON_MEMBER_CHECK,
     UserHelper,
     valid_keys_note,
 )

@@ -10,6 +10,9 @@ from impact.models import (
 from impact.utils import parse_date
 from impact.v1.helpers import (
     COULD_BE_EXPERT_CHECK,
+    COULD_BE_NON_MEMBER_CHECK,
+    IS_EXPERT_CHECK,
+    IS_NON_MEMBER_CHECK,
     ProfileHelper,
     USER_TYPE_TO_PROFILE_MODEL,
     UserHelper,

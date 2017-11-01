@@ -2,7 +2,11 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from impact.v1.views.base_list_view import BaseListView
-from impact.v1.helpers import OrganizationHelper
+from impact.v1.helpers import (
+    COULD_BE_STARTUP_CHECK,
+    # IS_STARTUP_CHECK,
+    OrganizationHelper,
+)
 
 
 class OrganizationListView(BaseListView):
