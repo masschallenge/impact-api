@@ -195,6 +195,10 @@ class Base(Configuration):
         'django.contrib.auth.backends.ModelBackend',
     )
 
+    MPTT_SWAPPABLE_INDUSTRY_MODEL_ADDITIONAL = "accelerator.Industry"
+    MPTT_SWAPPABLE_INDUSTRY_DB_TABLE_NAME = (
+        "accelerator_startup_related_industry")
+
 
 class Dev(Base):
     DEBUG = True
@@ -210,8 +214,8 @@ class Dev(Base):
     ]
 
     MIDDLEWARE_CLASSES = [
-        'debug_toolbar.middleware.DebugToolbarMiddleware',
-    ] + Base.MIDDLEWARE_CLASSES
+                             'debug_toolbar.middleware.DebugToolbarMiddleware',
+                         ] + Base.MIDDLEWARE_CLASSES
 
     INSTALLED_APPS = Base.INSTALLED_APPS + [
         'debug_toolbar',
