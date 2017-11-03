@@ -33,10 +33,10 @@ class BaseProfile(MCModel):
         managed = is_managed(db_table)
 
     def __str__(self):
-        fn = self.user.full_name
-        ln = self.user.short_name
+        fn = self.user.first_name
+        ln = self.user.last_name
         if fn and ln:
             identifier = "%s %s" % (fn, ln)
         else:
-            identifier = self.user.username
+            identifier = self.user.email
         return "Base Profile for %s" % identifier

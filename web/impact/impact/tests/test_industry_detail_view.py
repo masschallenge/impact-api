@@ -21,7 +21,7 @@ INDUSTRY_GET_FIELDS = [
 class TestIndustryDetailView(APITestCase):
     def test_get_industry(self):
         industry = IndustryFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(IndustryDetailView.view_name, args=[industry.id])
             response = self.client.get(url)
             assert response.data["name"] == industry.name
@@ -31,7 +31,7 @@ class TestIndustryDetailView(APITestCase):
     def test_get_industry_with_parent(self):
         parent = IndustryFactory()
         industry = IndustryFactory(parent=parent)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(IndustryDetailView.view_name, args=[industry.id])
             response = self.client.get(url)
             assert response.data["name"] == industry.name
@@ -40,7 +40,7 @@ class TestIndustryDetailView(APITestCase):
 
     def test_options(self):
         industry = IndustryFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(IndustryDetailView.view_name, args=[industry.id])
             response = self.client.options(url)
             assert response.status_code == 200
@@ -49,7 +49,7 @@ class TestIndustryDetailView(APITestCase):
 
     def test_options_against_get(self):
         industry = IndustryFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(IndustryDetailView.view_name, args=[industry.id])
 
             options_response = self.client.options(url)

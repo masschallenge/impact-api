@@ -75,9 +75,9 @@ USER_FIELDS = {
 class UserHelper(ModelHelper):
     VALIDATORS = {
         "email": validate_email_address,
-        "full_name": validate_string,
+        "first_name": validate_string,
         "is_active": validate_boolean,
-        "short_name": validate_string,
+        "last_name": validate_string,
         }
 
     model = User
@@ -93,18 +93,10 @@ class UserHelper(ModelHelper):
     OPTIONAL_KEYS = OPTIONAL_BOOLEAN_KEYS
     USER_INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
     INPUT_KEYS = USER_INPUT_KEYS + ProfileHelper.INPUT_KEYS
-    KEY_TRANSLATIONS = {
-        "first_name": "full_name",
-        "last_name": "short_name",
-        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.profile_helper = ProfileHelper(get_profile(self.subject))
-
-    @classmethod
-    def translate_key(cls, key):
-        return cls.KEY_TRANSLATIONS.get(key, key)
 
     def field_value(self, field):
         result = super().field_value(field)
@@ -129,14 +121,6 @@ class UserHelper(ModelHelper):
     def save(self):
         self.profile_helper.save()
         super().save()
-
-    @property
-    def first_name(self):
-        return self.subject.full_name
-
-    @property
-    def last_name(self):
-        return self.subject.short_name
 
     @classmethod
     def fields(cls):

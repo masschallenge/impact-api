@@ -19,7 +19,7 @@ class PartnerTeamMember(MCModel):
         db_table = 'mc_partnerteammember'
         managed = is_managed(db_table)
         verbose_name_plural = 'Partner Team Members'
-        ordering = ['team_member__full_name']
+        ordering = ['team_member__first_name']
         unique_together = ('partner', 'team_member')
 
     def __str__(self):

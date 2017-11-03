@@ -12,7 +12,7 @@ from impact.tests.factories import (
 class TestJobPostingDetailView(APITestCase):
 
     def test_request_with_no_jobkey(self):
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("job_posting_detail")
             # We are not passing JobKey but the view needs it
             response = self.client.post(url, data={})
@@ -21,7 +21,7 @@ class TestJobPostingDetailView(APITestCase):
     def test_request_with_jobkey(self):
         job = JobPostingFactory()
         StartupStatusFactory(startup=job.startup)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("job_posting_detail")
             data = {"JobKey": job.pk}
             response = self.client.post(url, data=data)
@@ -32,7 +32,7 @@ class TestJobPostingDetailView(APITestCase):
         job.startup.high_resolution_logo = "hamsterdance.gif"
         job.startup.save()
         StartupStatusFactory(startup=job.startup)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("job_posting_detail")
             data = {"JobKey": job.pk}
             response = self.client.post(url, data=data)

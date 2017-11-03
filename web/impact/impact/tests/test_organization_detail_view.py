@@ -49,7 +49,7 @@ STARTUP_GET_FIELDS = SHARED_GET_FIELDS + STARTUP_ONLY_GET_FIELDS
 class TestOrganizationDetailView(APITestCase):
     def test_get_startup(self):
         startup = StartupFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(OrganizationDetailView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
@@ -66,7 +66,7 @@ class TestOrganizationDetailView(APITestCase):
         startup = StartupFactory(
             primary_industry=primary_industry,
             additional_industries=additional_industries)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(OrganizationDetailView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
@@ -76,7 +76,7 @@ class TestOrganizationDetailView(APITestCase):
 
     def test_get_partner(self):
         partner = PartnerFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(OrganizationDetailView.view_name,
                           args=[partner.organization.id])
             response = self.client.get(url)
@@ -90,7 +90,7 @@ class TestOrganizationDetailView(APITestCase):
     def test_get_org_is_both_partner_and_startup(self):
         partner = PartnerFactory()
 
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(OrganizationDetailView.view_name,
                           args=[partner.organization.id])
             response = self.client.get(url)
@@ -103,7 +103,7 @@ class TestOrganizationDetailView(APITestCase):
 
     def test_organization_has_no_startup_nor_partner(self):
         organization = OrganizationFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(OrganizationDetailView.view_name,
                           args=[organization.id])
             response = self.client.get(url)
@@ -116,7 +116,7 @@ class TestOrganizationDetailView(APITestCase):
 
     def test_startup_options(self):
         organization = StartupFactory().organization
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(OrganizationDetailView.view_name,
                           args=[organization.id])
             response = self.client.options(url)
@@ -126,7 +126,7 @@ class TestOrganizationDetailView(APITestCase):
 
     def test_partner_options(self):
         organization = PartnerFactory().organization
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(OrganizationDetailView.view_name,
                           args=[organization.id])
             response = self.client.options(url)
