@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
-from simpleuser.models import User
+from django.conf import settings
 from django.db import models
 
 from impact.models.mc_model import MCModel
@@ -21,7 +21,7 @@ PANEL_STATUS_ENUM = ((DEFAULT_PANEL_STATUS, "NOT STARTED"),
 
 class Panel(MCModel):
     judges = models.ManyToManyField(
-        User,
+        settings.AUTH_USER_MODEL,
         related_name="panels",
         through="impact.JudgePanelAssignment")
     applications = models.ManyToManyField(

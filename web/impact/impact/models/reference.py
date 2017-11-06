@@ -2,9 +2,9 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from django.conf import settings
 from django.core.validators import EmailValidator
 from django.db import models
-from simpleuser.models import User
 
 from impact.models.mc_model import MCModel
 from impact.models.application import Application
@@ -30,7 +30,7 @@ class Reference(MCModel):
     question_1_rating = models.IntegerField(null=True)
     question_2_rating = models.IntegerField(null=True)
     comments = models.TextField(blank=True)
-    requesting_user = models.ForeignKey(User, null=True)
+    requesting_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
 
     class Meta(MCModel.Meta):
         db_table = "mc_reference"

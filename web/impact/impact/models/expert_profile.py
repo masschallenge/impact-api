@@ -4,8 +4,9 @@
 
 import decimal
 
+from django.conf import settings
 from django.db import models
-from simpleuser.models import User
+
 from impact.models.base_profile import (
     PHONE_MAX_LENGTH,
     TWITTER_HANDLE_MAX_LENGTH,
@@ -57,7 +58,7 @@ INVITED_JUDGE_ALERT = (
 
 
 class ExpertProfile(MCModel):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
     user_type = 'expert'
     phone = models.CharField(max_length=PHONE_MAX_LENGTH)
     linked_in_url = models.URLField(blank=True)

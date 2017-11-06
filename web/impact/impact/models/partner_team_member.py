@@ -2,8 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from django.conf import settings
 from django.db import models
-from simpleuser.models import User
 
 from impact.models.mc_model import MCModel
 from impact.models.partner import Partner
@@ -12,7 +12,7 @@ from impact.models.utils import is_managed
 
 class PartnerTeamMember(MCModel):
     partner = models.ForeignKey(Partner)
-    team_member = models.ForeignKey(User)
+    team_member = models.ForeignKey(settings.AUTH_USER_MODEL)
     partner_administrator = models.BooleanField(default=False)
 
     class Meta(MCModel.Meta):

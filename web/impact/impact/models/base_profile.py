@@ -2,8 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from django.conf import settings
 from django.db import models
-from simpleuser.models import User
 
 from impact.models.mc_model import MCModel
 from impact.models.utils import is_managed
@@ -21,7 +21,7 @@ PHONE_MAX_LENGTH = 20
 
 
 class BaseProfile(MCModel):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
     user_type = models.CharField(max_length=16, choices=USER_TYPES)
     privacy_policy_accepted = models.BooleanField(
         default=False,

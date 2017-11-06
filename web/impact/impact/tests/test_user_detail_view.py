@@ -4,6 +4,7 @@
 import json
 from jsonschema import Draft4Validator
 
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from impact.tests.contexts import UserContext
@@ -33,7 +34,6 @@ from impact.models.base_profile import (
     PHONE_MAX_LENGTH,
     TWITTER_HANDLE_MAX_LENGTH,
 )
-from impact.models import User
 from impact.v1.views.user_detail_view import (
     NO_USER_ERROR,
     UserDetailView,
@@ -91,6 +91,8 @@ EXPERT_READ_ONLY_FIELDS = [
 
 EXPERT_MUTABLE_FIELDS = EXPERT_ONLY_MUTABLE_FIELDS + NON_MEMBER_MUTABLE_FIELDS
 EXPERT_ONLY_FIELDS = EXPERT_ONLY_MUTABLE_FIELDS + EXPERT_READ_ONLY_FIELDS
+
+User = get_user_model()
 
 
 class TestUserDetailView(APITestCase):

@@ -7,14 +7,14 @@ from factory import (
     Sequence,
 )
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
-from simpleuser.models import User
 
 
 class UserFactory(DjangoModelFactory):
 
     class Meta:
-        model = User
+        model = get_user_model()
 
     username = Sequence(lambda n: uuid.uuid4())
     email = Sequence(lambda n: "user_{0}@example.com".format(n))
