@@ -108,7 +108,9 @@ class DynamicModelPermissions(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         model_name = view.kwargs.get('model', "").lower()
-        app_label = 'mc'
+        app_label = obj._meta.app_label
+        if app_label == "impact":
+            app_label = "mc"
         # This needs to be revised.  See AC-4573
         for permission in self.get_field_level_perms(app_label, model_name):
             action, perm_model, field, boolean_str = (
