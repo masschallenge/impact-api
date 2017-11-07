@@ -1,11 +1,16 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+
+from django.apps import apps
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
+from drf_auto_endpoint.router import router as schema_router
+from rest_framework import routers
 
+from impact.models.utils import split_on_caps
 from impact.schema import schema_view
 from impact.views import (
     GeneralViewSet,
@@ -34,9 +39,6 @@ from impact.v1.views import (
     UserListView,
     UserOrganizationsView,
 )
-from rest_framework import routers
-from drf_auto_endpoint.router import router as schema_router
-from django.apps import apps
 
 
 accelerator_router = routers.DefaultRouter()
@@ -46,7 +48,7 @@ simpleuser_router.register('User', GeneralViewSet, base_name='User')
 
 for model in apps.get_models('impact'):
     if model._meta.app_label == 'impact':
-        schema_router.register(model, url=model.__name__)
+        schema_router.register(model, url=split_on_caps(model.__name__))
 
 
 for model in apps.get_models('accelerator'):
