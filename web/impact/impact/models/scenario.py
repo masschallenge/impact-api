@@ -2,8 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from django.conf import settings
 from django.db import models
-from simpleuser.models import User
 
 from impact.models.mc_model import MCModel
 from impact.models.application import Application
@@ -18,7 +18,7 @@ class Scenario(MCModel):
     name = models.CharField(max_length=40)
     description = models.TextField(max_length=512, blank=True)
     judges = models.ManyToManyField(
-        User,
+        settings.AUTH_USER_MODEL,
         related_name="scenarios",
         through="impact.ScenarioJudge")
     applications = models.ManyToManyField(

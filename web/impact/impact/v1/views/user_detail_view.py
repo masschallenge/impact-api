@@ -58,8 +58,7 @@ class UserDetailView(BaseDetailView):
         valid_keys = set(data.keys()).intersection(UserHelper.INPUT_KEYS)
         valid_data = {}
         for key in valid_keys:
-            field = helper.translate_key(key)
-            valid_data[field] = helper.validate(field, data[key])
+            valid_data[key] = helper.validate(key, data[key])
         if helper.errors:
             return _error_response(helper)
         for field, value in valid_data.items():

@@ -4,7 +4,7 @@
 
 from embed_video.fields import EmbedVideoField
 
-from simpleuser.models import User
+from django.conf import settings
 from django.db import models
 from django.core.validators import RegexValidator
 
@@ -38,7 +38,7 @@ STARTUP_COMMUNITIES = (
 
 class Startup(MCModel):
     organization = models.ForeignKey(Organization, blank=True, null=True)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     is_visible = models.BooleanField(
         default=True,
         help_text="Public Profiles will be published on the MassChallenge web "

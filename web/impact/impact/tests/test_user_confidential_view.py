@@ -27,7 +27,7 @@ class TestUserConfidentialView(APITestCase):
 
     def test_basic_user_cannot_access(self):
         user = ExpertFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserConfidentialView.view_name, args=[user.id])
             response = self.client.get(url)
             self.assertEqual(403, response.status_code)
@@ -35,7 +35,7 @@ class TestUserConfidentialView(APITestCase):
     def test_privileged_user_can_access(self):
         user = ExpertFactory(profile__expert_group=TEST_EXPERT_GROUP,
                              profile__internal_notes=TEST_INTERNAL_NOTES)
-        with self.login(username=self.privileged_user().username):
+        with self.login(email=self.privileged_user().email):
             url = reverse(UserConfidentialView.view_name, args=[user.id])
             response = self.client.get(url)
             self.assertEqual(200, response.status_code)
@@ -47,7 +47,7 @@ class TestUserConfidentialView(APITestCase):
     def test_options(self):
         user = ExpertFactory(profile__expert_group=TEST_EXPERT_GROUP,
                              profile__internal_notes=TEST_INTERNAL_NOTES)
-        with self.login(username=self.privileged_user().username):
+        with self.login(email=self.privileged_user().email):
             url = reverse(UserConfidentialView.view_name, args=[user.id])
             response = self.client.options(url)
             assert response.status_code == 200
@@ -59,7 +59,7 @@ class TestUserConfidentialView(APITestCase):
     def test_options_against_get(self):
         user = ExpertFactory(profile__expert_group=TEST_EXPERT_GROUP,
                              profile__internal_notes=TEST_INTERNAL_NOTES)
-        with self.login(username=self.privileged_user().username):
+        with self.login(email=self.privileged_user().email):
             url = reverse(UserConfidentialView.view_name, args=[user.id])
 
             options_response = self.client.options(url)

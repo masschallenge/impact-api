@@ -27,7 +27,7 @@ class TestUserOrganizationsView(APITestCase):
         partner_team_member = PartnerTeamMemberFactory(
             team_member=startup_team_member.user)
         partner_org_id = partner_team_member.partner.organization_id
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserOrganizationsView.view_name,
                           args=[startup_team_member.user_id])
             response = self.client.get(url)
@@ -43,7 +43,7 @@ class TestUserOrganizationsView(APITestCase):
 
     def test_options(self):
         stm = StartupTeamMemberFactory(startup_administrator=True)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserOrganizationsView.view_name, args=[stm.user.id])
             response = self.client.options(url)
             assert response.status_code == 200
@@ -54,7 +54,7 @@ class TestUserOrganizationsView(APITestCase):
 
     def test_options_against_get(self):
         stm = StartupTeamMemberFactory(startup_administrator=True)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserOrganizationsView.view_name, args=[stm.user.id])
 
             options_response = self.client.options(url)

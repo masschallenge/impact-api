@@ -1,5 +1,9 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
+
+from django.conf import settings
 from django.db import models
-from simpleuser.models import User
 
 from impact.models.utils import is_managed
 from impact.models.mc_model import MCModel
@@ -19,7 +23,7 @@ CLEARANCE_LEVEL_CHOICES = [(x, x) for x in CLEARANCE_LEVELS]
 
 
 class Clearance(MCModel):
-    user = models.ForeignKey(User,
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              null=False,
                              blank=False,
                              related_name="clearances")

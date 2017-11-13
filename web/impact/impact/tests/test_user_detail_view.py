@@ -4,6 +4,7 @@
 import json
 from jsonschema import Draft4Validator
 
+from django.contrib.auth import get_user_model
 from django.urls import reverse
 
 from impact.tests.contexts import UserContext
@@ -33,7 +34,6 @@ from impact.models.base_profile import (
     PHONE_MAX_LENGTH,
     TWITTER_HANDLE_MAX_LENGTH,
 )
-from impact.models import User
 from impact.v1.views.user_detail_view import (
     NO_USER_ERROR,
     UserDetailView,
@@ -92,16 +92,18 @@ EXPERT_READ_ONLY_FIELDS = [
 EXPERT_MUTABLE_FIELDS = EXPERT_ONLY_MUTABLE_FIELDS + NON_MEMBER_MUTABLE_FIELDS
 EXPERT_ONLY_FIELDS = EXPERT_ONLY_MUTABLE_FIELDS + EXPERT_READ_ONLY_FIELDS
 
+User = get_user_model()
+
 
 class TestUserDetailView(APITestCase):
     def test_get(self):
         context = UserContext()
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             response = self.client.get(url)
-            assert user.full_name == response.data["first_name"]
-            assert user.short_name == response.data["last_name"]
+            assert user.first_name == response.data["first_name"]
+            assert user.last_name == response.data["last_name"]
             assert user.last_login == response.data.get("last_login")
             assert user.date_joined == response.data["date_joined"]
             helper = UserHelper(user)
@@ -116,7 +118,7 @@ class TestUserDetailView(APITestCase):
         category = profile.expert_category
         specialty = MentoringSpecialtiesFactory()
         profile.mentoring_specialties.add(specialty)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             response = self.client.get(url)
             assert category.name == response.data["expert_category"]
@@ -129,7 +131,7 @@ class TestUserDetailView(APITestCase):
                               primary_industry=primary_industry,
                               additional_industries=additional_industries)
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             response = self.client.get(url)
             assert response.data["primary_industry_id"] == primary_industry.id
@@ -139,7 +141,7 @@ class TestUserDetailView(APITestCase):
     def test_options(self):
         context = UserContext()
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             response = self.client.options(url)
             assert response.status_code == 200
@@ -159,7 +161,7 @@ class TestUserDetailView(APITestCase):
     def test_expert_options(self):
         context = UserContext(user_type=BASE_EXPERT_TYPE)
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             response = self.client.options(url)
             get_options = response.data["actions"]["GET"]["properties"]
@@ -170,7 +172,7 @@ class TestUserDetailView(APITestCase):
     def test_member_options(self):
         context = UserContext(user_type=BASE_MEMBER_TYPE)
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             response = self.client.options(url)
             get_options = response.data["actions"]["GET"]["properties"]
@@ -181,7 +183,7 @@ class TestUserDetailView(APITestCase):
     def test_options_against_get(self):
         context = UserContext(user_type=BASE_EXPERT_TYPE)
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
 
             options_response = self.client.options(url)
@@ -195,7 +197,7 @@ class TestUserDetailView(APITestCase):
         context = UserContext()
         user = context.user
         profile = get_profile(user)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             bio = profile.bio + " I'm an awesome API!"
             email = user.email + ".org"
@@ -223,7 +225,7 @@ class TestUserDetailView(APITestCase):
             user.refresh_from_db()
             profile.refresh_from_db()
             assert user.email == email
-            assert user.full_name == first_name
+            assert user.first_name == first_name
             assert user.is_active == is_active
             helper = UserHelper(user)
             assert helper.field_value("bio") == bio
@@ -235,7 +237,7 @@ class TestUserDetailView(APITestCase):
             assert helper.field_value("twitter_handle") == twitter_handle
 
     def test_patch_bad_id(self):
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             highest_user = User.objects.order_by("-id").first()
             _id = highest_user.id + 1
             assert not User.objects.filter(id=_id).exists()
@@ -248,7 +250,7 @@ class TestUserDetailView(APITestCase):
         context = UserContext(user_type=BASE_EXPERT_TYPE)
         user = context.user
         profile = get_profile(user)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             company = profile.company + ", Inc."
             expert_category = ExpertCategoryFactory().name
@@ -284,11 +286,11 @@ class TestUserDetailView(APITestCase):
             assert helper.field_value("judge_interest") is False
             assert helper.field_value("mentor_interest") is True
 
-    def test_patch_personal_website_url_with_username_and_password_url(self):
+    def test_patch_personal_website_url_with_email_and_password_url(self):
         context = UserContext(user_type=BASE_ENTREPRENEUR_TYPE)
         user = context.user
         profile = get_profile(user)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             website_url = "http://usuario:LINGO321@beta.lingofante.com/demo/"
             data = {
@@ -303,7 +305,7 @@ class TestUserDetailView(APITestCase):
     def test_patch_expert_field_fails_for_entrepreneur(self):
         context = UserContext(user_type=BASE_ENTREPRENEUR_TYPE)
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             data = {
                 "company": "iStrtupify",
@@ -317,7 +319,7 @@ class TestUserDetailView(APITestCase):
     def test_patch_bio_fails_for_member(self):
         context = UserContext(user_type=BASE_MEMBER_TYPE)
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             bio = "I'm an awesome API!"
             data = {
@@ -332,7 +334,7 @@ class TestUserDetailView(APITestCase):
     def test_patch_invalid_key(self):
         context = UserContext()
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             bad_value = "bad key"
             response = self.client.patch(url, {bad_value: True})
@@ -343,7 +345,7 @@ class TestUserDetailView(APITestCase):
     def test_patch_invalid_gender(self):
         context = UserContext()
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             bad_value = "bad gender"
             response = self.client.patch(url, {"gender": bad_value})
@@ -354,7 +356,7 @@ class TestUserDetailView(APITestCase):
     def test_patch_invalid_twitter_handle(self):
         context = UserContext()
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             bad_value = "a" * (TWITTER_HANDLE_MAX_LENGTH + 1)
             response = self.client.patch(url, {"twitter_handle": bad_value})
@@ -365,7 +367,7 @@ class TestUserDetailView(APITestCase):
     def test_patch_invalid_boolean(self):
         context = UserContext()
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             bad_value = "Maybe"
             response = self.client.patch(url, {"is_active": bad_value})
@@ -376,7 +378,7 @@ class TestUserDetailView(APITestCase):
     def test_patch_invalid_phone_string(self):
         context = UserContext()
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             bad_value = "Call me!"
             response = self.client.patch(url, {"phone": bad_value})
@@ -387,7 +389,7 @@ class TestUserDetailView(APITestCase):
     def test_patch_invalid_phone_too_long(self):
         context = UserContext()
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             bad_value = "5" * (PHONE_MAX_LENGTH + 1)
             response = self.client.patch(url, {"phone": bad_value})
@@ -398,7 +400,7 @@ class TestUserDetailView(APITestCase):
     def test_patch_invalid_email(self):
         context = UserContext()
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             bad_value = "This is *not* a valid email"
             response = self.client.patch(url, {"email": bad_value})
@@ -409,7 +411,7 @@ class TestUserDetailView(APITestCase):
     def test_patch_invalid_url(self):
         context = UserContext()
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             bad_value = "This is *not* a valid url"
             response = self.client.patch(url,
@@ -421,7 +423,7 @@ class TestUserDetailView(APITestCase):
     def test_patch_no_duplicate_error_msg(self):
         context = UserContext()
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             bad_value = "This is *not* a valid url"
             response = self.client.patch(url,
@@ -435,7 +437,7 @@ class TestUserDetailView(APITestCase):
     def test_patch_invalid_personal_website_url(self):
         context = UserContext()
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             bad_value = "This is *not* a valid url"
             response = self.client.patch(url,
@@ -450,7 +452,7 @@ class TestUserDetailView(APITestCase):
         profile = get_profile(user)
         industry = IndustryFactory()
         program_family = ProgramFamilyFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             self.client.patch(url, {
                 "home_program_family_id": program_family.id,
@@ -467,7 +469,7 @@ class TestUserDetailView(APITestCase):
         context = UserContext()
         user = context.user
         profile = get_profile(user)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             empty_value = ""
             self.client.patch(url, {"facebook_url": empty_value})
@@ -480,7 +482,7 @@ class TestUserDetailView(APITestCase):
         context = UserContext()
         user = context.user
         profile = get_profile(user)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             empty_value = ""
             self.client.patch(url, {"phone": empty_value})
@@ -493,7 +495,7 @@ class TestUserDetailView(APITestCase):
         context = UserContext()
         user = context.user
         profile = get_profile(user)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             empty_value = ""
             self.client.patch(url, {"twitter_handle": empty_value})
@@ -505,7 +507,7 @@ class TestUserDetailView(APITestCase):
     def test_patch_invalid_primary_industry_id(self):
         context = UserContext(user_type=BASE_EXPERT_TYPE)
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             bad_value = 0
             response = self.client.patch(url, {

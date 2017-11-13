@@ -18,7 +18,7 @@ class TestIndustryListView(APITestCase):
     def test_get_industries(self):
         count = 5
         industries = IndustryFactory.create_batch(count)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             response = self.client.get(self.url)
             assert response.data['count'] == count
             assert all([IndustryListView.serialize(industry)
@@ -26,7 +26,7 @@ class TestIndustryListView(APITestCase):
                         for industry in industries])
 
     def test_options(self):
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             response = self.client.options(self.url)
             assert response.status_code == 200
             results = response.data["actions"]["GET"]["properties"]["results"]
@@ -34,7 +34,7 @@ class TestIndustryListView(APITestCase):
             assert_fields(INDUSTRY_GET_FIELDS, get_options)
 
     def test_options_against_get(self):
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
 
             options_response = self.client.options(self.url)
             get_response = self.client.get(self.url)
