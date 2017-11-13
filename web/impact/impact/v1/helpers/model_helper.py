@@ -166,7 +166,8 @@ class ModelHelper(object):
         return value
 
     def save(self):
-        self.subject.save()
+        if self.subject:
+            self.subject.save()
 
     @classmethod
     def all_objects(cls):
