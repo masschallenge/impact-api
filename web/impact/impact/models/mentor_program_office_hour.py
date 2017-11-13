@@ -2,8 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from django.conf import settings
 from django.db import models
-from simpleuser.models import User
 
 from impact.models.mc_model import MCModel
 from impact.models.program import Program
@@ -32,9 +32,9 @@ LOCATION_CHOICES = (
 
 class MentorProgramOfficeHour(MCModel):
     program = models.ForeignKey(Program)
-    mentor = models.ForeignKey(User,
+    mentor = models.ForeignKey(settings.AUTH_USER_MODEL,
                                related_name='mentor_officehours')
-    finalist = models.ForeignKey(User,
+    finalist = models.ForeignKey(settings.AUTH_USER_MODEL,
                                  verbose_name="Finalist",
                                  blank=True,
                                  null=True,

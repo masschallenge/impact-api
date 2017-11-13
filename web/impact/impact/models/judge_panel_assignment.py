@@ -2,9 +2,9 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from django.conf import settings
 from django.db import models
 from impact.models.mc_model import MCModel
-from simpleuser.models import User
 
 from impact.models.panel import Panel
 from impact.models.judge_panel_assignment_manager import (
@@ -22,7 +22,7 @@ JUDGE_PANEL_ASSIGNMENT_STATUS_ENUM = (
 
 
 class JudgePanelAssignment(MCModel):
-    judge = models.ForeignKey(User)
+    judge = models.ForeignKey(settings.AUTH_USER_MODEL)
     panel = models.ForeignKey(Panel)
     scenario = models.ForeignKey(
         'Scenario',

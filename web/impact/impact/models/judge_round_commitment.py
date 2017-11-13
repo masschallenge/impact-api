@@ -2,8 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from django.conf import settings
 from django.db import models
-from simpleuser.models import User
 
 from impact.models.mc_model import MCModel
 from impact.models.judging_round import JudgingRound
@@ -14,7 +14,7 @@ logger = logging.getLogger(__file__)
 
 
 class JudgeRoundCommitment(MCModel):
-    judge = models.ForeignKey(User)
+    judge = models.ForeignKey(settings.AUTH_USER_MODEL)
     judging_round = models.ForeignKey(JudgingRound)
     commitment_state = models.BooleanField(default=True)
     capacity = models.IntegerField(blank=True, null=True)

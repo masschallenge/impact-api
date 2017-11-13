@@ -189,3 +189,5 @@ web/impact/htmlcov/
 db_cache/
 *~
 *.orig
+web/impact/categories.json
+web/impact/confusables.json

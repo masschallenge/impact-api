@@ -2,8 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from django.conf import settings
 from django.db import models
-from simpleuser.models import User
 
 from impact.models.mc_model import MCModel
 from impact.models.utils import is_managed
@@ -11,7 +11,7 @@ from impact.models.utils import is_managed
 
 class ExpertInterest(MCModel):
     user = models.ForeignKey(
-        User,
+        settings.AUTH_USER_MODEL,
         related_name="expert_interests",
     )
     program_family = models.ForeignKey(

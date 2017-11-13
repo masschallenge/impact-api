@@ -13,6 +13,7 @@ class APIRouter(object):
                 'auth',
                 'admin',
                 'sessions',
+                'simpleuser',
                 'sites',
                 'contenttypes']:
             return False

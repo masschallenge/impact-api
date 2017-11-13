@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
-from simpleuser.models import User
+from django.conf import settings
 from django.db import models
 
 from impact.models.application import Application
@@ -42,7 +42,7 @@ JUDGING_STATUS_ENUM = (
 class JudgeApplicationFeedback(MCModel):
     application = models.ForeignKey(Application)
     form_type = models.ForeignKey(JudgingForm)
-    judge = models.ForeignKey(User)
+    judge = models.ForeignKey(settings.AUTH_USER_MODEL)
     panel = models.ForeignKey(Panel)
     judging_status = models.IntegerField(
         null=True,

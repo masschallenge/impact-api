@@ -79,7 +79,7 @@ class TestRelatedColumns(TestCase):
         user.user_permissions.add(startup_member_permission)
         user.save()
 
-        with self.login(username="admin@test.com"):
+        with self.login(email="admin@test.com"):
             response = self.get(url_name, **view_kwargs)
             self.response_200(response)
 
@@ -117,7 +117,7 @@ class TestRelatedColumns(TestCase):
         user.user_permissions.add(startup_permission)
         user.user_permissions.add(startupteammember_permission)
         user.save()
-        with self.login(username="admin@test.com"):
+        with self.login(email="admin@test.com"):
             response = self.get(url_name, **view_kwargs)
             self.response_200(response)
             response_dict = json.loads(response.content)

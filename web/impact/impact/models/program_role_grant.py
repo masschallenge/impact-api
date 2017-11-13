@@ -2,15 +2,16 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from django.conf import settings
 from django.db import models
-from simpleuser.models import User
+
 from impact.models.mc_model import MCModel
 from impact.models.program_role import ProgramRole
 from impact.models.utils import is_managed
 
 
 class ProgramRoleGrant(MCModel):
-    person = models.ForeignKey(User)
+    person = models.ForeignKey(settings.AUTH_USER_MODEL)
     program_role = models.ForeignKey(ProgramRole)
 
     class Meta(MCModel.Meta):

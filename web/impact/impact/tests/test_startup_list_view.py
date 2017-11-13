@@ -50,7 +50,7 @@ NON_REMOTE_LOGO = "logo.jpg"  # used to be http://cloud.test.com/logo.jpg,
 class TestStartupListView(APITestCase):
     def test_program_key_post(self):
         program = ProgramFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             response = self.client.post(url,
                                         {"ProgramKey": program.id})
@@ -63,7 +63,7 @@ class TestStartupListView(APITestCase):
             program_startup_status__program=program,
             program_startup_status__badge_display=TEST_BADGE_DISPLAY,
             startup=startup)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             response = self.client.post(url,
                                         {"ProgramKey": program.id})
@@ -77,7 +77,7 @@ class TestStartupListView(APITestCase):
             program_startup_status__program=program,
             program_startup_status__badge_display=TEST_BADGE_DISPLAY,
             startup=startup)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             response = self.client.post(url,
                                         {"ProgramKey": program.id})
@@ -93,7 +93,7 @@ class TestStartupListView(APITestCase):
             program_startup_status__program=program,
             program_startup_status__badge_display=TEST_BADGE_DISPLAY,
             startup=startup)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             response = self.client.post(url,
                                         {"ProgramKey": program.id})
@@ -109,7 +109,7 @@ class TestStartupListView(APITestCase):
             program_startup_status__include_stealth_startup_names=True,
             program_startup_status__badge_display=TEST_BADGE_DISPLAY,
             startup=startup)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             response = self.client.post(url,
                                         {"ProgramKey": program.id})
@@ -124,7 +124,7 @@ class TestStartupListView(APITestCase):
             program_startup_status__program=program,
             program_startup_status__badge_display=TEST_BADGE_DISPLAY,
             startup=startup)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             response = self.client.post(url,
                                         {"ProgramKey": program.id,
@@ -142,7 +142,7 @@ class TestStartupListView(APITestCase):
                 program_startup_status__program=program,
                 program_startup_status__badge_display=TEST_BADGE_DISPLAY,
                 startup=startup)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             response = self.client.post(url,
                                         {"ProgramKey": program.id,
@@ -162,7 +162,7 @@ class TestStartupListView(APITestCase):
                 program_startup_status__program=program,
                 program_startup_status__badge_display=TEST_BADGE_DISPLAY,
                 startup=startup)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             response = self.client.post(url,
                                         {"ProgramKey": program.id,
@@ -179,7 +179,7 @@ class TestStartupListView(APITestCase):
                 program_startup_status__program=program,
                 program_startup_status__badge_display=TEST_BADGE_DISPLAY,
                 startup=startup)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             response = self.client.post(url,
                                         {"ProgramKey": program.id,
@@ -194,7 +194,7 @@ class TestStartupListView(APITestCase):
             status_group=VALID_STATUS_GROUP)
         status = StartupStatusFactory(
             program_startup_status=program_startup_status)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             data = {
                 "StartupStatus": program_startup_status.startup_list_tab_id,
@@ -209,7 +209,7 @@ class TestStartupListView(APITestCase):
             badge_display=TEST_BADGE_DISPLAY,
             status_group=VALID_STATUS_GROUP)
         StartupStatusFactory(program_startup_status=program_startup_status)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             data = {
                 "StartupStatus": program_startup_status.startup_list_tab_id,
@@ -223,7 +223,7 @@ class TestStartupListView(APITestCase):
                 response.data)
 
     def test_invalid_args_post(self):
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             response = self.client.post(url, data=INVALID_DATA)
             assert 404 == response.status_code
@@ -236,7 +236,7 @@ class TestStartupListView(APITestCase):
             status_group=VALID_STATUS_GROUP)
         startup = StartupStatusFactory(
             program_startup_status=program_startup_status).startup
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             data = {
                 "StartupStatus": program_startup_status.startup_list_tab_id,
@@ -258,7 +258,7 @@ class TestStartupListView(APITestCase):
             badge_display=TEST_BADGE_DISPLAY,
             status_group=VALID_STATUS_GROUP)
         StartupStatusFactory(program_startup_status=program_startup_status)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             data = {
                 "StartupStatus": program_startup_status.startup_list_tab_id,
@@ -279,7 +279,7 @@ class TestStartupListView(APITestCase):
             status_group=VALID_STATUS_GROUP)
         StartupStatusFactory(
             program_startup_status=program_startup_status)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             data = {
                 "StartupStatus": program_startup_status.startup_list_tab_id,
@@ -299,7 +299,7 @@ class TestStartupListView(APITestCase):
             status_group=VALID_STATUS_GROUP)
         startup = StartupStatusFactory(
             program_startup_status=program_startup_status).startup
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_list")
             data = {
                 "StartupStatus": program_startup_status.startup_list_tab_id,
