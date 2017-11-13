@@ -2,7 +2,6 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 from datetime import datetime
 from pytz import utc
-from impact.models import BaseProfile
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import Q

@@ -563,10 +563,10 @@ class TestUserDetailView(APITestCase):
         user.save()
         with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
-            new_last_name = user.last_name + ", Jr."
             response = self.client.patch(url, {"personal_website_url": ""})
             assert response.status_code == 403
             assert MISSING_PROFILE_ERROR.format(user.id) in response.data
+
 
 def _valid_note(messages):
     note_prefix = VALID_KEYS_NOTE.format("")
