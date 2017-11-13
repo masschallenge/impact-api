@@ -3,6 +3,7 @@
 from datetime import datetime
 from pytz import utc
 from impact.models import BaseProfile
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import Q
 from django.utils.formats import get_format
@@ -41,7 +42,7 @@ def get_profile(user):
         if user_type == "EXPERT":
             return user.expertprofile
         return user.memberprofile
-    except BaseProfile.DoesNotExist:
+    except ObjectDoesNotExist:
         return None
 
 

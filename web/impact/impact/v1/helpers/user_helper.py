@@ -110,16 +110,22 @@ class UserHelper(ModelHelper):
         result = super().field_value(field)
         if result is not None:
             return result
+        if not self.profile_helper:
+            return None
         return self.profile_helper.field_value(field)
 
     def field_setter(self, field, value):
         if field in ProfileHelper.INPUT_KEYS:
+            if not self.profile_helper:
+                return
             self.profile_helper.field_setter(field, value)
         else:
             super().field_setter(field, value)
 
     def validate(self, field, value):
         if field in ProfileHelper.INPUT_KEYS:
+            if not self.profile_helper:
+                return None
             self.profile_helper.errors = []
             result = self.profile_helper.validate(field, value)
             self.errors += self.profile_helper.errors
@@ -127,7 +133,8 @@ class UserHelper(ModelHelper):
         return super().validate(field, value)
 
     def save(self):
-        self.profile_helper.save()
+        if self.profile_helper:
+            self.profile_helper.save()
         super().save()
 
     @property
