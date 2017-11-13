@@ -125,6 +125,7 @@ INVALID_EMAIL_ERROR = ("Invalid {field}: "
 INVALID_REGEX_ERROR = "Invalid {field}: Expected '{value}' to match '{regex}'"
 INVALID_STRING_ERROR = "Invalid {field}: Expected a String not {value}"
 INVALID_URL_ERROR = "Invalid {field}: Expected '{value}' to be a valid URL"
+MISSING_SUBJECT_ERROR = "Database error: missing object"
 
 
 class ModelHelper(object):
@@ -133,6 +134,8 @@ class ModelHelper(object):
     def __init__(self, subject):
         self.subject = subject
         self.errors = []
+        if not self.subject:
+            self.errors.append(MISSING_SUBJECT_ERROR)
 
     def serialize(self, fields):
         result = {}
@@ -157,7 +160,8 @@ class ModelHelper(object):
         # attr = getattr(self.__class__, field, None)
         # if attr and attr.fset:
         #     subject = self
-        setattr(subject, field, value)
+        if subject:
+            setattr(subject, field, value)
 
     def validate(self, field, value):
         validator = self.VALIDATORS.get(field)

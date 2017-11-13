@@ -24,6 +24,7 @@ from impact.tests.utils import (
 from impact.utils import get_profile
 from impact.v1.helpers import (
     INVALID_ID_ERROR,
+    MISSING_SUBJECT_ERROR,
     UserHelper,
     VALID_KEYS_NOTE,
 )
@@ -566,6 +567,7 @@ class TestUserDetailView(APITestCase):
             response = self.client.patch(url, {"personal_website_url": ""})
             assert response.status_code == 403
             assert MISSING_PROFILE_ERROR.format(user.id) in response.data
+            assert MISSING_SUBJECT_ERROR in response.data
 
 
 def _valid_note(messages):
