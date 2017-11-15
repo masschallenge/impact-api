@@ -11,6 +11,9 @@ from impact.v1.views.organization_users_view import OrganizationUsersView
 from impact.v1.views.program_cycle_detail_view import ProgramCycleDetailView
 from impact.v1.views.program_cycle_list_view import ProgramCycleListView
 
+from impact.v1.views.program_detail_view import ProgramDetailView
+from impact.v1.views.program_list_view import ProgramListView
+
 from impact.v1.views.program_family_detail_view import ProgramFamilyDetailView
 from impact.v1.views.program_family_list_view import ProgramFamilyListView
 

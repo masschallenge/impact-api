@@ -53,6 +53,12 @@ INTEGER_FIELD = {
     },
 }
 
+FLOAT_FIELD = {
+    "json-schema": {
+        "type": "number"
+    },
+}
+
 READ_ONLY_ID_FIELD = {
     "json-schema": {
         "type": "integer",
