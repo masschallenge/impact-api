@@ -13,6 +13,13 @@ class OrganizationListView(BaseListView):
     view_name = "organization"
     helper_class = OrganizationHelper
 
+    def filter(self, queryset):
+        queryset = super().filter(queryset)
+        name_filter = self.request.query_params.get('name', None)
+        if name_filter:
+            return queryset.filter(name__icontains=name_filter)
+        return queryset
+
     def description_check(self, check_name):
         # This will be needed once we do POST/PATCH for
         # organizations, but not yet...
