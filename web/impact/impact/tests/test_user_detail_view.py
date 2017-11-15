@@ -556,7 +556,7 @@ class TestUserDetailView(APITestCase):
             user.refresh_from_db()
             assert user.last_name == new_last_name
 
-    def test_patch_profile_file_with_no_profile(self):
+    def test_patch_user_with_no_profile_not_allowed_on_missing_fields(self):
         context = UserContext(user_type=BASE_ENTREPRENEUR_TYPE)
         user = context.user
         user.entrepreneurprofile.delete()
