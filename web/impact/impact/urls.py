@@ -10,7 +10,7 @@ from django.contrib import admin
 from drf_auto_endpoint.router import router as schema_router
 from rest_framework import routers
 
-from impact.models.utils import split_on_caps
+from impact.models.utils import camel_case_to_snake
 from impact.schema import schema_view
 from impact.views import (
     GeneralViewSet,
@@ -48,7 +48,7 @@ simpleuser_router.register('User', GeneralViewSet, base_name='User')
 
 for model in apps.get_models('impact'):
     if model._meta.app_label == 'impact':
-        schema_router.register(model, url=split_on_caps(model.__name__))
+        schema_router.register(model, url=camel_case_to_snake(model.__name__))
 
 
 for model in apps.get_models('accelerator'):

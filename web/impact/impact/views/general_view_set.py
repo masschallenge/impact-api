@@ -43,7 +43,6 @@ class GeneralViewSet(LoggingMixin, viewsets.ModelViewSet):
                 app_label=self.kwargs['app'],
                 model_name=snake_to_camel_case(self.kwargs['model']))
 
-
     def get_queryset(self):
         return self.model.objects.all()
 
