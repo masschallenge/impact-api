@@ -47,6 +47,10 @@ from impact.v1.helpers.profile_helper import (
     validate_expert_categories,
     validate_gender,
 )
+from impact.v1.helpers.program_cycle_helper import (
+    PROGRAM_CYCLE_FIELDS,
+    ProgramCycleHelper,
+)
 from impact.v1.helpers.program_family_helper import (
     PROGRAM_FAMILY_FIELDS,
     ProgramFamilyHelper,

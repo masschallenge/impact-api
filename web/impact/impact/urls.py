@@ -26,6 +26,8 @@ from impact.v1.views import (
     OrganizationHistoryView,
     OrganizationListView,
     OrganizationUsersView,
+    ProgramCycleDetailView,
+    ProgramCycleListView,
     ProgramFamilyDetailView,
     ProgramFamilyListView,
     UserConfidentialView,
@@ -100,6 +102,13 @@ v1_urlpatterns = [
     url(r"^organization/(?P<pk>[0-9]+)/users/$",
         OrganizationUsersView.as_view(),
         name=OrganizationUsersView.view_name),
+
+    url(r"^program_cycle/(?P<pk>[0-9]+)/$",
+        ProgramCycleDetailView.as_view(),
+        name=ProgramCycleDetailView.view_name),
+    url(r"^program_cycle/$",
+        ProgramCycleListView.as_view(),
+        name=ProgramCycleListView.view_name),
 
     url(r"^program_family/(?P<pk>[0-9]+)/$",
         ProgramFamilyDetailView.as_view(),
