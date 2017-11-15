@@ -183,6 +183,11 @@ class ModelHelper(object):
     def all_objects(cls):
         return cls.model.objects.all()
 
+    def field_name(self, field):
+        obj = getattr(self.subject, field, None)
+        if hasattr(obj, "name"):
+            return obj.name
+
 
 def validate_boolean(helper, field, value):
     result = value

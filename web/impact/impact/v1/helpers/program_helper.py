@@ -35,14 +35,8 @@ class ProgramHelper(ModelHelper):
 
     @property
     def cycle_name(self):
-        if hasattr(self.subject, "cycle"):
-            cycle = self.subject.cycle
-            if cycle:
-                return cycle.name
+        return self.field_name("cycle")
 
     @property
     def program_family_name(self):
-        if hasattr(self.subject, "program_family"):
-            program_family = self.subject.program_family
-            if program_family:
-                return program_family.name
+        return self.field_name("program_family")
