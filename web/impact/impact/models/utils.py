@@ -11,12 +11,6 @@ LABEL_LENGTH = 255
 def is_managed(db_table):
     return False
 
-def snake_to_camel_case(value):
-    old_value = value.split('_')
-    new_value = ""
-    for word in old_value:
-        new_value += (word[0].upper() + word[1:])
-    return new_value
 
 def camel_case_to_snake(value):
     original_model_string = re.findall('[A-Z][^A-Z]*', value)
@@ -25,3 +19,11 @@ def camel_case_to_snake(value):
         holder += word.lower() + "_"
         new_model_string = holder[:-1]
     return new_model_string
+
+
+def snake_to_camel_case(value):
+    old_value = value.split('_')
+    new_value = ""
+    for word in old_value:
+        new_value += (word[0].upper() + word[1:])
+    return new_value

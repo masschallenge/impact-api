@@ -128,7 +128,8 @@ class TestApiRoute(TestCase):
             codename='view_startup_additional_industries'
         )
         url_name = "object-list"
-        view_kwargs = {'app': 'impact', "model": "Startup_additional_industries"}
+        view_kwargs = {'app': 'impact',
+                       "model": "Startup_additional_industries"}
         self.response_401(self.get(url_name, **view_kwargs))
 
         basic_user = self.make_user('basic_user@test.com')
@@ -136,7 +137,8 @@ class TestApiRoute(TestCase):
             self.response_403(self.get(url_name, **view_kwargs))
 
         perm_user = self.make_user(
-            'perm_user@test.com', perms=["mc.view_startup_additional_industries"])
+            'perm_user@test.com',
+            perms=["mc.view_startup_additional_industries"])
         perm_user.user_permissions.add(view_perm)
         perm_user.save()
         with self.login(perm_user):
