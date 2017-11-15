@@ -112,14 +112,15 @@ class UserHelper(ModelHelper):
 
     def validate(self, field, value):
         if field in ProfileHelper.INPUT_KEYS:
-            self.profile_helper.errors = []
             result = self.profile_helper.validate(field, value)
             self.errors += self.profile_helper.errors
+            self.profile_helper.errors = []
             return result
         return super().validate(field, value)
 
     def save(self):
-        self.profile_helper.save()
+        if self.profile_helper:
+            self.profile_helper.save()
         super().save()
 
     @classmethod

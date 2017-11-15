@@ -24,6 +24,7 @@ from impact.tests.utils import (
 from impact.utils import get_profile
 from impact.v1.helpers import (
     INVALID_ID_ERROR,
+    MISSING_SUBJECT_ERROR,
     UserHelper,
     VALID_KEYS_NOTE,
 )
@@ -35,6 +36,7 @@ from impact.models.base_profile import (
     TWITTER_HANDLE_MAX_LENGTH,
 )
 from impact.v1.views.user_detail_view import (
+    MISSING_PROFILE_ERROR,
     NO_USER_ERROR,
     UserDetailView,
 )
@@ -137,6 +139,21 @@ class TestUserDetailView(APITestCase):
             assert response.data["primary_industry_id"] == primary_industry.id
             assert all([industry.id in response.data["additional_industry_ids"]
                         for industry in additional_industries])
+
+    def test_get_with_no_profile(self):
+        context = UserContext(user_type=BASE_ENTREPRENEUR_TYPE)
+        user = context.user
+        user.entrepreneurprofile.delete()
+        user.entrepreneurprofile = None
+        user.save()
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserDetailView.view_name, args=[user.id])
+            response = self.client.get(url)
+            assert user.first_name == response.data["first_name"]
+            assert user.last_name == response.data["last_name"]
+            assert user.last_login == response.data.get("last_login")
+            assert user.date_joined == response.data["date_joined"]
+            assert "phone" not in response.data
 
     def test_options(self):
         context = UserContext()
@@ -524,6 +541,33 @@ class TestUserDetailView(APITestCase):
                 classname="Industry")
             assert error_msg in response.data
             assert "home_program_family_id" in _valid_note(response.data)
+
+    def test_patch_with_no_profile(self):
+        context = UserContext(user_type=BASE_ENTREPRENEUR_TYPE)
+        user = context.user
+        user.entrepreneurprofile.delete()
+        user.entrepreneurprofile = None
+        user.save()
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserDetailView.view_name, args=[user.id])
+            new_last_name = user.last_name + ", Jr."
+            response = self.client.patch(url, {"last_name": new_last_name})
+            assert response.status_code == 204
+            user.refresh_from_db()
+            assert user.last_name == new_last_name
+
+    def test_patch_user_with_no_profile_not_allowed_on_missing_fields(self):
+        context = UserContext(user_type=BASE_ENTREPRENEUR_TYPE)
+        user = context.user
+        user.entrepreneurprofile.delete()
+        user.entrepreneurprofile = None
+        user.save()
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserDetailView.view_name, args=[user.id])
+            response = self.client.patch(url, {"personal_website_url": ""})
+            assert response.status_code == 403
+            assert MISSING_PROFILE_ERROR.format(user.id) in response.data
+            assert MISSING_SUBJECT_ERROR in response.data
 
 
 def _valid_note(messages):

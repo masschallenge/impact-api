@@ -379,12 +379,14 @@ class ProfileHelper(ModelHelper):
     INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
 
     def find_user_type(self):
-        return self.subject.user_type
+        if hasattr(self.subject, "user_type"):
+            return self.subject.user_type
 
     @property
     def additional_industry_ids(self):
-        return self.subject.additional_industries.values_list(
-            "id", flat=True)
+        if hasattr(self.subject, "additional_industries"):
+            return self.subject.additional_industries.values_list(
+                "id", flat=True)
 
     @property
     def expert_category(self):
@@ -401,7 +403,9 @@ class ProfileHelper(ModelHelper):
                 return [specialty.name for specialty in specialties.all()]
 
     def is_expert(self):
-        return self.subject.user_type == ExpertProfile.user_type
+        if hasattr(self.subject, "user_type"):
+            return self.subject.user_type == ExpertProfile.user_type
 
     def is_non_member(self):
-        return self.subject.user_type != MemberProfile.user_type
+        if hasattr(self.subject, "user_type"):
+            return self.subject.user_type != MemberProfile.user_type
