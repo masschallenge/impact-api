@@ -13,6 +13,7 @@ from impact.v1.views.base_detail_view import BaseDetailView
 
 
 INVALID_KEYS_ERROR = "Recevied invalid key(s): {invalid_keys}."
+MISSING_PROFILE_ERROR = "User ({}) has no profile"
 NO_USER_ERROR = "Unable to find user with an id of {}"
 
 User = get_user_model()
@@ -58,8 +59,7 @@ class UserDetailView(BaseDetailView):
         valid_keys = set(data.keys()).intersection(UserHelper.INPUT_KEYS)
         valid_data = {}
         for key in valid_keys:
-            field = helper.translate_key(key)
-            valid_data[field] = helper.validate(field, data[key])
+            valid_data[key] = helper.validate(key, data[key])
         if helper.errors:
             return _error_response(helper)
         for field, value in valid_data.items():
@@ -69,5 +69,9 @@ class UserDetailView(BaseDetailView):
 
 
 def _error_response(helper):
-    note = valid_keys_note(helper.profile_helper.subject.user_type)
+    subject = helper.profile_helper.subject
+    if subject:
+        note = valid_keys_note(subject.user_type)
+    else:
+        note = MISSING_PROFILE_ERROR.format(helper.subject.id)
     return Response(status=403, data=helper.errors + [note])

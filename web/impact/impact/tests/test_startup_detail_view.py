@@ -41,7 +41,7 @@ class TestStartupDetailView(APITestCase):
             program_startup_status__badge_display=BADGE_DISPLAYS[0],
             program_startup_status__startup_list_include=True,
             startup=startup).program_startup_status.startup_status
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_detail")
             response = self.client.post(url,
                                         {"ProgramKey": program.id,
@@ -64,7 +64,7 @@ class TestStartupDetailView(APITestCase):
             program_startup_status__badge_display=BADGE_DISPLAYS[0],
             program_startup_status__startup_list_include=True,
             startup=startup).program_startup_status.startup_status
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_detail")
             response = self.client.post(url,
                                         {"StartupKey": startup.id})
@@ -80,7 +80,7 @@ class TestStartupDetailView(APITestCase):
                                           startup__is_visible=False)
         startup = member.startup
         program = ProgramFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_detail")
             response = self.client.post(url,
                                         {"ProgramKey": program.id,
@@ -92,7 +92,7 @@ class TestStartupDetailView(APITestCase):
         member = StartupTeamMemberFactory(user=context.user)
         startup = member.startup
         program = ProgramFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_detail")
             response = self.client.post(
                 url,
@@ -106,7 +106,7 @@ class TestStartupDetailView(APITestCase):
                                           display_on_public_profile=True)
         startup = member.startup
         program = ProgramFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_detail")
             response = self.client.post(url,
                                         {"ProgramKey": program.id,
@@ -121,7 +121,7 @@ class TestStartupDetailView(APITestCase):
             startup__video_elevator_pitch_url=VIMEO_EXAMPLE)
         startup = member.startup
         program = ProgramFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_detail")
             response = self.client.post(url,
                                         {"ProgramKey": program.id,
@@ -136,7 +136,7 @@ class TestStartupDetailView(APITestCase):
             startup__video_elevator_pitch_url=BAD_YOUTUBE_EXAMPLE)
         startup = member.startup
         program = ProgramFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_detail")
             response = self.client.post(url,
                                         {"ProgramKey": program.id,
@@ -151,7 +151,7 @@ class TestStartupDetailView(APITestCase):
             startup__video_elevator_pitch_url=UNKNOWN_VIDEO_EXAMPLE)
         startup = member.startup
         program = ProgramFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_detail")
             response = self.client.post(url,
                                         {"ProgramKey": program.id,
@@ -163,7 +163,7 @@ class TestStartupDetailView(APITestCase):
         startup_id = startup.id
         startup.delete()
         program = ProgramFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_detail")
             response = self.client.post(url,
                                         {"ProgramKey": program.id,
@@ -174,7 +174,7 @@ class TestStartupDetailView(APITestCase):
 
     def test_missing_startup(self):
         program = ProgramFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("startup_detail")
             response = self.client.post(url,
                                         {"ProgramKey": program.id})

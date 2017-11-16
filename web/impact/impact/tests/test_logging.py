@@ -15,7 +15,7 @@ class TestLogging(APITestCase):
         context = UserContext()
         target_user = context.user
         requesting_user = self.basic_user()
-        with self.login(username=requesting_user.username):
+        with self.login(email=requesting_user.email):
             url = reverse("user_detail", args=[target_user.id])
             self.client.get(url)
             log_entry = APIRequestLog.objects.last()

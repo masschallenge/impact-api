@@ -2,8 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from django.conf import settings
 from django.db import models
-from simpleuser.models import User
 
 from impact.models.mc_model import MCModel
 from impact.models.program_administrator_permission import (
@@ -13,7 +13,7 @@ from impact.models.utils import is_managed
 
 
 class ProgramAdministrator(MCModel):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
     permission = models.ManyToManyField(
         ProgramAdministratorPermission,
         related_name="administrator_permissions")

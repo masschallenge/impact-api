@@ -19,7 +19,7 @@ class TestSchemaEndpoints(APITestCase):
         count = 5
         StartupFactory.create_batch(count)
         response = ''
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("organization")
             response = self.client.options(url)
         results = response.data["actions"]["GET"]["properties"]["results"]
@@ -30,7 +30,7 @@ class TestSchemaEndpoints(APITestCase):
         count = 5
         startups = StartupFactory.create_batch(count)
         response = ''
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("organization_users", args=[startups[0].pk])
             response = self.client.options(url)
         response_json = json.loads(response.content)
@@ -43,7 +43,7 @@ class TestSchemaEndpoints(APITestCase):
         count = 5
         startups = StartupFactory.create_batch(count)
         response = ''
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("user_organizations", args=[startups[0].user.pk])
             response = self.client.options(url)
         response_json = json.loads(response.content)
@@ -56,7 +56,7 @@ class TestSchemaEndpoints(APITestCase):
         count = 5
         StartupFactory.create_batch(count)
         response = ''
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("user")
             response = self.client.options(url)
         results = response.data["actions"]["GET"]["properties"]["results"]
