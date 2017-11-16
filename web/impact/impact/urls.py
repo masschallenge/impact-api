@@ -39,7 +39,6 @@ from impact.v1.views import (
     UserOrganizationsView,
 )
 
-
 accelerator_router = routers.DefaultRouter()
 simpleuser_router = routers.DefaultRouter()
 
@@ -48,8 +47,6 @@ simpleuser_router.register('User', GeneralViewSet, base_name='User')
 for model in apps.get_models('impact'):
     if model._meta.app_label == 'impact' and not model._meta.auto_created:
         schema_router.register(model, url=model_name_to_snake(model.__name__))
-
-
 
 for model in apps.get_models('accelerator'):
     if model._meta.app_label == 'accelerator' and hasattr(model, "Meta"):
@@ -132,7 +129,16 @@ urls = [
     url(r"^api/v1/", include(v1_urlpatterns)),
     url(r'^api/(?P<app>\w+)/(?P<model>\w+)/(?P<related_model>\w+)/$',
         GeneralViewSet.as_view({'get': 'list', 'post': 'create'}),
-        name='object-list'),
+        name='related-object-list'),
+    url(r'^api/(?P<app>\w+)/(?P<model>\w+)/(?P<related_model>\w+)/'
+        r'(?P<pk>[0-9]+)/$',
+        GeneralViewSet.as_view({
+            'get': 'retrieve',
+            'put': 'update',
+            'patch': 'partial_update',
+            'delete': 'destroy'
+        }),
+        name='related-object-detail'),
     url(r'^api/(?P<app>\w+)/(?P<model>\w+)/$',
         GeneralViewSet.as_view({'get': 'list', 'post': 'create'}),
         name='object-list'),
