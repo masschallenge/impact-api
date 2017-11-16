@@ -1,3 +1,6 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 from impact.v1.helpers.industry_helper import (
     INDUSTRY_FIELDS,
     IndustryHelper,
@@ -5,8 +8,10 @@ from impact.v1.helpers.industry_helper import (
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     EMAIL_FIELD,
+    FLOAT_FIELD,
     INTEGER_ARRAY_FIELD,
     INTEGER_FIELD,
+    MISSING_SUBJECT_ERROR,
     PK_FIELD,
     REQUIRED_STRING_FIELD,
     STRING_FIELD,
@@ -45,6 +50,14 @@ from impact.v1.helpers.profile_helper import (
     VALID_USER_TYPES,
     validate_expert_categories,
     validate_gender,
+)
+from impact.v1.helpers.program_helper import (
+    PROGRAM_FIELDS,
+    ProgramHelper,
+)
+from impact.v1.helpers.program_cycle_helper import (
+    PROGRAM_CYCLE_FIELDS,
+    ProgramCycleHelper,
 )
 from impact.v1.helpers.program_family_helper import (
     PROGRAM_FAMILY_FIELDS,

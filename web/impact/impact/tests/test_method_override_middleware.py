@@ -13,7 +13,7 @@ class TestMethodOverrideMiddleware(APITestCase):
     def test_patch_via_post(self):
         context = UserContext()
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("user_detail", args=[user.id])
             new_first_name = "David"
             self.client.post(
@@ -21,12 +21,12 @@ class TestMethodOverrideMiddleware(APITestCase):
                 **{METHOD_OVERRIDE_HEADER: "PATCH"},
                 data={"first_name": new_first_name})
             user.refresh_from_db()
-            assert user.full_name == new_first_name
+            assert user.first_name == new_first_name
 
     def test_patch_via_get_makes_no_change(self):
         context = UserContext()
         user = context.user
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse("user_detail", args=[user.id])
             new_first_name = "David"
             self.client.get(
@@ -34,4 +34,4 @@ class TestMethodOverrideMiddleware(APITestCase):
                 **{METHOD_OVERRIDE_HEADER: "PATCH"},
                 data={"first_name": new_first_name})
             user.refresh_from_db()
-            assert user.full_name != new_first_name
+            assert user.first_name != new_first_name

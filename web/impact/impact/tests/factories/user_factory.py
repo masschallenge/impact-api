@@ -1,23 +1,25 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+import uuid
 from factory import (
     DjangoModelFactory,
     Sequence,
 )
 
+from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
-from simpleuser.models import User
 
 
 class UserFactory(DjangoModelFactory):
 
     class Meta:
-        model = User
+        model = get_user_model()
 
+    username = Sequence(lambda n: uuid.uuid4())
     email = Sequence(lambda n: "user_{0}@example.com".format(n))
-    full_name = Sequence(lambda n: "First {0}".format(n))
-    short_name = Sequence(lambda n: "Last {0}".format(n))
+    first_name = Sequence(lambda n: "First {0}".format(n))
+    last_name = Sequence(lambda n: "Last {0}".format(n))
     is_superuser = False
     is_staff = False
     is_active = True

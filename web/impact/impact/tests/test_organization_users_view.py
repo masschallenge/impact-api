@@ -30,7 +30,7 @@ class TestOrganizationUsersView(APITestCase):
         partner_team_member = PartnerTeamMemberFactory(
             partner__organization=startup_team_member.startup.organization)
         partner_user_id = partner_team_member.team_member.id
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(OrganizationUsersView.view_name,
                           args=[startup_team_member.startup.organization.id])
             response = self.client.get(url)
@@ -46,7 +46,7 @@ class TestOrganizationUsersView(APITestCase):
 
     def test_options(self):
         stm = StartupTeamMemberFactory(startup_administrator=True)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(OrganizationUsersView.view_name,
                           args=[stm.startup.id])
             response = self.client.options(url)
@@ -58,7 +58,7 @@ class TestOrganizationUsersView(APITestCase):
 
     def test_options_against_get(self):
         stm = StartupTeamMemberFactory(startup_administrator=True)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(OrganizationUsersView.view_name,
                           args=[stm.startup.id])
 

@@ -1,3 +1,6 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from rest_framework.response import Response
@@ -56,7 +59,7 @@ class UserListView(BaseListView):
 
     def _user_args(self, dict):
         self._check_required_keys(dict, UserHelper.REQUIRED_KEYS)
-        results = self._copy_translated_keys(dict, UserHelper.USER_INPUT_KEYS)
+        results = self._copy_keys(dict, UserHelper.USER_INPUT_KEYS)
         email = results.get("email")
         if email and User.objects.filter(email=email).exists():
             self.errors.append(EMAIL_EXISTS_ERROR.format(email))
@@ -74,19 +77,16 @@ class UserListView(BaseListView):
             self.errors.append(UNSUPPORTED_KEY_ERROR.format(key=key,
                                                             type=user_type))
 
-    def _copy_translated_keys(self, user_data, keys):
+    def _copy_keys(self, user_data, keys):
         result = {}
         for key in keys:
             if key in user_data:
-                target_key = UserHelper.translate_key(key)
-                value = user_data[key]
-                result[target_key] = value
+                result[key] = user_data[key]
         return result
 
     def _profile_args(self, user_data):
         self._check_required_keys(user_data, ProfileHelper.CORE_REQUIRED_KEYS)
-        results = self._copy_translated_keys(user_data,
-                                             ProfileHelper.INPUT_KEYS)
+        results = self._copy_keys(user_data, ProfileHelper.INPUT_KEYS)
         self.user_type = validate_choices(
             self, "user_type", results.get("user_type"), VALID_USER_TYPES)
         if self.user_type == ExpertProfile.user_type:

@@ -2,8 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from django.conf import settings
 from django.db import models
-from simpleuser.models import User
 
 from impact.models.mc_model import MCModel
 from impact.models.utils import (
@@ -14,7 +14,7 @@ from impact.models.utils import (
 
 class UserLabel(MCModel):
     label = models.CharField(max_length=LABEL_LENGTH)
-    users = models.ManyToManyField(User, blank=True)
+    users = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
 
     class Meta(MCModel.Meta):
         db_table = 'mc_userlabel'

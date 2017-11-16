@@ -1,3 +1,6 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 from datetime import datetime
 from pytz import utc
 from django.contrib.auth import get_user_model

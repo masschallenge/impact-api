@@ -20,7 +20,7 @@ class TestProgramFamilyListView(APITestCase):
     def test_get(self):
         count = 5
         program_families = ProgramFamilyFactory.create_batch(count)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             response = self.client.get(self.url)
             assert response.data["count"] == count
             assert all([ProgramFamilyListView.serialize(program_family)
@@ -28,7 +28,7 @@ class TestProgramFamilyListView(APITestCase):
                         for program_family in program_families])
 
     def test_options(self):
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             response = self.client.options(self.url)
             assert response.status_code == 200
             results = response.data["actions"]["GET"]["properties"]["results"]
@@ -36,7 +36,7 @@ class TestProgramFamilyListView(APITestCase):
             assert_fields(PROGRAM_FAMILY_GET_FIELDS, get_options)
 
     def test_options_against_get(self):
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
 
             options_response = self.client.options(self.url)
             get_response = self.client.get(self.url)

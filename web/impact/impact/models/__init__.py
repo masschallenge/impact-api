@@ -1,7 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from simpleuser.models import User
 # from paypal.pro.helpers import PayPalWPP  # Commented out for impact-api
 
 from .startup_role import StartupRole

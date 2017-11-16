@@ -66,6 +66,7 @@ class Base(Configuration):
 
     INSTALLED_APPS = [
         'accelerator.apps.AcceleratorConfig',
+        'simpleuser.apps.SimpleuserConfig',
         'corsheaders',
         'django.contrib.admin',
         'django.contrib.admindocs',
@@ -82,7 +83,6 @@ class Base(Configuration):
         'rest_framework.authtoken',
         'rest_framework_swagger',
         'rest_framework_tracking',
-        'simpleuser',
     ]
     ACCELERATOR_MODELS_ARE_MANAGED = False
 
@@ -192,6 +192,7 @@ class Base(Configuration):
 
     AUTHENTICATION_BACKENDS = (
         'oauth2_provider.backends.OAuth2Backend',
+        'simpleuser.email_model_backend.EmailModelBackend',
         'django.contrib.auth.backends.ModelBackend',
     )
 

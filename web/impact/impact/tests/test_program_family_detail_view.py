@@ -13,6 +13,7 @@ from impact.v1.views import ProgramFamilyDetailView
 
 PROGRAM_FAMILY_GET_FIELDS = [
     "id",
+    "is_open",
     "name",
     "email_domain",
     "phone_number",
@@ -24,7 +25,7 @@ PROGRAM_FAMILY_GET_FIELDS = [
 class TestProgramFamilyDetailView(APITestCase):
     def test_get(self):
         program_family = ProgramFamilyFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(ProgramFamilyDetailView.view_name,
                           args=[program_family.id])
             response = self.client.get(url)
@@ -34,7 +35,7 @@ class TestProgramFamilyDetailView(APITestCase):
 
     def test_options(self):
         program_family = ProgramFamilyFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(ProgramFamilyDetailView.view_name,
                           args=[program_family.id])
             response = self.client.options(url)
@@ -44,7 +45,7 @@ class TestProgramFamilyDetailView(APITestCase):
 
     def test_options_against_get(self):
         program_family = ProgramFamilyFactory()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = reverse(ProgramFamilyDetailView.view_name,
                           args=[program_family.id])
 

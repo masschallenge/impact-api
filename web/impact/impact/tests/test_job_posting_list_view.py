@@ -47,14 +47,14 @@ class TestJobPostingListView(APITestCase):
         self.url = reverse("job_posting_list")
 
     def test_all_jobs_returned_when_no_program_key(self):
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             response = self.client.post(self.url)
             response_data = json.loads(response.content)["job_postings"]
             self.assertEqual(2, len(response_data))
 
     def test_filter_by_startup(self):
         startup = Startup.objects.first()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             data = {"StartupKey": startup.pk}
             response = self.client.post(self.url, data=data)
             response_data = json.loads(response.content)["job_postings"][0]
@@ -68,33 +68,33 @@ class TestJobPostingListView(APITestCase):
         j2 = JobPosting.objects.last()
         j2.postdate = utc.localize(datetime.now() - timedelta(1))
         j2.save()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             response = self.client.post(self.url)
             jobs = json.loads(response.content)["job_postings"]
             self.assertTrue(jobs[0]["post_date"] > jobs[1]["post_date"])
 
     def test_ordering_by_type(self):
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             data = {"OrderBy": "jobtype"}
             response = self.client.post(self.url, data=data)
             jobs = json.loads(response.content)["job_postings"]
             self.assertTrue(jobs[0]["type"] < jobs[1]["type"])
 
     def test_ordering_by_startup(self):
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             data = {"OrderBy": "startup"}
             response = self.client.post(self.url, data=data)
             jobs = json.loads(response.content)["job_postings"]
             self.assertTrue(jobs[0]["startup_name"] < jobs[1]["startup_name"])
 
     def test_valid_programkey(self):
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             response = self.client.post(
                 self.url, data={"ProgramKey": self.program.pk})
             self.assertEqual(200, response.status_code)
 
     def test_invalid_programkey(self):
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             # Bogus ProgramKey
             response = self.client.post(self.url, data={"ProgramKey": "x"})
             self.assertEqual(400, response.status_code)
@@ -107,7 +107,7 @@ class TestJobPostingListView(APITestCase):
         j2 = JobPosting.objects.last()
         j2.description = "enterprisey"
         j2.save()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             # Match on title
             data = {"Keywords": "Strategerist"}
             response = self.client.post(self.url, data=data)
@@ -127,7 +127,7 @@ class TestJobPostingListView(APITestCase):
         j2 = JobPosting.objects.last()
         j2.type = "PART_TIME_PERMANENT"
         j2.save()
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             # Match on title
             data = {"JobType": "INTERNSHIP"}
             response = self.client.post(self.url, data=data)

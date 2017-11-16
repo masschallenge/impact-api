@@ -1,3 +1,6 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 from django.db.models import Q
 from rest_framework.response import Response
 
