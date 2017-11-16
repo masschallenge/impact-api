@@ -54,7 +54,8 @@ for model in apps.get_models('impact'):
 
 for model in apps.get_models('accelerator'):
     if (model._meta.app_label == 'accelerator' and
-        hasattr(model, "Meta") and not model._meta.auto_created):
+            hasattr(model, "Meta") and
+            not model._meta.auto_created):
         accelerator_router.register(
             model.__name__, GeneralViewSet,
             base_name="accelerator.{model}".format(model=model.__name__))
@@ -146,10 +147,13 @@ v1_urlpatterns = [
 urls = [
     url(r"^api/v0/", include(v0_urlpatterns)),
     url(r"^api/v1/", include(v1_urlpatterns)),
-    url(r'^api/(?P<app>\w+)/(?P<model>\w+)/(?P<related_model>\w+)/$',
+    url(
+        r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/'
+        r'(?P<related_model>[a-z_]+)/$',
         GeneralViewSet.as_view({'get': 'list', 'post': 'create'}),
         name='related-object-list'),
-    url(r'^api/(?P<app>\w+)/(?P<model>\w+)/(?P<related_model>\w+)/'
+    url(r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/'
+        r'(?P<related_model>[a-z_]+)/'
         r'(?P<pk>[0-9]+)/$',
         GeneralViewSet.as_view({
             'get': 'retrieve',
@@ -158,10 +162,10 @@ urls = [
             'delete': 'destroy'
         }),
         name='related-object-detail'),
-    url(r'^api/(?P<app>\w+)/(?P<model>\w+)/$',
+    url(r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/$',
         GeneralViewSet.as_view({'get': 'list', 'post': 'create'}),
         name='object-list'),
-    url(r'^api/(?P<app>\w+)/(?P<model>\w+)/(?P<pk>[0-9]+)/$',
+    url(r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/(?P<pk>[0-9]+)/$',
         GeneralViewSet.as_view({
             'get': 'retrieve',
             'put': 'update',

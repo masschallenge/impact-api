@@ -127,9 +127,10 @@ class TestApiRoute(TestCase):
                 model='startup'),
             codename='view_startup_additional_industries'
         )
-        url_name = "object-list"
-        view_kwargs = {'app': 'impact',
-                       "model": "Startup_additional_industries"}
+        url_name = "related-object-list"
+        view_kwargs = {"app": "impact",
+                       "model": "startup",
+                       "related_model": "additional_industries"}
         self.response_401(self.get(url_name, **view_kwargs))
 
         basic_user = self.make_user('basic_user@test.com')

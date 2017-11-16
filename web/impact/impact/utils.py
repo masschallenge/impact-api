@@ -7,11 +7,11 @@ from django.db import connection
 from django.db.models import Q
 from django.utils.formats import get_format
 import dateutil.parser
-
+from impact.models.utils import snake_to_model_name
 
 DAWN_OF_TIME = utc.localize(datetime.strptime(
-        "2010-01-01T00:00:00Z",
-        "%Y-%m-%dT%H:%M:%SZ"))  # format based on browsable API output
+    "2010-01-01T00:00:00Z",
+    "%Y-%m-%dT%H:%M:%SZ"))  # format based on browsable API output
 
 UPDATE_STATEMENT = "UPDATE {table} SET updated_at = %s WHERE id = %s"
 
@@ -43,6 +43,22 @@ def get_profile(user):
         return user.memberprofile
     except ObjectDoesNotExist:
         return None
+
+
+def lower_case_model_name(view):
+    model = view.kwargs.get('model', '').lower()
+    related_model = view.kwargs.get('related_model')
+    if related_model:
+        return model + '_' + related_model
+    return model
+
+
+def model_case_model_name(view):
+    model = snake_to_model_name(view.kwargs.get('model', ''))
+    related_model = view.kwargs.get('related_model')
+    if related_model:
+        return model + '_' + related_model
+    return model
 
 
 def compose_filter(key_pieces, value):
