@@ -13,6 +13,7 @@ from impact.v1.views import ProgramFamilyDetailView
 
 PROGRAM_FAMILY_GET_FIELDS = [
     "id",
+    "is_open",
     "name",
     "email_domain",
     "phone_number",

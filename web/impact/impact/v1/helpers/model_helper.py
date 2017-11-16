@@ -53,6 +53,12 @@ INTEGER_FIELD = {
     },
 }
 
+FLOAT_FIELD = {
+    "json-schema": {
+        "type": "number"
+    },
+}
+
 READ_ONLY_ID_FIELD = {
     "json-schema": {
         "type": "integer",
@@ -176,6 +182,11 @@ class ModelHelper(object):
     @classmethod
     def all_objects(cls):
         return cls.model.objects.all()
+
+    def field_name(self, field):
+        obj = getattr(self.subject, field, None)
+        if hasattr(obj, "name"):
+            return obj.name
 
 
 def validate_boolean(helper, field, value):
