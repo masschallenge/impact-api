@@ -7,6 +7,7 @@ from impact.v1.helpers.model_helper import (
     EMAIL_FIELD,
     INTEGER_ARRAY_FIELD,
     INTEGER_FIELD,
+    MISSING_SUBJECT_ERROR,
     PK_FIELD,
     REQUIRED_STRING_FIELD,
     STRING_FIELD,
