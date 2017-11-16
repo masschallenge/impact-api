@@ -46,8 +46,9 @@ simpleuser_router = routers.DefaultRouter()
 simpleuser_router.register('User', GeneralViewSet, base_name='User')
 
 for model in apps.get_models('impact'):
-    if model._meta.app_label == 'impact':
+    if model._meta.app_label == 'impact' and not model._meta.auto_created:
         schema_router.register(model, url=model_name_to_snake(model.__name__))
+
 
 
 for model in apps.get_models('accelerator'):
@@ -129,6 +130,9 @@ v1_urlpatterns = [
 urls = [
     url(r"^api/v0/", include(v0_urlpatterns)),
     url(r"^api/v1/", include(v1_urlpatterns)),
+    url(r'^api/(?P<app>\w+)/(?P<model>\w+)/(?P<related_model>\w+)/$',
+        GeneralViewSet.as_view({'get': 'list', 'post': 'create'}),
+        name='object-list'),
     url(r'^api/(?P<app>\w+)/(?P<model>\w+)/$',
         GeneralViewSet.as_view({'get': 'list', 'post': 'create'}),
         name='object-list'),
