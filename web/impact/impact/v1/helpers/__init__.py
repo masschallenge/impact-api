@@ -1,3 +1,6 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 from impact.v1.helpers.industry_helper import (
     INDUSTRY_FIELDS,
     IndustryHelper,
