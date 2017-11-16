@@ -1,7 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-
 from django.apps import apps
 from django.conf import settings
 from django.conf.urls import include, url
@@ -10,7 +9,7 @@ from django.contrib import admin
 from drf_auto_endpoint.router import router as schema_router
 from rest_framework import routers
 
-from impact.models.utils import camel_case_to_snake
+from impact.models.utils import model_name_to_snake
 from impact.schema import schema_view
 from impact.views import (
     GeneralViewSet,
@@ -47,8 +46,9 @@ simpleuser_router = routers.DefaultRouter()
 simpleuser_router.register('User', GeneralViewSet, base_name='User')
 
 for model in apps.get_models('impact'):
-    if model._meta.app_label == 'impact':
-        schema_router.register(model, url=camel_case_to_snake(model.__name__))
+    if model._meta.app_label == 'impact' and not model._meta.auto_created:
+        schema_router.register(model, url=model_name_to_snake(model.__name__))
+
 
 
 for model in apps.get_models('accelerator'):
@@ -130,6 +130,9 @@ v1_urlpatterns = [
 urls = [
     url(r"^api/v0/", include(v0_urlpatterns)),
     url(r"^api/v1/", include(v1_urlpatterns)),
+    url(r'^api/(?P<app>\w+)/(?P<model>\w+)/(?P<related_model>\w+)/$',
+        GeneralViewSet.as_view({'get': 'list', 'post': 'create'}),
+        name='object-list'),
     url(r'^api/(?P<app>\w+)/(?P<model>\w+)/$',
         GeneralViewSet.as_view({'get': 'list', 'post': 'create'}),
         name='object-list'),

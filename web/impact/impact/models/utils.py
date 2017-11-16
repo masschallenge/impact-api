@@ -1,9 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-
 import re
-
 
 LABEL_LENGTH = 255
 
@@ -12,16 +10,16 @@ def is_managed(db_table):
     return False
 
 
-def camel_case_to_snake(value):
+def model_name_to_snake(value):
     original_model_string = re.findall('[A-Z][^A-Z]*', value)
     holder = ""
     for word in original_model_string:
         holder += word.lower() + "_"
-        new_model_string = holder[:-1]
+    new_model_string = holder[:-1]
     return new_model_string
 
 
-def snake_to_camel_case(value):
+def snake_to_model_name(value):
     old_value = value.split('_')
     new_value = ""
     for word in old_value:

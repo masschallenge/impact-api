@@ -111,7 +111,7 @@ class TestApiRoute(TestCase):
             response_dict = json.loads(response.content)
             self.assertIn("is_visible", response_dict.keys())
 
-    def test_api_many_to_many_object_is_displayed(self):
+    def test_api_many_to_many_object_get(self):
         StartupFactory(is_visible=1, organization__url_slug="test1")
         StartupFactory(is_visible=1, organization__url_slug="test2")
         StartupFactory(is_visible=1, organization__url_slug="test3")

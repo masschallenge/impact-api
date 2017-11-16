@@ -6,7 +6,7 @@ from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework_tracking.mixins import LoggingMixin
 
-from impact.models.utils import snake_to_camel_case
+from impact.models.utils import snake_to_model_name
 from impact.permissions import DynamicModelPermissions
 from impact.serializers import GeneralSerializer
 
@@ -34,14 +34,17 @@ class GeneralViewSet(LoggingMixin, viewsets.ModelViewSet):
 
     @property
     def model(self):
-        if self.kwargs['model'] in model_attribute_calls:
-            return apps.get_model(
-                app_label=self.kwargs['app'],
-                model_name=self.kwargs['model'])
+        model = snake_to_model_name(self.kwargs['model'])
+        related_model = self.kwargs.get('related_model')
+
+        if related_model:
+            model_name = model + '_' + related_model
         else:
-            return apps.get_model(
-                app_label=self.kwargs['app'],
-                model_name=snake_to_camel_case(self.kwargs['model']))
+            model_name = model
+
+        return apps.get_model(
+            app_label=self.kwargs['app'],
+            model_name=model_name)
 
     def get_queryset(self):
         return self.model.objects.all()

@@ -1,22 +1,27 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from test_plus.test import TestCase
-from impact.utils import get_profile
-from impact.tests.contexts import (
-    UserContext,
-)
-from impact.models import (
-    ExpertProfile,
-    MemberProfile,
+from impact.tests.api_test_case import APITestCase
+from impact.models.utils import (
+    model_name_to_snake,
+    snake_to_model_name,
 )
 
+empty_string = ''
+model_name = 'ProgramStartupStatus'
+lowercase_model_name = 'programstartupstatus'
+snake_case = 'program_startup_status'
 
-class TestUtils(TestCase):
-    def test_get_profile_for_expert(self):
-        user = UserContext("EXPERT").user
-        assert isinstance(get_profile(user), ExpertProfile)
 
-    def test_get_profile_for_member(self):
-        user = UserContext("MEMBER").user
-        assert isinstance(get_profile(user), MemberProfile)
+class TestUtils(APITestCase):
+    def test_empty_string_snake_case_returns_nothing(self):
+        assert model_name_to_snake(empty_string) == ''
+
+    def test_model_name_to_snake_case(self):
+        assert model_name_to_snake(model_name) == snake_case
+
+    def test_lowercase_model_name_not_snaked(self):
+        assert model_name_to_snake(lowercase_model_name) != snake_case
+
+    def test_snake_case_to_model_name(self):
+        assert snake_to_model_name(snake_case) == model_name
