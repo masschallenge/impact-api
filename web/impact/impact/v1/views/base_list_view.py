@@ -94,8 +94,7 @@ def _remove_query_param(url, query_param_key):
         return url
     parsed_qs = parse_qs(qs, strict_parsing=True)
     parsed_qs.pop(query_param_key, None)
-    return urlunparse((parsed[0], parsed[1], parsed[2], parsed[3],
-                       urlencode(parsed_qs, doseq=True), parsed[5]))
+    return _build_url_with_query(parsed, parsed_qs)
 
 
 def _update_query_param(url, query_param_key, query_param_value=None):
@@ -103,5 +102,13 @@ def _update_query_param(url, query_param_key, query_param_value=None):
     qs = parsed.query
     parsed_qs = parse_qs(qs) if qs else {}
     parsed_qs.update({query_param_key: query_param_value})
-    return urlunparse((parsed[0], parsed[1], parsed[2], parsed[3],
-                       urlencode(parsed_qs, doseq=True), parsed[5]))
+    return _build_url_with_query(parsed, parsed_qs)
+
+
+def _build_url_with_query(parsed_url, parsed_qs):
+    return urlunparse((parsed_url[0],
+                       parsed_url[1],
+                       parsed_url[2],
+                       parsed_url[3],
+                       urlencode(parsed_qs, doseq=True),
+                       parsed_url[5]))
