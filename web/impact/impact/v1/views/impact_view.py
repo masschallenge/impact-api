@@ -1,3 +1,6 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 from abc import ABCMeta
 from rest_framework.views import APIView
 from rest_framework_tracking.mixins import LoggingMixin

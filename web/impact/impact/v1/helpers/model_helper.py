@@ -1,3 +1,6 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 import re
 from django.core.exceptions import ValidationError
 from django.core.validators import (
