@@ -21,16 +21,13 @@ from impact.v1.helpers import (
     STRING_FIELD,
 )
 
-PROGRAMS_FIELD = {
+PROGRAM_FIELD = {
     "json-schema": {
-        "type": "array",
-        "item": {
-            "type": "object",
-            "properties": {
-                "id": INTEGER_FIELD,
-                "name": STRING_FIELD,
-                "preference": INTEGER_FIELD,
-            },
+        "type": "object",
+        "properties": {
+            "id": INTEGER_FIELD,
+            "name": STRING_FIELD,
+            "preference": INTEGER_FIELD,
         },
     },
 }
@@ -43,14 +40,15 @@ class OrganizationBecameEntrantEvent(BaseHistoryEvent):
     CLASS_FIELDS = {
         "cycle_id": INTEGER_FIELD,
         "cycle": STRING_FIELD,
-        "programs": PROGRAMS_FIELD,
+        "program": PROGRAM_FIELD,
        }
 
-    def __init__(self, application):
+    def __init__(self, application, program):
         super().__init__()
         self.application = application
         self.startup = self.application.startup
         self._cycle = self.application.cycle
+        self._program = program
         self.startup_status = StartupStatus.objects.filter(
             program_startup_status__startup_role__name=StartupRole.ENTRANT,
             program_startup_status__program__cycle=self._cycle,
@@ -65,7 +63,8 @@ class OrganizationBecameEntrantEvent(BaseHistoryEvent):
             for app in startup.application_set.filter(
                     application_type__in=entrant_app_types,
                     application_status=SUBMITTED_APP_STATUS):
-                result.append(cls(app))
+                for program in cls.programs_for_app(app):
+                    result.append(cls(app, program))
         return result
 
     def cycle(self):
@@ -74,10 +73,14 @@ class OrganizationBecameEntrantEvent(BaseHistoryEvent):
     def cycle_id(self):
         return self._cycle.id
 
-    def programs(self):
-        raw_data = self.startup.startupprograminterest_set.filter(
+    def program(self):
+        return self._program
+
+    @classmethod
+    def programs_for_app(self, app):
+        raw_data = app.startup.startupprograminterest_set.filter(
             applying=True,
-            program__cycle=self._cycle
+            program__cycle=app.cycle
             ).order_by("order").values_list("program_id",
                                             "program__name")
         result = []
