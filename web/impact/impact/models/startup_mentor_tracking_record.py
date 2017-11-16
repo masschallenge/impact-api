@@ -2,8 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from django.conf import settings
 from django.db import models
-from simpleuser.models import User
 
 from impact.models.mc_model import MCModel
 from impact.models.program import Program
@@ -30,7 +30,7 @@ class StartupMentorTrackingRecord(MCModel):
     startup = models.ForeignKey(Startup)
     program = models.ForeignKey(Program)
     mentors = models.ManyToManyField(
-        User,
+        settings.AUTH_USER_MODEL,
         verbose_name="Registered Mentors",
         help_text=MENTOR_HELP,
         through="impact.StartupMentorRelationship")

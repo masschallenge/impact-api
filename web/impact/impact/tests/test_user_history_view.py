@@ -1,6 +1,9 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+import json
+from jsonschema import Draft4Validator
+
 from django.urls import reverse
 
 from impact.models import UserRole
@@ -33,8 +36,8 @@ from impact.v1.views import UserHistoryView
 class TestUserHistoryView(APITestCase):
     def test_user_created(self):
         user = UserFactory()
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_history", args=[user.id])
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[user.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
                                  UserCreatedEvent.EVENT_TYPE)
@@ -43,8 +46,8 @@ class TestUserHistoryView(APITestCase):
 
     def test_user_joined_startup(self):
         stm = StartupTeamMemberFactory()
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_history", args=[stm.user.id])
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[stm.user.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
                                  UserJoinedStartupEvent.EVENT_TYPE)
@@ -65,8 +68,8 @@ class TestUserHistoryView(APITestCase):
         next_stm = StartupTeamMemberFactory()
         next_stm.created_at = next_created_at
         next_stm.save()
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_history", args=[stm.user.id])
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[stm.user.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
                                  UserJoinedStartupEvent.EVENT_TYPE)
@@ -77,8 +80,8 @@ class TestUserHistoryView(APITestCase):
     def test_user_became_finalist(self):
         prg = ProgramRoleGrantFactory(
             program_role__user_role__name=UserRole.FINALIST)
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_history", args=[prg.person.id])
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[prg.person.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
                                  UserBecameFinalistEvent.EVENT_TYPE)
@@ -104,8 +107,8 @@ class TestUserHistoryView(APITestCase):
         next_prg = ProgramRoleGrantFactory()
         next_prg.created_at = next_prg_date
         next_prg.save()
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_history", args=[prg.person.id])
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[prg.person.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
                                  UserBecameFinalistEvent.EVENT_TYPE)
@@ -124,8 +127,8 @@ class TestUserHistoryView(APITestCase):
             program_role__user_role__name=UserRole.FINALIST)
         prg.created_at = None
         prg.save()
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_history", args=[prg.person.id])
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[prg.person.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
                                  UserBecameFinalistEvent.EVENT_TYPE)
@@ -142,8 +145,8 @@ class TestUserHistoryView(APITestCase):
             program_role__user_role__name=UserRole.JUDGE)
         prg.created_at = None
         prg.save()
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_history", args=[prg.person.id])
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[prg.person.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
                                  UserBecameConfirmedJudgeEvent.EVENT_TYPE)
@@ -153,8 +156,8 @@ class TestUserHistoryView(APITestCase):
     def test_user_became_confirmed_judge(self):
         prg = ProgramRoleGrantFactory(
             program_role__user_role__name=UserRole.JUDGE)
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_history", args=[prg.person.id])
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[prg.person.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
                                  UserBecameConfirmedJudgeEvent.EVENT_TYPE)
@@ -169,8 +172,8 @@ class TestUserHistoryView(APITestCase):
             program_role__user_role__name=UserRole.JUDGE)
         jr = JudgingRoundFactory(
             confirmed_judge_label=prg.program_role.user_label)
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_history", args=[prg.person.id])
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[prg.person.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
                                  UserBecameConfirmedJudgeEvent.EVENT_TYPE)
@@ -188,8 +191,8 @@ class TestUserHistoryView(APITestCase):
         jr = JudgingRoundFactory(
             confirmed_judge_label=prg.program_role.user_label,
             cycle_based_round=True)
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_history", args=[prg.person.id])
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[prg.person.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
                                  UserBecameConfirmedJudgeEvent.EVENT_TYPE)
@@ -202,8 +205,8 @@ class TestUserHistoryView(APITestCase):
     def test_user_became_confirmed_mentor(self):
         prg = ProgramRoleGrantFactory(
             program_role__user_role__name=UserRole.MENTOR)
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_history", args=[prg.person.id])
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[prg.person.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
                                  UserBecameConfirmedMentorEvent.EVENT_TYPE)
@@ -212,8 +215,9 @@ class TestUserHistoryView(APITestCase):
 
     def test_user_received_newsletter(self):
         receipt = NewsletterReceiptFactory()
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_history", args=[receipt.recipient.id])
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name,
+                          args=[receipt.recipient.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
                                  UserReceivedNewsletterEvent.EVENT_TYPE)
@@ -226,10 +230,22 @@ class TestUserHistoryView(APITestCase):
 
     def test_options(self):
         user = UserFactory()
-        with self.login(username=self.basic_user().username):
-            url = reverse("user_history", args=[user.id])
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[user.id])
             response = self.client.options(url)
             assert response.status_code == 200
             results = response.data["actions"]["GET"]["properties"]["results"]
             get_options = results["item"]["properties"]
             assert_fields(UserHistoryView.fields().keys(), get_options)
+
+    def test_options_against_get(self):
+        user = UserFactory()
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[user.id])
+
+            options_response = self.client.options(url)
+            get_response = self.client.get(url)
+
+            schema = options_response.data["actions"]["GET"]
+            validator = Draft4Validator(schema)
+            assert validator.is_valid(json.loads(get_response.content))

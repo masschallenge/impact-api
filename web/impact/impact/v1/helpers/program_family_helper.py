@@ -1,6 +1,10 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 import re
 from impact.models import ProgramFamily
 from impact.v1.helpers.model_helper import (
+    BOOLEAN_FIELD,
     ModelHelper,
     PHONE_FIELD,
     PK_FIELD,
@@ -9,7 +13,7 @@ from impact.v1.helpers.model_helper import (
     URL_SLUG_FIELD,
 )
 
-EMAIL_DOMAIN_PATTERN = fr'^[a-z][a-z.]+[a-z]$'
+EMAIL_DOMAIN_PATTERN = '^[a-z][a-z0-9.]+[a-z]$'
 EMAIL_DOMAIN_REGEX = re.compile(EMAIL_DOMAIN_PATTERN)
 EMAIL_DOMAIN_FIELD = {
     "json-schema": {
@@ -27,16 +31,19 @@ PROGRAM_FAMILY_FIELDS = {
     "phone_number": PHONE_FIELD,
     "short_description": STRING_FIELD,
     "url_slug": URL_SLUG_FIELD,
+    "is_open": BOOLEAN_FIELD,
 }
 
 
 class ProgramFamilyHelper(ModelHelper):
-    MODEL = ProgramFamily
+    model = ProgramFamily
     REQUIRED_KEYS = ["name"]
     OPTIONAL_KEYS = ["email_domain",
                      "phone_number",
                      "short_description",
                      "url_slug"]
     INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
-    READ_ONLY_KEYS = ["id"]
-    OUTPUT_KEYS = READ_ONLY_KEYS + INPUT_KEYS
+
+    @classmethod
+    def fields(cls):
+        return PROGRAM_FAMILY_FIELDS

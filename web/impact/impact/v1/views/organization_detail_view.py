@@ -1,44 +1,28 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from rest_framework.response import Response
-
-from impact.permissions import (
-    V1APIPermissions,
-)
 from impact.models import Organization
 from impact.v1.helpers import (
-    ORGANIZATION_FIELDS,
+    COULD_BE_STARTUP_CHECK,
+    IS_STARTUP_CHECK,
     OrganizationHelper,
 )
-from impact.v1.metadata import ImpactMetadata
-from impact.v1.views import ImpactView
+from impact.v1.views.base_detail_view import BaseDetailView
 
 
-class OrganizationDetailView(ImpactView):
-    model = Organization
-    metadata_class = ImpactMetadata
-
-    permission_classes = (
-        V1APIPermissions,
-    )
+class OrganizationDetailView(BaseDetailView):
+    view_name = "organization_detail"
+    helper_class = OrganizationHelper
 
     def __init__(self, *args, **kwargs):
         self.organization = None
         super().__init__(*args, **kwargs)
-
-    def metadata(self):
-        return self.options_from_fields(ORGANIZATION_FIELDS, ["GET"])
 
     def options(self, request, pk):
         self.organization = Organization.objects.get(pk=pk)
         return super().options(request, pk)
 
     def description_check(self, check_name):
-        if check_name in ["is_startup", "could_be_startup"]:
+        if check_name in [IS_STARTUP_CHECK, COULD_BE_STARTUP_CHECK]:
             return OrganizationHelper(self.organization).is_startup
         return check_name
-
-    def get(self, request, pk):
-        self.instance = self.model.objects.get(pk=pk)
-        return Response(OrganizationHelper(self.instance).serialize())

@@ -1,3 +1,6 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 from impact.models import Organization
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
@@ -15,13 +18,15 @@ from impact.v1.helpers.model_helper import (
     merge_fields,
 )
 
+COULD_BE_STARTUP_CHECK = "could_be_startup"
+IS_STARTUP_CHECK = "is_startup"
 STARTUP_FIELD = {
     "GET": {
-        "included": "could_be_startup",
+        "included": COULD_BE_STARTUP_CHECK,
         "description": "This field exists only when is_startup is true",
     },
-    "PATCH": {"allowed": "is_startup"},
-    "POST": {"allowed": "could_be_startup"},
+    "PATCH": {"allowed": IS_STARTUP_CHECK},
+    "POST": {"allowed": COULD_BE_STARTUP_CHECK},
 }
 STARTUP_BOOLEAN_FIELD = merge_fields(STARTUP_FIELD, BOOLEAN_FIELD)
 STARTUP_INTEGER_ARRAY_FIELD = merge_fields(STARTUP_FIELD, INTEGER_ARRAY_FIELD)
@@ -65,7 +70,7 @@ ORGANIZATION_USER_FIELDS = {
 
 
 class OrganizationHelper(ModelHelper):
-    MODEL = Organization
+    model = Organization
 
     REQUIRED_KEYS = [
         "name",
@@ -89,18 +94,15 @@ class OrganizationHelper(ModelHelper):
         "website_url",
         ]
     INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
-    READ_ONLY_KEYS = [
-        "id",
-        "is_partner",
-        "is_startup",
-        "updated_at",
-        ]
-    OUTPUT_KEYS = READ_ONLY_KEYS + INPUT_KEYS
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.startup = self.subject.startup_set.order_by("-id").first()
         self.partner = self.subject.partner_set.order_by("-id").first()
+
+    @classmethod
+    def fields(cls):
+        return ORGANIZATION_FIELDS
 
     @property
     def is_startup(self):

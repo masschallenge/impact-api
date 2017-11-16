@@ -2,8 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from django.conf import settings
 from django.db import models
-from simpleuser.models import User
 
 from impact.models.mc_model import MCModel
 from impact.models.startup_mentor_tracking_record import (
@@ -22,7 +22,7 @@ RELATIONSHIP_CHOICES = ((DESIRED_RELATIONSHIP, DESIRED_RELATIONSHIP),
 
 class StartupMentorRelationship(MCModel):
     startup_mentor_tracking = models.ForeignKey(StartupMentorTrackingRecord)
-    mentor = models.ForeignKey(User)
+    mentor = models.ForeignKey(settings.AUTH_USER_MODEL)
     status = models.CharField(
         max_length=32,
         choices=RELATIONSHIP_CHOICES,

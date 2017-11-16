@@ -1,17 +1,20 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 from django.core.exceptions import (
     ObjectDoesNotExist,
     ValidationError,
 )
 from django.core.validators import RegexValidator
 from impact.v1.helpers.model_helper import (
+    BOOLEAN_FIELD,
     INTEGER_ARRAY_FIELD,
-    INVALID_CHOICE_ERROR,
     INVALID_URL_ERROR,
     ModelHelper,
     PHONE_FIELD,
     PHONE_REGEX,
+    STRING_FIELD,
     TWITTER_REGEX,
-    format_choices,
     merge_fields,
     validate_boolean,
     validate_choices,
@@ -29,42 +32,39 @@ from impact.models import (
 )
 
 
-EXPERT_DESCRIPTION = "This field exists only when user_type is 'expert'"
-EXPERT_BOOLEAN_FIELD = {
-    "json-schema": {
-        "type": "boolean",
-    },
+COULD_BE_EXPERT_CHECK = "could_be_expert"
+COULD_BE_NON_MEMBER_CHECK = "could_be_non_member"
+IS_EXPERT_CHECK = "is_expert"
+IS_NON_MEMBER_CHECK = "is_non_member"
+
+EXPERT_DESCRIPTION = "This field exists only when user_type is 'expert'."
+
+OPTIONAL_EXPERT_FIELD = {
     "GET": {
-        "included": "could_be_expert",
+        "included": COULD_BE_EXPERT_CHECK,
         "description": EXPERT_DESCRIPTION,
     },
-    "PATCH": {"required": False, "allowed": "is_expert"},
-    "POST": {"required": False, "allowed": "could_be_expert"},
+    "PATCH": {"required": False, "allowed": IS_EXPERT_CHECK},
+    "POST": {"required": False, "allowed": COULD_BE_EXPERT_CHECK},
 }
 
-EXPERT_STRING_FIELD = {
-    "json-schema": {
-        "type": "string",
-    },
-    "GET": {
-        "included": "could_be_expert",
-        "description": EXPERT_DESCRIPTION,
-    },
-    "PATCH": {"required": False, "allowed": "is_expert"},
-    "POST": {"required": False, "allowed": "could_be_expert"},
-}
+EXPERT_BOOLEAN_FIELD = merge_fields(OPTIONAL_EXPERT_FIELD,
+                                    BOOLEAN_FIELD)
+
+EXPERT_STRING_FIELD = merge_fields(OPTIONAL_EXPERT_FIELD,
+                                   STRING_FIELD)
 
 NON_MEMBER_STRING_FIELD = {
     "json-schema": {
         "type": "string",
     },
     "GET": {
-        "included": "could_be_non_member",
+        "included": COULD_BE_NON_MEMBER_CHECK,
         "description": ("This field exists only when user_type is "
                         "'entrepreneur' or 'expert'"),
     },
-    "PATCH": {"required": False, "allowed": "is_non_member"},
-    "POST": {"required": False, "allowed": "could_be_non_member"},
+    "PATCH": {"required": False, "allowed": IS_NON_MEMBER_CHECK},
+    "POST": {"required": False, "allowed": COULD_BE_NON_MEMBER_CHECK},
 }
 
 
@@ -80,7 +80,7 @@ USER_TYPE_TO_PROFILE_MODEL = {
     ExpertProfile.user_type: ExpertProfile,
     MemberProfile.user_type: MemberProfile,
 }
-VALID_USER_TYPES = USER_TYPE_TO_PROFILE_MODEL.keys()
+VALID_USER_TYPES = list(USER_TYPE_TO_PROFILE_MODEL.keys())
 
 USER_TYPE_FIELD = {
     "json-schema": {
@@ -93,12 +93,12 @@ EXPERT_PHONE_FIELD = merge_fields(
     PHONE_FIELD,
     {
         "POST": {
-            "required": "is_expert",
+            "required": IS_EXPERT_CHECK,
             "description": "Required when user_type is 'expert'",
         }
     })
 
-VALID_GENDERS = GENDER_TRANSLATIONS.values()
+VALID_GENDERS = list(GENDER_TRANSLATIONS.values())
 
 GENDER_FIELD = {
     "json-schema": {
@@ -120,82 +120,92 @@ EXPERT_CATEGORY_FIELD = {
         "enum": VALID_EXPERT_CATEGORIES,
     },
     "GET": {
-        "included": "could_be_expert",
+        "included": COULD_BE_EXPERT_CHECK,
         "description": EXPERT_DESCRIPTION,
     },
     "PATCH": {
         "required": False,
-        "allowed": "is_expert",
+        "allowed": IS_EXPERT_CHECK,
         "description": ("Allowed only when user_type is 'expert' and "
                         "Expert Category is valid"),
     },
     "POST": {
-        "required": "is_expert",
-        "allowed": "could_be_expert",
+        "required": IS_EXPERT_CHECK,
+        "allowed": COULD_BE_EXPERT_CHECK,
         "description": "Required when user_type is 'expert'",
     },
 }
 
 MENTORING_SPECIALTIES_FIELD = {
     "json-schema": {
-        "type": "string",
+        "type": "array",
+        "items": {"type": "string"},
     },
     "GET": {
-        "included": "could_be_expert",
+        "included": COULD_BE_EXPERT_CHECK,
         "description": EXPERT_DESCRIPTION,
     },
 }
 
-PRIMARY_INDUSTRY_ID_FIELD = {
-    "json-schema": {"type": "integer"},
+EXPERT_OBJECT_ID_FIELD = {
     "GET": {
-        "included": "could_be_expert",
-        "description": ("This field exists only when user_type is 'expert'. "
-                        "Will always be an existing Industry ID."),
+        "included": COULD_BE_EXPERT_CHECK,
     },
     "PATCH": {
         "required": False,
-        "allowed": "is_expert",
-        "description": ("Allowed only when user_type is 'expert' and a "
-                        "matching Industry object exists"),
+        "allowed": IS_EXPERT_CHECK,
     },
     "POST": {
-        "required": "is_expert",
-        "allowed": "could_be_expert",
-        "description": ("Required and allowed only when user_type is "
-                        "'expert' and a matching Industry object exists"),
+        "required": IS_EXPERT_CHECK,
+        "allowed": COULD_BE_EXPERT_CHECK,
     },
 }
+
+EXPERT_ALLOWED = "Field is allowed only when user_type is 'expert'."
+EXPERT_REQUIRED = "Field is required when user_type is 'expert'."
+RESOURCE_MUST_EXIST = "A matching {classname} resource must exist."
+RESOURCE_WILL_BE = "Field will be an existing {classname} resource id."
+
+
+def get_description(classname):
+    return " ".join([EXPERT_DESCRIPTION,
+                     RESOURCE_WILL_BE.format(classname=classname)])
+
+
+def patch_description(classname):
+    return " ".join([EXPERT_ALLOWED,
+                     RESOURCE_MUST_EXIST.format(classname=classname)])
+
+
+def post_description(classname):
+    return " ".join([EXPERT_REQUIRED,
+                     RESOURCE_MUST_EXIST.format(classname=classname)])
+
+
+def object_id_field(klass):
+    classname = klass.__name__
+    return {
+        "json-schema": {"type": "integer"},
+        "GET": {"description": get_description(classname)},
+        "PATCH": {"description": patch_description(classname)},
+        "POST": {"description": post_description(classname)}
+    }
+
+
+HOME_PROGRAM_FAMILY_ID_FIELD = merge_fields(object_id_field(ProgramFamily),
+                                            EXPERT_OBJECT_ID_FIELD)
+
+PRIMARY_INDUSTRY_ID_FIELD = merge_fields(object_id_field(Industry),
+                                         EXPERT_OBJECT_ID_FIELD)
 
 EXPERT_INTEGER_ARRAY_FIELD = merge_fields(
     INTEGER_ARRAY_FIELD,
     {
         "GET": {
-            "included": "could_be_expert",
+            "included": COULD_BE_EXPERT_CHECK,
             "description": EXPERT_DESCRIPTION,
         },
     })
-
-HOME_PROGRAM_FAMILY_ID_FIELD = {
-    "json-schema": {"type": "integer"},
-    "GET": {
-        "included": "could_be_expert",
-        "description": ("This field exists only when user_type is 'expert'. "
-                        "Will always be an existing Program Family ID."),
-    },
-    "PATCH": {
-        "required": False,
-        "allowed": "is_expert",
-        "description": ("Allowed only when user_type is 'expert' and a "
-                        "matching ProgramFamily object exists"),
-    },
-    "POST": {
-        "required": "is_expert",
-        "allowed": "could_be_expert",
-        "description": ("Required and allowed only when user_type is "
-                        "'expert' and a matching ProgramFamily object exists"),
-    },
-}
 
 URL_SCHEMA = "^[hH][tT][tT][pP][sS]?://"
 NETLOC_ELEMENT = "([^/:@]+(:[^/@]+)?@)?([\w-]+)"
@@ -216,10 +226,7 @@ PERSONAL_WEBSITE_URL_FIELD = {
 }
 
 
-INVALID_INDUSTRY_ID_ERROR = ("Invalid {field}: "
-                             "Expected valid id for an industry resource")
-INVALID_PROGRAM_FAMILY_ID_ERROR = (
-    "Invalid {field}: Expected valid id for an program family resource")
+INVALID_ID_ERROR = "Invalid {field}: {classname} id"
 
 EXPERT_ONLY = [ExpertProfile.user_type]
 NON_MEMBER = [ExpertProfile.user_type, EntrepreneurProfile.user_type]
@@ -242,11 +249,7 @@ def validate_non_member_string(helper, field, value):
 
 def validate_by_user_type(helper, field, value, user_types):
     user_type = helper.find_user_type()
-    if user_type not in user_types:
-        helper.errors.append(INVALID_CHOICE_ERROR.format(
-                field=field,
-                value=user_type,
-                choices=format_choices(user_types)))
+    validate_choices(helper, field, user_type, user_types)
     return value
 
 
@@ -265,19 +268,14 @@ def validate_personal_website_url(helper, field, value):
 def validate_expert_categories(helper, field, value):
     translations = dict([(category.name, category)
                          for category in ExpertCategory.objects.all()])
-    return validate_choices(helper,
-                            field,
-                            value,
-                            translations.keys(),
-                            translations)
+    result = validate_choices(helper, field, value, translations.keys())
+    return translations.get(result, result)
 
 
 def validate_gender(helper, field, value):
-    return validate_choices(helper,
-                            field,
-                            value,
-                            VALID_GENDERS,
-                            GENDER_TRANSLATIONS)
+    std_value = value.lower()
+    db_value = GENDER_TRANSLATIONS.get(std_value, std_value)
+    return validate_choices(helper, field, db_value, VALID_GENDERS)
 
 
 def validate_phone(helper, field, value):
@@ -288,24 +286,24 @@ def validate_twitter_handle(helper, field, value):
     return validate_regex(helper, field, value, TWITTER_REGEX)
 
 
-def validate_primary_industry_id(helper, field, value):
+def validate_object_id(klass, helper, field, value):
     try:
         value = int(value)
-        Industry.objects.get(id=value)
+        klass.objects.get(id=value)
     except (ValueError, ObjectDoesNotExist):
-        helper.errors.append(INVALID_INDUSTRY_ID_ERROR.format(field=field,
-                                                              value=value))
+        classname = klass.__name__
+        helper.errors.append(INVALID_ID_ERROR.format(classname=classname,
+                                                     field=field,
+                                                     value=value))
     return validate_by_user_type(helper, field, value, EXPERT_ONLY)
+
+
+def validate_primary_industry_id(helper, field, value):
+    return validate_object_id(Industry, helper, field, value)
 
 
 def validate_home_program_family_id(helper, field, value):
-    try:
-        value = int(value)
-        ProgramFamily.objects.get(id=value)
-    except (ValueError, ObjectDoesNotExist):
-        helper.errors.append(INVALID_PROGRAM_FAMILY_ID_ERROR.format(
-                field=field, value=value))
-    return validate_by_user_type(helper, field, value, EXPERT_ONLY)
+    return validate_object_id(ProgramFamily, helper, field, value)
 
 
 class ProfileHelper(ModelHelper):
@@ -383,27 +381,19 @@ class ProfileHelper(ModelHelper):
     REQUIRED_KEYS = CORE_REQUIRED_KEYS + EXPERT_REQUIRED_KEYS
     INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
 
-    READ_ONLY_KEYS = [
-        "additional_industry_ids",
-        "mentoring_specialties",
-        "updated_at",
-        ]
-    OUTPUT_KEYS = READ_ONLY_KEYS + INPUT_KEYS
-
     def find_user_type(self):
-        return self.subject.user_type
+        if hasattr(self.subject, "user_type"):
+            return self.subject.user_type
 
     @property
     def additional_industry_ids(self):
-        return self.subject.additional_industries.values_list(
-            "id", flat=True)
+        if hasattr(self.subject, "additional_industries"):
+            return self.subject.additional_industries.values_list(
+                "id", flat=True)
 
     @property
     def expert_category(self):
-        if hasattr(self.subject, "expert_category"):
-            category = self.subject.expert_category
-            if category:
-                return category.name
+        return self.field_name("expert_category")
 
     @property
     def mentoring_specialties(self):
@@ -413,7 +403,9 @@ class ProfileHelper(ModelHelper):
                 return [specialty.name for specialty in specialties.all()]
 
     def is_expert(self):
-        return self.subject.user_type == ExpertProfile.user_type
+        if hasattr(self.subject, "user_type"):
+            return self.subject.user_type == ExpertProfile.user_type
 
     def is_non_member(self):
-        return self.subject.user_type != MemberProfile.user_type
+        if hasattr(self.subject, "user_type"):
+            return self.subject.user_type != MemberProfile.user_type

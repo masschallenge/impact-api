@@ -1,3 +1,6 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 from impact.models import Industry
 from impact.v1.helpers.model_helper import (
     ModelHelper,
@@ -16,14 +19,16 @@ INDUSTRY_FIELDS = {
 
 
 class IndustryHelper(ModelHelper):
-    MODEL = Industry
+    model = Industry
 
     REQUIRED_KEYS = ["name"]
     OPTIONAL_KEYS = ["parent_id"]
     INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
-    READ_ONLY_KEYS = ["id", "full_name"]
-    OUTPUT_KEYS = READ_ONLY_KEYS + INPUT_KEYS
 
     @property
     def full_name(self):
         return str(self.subject)
+
+    @classmethod
+    def fields(cls):
+        return INDUSTRY_FIELDS

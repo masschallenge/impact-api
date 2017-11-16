@@ -2,6 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 import datetime
+import json
+from jsonschema import Draft4Validator
 import pytz
 
 from django.urls import reverse
@@ -20,38 +22,38 @@ from impact.tests.utils import (
     assert_fields,
 )
 from impact.utils import override_updated_at
-from impact.v1.helpers import OrganizationHelper
+from impact.v1.views import OrganizationListView
 
 
 class TestOrganizationListView(APITestCase):
+    url = reverse(OrganizationListView.view_name)
+
     def test_get_startup(self):
         count = 5
         startups = StartupFactory.create_batch(count)
-        with self.login(username=self.basic_user().username):
-            url = reverse("organization")
-            response = self.client.get(url)
+        with self.login(email=self.basic_user().email):
+            response = self.client.get(self.url)
             assert response.data['count'] == count
-            assert all([OrganizationHelper(startup.organization).serialize()
+            assert all([OrganizationListView.serialize(startup.organization)
                         in response.data['results']
                         for startup in startups])
 
     def test_get_partner(self):
         count = 5
         partners = PartnerFactory.create_batch(count)
-        with self.login(username=self.basic_user().username):
-            url = reverse("organization")
-            response = self.client.get(url)
+        with self.login(email=self.basic_user().email):
+            response = self.client.get(self.url)
             assert response.data['count'] == count
-            assert all([OrganizationHelper(partner.organization).serialize()
+            assert all([OrganizationListView.serialize(partner.organization)
                         in response.data['results']
                         for partner in partners])
 
     def test_get_with_limit(self):
         count = 5
         StartupFactory.create_batch(count)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             limit = 2
-            url = reverse("organization") + "?limit=%s" % limit
+            url = self.url + "?limit=%s" % limit
             response = self.client.get(url)
             assert response.data['count'] == count
             assert len(response.data['results']) == limit
@@ -63,9 +65,9 @@ class TestOrganizationListView(APITestCase):
         updated_before = _org_for_date(week_ago - one_day)
         updated_exactly = _org_for_date(week_ago)
         updated_after = _org_for_date(week_ago + one_day)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = "{base_url}?updated_at.before={datestr}".format(
-                base_url=reverse("organization"),
+                base_url=self.url,
                 datestr=week_ago.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
             response = self.client.get(url)
             assert _contains_org(updated_none, response.data)
@@ -80,9 +82,9 @@ class TestOrganizationListView(APITestCase):
         updated_before = _org_for_date(week_ago - one_day)
         updated_exactly = _org_for_date(week_ago)
         updated_after = _org_for_date(week_ago + one_day)
-        with self.login(username=self.basic_user().username):
+        with self.login(email=self.basic_user().email):
             url = "{base_url}?updated_at.after={datestr}".format(
-                base_url=reverse("organization"),
+                base_url=self.url,
                 datestr=week_ago.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
             response = self.client.get(url)
             assert not _contains_org(updated_none, response.data)
@@ -91,14 +93,23 @@ class TestOrganizationListView(APITestCase):
             assert _contains_org(updated_after, response.data)
 
     def test_options(self):
-        with self.login(username=self.basic_user().username):
-            url = reverse("organization")
-            response = self.client.options(url)
+        with self.login(email=self.basic_user().email):
+            response = self.client.options(self.url)
             assert response.status_code == 200
             results = response.data["actions"]["GET"]["properties"]["results"]
             get_options = results["item"]["properties"]
             assert_fields(PARTNER_GET_FIELDS, get_options)
             assert_fields(STARTUP_GET_FIELDS, get_options)
+
+    def test_options_against_get(self):
+        with self.login(email=self.basic_user().email):
+
+            options_response = self.client.options(self.url)
+            get_response = self.client.get(self.url)
+
+            schema = options_response.data["actions"]["GET"]
+            validator = Draft4Validator(schema)
+            assert validator.is_valid(json.loads(get_response.content))
 
 
 def _org_for_date(date):

@@ -118,8 +118,8 @@ def _statuses(startup, program):
 def _user_description(member, base_url):
     user = member.user
     result = {
-        "first_name": user.short_name,
-        "last_name": user.full_name,
+        "first_name": user.last_name,
+        "last_name": user.first_name,
         "email": user.email,
         "title": member.title,
     }
@@ -139,7 +139,7 @@ def _image_fields(user, base_url):
 def _find_members(startup):
     return startup.startupteammember_set.filter(
         display_on_public_profile=True
-    ).order_by("user__full_name", "user__short_name")
+    ).order_by("user__first_name", "user__last_name")
 
 
 def _video_link(video_url):

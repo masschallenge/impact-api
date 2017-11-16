@@ -2,8 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from django.conf import settings
 from django.db import models
-from simpleuser.models import User
 
 from impact.models.mc_model import MCModel
 from impact.models.startup import Startup
@@ -13,7 +13,7 @@ from impact.models.utils import is_managed
 
 class StartupTeamMember(MCModel):
     startup = models.ForeignKey(Startup)
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL)
     title = models.CharField(max_length=60, blank=True)
     startup_administrator = models.BooleanField(
         help_text='You have to have at least one administrator')

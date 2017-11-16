@@ -51,7 +51,7 @@ class APITestCase(TestCase):
             data={
                 "password": 'password',
                 "client_id": app.client_id,
-                "username": user.email,
+                "username": user.username,
                 "grant_type": "password",
             },
             headers={'Content-Type': 'application/x-www-form-urlencoded'}

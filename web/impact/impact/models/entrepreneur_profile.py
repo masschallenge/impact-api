@@ -2,6 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from django.conf import settings
 from django.db import models
 
 from impact.models.base_profile import (
@@ -10,11 +11,10 @@ from impact.models.base_profile import (
 )
 from impact.models.mc_model import MCModel
 from impact.models.utils import is_managed
-from simpleuser.models import User
 
 
 class EntrepreneurProfile(MCModel):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL)
     user_type = 'entrepreneur'
     phone = models.CharField(max_length=PHONE_MAX_LENGTH)
     linked_in_url = models.URLField(blank=True)
