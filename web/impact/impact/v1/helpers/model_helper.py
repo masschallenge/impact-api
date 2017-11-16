@@ -1,3 +1,6 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 import re
 from django.core.exceptions import ValidationError
 from django.core.validators import (
@@ -50,6 +53,12 @@ INTEGER_ARRAY_FIELD = {
 INTEGER_FIELD = {
     "json-schema": {
         "type": "integer"
+    },
+}
+
+FLOAT_FIELD = {
+    "json-schema": {
+        "type": "number"
     },
 }
 
@@ -176,6 +185,11 @@ class ModelHelper(object):
     @classmethod
     def all_objects(cls):
         return cls.model.objects.all()
+
+    def field_name(self, field):
+        obj = getattr(self.subject, field, None)
+        if hasattr(obj, "name"):
+            return obj.name
 
 
 def validate_boolean(helper, field, value):

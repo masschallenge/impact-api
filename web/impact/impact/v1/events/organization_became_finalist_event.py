@@ -1,3 +1,6 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 from impact.models import StartupRole
 from impact.utils import compose_filter
 from impact.v1.events.base_history_event import BaseHistoryEvent

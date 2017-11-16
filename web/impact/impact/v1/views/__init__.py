@@ -1,3 +1,6 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 from impact.v1.views.impact_view import ImpactView
 
 from impact.v1.views.industry_detail_view import IndustryDetailView
@@ -7,6 +10,12 @@ from impact.v1.views.organization_detail_view import OrganizationDetailView
 from impact.v1.views.organization_history_view import OrganizationHistoryView
 from impact.v1.views.organization_list_view import OrganizationListView
 from impact.v1.views.organization_users_view import OrganizationUsersView
+
+from impact.v1.views.program_cycle_detail_view import ProgramCycleDetailView
+from impact.v1.views.program_cycle_list_view import ProgramCycleListView
+
+from impact.v1.views.program_detail_view import ProgramDetailView
+from impact.v1.views.program_list_view import ProgramListView
 
 from impact.v1.views.program_family_detail_view import ProgramFamilyDetailView
 from impact.v1.views.program_family_list_view import ProgramFamilyListView
