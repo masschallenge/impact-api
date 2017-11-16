@@ -82,24 +82,26 @@ def _url(base_url, limit, offset):
 
 def _base_url(request):
     absolute_uri = request.build_absolute_uri()
-    absolute_uri = _remove_query_param(absolute_uri, "limit")
     absolute_uri = _remove_query_param(absolute_uri, "offset")
+    absolute_uri = _remove_query_param(absolute_uri, "limit")
     return absolute_uri
 
 
-def _remove_query_param(absolute_uri, query_param_key):
-    parsed = urlparse(absolute_uri)
+def _remove_query_param(url, query_param_key):
+    parsed = urlparse(url)
     qs = parsed.query
+    if not qs:
+        return url
     parsed_qs = parse_qs(qs, strict_parsing=True)
     parsed_qs.pop(query_param_key, None)
     return urlunparse((parsed[0], parsed[1], parsed[2], parsed[3],
                        urlencode(parsed_qs, doseq=True), parsed[5]))
 
 
-def _update_query_param(absolute_uri, query_param_key, query_param_value=None):
-    parsed = urlparse(absolute_uri)
+def _update_query_param(url, query_param_key, query_param_value=None):
+    parsed = urlparse(url)
     qs = parsed.query
-    parsed_qs = parse_qs(qs)
+    parsed_qs = parse_qs(qs) if qs else {}
     parsed_qs.update({query_param_key: query_param_value})
     return urlunparse((parsed[0], parsed[1], parsed[2], parsed[3],
                        urlencode(parsed_qs, doseq=True), parsed[5]))
