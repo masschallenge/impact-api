@@ -1,6 +1,10 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 import re
 from impact.models import ProgramFamily
 from impact.v1.helpers.model_helper import (
+    BOOLEAN_FIELD,
     ModelHelper,
     PHONE_FIELD,
     PK_FIELD,
@@ -27,6 +31,7 @@ PROGRAM_FAMILY_FIELDS = {
     "phone_number": PHONE_FIELD,
     "short_description": STRING_FIELD,
     "url_slug": URL_SLUG_FIELD,
+    "is_open": BOOLEAN_FIELD,
 }
 
 

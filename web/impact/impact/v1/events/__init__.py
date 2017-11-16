@@ -1,3 +1,6 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 from impact.v1.events.base_user_role_grant_event import BaseUserRoleGrantEvent
 from impact.v1.events.organization_became_entrant_event import (
     OrganizationBecameEntrantEvent,

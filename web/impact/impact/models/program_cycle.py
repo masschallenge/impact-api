@@ -13,6 +13,7 @@ class ProgramCycle(MCModel):
 
     """Association of relatively simultaneous programs"""
     name = models.CharField(max_length=128)
+    short_name = models.CharField(max_length=32, blank=True, null=True)
     applications_open = models.BooleanField(default=False)
     application_open_date = models.DateTimeField(blank=True, null=True)
     application_early_deadline_date = models.DateTimeField(

@@ -1,3 +1,6 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
 from django.core.exceptions import (
     ObjectDoesNotExist,
     ValidationError,
@@ -390,10 +393,7 @@ class ProfileHelper(ModelHelper):
 
     @property
     def expert_category(self):
-        if hasattr(self.subject, "expert_category"):
-            category = self.subject.expert_category
-            if category:
-                return category.name
+        return self.field_name("expert_category")
 
     @property
     def mentoring_specialties(self):

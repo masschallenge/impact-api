@@ -1,3 +1,7 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
+
 def coalesce_dictionaries(data, merge_field="id"):
     """Takes a sequence of dictionaries, merges those that share the
     same merge_field, and returns a list of resulting dictionaries"""
