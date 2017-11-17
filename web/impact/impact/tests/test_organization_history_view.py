@@ -187,19 +187,18 @@ class TestOrganizationHistoryView(APITestCase):
             application_type=cycle.default_application_type,
             cycle=cycle)
         startup = application.startup
-        StartupProgramInterestFactory(startup=startup,
-                                      program__cycle=cycle,
-                                      applying=True)
-        StartupProgramInterestFactory(startup=startup,
-                                      program__cycle=cycle,
-                                      applying=True)
+        INTEREST_COUNT = 2
+        StartupProgramInterestFactory.create_batch(INTEREST_COUNT,
+                                                   startup=startup,
+                                                   program__cycle=cycle,
+                                                   applying=True)
         with self.login(email=self.basic_user().email):
             url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
                                  OrganizationBecameEntrantEvent.EVENT_TYPE)
-            self.assertEqual(2, len(events))
+            self.assertEqual(INTEREST_COUNT, len(events))
 
     def test_startup_became_entrant_no_startup_status(self):
         program = ProgramFactory()
