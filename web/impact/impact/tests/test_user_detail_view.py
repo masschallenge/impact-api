@@ -79,20 +79,26 @@ EXPERT_ONLY_MUTABLE_FIELDS = [
     "mentor_interest",
     "office_hours_interest",
     "office_hours_topics",
-    "primary_industry_id",
     "referred_by",
     "speaker_interest",
     "speaker_topics",
     "title",
 ]
 
+EXPERT_WRITE_ONLY_FIELDS = [
+    "primary_industry_id",
+]
+
 EXPERT_READ_ONLY_FIELDS = [
     "additional_industries",
     "mentoring_specialties",
+    "primary_industry",
 ]
 
-EXPERT_MUTABLE_FIELDS = EXPERT_ONLY_MUTABLE_FIELDS + NON_MEMBER_MUTABLE_FIELDS
-EXPERT_ONLY_FIELDS = EXPERT_ONLY_MUTABLE_FIELDS + EXPERT_READ_ONLY_FIELDS
+EXPERT_WRITE_FIELDS = (EXPERT_ONLY_MUTABLE_FIELDS +
+                       NON_MEMBER_MUTABLE_FIELDS +
+                       EXPERT_WRITE_ONLY_FIELDS)
+EXPERT_GET_FIELDS = EXPERT_ONLY_MUTABLE_FIELDS + EXPERT_READ_ONLY_FIELDS
 
 User = get_user_model()
 
@@ -170,13 +176,14 @@ class TestUserDetailView(APITestCase):
             assert get_data["type"] == "object"
             get_options = get_data["properties"]
             assert_fields(ENTREPRENEUR_GET_FIELDS, get_options)
-            assert_fields_missing(EXPERT_ONLY_FIELDS, get_options)
+            assert_fields_missing(EXPERT_GET_FIELDS, get_options)
             patch_options = response.data["actions"]["PATCH"]["properties"]
             assert_fields_required(["id"], patch_options)
             assert_fields_not_required(ENTREPRENEUR_PATCH_FIELDS,
                                        patch_options)
             assert_fields_missing(NON_PATCH_FIELDS, patch_options)
-            assert_fields_missing(EXPERT_ONLY_FIELDS, patch_options)
+            assert_fields_missing(EXPERT_ONLY_MUTABLE_FIELDS, patch_options)
+            assert_fields_missing(EXPERT_WRITE_ONLY_FIELDS, patch_options)
             assert_fields_missing(["POST"], response.data["actions"])
 
     def test_expert_options(self):
@@ -186,7 +193,7 @@ class TestUserDetailView(APITestCase):
             url = reverse(UserDetailView.view_name, args=[user.id])
             response = self.client.options(url)
             get_options = response.data["actions"]["GET"]["properties"]
-            assert_fields(EXPERT_ONLY_FIELDS, get_options)
+            assert_fields(EXPERT_GET_FIELDS, get_options)
             patch_options = response.data["actions"]["PATCH"]["properties"]
             assert_fields(EXPERT_ONLY_MUTABLE_FIELDS, patch_options)
 

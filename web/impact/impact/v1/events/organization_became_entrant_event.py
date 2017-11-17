@@ -40,15 +40,17 @@ class OrganizationBecameEntrantEvent(BaseHistoryEvent):
     CLASS_FIELDS = {
         "cycle_id": INTEGER_FIELD,
         "cycle": STRING_FIELD,
-        "program": PROGRAM_FIELD,
+        "program_id": INTEGER_FIELD,
+        "program": STRING_FIELD,
+        "program_preference": INTEGER_FIELD,
        }
 
-    def __init__(self, application, program):
+    def __init__(self, application, program_data):
         super().__init__()
         self.application = application
         self.startup = self.application.startup
         self._cycle = self.application.cycle
-        self._program = program
+        self.program_data = program_data
         self.startup_status = StartupStatus.objects.filter(
             program_startup_status__startup_role__name=StartupRole.ENTRANT,
             program_startup_status__program__cycle=self._cycle,
@@ -74,7 +76,13 @@ class OrganizationBecameEntrantEvent(BaseHistoryEvent):
         return self._cycle.id
 
     def program(self):
-        return self._program
+        return self.program_data["name"]
+
+    def program_id(self):
+        return self.program_data["id"]
+
+    def program_preference(self):
+        return self.program_data["preference"]
 
     @classmethod
     def programs_for_app(self, app):

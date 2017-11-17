@@ -61,4 +61,6 @@ class TestSchemaEndpoints(APITestCase):
             response = self.client.options(url)
         results = response.data["actions"]["GET"]["properties"]["results"]
         properties = results["item"]["properties"]
-        self.assertEqual(USER_FIELDS.keys(), properties.keys())
+        response_keys = set(properties.keys())
+        self.assertTrue(len(response_keys) > 0)
+        self.assertFalse(response_keys - set(USER_FIELDS.keys()))

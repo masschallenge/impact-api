@@ -176,10 +176,9 @@ class TestOrganizationHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             self.assertTrue(cycle.name in events[0]["description"])
             self.assertEqual(startup_status.created_at, events[0]["datetime"])
-            self.assertEqual({"id": program.id,
-                              "name": program.name,
-                              "preference": 1},
-                             events[0]["program"])
+            self.assertEqual(program.id, events[0]["program_id"])
+            self.assertEqual(program.name, events[0]["program"])
+            self.assertEqual(1, events[0]["program_preference"])
 
     def test_startup_became_entrant_for_multiple_programs(self):
         cycle = ProgramCycleFactory()
