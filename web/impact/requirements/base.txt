@@ -32,6 +32,7 @@ django-rest-framework-proxy
 django-rest-swagger
 Django==1.10.3
 djangorestframework
+djangorestframework-sso
 drf-schema-adapter
 drf-tracking
 git+https://github.com/masschallenge/django-accelerator.git@2017.11.09#egg=django-accelerator

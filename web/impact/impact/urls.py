@@ -1,10 +1,18 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+from django.apps import apps
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
+
+from rest_framework import routers
+from rest_framework_sso.views import (
+    obtain_session_token,
+    obtain_authorization_token
+)
+from drf_auto_endpoint.router import router as schema_router
 
 from impact.schema import schema_view
 from impact.views import (
@@ -38,9 +46,6 @@ from impact.v1.views import (
     UserListView,
     UserOrganizationsView,
 )
-from rest_framework import routers
-from drf_auto_endpoint.router import router as schema_router
-from django.apps import apps
 
 
 accelerator_router = routers.DefaultRouter()
@@ -161,12 +166,13 @@ urls = [
     url(r'^api/accelerator/', include(accelerator_router.urls)),
     url(r'^api/impact/', include(schema_router.urls), name='api-root'),
     url(r'^$', IndexView.as_view()),
-    url(r'^accounts/', include(account_urlpatterns)),
     url(r'^schema/$', schema_view, name='schema'),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^oauth/', include(
-        'oauth2_provider.urls',
-        namespace='oauth2_provider'))
+    url(r'^accounts/', include(account_urlpatterns)),
+    url(r'^authorize/', obtain_authorization_token),
+    url(r'^oauth/', include('oauth2_provider.urls',
+        namespace='oauth2_provider')),
+    url(r'^session/', obtain_session_token),
 ]
 
 # use staticfiles with gunicorn (not recommneded!)
