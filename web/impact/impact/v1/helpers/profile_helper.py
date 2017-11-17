@@ -236,7 +236,7 @@ PERSONAL_WEBSITE_URL_FIELD = {
 }
 
 
-INVALID_ID_ERROR = "Invalid {field}: {classname} id"
+INVALID_ID_ERROR = "Invalid {field}: Expected {classname} id"
 
 EXPERT_ONLY = [ExpertProfile.user_type]
 NON_MEMBER = [ExpertProfile.user_type, EntrepreneurProfile.user_type]
