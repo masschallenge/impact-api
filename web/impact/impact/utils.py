@@ -1,13 +1,15 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
+
 from datetime import datetime
+import dateutil.parser
 from pytz import utc
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import Q
 from django.utils.formats import get_format
-import dateutil.parser
-from impact.models.utils import snake_to_model_name
+
 
 DAWN_OF_TIME = utc.localize(datetime.strptime(
     "2010-01-01T00:00:00Z",
@@ -45,16 +47,7 @@ def get_profile(user):
         return None
 
 
-def lower_case_model_name(view):
-    model = view.kwargs.get('model', '').lower()
-    related_model = view.kwargs.get('related_model')
-    if related_model:
-        return model + '_' + related_model
-    return model
-
-
-def model_case_model_name(view):
-    model = snake_to_model_name(view.kwargs.get('model', ''))
+def model_name_case(view, model):
     related_model = view.kwargs.get('related_model')
     if related_model:
         return model + '_' + related_model

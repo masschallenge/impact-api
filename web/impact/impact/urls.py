@@ -53,9 +53,11 @@ for model in apps.get_models('impact'):
         schema_router.register(model, url=model_name_to_snake(model.__name__))
 
 for model in apps.get_models('accelerator'):
-    if (model._meta.app_label == 'accelerator' and
-            hasattr(model, "Meta") and
-            not model._meta.auto_created):
+    if (
+        model._meta.app_label == 'accelerator'
+        and hasattr(model, "Meta")
+        and not model._meta.auto_created
+    ):
         accelerator_router.register(
             model.__name__, GeneralViewSet,
             base_name="accelerator.{model}".format(model=model.__name__))

@@ -6,9 +6,10 @@ from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework_tracking.mixins import LoggingMixin
 
+from impact.models.utils import snake_to_model_name
 from impact.permissions import DynamicModelPermissions
 from impact.serializers import GeneralSerializer
-from impact.utils import model_case_model_name
+from impact.utils import model_name_case
 
 
 class GeneralViewSet(LoggingMixin, viewsets.ModelViewSet):
@@ -19,7 +20,8 @@ class GeneralViewSet(LoggingMixin, viewsets.ModelViewSet):
 
     @property
     def model(self):
-        model_name = model_case_model_name(self)
+        model = snake_to_model_name(self.kwargs.get('model', ''))
+        model_name = model_name_case(self, model)
         return apps.get_model(
             app_label=self.kwargs['app'],
             model_name=model_name)

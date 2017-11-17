@@ -10,7 +10,7 @@ from django.contrib.auth.models import PermissionDenied
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.permissions import BasePermission
 
-from impact.utils import lower_case_model_name
+from impact.utils import model_name_case
 
 User = get_user_model()
 
@@ -53,7 +53,8 @@ class DynamicModelPermissions(BasePermission):
     authenticated_users_only = True
 
     def has_permission(self, request, view):
-        model_name = lower_case_model_name(view)
+        model = model = view.kwargs.get('model', '').lower()
+        model_name = model_name_case(view, model)
         app_label = 'mc'
         kwargs = {'app': app_label, 'model_name': model_name}
         perms = [perm % kwargs for perm in self.perms_map[request.method]]
@@ -105,7 +106,8 @@ class DynamicModelPermissions(BasePermission):
         return boolean_value
 
     def has_object_permission(self, request, view, obj):
-        model_name = lower_case_model_name(view)
+        model = model = view.kwargs.get('model', '').lower()
+        model_name = model_name_case(view, model)
         app_label = obj._meta.app_label
         if app_label == "impact":
             app_label = "mc"
