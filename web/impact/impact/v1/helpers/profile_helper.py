@@ -16,6 +16,7 @@ from impact.v1.helpers.model_helper import (
     TWITTER_REGEX,
     json_array,
     merge_fields,
+    serialize_list_field,
     validate_boolean,
     validate_choices,
     validate_regex,
@@ -396,13 +397,9 @@ class ProfileHelper(ModelHelper):
 
     @property
     def additional_industries(self):
-        if hasattr(self.subject, "additional_industries"):
-            industries = self.subject.additional_industries
-            result = []
-            for industry in industries.all():
-                helper = IndustryHelper(industry)
-                result.append(helper.serialize(helper.fields()))
-            return result
+        return serialize_list_field(self.subject,
+                                    "additional_industries",
+                                    IndustryHelper)
 
     @property
     def primary_industry(self):

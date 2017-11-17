@@ -196,6 +196,15 @@ class ModelHelper(object):
             return obj.name
 
 
+def serialize_list_field(object, field, helper_class):
+    if hasattr(object, field):
+        result = []
+        for item in getattr(object, field).all():
+            helper = helper_class(item)
+            result.append(helper.serialize(helper.fields()))
+        return result
+
+
 def validate_boolean(helper, field, value):
     result = value
     if isinstance(result, str):

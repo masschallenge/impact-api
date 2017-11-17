@@ -18,6 +18,7 @@ from impact.v1.helpers.model_helper import (
     json_array,
     json_schema,
     merge_fields,
+    serialize_list_field,
 )
 from impact.v1.helpers.industry_helper import (
     INDUSTRY_TYPE,
@@ -101,13 +102,9 @@ class OrganizationHelper(ModelHelper):
 
     @property
     def additional_industries(self):
-        if self.startup:
-            industries = self.startup.additional_industries
-            result = []
-            for industry in industries.all():
-                helper = IndustryHelper(industry)
-                result.append(helper.serialize(helper.fields()))
-            return result
+        return serialize_list_field(self.startup,
+                                    "additional_industries",
+                                    IndustryHelper)
 
     @property
     def primary_industry(self):
