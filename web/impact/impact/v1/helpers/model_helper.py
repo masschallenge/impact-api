@@ -24,8 +24,8 @@ def merge_fields(field, extension):
     return result
 
 
-def json_schema(type):
-    return {"json-schema": {"type": type}}
+def json_schema(field_type):
+    return {"json-schema": {"type": field_type}}
 
 
 PK_FIELD = {
