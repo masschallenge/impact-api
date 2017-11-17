@@ -8,6 +8,8 @@ from impact.v1.helpers.model_helper import (
     REQUIRED_STRING_FIELD,
     READ_ONLY_ID_FIELD,
     READ_ONLY_STRING_FIELD,
+    json_object,
+    properties_from_fields,
 )
 
 INDUSTRY_FIELDS = {
@@ -16,6 +18,7 @@ INDUSTRY_FIELDS = {
     "full_name": READ_ONLY_STRING_FIELD,
     "parent_id": READ_ONLY_ID_FIELD,
 }
+INDUSTRY_TYPE = json_object(properties_from_fields(INDUSTRY_FIELDS))
 
 
 class IndustryHelper(ModelHelper):

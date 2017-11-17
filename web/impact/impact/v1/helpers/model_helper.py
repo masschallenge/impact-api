@@ -24,6 +24,10 @@ def merge_fields(field, extension):
     return result
 
 
+def json_schema(type):
+    return {"json-schema": {"type": type}}
+
+
 PK_FIELD = {
     "json-schema": {
         "type": "integer",
@@ -263,6 +267,13 @@ def json_object(properties):
         "type": "object",
         "properties": properties,
     }
+
+
+def properties_from_fields(fields):
+    result = {}
+    for key, field in fields.items():
+        result[key] = field["json-schema"]
+    return result
 
 
 def json_array(item):

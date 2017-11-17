@@ -87,7 +87,7 @@ EXPERT_ONLY_MUTABLE_FIELDS = [
 ]
 
 EXPERT_READ_ONLY_FIELDS = [
-    "additional_industry_ids",
+    "additional_industries",
     "mentoring_specialties",
 ]
 
@@ -136,8 +136,12 @@ class TestUserDetailView(APITestCase):
         with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             response = self.client.get(url)
-            assert response.data["primary_industry_id"] == primary_industry.id
-            assert all([industry.id in response.data["additional_industry_ids"]
+            assert (response.data["primary_industry"]["id"] ==
+                    primary_industry.id)
+            additional_industry_ids = [
+                datum["id"] for datum
+                in response.data["additional_industries"]]
+            assert all([industry.id in additional_industry_ids
                         for industry in additional_industries])
 
     def test_get_with_no_profile(self):

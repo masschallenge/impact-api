@@ -28,7 +28,7 @@ SHARED_GET_FIELDS = [
     "website_url",
 ]
 STARTUP_ONLY_GET_FIELDS = [
-    "additional_industry_ids",
+    "additional_industries",
     "date_founded",
     "facebook_url",
     "full_elevator_pitch",
@@ -38,7 +38,7 @@ STARTUP_ONLY_GET_FIELDS = [
     "location_national",
     "location_postcode",
     "location_regional",
-    "primary_industry_id",
+    "primary_industry",
     "short_pitch",
     "video_elevator_pitch_url",
 ]
@@ -70,8 +70,12 @@ class TestOrganizationDetailView(APITestCase):
             url = reverse(OrganizationDetailView.view_name,
                           args=[startup.organization.id])
             response = self.client.get(url)
-            assert response.data["primary_industry_id"] == primary_industry.id
-            assert all([industry.id in response.data["additional_industry_ids"]
+            assert (response.data["primary_industry"]["id"] ==
+                    primary_industry.id)
+            additional_industry_ids = [
+                datum["id"] for datum
+                in response.data["additional_industries"]]
+            assert all([industry.id in additional_industry_ids
                         for industry in additional_industries])
 
     def test_get_partner(self):

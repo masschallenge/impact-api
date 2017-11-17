@@ -8,19 +8,23 @@ from django.core.exceptions import (
 from django.core.validators import RegexValidator
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
-    INTEGER_ARRAY_FIELD,
     INVALID_URL_ERROR,
     ModelHelper,
     PHONE_FIELD,
     PHONE_REGEX,
     STRING_FIELD,
     TWITTER_REGEX,
+    json_array,
     merge_fields,
     validate_boolean,
     validate_choices,
     validate_regex,
     validate_string,
     validate_url,
+)
+from impact.v1.helpers.industry_helper import (
+    INDUSTRY_TYPE,
+    IndustryHelper,
 )
 from impact.models import (
     EntrepreneurProfile,
@@ -182,10 +186,10 @@ def post_description(classname):
                      RESOURCE_MUST_EXIST.format(classname=classname)])
 
 
-def object_id_field(klass):
+def object_id_field(klass, type="integer"):
     classname = klass.__name__
     return {
-        "json-schema": {"type": "integer"},
+        "json-schema": {"type": type},
         "GET": {"description": get_description(classname)},
         "PATCH": {"description": patch_description(classname)},
         "POST": {"description": post_description(classname)}
@@ -194,18 +198,23 @@ def object_id_field(klass):
 
 HOME_PROGRAM_FAMILY_ID_FIELD = merge_fields(object_id_field(ProgramFamily),
                                             EXPERT_OBJECT_ID_FIELD)
+PRIMARY_INDUSTRY_ID_FIELD = merge_fields(
+    {"GET": {"included": False}},
+    merge_fields(object_id_field(Industry),
+                 EXPERT_OBJECT_ID_FIELD))
 
-PRIMARY_INDUSTRY_ID_FIELD = merge_fields(object_id_field(Industry),
-                                         EXPERT_OBJECT_ID_FIELD)
+EXPERT_INDUSTRY_FIELD = {
+    "json-schema": INDUSTRY_TYPE,
+    "GET": {"description": EXPERT_DESCRIPTION,
+            "included": COULD_BE_EXPERT_CHECK}}
 
-EXPERT_INTEGER_ARRAY_FIELD = merge_fields(
-    INTEGER_ARRAY_FIELD,
-    {
-        "GET": {
-            "included": COULD_BE_EXPERT_CHECK,
-            "description": EXPERT_DESCRIPTION,
-        },
-    })
+EXPERT_INDUSTRY_ARRAY_FIELD = {
+    "json-schema": json_array(INDUSTRY_TYPE),
+    "GET": {
+        "included": COULD_BE_EXPERT_CHECK,
+        "description": EXPERT_DESCRIPTION,
+    }
+}
 
 URL_SCHEMA = "^[hH][tT][tT][pP][sS]?://"
 NETLOC_ELEMENT = "([^/:@]+(:[^/@]+)?@)?([\w-]+)"
@@ -386,10 +395,20 @@ class ProfileHelper(ModelHelper):
             return self.subject.user_type
 
     @property
-    def additional_industry_ids(self):
+    def additional_industries(self):
         if hasattr(self.subject, "additional_industries"):
-            return self.subject.additional_industries.values_list(
-                "id", flat=True)
+            industries = self.subject.additional_industries
+            result = []
+            for industry in industries.all():
+                helper = IndustryHelper(industry)
+                result.append(helper.serialize(helper.fields()))
+            return result
+
+    @property
+    def primary_industry(self):
+        if hasattr(self.subject, "primary_industry"):
+            helper = IndustryHelper(self.subject.primary_industry)
+            return helper.serialize(helper.fields())
 
     @property
     def expert_category(self):
