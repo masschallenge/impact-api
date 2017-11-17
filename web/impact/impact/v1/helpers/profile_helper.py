@@ -187,10 +187,10 @@ def post_description(classname):
                      RESOURCE_MUST_EXIST.format(classname=classname)])
 
 
-def object_id_field(klass, type="integer"):
+def object_id_field(klass):
     classname = klass.__name__
     return {
-        "json-schema": {"type": type},
+        "json-schema": {"type": "integer"},
         "GET": {"description": get_description(classname)},
         "PATCH": {"description": patch_description(classname)},
         "POST": {"description": post_description(classname)}
@@ -236,7 +236,7 @@ PERSONAL_WEBSITE_URL_FIELD = {
 }
 
 
-INVALID_ID_ERROR = "Invalid {field}: Expected {classname} id"
+INVALID_ID_ERROR = "Invalid {field}: Expected valid integer {classname} id"
 
 EXPERT_ONLY = [ExpertProfile.user_type]
 NON_MEMBER = [ExpertProfile.user_type, EntrepreneurProfile.user_type]
