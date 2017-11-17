@@ -62,27 +62,18 @@ class OrganizationBecameEntrantEvent(BaseHistoryEvent):
         for startup in organization.startup_set.all():
             entrant_app_types = [cycle.default_application_type for
                                  cycle in ProgramCycle.objects.all()]
-            for app in startup.application_set.filter(
-                    application_type__in=entrant_app_types,
-                    application_status=SUBMITTED_APP_STATUS):
-                for program in cls.programs_for_app(app):
-                    result.append(cls(app, program))
+            result += cls._events_for_startup(startup, entrant_app_types)
         return result
 
-    def cycle(self):
-        return self._cycle.name
-
-    def cycle_id(self):
-        return self._cycle.id
-
-    def program(self):
-        return self.program_data["name"]
-
-    def program_id(self):
-        return self.program_data["id"]
-
-    def program_preference(self):
-        return self.program_data["preference"]
+    @classmethod
+    def _events_for_startup(cls, startup, app_types):
+        result = []
+        for app in startup.application_set.filter(
+                application_type__in=app_types,
+                application_status=SUBMITTED_APP_STATUS):
+            for program in cls.programs_for_app(app):
+                result.append(cls(app, program))
+        return result
 
     @classmethod
     def programs_for_app(self, app):
@@ -99,6 +90,21 @@ class OrganizationBecameEntrantEvent(BaseHistoryEvent):
                            "preference": preference})
             preference += 1
         return result
+
+    def cycle(self):
+        return self._cycle.name
+
+    def cycle_id(self):
+        return self._cycle.id
+
+    def program(self):
+        return self.program_data["name"]
+
+    def program_id(self):
+        return self.program_data["id"]
+
+    def program_preference(self):
+        return self.program_data["preference"]
 
     def description(self):
         return self.DESCRIPTION_FORMAT.format(self.application.cycle.name)
