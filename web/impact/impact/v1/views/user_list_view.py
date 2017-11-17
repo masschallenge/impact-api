@@ -117,7 +117,7 @@ class UserListView(BaseListView):
         for key in set(user_keys) - set(UserHelper.INPUT_KEYS):
             self.errors.append(INVALID_KEY_ERROR.format(key))
 
-    def _filter_by_date(self, qs, after, before):
+    def _apply_filter_by_date(self, qs, after, before):
         updated_at_after = parse_date(after)
         updated_at_before = parse_date(before)
         if updated_at_after:

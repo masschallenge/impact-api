@@ -17,6 +17,7 @@ from impact.v1.helpers import (
 )
 from impact.v1.views import ImpactView
 from impact.utils import parse_date
+from impact.models.utils import model_has_field
 
 
 class BaseListView(ImpactView):
@@ -51,24 +52,36 @@ class BaseListView(ImpactView):
                 [self.serialize(obj)
                  for obj in queryset[offset:offset + limit]])
 
-    def filter(self, queryset):
+    def filter(self, qs):
+        qs = self._filter_by_date(qs)
+        if model_has_field(self.model(), "name"):
+            qs = self._filter_by_name(qs)
+        return qs
+
+    def _filter_by_date(self, qs):
         updated_at_after = self.request.query_params.get(
             'updated_at.after', None)
         updated_at_before = self.request.query_params.get(
             'updated_at.before', None)
         if updated_at_after or updated_at_before:
-            queryset = self._filter_by_date(queryset,
+            qs = self._apply_filter_by_date(qs,
                                             updated_at_after,
                                             updated_at_before)
-        return queryset
+        return qs
 
-    def _filter_by_date(self, qs, after, before):
+    def _apply_filter_by_date(self, qs, after, before):
         updated_at_after = parse_date(after)
         updated_at_before = parse_date(before)
         if updated_at_after:
             qs = qs.filter(updated_at__gte=updated_at_after)
         if updated_at_before:
             qs = qs.exclude(updated_at__gt=updated_at_before)
+        return qs
+
+    def _filter_by_name(self, qs):
+        name_filter = self.request.query_params.get('name', None)
+        if name_filter:
+            return qs.filter(name__icontains=name_filter)
         return qs
 
 
