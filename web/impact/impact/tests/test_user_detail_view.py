@@ -131,6 +131,7 @@ class TestUserDetailView(APITestCase):
             response = self.client.get(url)
             assert category.name == response.data["expert_category"]
             assert specialty.name in response.data["mentoring_specialties"]
+            assert "primary_industry_id" not in response.data
 
     def test_get_expert_with_industries(self):
         primary_industry = IndustryFactory()
@@ -194,6 +195,7 @@ class TestUserDetailView(APITestCase):
             response = self.client.options(url)
             get_options = response.data["actions"]["GET"]["properties"]
             assert_fields(EXPERT_GET_FIELDS, get_options)
+            assert_fields_missing(EXPERT_WRITE_ONLY_FIELDS, get_options)
             patch_options = response.data["actions"]["PATCH"]["properties"]
             assert_fields(EXPERT_ONLY_MUTABLE_FIELDS, patch_options)
 
@@ -491,7 +493,8 @@ class TestUserDetailView(APITestCase):
             helper = UserHelper(user)
             assert (helper.field_value("home_program_family_id") ==
                     program_family.id)
-            assert helper.field_value("primary_industry_id") == industry.id
+            assert (helper.profile_helper.subject.primary_industry_id ==
+                    industry.id)
 
     def test_patch_blank_url(self):
         context = UserContext()

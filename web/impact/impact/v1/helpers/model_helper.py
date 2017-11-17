@@ -159,9 +159,8 @@ class ModelHelper(object):
         return result
 
     def field_value(self, field):
-        result = getattr(self, field, None)
-        if result is not None:
-            return result
+        if hasattr(self, field):
+            return getattr(self, field)
         return getattr(self.subject, field, None)
 
     def field_setter(self, field, value):

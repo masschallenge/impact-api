@@ -408,6 +408,10 @@ class ProfileHelper(ModelHelper):
             return helper.serialize(helper.fields())
 
     @property
+    def primary_industry_id(self):
+        return None
+
+    @property
     def expert_category(self):
         return self.field_name("expert_category")
 
