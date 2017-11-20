@@ -103,13 +103,34 @@ class TestOrganizationListView(APITestCase):
 
     def test_options_against_get(self):
         with self.login(email=self.basic_user().email):
-
             options_response = self.client.options(self.url)
             get_response = self.client.get(self.url)
 
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)
             assert validator.is_valid(json.loads(get_response.content))
+
+    def test_results_are_filtered_by_name(self):
+        name = "foo"
+        other_name = "bar"
+        startup = StartupFactory(organization__name=name)
+        other_startup = StartupFactory(organization__name=other_name)
+        with self.login(email=self.basic_user().email):
+            url = self.url + "?name=%s" % name
+            response = self.client.get(url)
+            assert response.data['count'] == 1
+            assert _contains_org(startup.organization, response.data)
+            assert not _contains_org(other_startup.organization, response.data)
+
+    def test_next_info_contains_filter(self):
+        name = "foo"
+        StartupFactory(organization__name=name)
+        StartupFactory.create_batch(10)
+        with self.login(email=self.basic_user().email):
+            name_query_parameter = "name=%s" % name
+            url = self.url + "?" + name_query_parameter
+            response = self.client.get(url)
+            assert name_query_parameter in response.data['next']
 
 
 def _org_for_date(date):
