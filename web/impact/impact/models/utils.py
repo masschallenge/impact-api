@@ -5,6 +5,7 @@ import re
 from django.core.exceptions import FieldDoesNotExist
 from django.utils.text import camel_case_to_spaces
 
+
 LABEL_LENGTH = 255
 
 
