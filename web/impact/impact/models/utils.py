@@ -2,6 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 import re
+from django.utils.text import camel_case_to_spaces
 
 LABEL_LENGTH = 255
 
@@ -11,11 +12,8 @@ def is_managed(db_table):
 
 
 def model_name_to_snake(value):
-    original_model_string = re.findall('[A-Z][^A-Z]*', value)
-    holder = ""
-    for word in original_model_string:
-        holder += word.lower() + "_"
-    new_model_string = holder[:-1]
+    original_model_string = camel_case_to_spaces(value)
+    new_model_string = original_model_string.replace(" ", "_")
     return new_model_string
 
 
