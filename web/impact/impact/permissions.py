@@ -2,7 +2,6 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from ast import literal_eval
-
 from django.conf import settings
 from django.contrib.auth import get_user
 from django.contrib.auth import get_user_model
@@ -11,11 +10,12 @@ from django.contrib.auth.models import PermissionDenied
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.permissions import BasePermission
 
+from impact.utils import model_name_case
+
 User = get_user_model()
 
 
 class V0APIPermissions(BasePermission):
-
     authenticated_users_only = True
 
     def has_permission(self, request, view):
@@ -24,7 +24,6 @@ class V0APIPermissions(BasePermission):
 
 
 class V1APIPermissions(BasePermission):
-
     authenticated_users_only = True
 
     def has_permission(self, request, view):
@@ -33,7 +32,6 @@ class V1APIPermissions(BasePermission):
 
 
 class V1ConfidentialAPIPermissions(BasePermission):
-
     authenticated_users_only = True
 
     def has_permission(self, request, view):
@@ -55,7 +53,9 @@ class DynamicModelPermissions(BasePermission):
     authenticated_users_only = True
 
     def has_permission(self, request, view):
-        model_name = view.kwargs.get('model', "").lower()
+        model = model = view.kwargs.get('model', '').lower()
+        related_model = view.kwargs.get('related_model', '').lower()
+        model_name = model_name_case(model, related_model)
         app_label = 'mc'
         kwargs = {'app': app_label, 'model_name': model_name}
         perms = [perm % kwargs for perm in self.perms_map[request.method]]
@@ -107,7 +107,9 @@ class DynamicModelPermissions(BasePermission):
         return boolean_value
 
     def has_object_permission(self, request, view, obj):
-        model_name = view.kwargs.get('model', "").lower()
+        model = model = view.kwargs.get('model', '').lower()
+        related_model = view.kwargs.get('related_model', '').lower()
+        model_name = model_name_case(model, related_model)
         app_label = obj._meta.app_label
         if app_label == "impact":
             app_label = "mc"

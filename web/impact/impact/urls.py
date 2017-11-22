@@ -1,11 +1,15 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+from django.apps import apps
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
 from django.contrib import admin
+from drf_auto_endpoint.router import router as schema_router
+from rest_framework import routers
 
+from impact.models.utils import model_name_to_snake
 from impact.schema import schema_view
 from impact.views import (
     GeneralViewSet,
@@ -38,10 +42,6 @@ from impact.v1.views import (
     UserListView,
     UserOrganizationsView,
 )
-from rest_framework import routers
-from drf_auto_endpoint.router import router as schema_router
-from django.apps import apps
-
 
 accelerator_router = routers.DefaultRouter()
 simpleuser_router = routers.DefaultRouter()
@@ -49,12 +49,15 @@ simpleuser_router = routers.DefaultRouter()
 simpleuser_router.register('User', GeneralViewSet, base_name='User')
 
 for model in apps.get_models('impact'):
-    if model._meta.app_label == 'impact':
-        schema_router.register(model, url=model.__name__)
-
+    if model._meta.app_label == 'impact' and not model._meta.auto_created:
+        schema_router.register(model, url=model_name_to_snake(model.__name__))
 
 for model in apps.get_models('accelerator'):
-    if model._meta.app_label == 'accelerator' and hasattr(model, "Meta"):
+    if (
+        model._meta.app_label == 'accelerator'
+        and hasattr(model, "Meta")
+        and not model._meta.auto_created
+    ):
         accelerator_router.register(
             model.__name__, GeneralViewSet,
             base_name="accelerator.{model}".format(model=model.__name__))
@@ -146,10 +149,25 @@ v1_urlpatterns = [
 urls = [
     url(r"^api/v0/", include(v0_urlpatterns)),
     url(r"^api/v1/", include(v1_urlpatterns)),
-    url(r'^api/(?P<app>\w+)/(?P<model>\w+)/$',
+    url(
+        r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/'
+        r'(?P<related_model>[a-z_]+)/$',
+        GeneralViewSet.as_view({'get': 'list', 'post': 'create'}),
+        name='related-object-list'),
+    url(r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/'
+        r'(?P<related_model>[a-z_]+)/'
+        r'(?P<pk>[0-9]+)/$',
+        GeneralViewSet.as_view({
+            'get': 'retrieve',
+            'put': 'update',
+            'patch': 'partial_update',
+            'delete': 'destroy'
+        }),
+        name='related-object-detail'),
+    url(r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/$',
         GeneralViewSet.as_view({'get': 'list', 'post': 'create'}),
         name='object-list'),
-    url(r'^api/(?P<app>\w+)/(?P<model>\w+)/(?P<pk>[0-9]+)/$',
+    url(r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/(?P<pk>[0-9]+)/$',
         GeneralViewSet.as_view({
             'get': 'retrieve',
             'put': 'update',
