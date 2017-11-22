@@ -54,7 +54,8 @@ class DynamicModelPermissions(BasePermission):
 
     def has_permission(self, request, view):
         model = model = view.kwargs.get('model', '').lower()
-        model_name = model_name_case(view, model)
+        related_model = view.kwargs.get('related_model', '').lower()
+        model_name = model_name_case(model, related_model)
         app_label = 'mc'
         kwargs = {'app': app_label, 'model_name': model_name}
         perms = [perm % kwargs for perm in self.perms_map[request.method]]
@@ -107,7 +108,8 @@ class DynamicModelPermissions(BasePermission):
 
     def has_object_permission(self, request, view, obj):
         model = model = view.kwargs.get('model', '').lower()
-        model_name = model_name_case(view, model)
+        related_model = view.kwargs.get('related_model', '').lower()
+        model_name = model_name_case(model, related_model)
         app_label = obj._meta.app_label
         if app_label == "impact":
             app_label = "mc"

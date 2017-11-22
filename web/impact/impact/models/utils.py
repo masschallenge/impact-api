@@ -1,7 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-import re
 from django.core.exceptions import FieldDoesNotExist
 from django.utils.text import camel_case_to_spaces
 

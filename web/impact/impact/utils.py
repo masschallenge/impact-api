@@ -47,8 +47,7 @@ def get_profile(user):
         return None
 
 
-def model_name_case(view, model):
-    related_model = view.kwargs.get('related_model')
+def model_name_case(model, related_model):
     if related_model:
         return model + '_' + related_model
     return model

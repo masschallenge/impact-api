@@ -21,7 +21,8 @@ class GeneralViewSet(LoggingMixin, viewsets.ModelViewSet):
     @property
     def model(self):
         model = snake_to_model_name(self.kwargs.get('model', ''))
-        model_name = model_name_case(self, model)
+        related_model = self.kwargs.get('related_model', '')
+        model_name = model_name_case(model, related_model)
         return apps.get_model(
             app_label=self.kwargs['app'],
             model_name=model_name)
