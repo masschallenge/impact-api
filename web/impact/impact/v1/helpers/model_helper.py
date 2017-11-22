@@ -24,6 +24,10 @@ def merge_fields(field, extension):
     return result
 
 
+def json_schema(field_type):
+    return {"json-schema": {"type": field_type}}
+
+
 PK_FIELD = {
     "json-schema": {
         "type": "integer",
@@ -155,9 +159,8 @@ class ModelHelper(object):
         return result
 
     def field_value(self, field):
-        result = getattr(self, field, None)
-        if result is not None:
-            return result
+        if hasattr(self, field):
+            return getattr(self, field)
         return getattr(self.subject, field, None)
 
     def field_setter(self, field, value):
@@ -190,6 +193,15 @@ class ModelHelper(object):
         obj = getattr(self.subject, field, None)
         if hasattr(obj, "name"):
             return obj.name
+
+
+def serialize_list_field(object, field, helper_class):
+    if hasattr(object, field):
+        result = []
+        for item in getattr(object, field).all():
+            helper = helper_class(item)
+            result.append(helper.serialize(helper.fields()))
+        return result
 
 
 def validate_boolean(helper, field, value):
@@ -263,6 +275,13 @@ def json_object(properties):
         "type": "object",
         "properties": properties,
     }
+
+
+def properties_from_fields(fields):
+    result = {}
+    for key, field in fields.items():
+        result[key] = field["json-schema"]
+    return result
 
 
 def json_array(item):

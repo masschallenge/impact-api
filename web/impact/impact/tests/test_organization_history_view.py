@@ -176,13 +176,33 @@ class TestOrganizationHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             self.assertTrue(cycle.name in events[0]["description"])
             self.assertEqual(startup_status.created_at, events[0]["datetime"])
-            self.assertEqual([{"id": program.id,
-                               "name": program.name,
-                               "preference": 1}],
-                             events[0]["programs"])
+            self.assertEqual(program.id, events[0]["program_id"])
+            self.assertEqual(program.name, events[0]["program"])
+            self.assertEqual(1, events[0]["program_preference"])
+
+    def test_startup_became_entrant_for_multiple_programs(self):
+        cycle = ProgramCycleFactory()
+        application = ApplicationFactory(
+            application_status=SUBMITTED_APP_STATUS,
+            application_type=cycle.default_application_type,
+            cycle=cycle)
+        startup = application.startup
+        INTEREST_COUNT = 2
+        StartupProgramInterestFactory.create_batch(INTEREST_COUNT,
+                                                   startup=startup,
+                                                   program__cycle=cycle,
+                                                   applying=True)
+        with self.login(email=self.basic_user().email):
+            url = reverse(OrganizationHistoryView.view_name,
+                          args=[startup.organization.id])
+            response = self.client.get(url)
+            events = find_events(response.data["results"],
+                                 OrganizationBecameEntrantEvent.EVENT_TYPE)
+            self.assertEqual(INTEREST_COUNT, len(events))
 
     def test_startup_became_entrant_no_startup_status(self):
-        cycle = ProgramCycleFactory()
+        program = ProgramFactory()
+        cycle = program.cycle
         submission_datetime = days_from_now(-2)
         application = ApplicationFactory(
             application_status=SUBMITTED_APP_STATUS,
@@ -190,6 +210,9 @@ class TestOrganizationHistoryView(APITestCase):
             submission_datetime=submission_datetime,
             cycle=cycle)
         startup = application.startup
+        StartupProgramInterestFactory(startup=startup,
+                                      program=program,
+                                      applying=True)
         with self.login(email=self.basic_user().email):
             url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])
@@ -210,6 +233,9 @@ class TestOrganizationHistoryView(APITestCase):
             cycle=cycle,
             submission_datetime=None)
         startup = application.startup
+        StartupProgramInterestFactory(startup=startup,
+                                      program__cycle=cycle,
+                                      applying=True)
         with self.login(email=self.basic_user().email):
             url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])
@@ -229,6 +255,9 @@ class TestOrganizationHistoryView(APITestCase):
             cycle=cycle,
             submission_datetime=None)
         startup = application.startup
+        StartupProgramInterestFactory(startup=startup,
+                                      program__cycle=cycle,
+                                      applying=True)
         with self.login(email=self.basic_user().email):
             url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])
@@ -252,6 +281,9 @@ class TestOrganizationHistoryView(APITestCase):
             cycle=cycle,
             submission_datetime=None)
         startup = application.startup
+        StartupProgramInterestFactory(startup=startup,
+                                      program__cycle=cycle,
+                                      applying=True)
         with self.login(email=self.basic_user().email):
             url = reverse(OrganizationHistoryView.view_name,
                           args=[startup.organization.id])

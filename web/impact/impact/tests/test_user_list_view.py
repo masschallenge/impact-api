@@ -24,8 +24,8 @@ from impact.tests.factories import (
 )
 from impact.tests.test_user_detail_view import (
     ENTREPRENEUR_GET_FIELDS,
-    EXPERT_MUTABLE_FIELDS,
-    EXPERT_ONLY_FIELDS,
+    EXPERT_GET_FIELDS,
+    EXPERT_WRITE_FIELDS,
     MUTABLE_FIELDS,
     NON_MEMBER_MUTABLE_FIELDS,
     WRITE_ONCE_FIELDS,
@@ -85,7 +85,7 @@ REQUIRED_POST_FIELDS = set([
         "last_name",
         "user_type",
 ])
-ALL_POST_FIELDS = set(EXPERT_MUTABLE_FIELDS +
+ALL_POST_FIELDS = set(EXPERT_WRITE_FIELDS +
                       MUTABLE_FIELDS +
                       NON_MEMBER_MUTABLE_FIELDS +
                       WRITE_ONCE_FIELDS)
@@ -126,7 +126,7 @@ class TestUserListView(APITestCase):
             results = response.data["actions"]["GET"]["properties"]["results"]
             get_options = results["item"]["properties"]
             assert_fields(ENTREPRENEUR_GET_FIELDS, get_options)
-            assert_fields(EXPERT_ONLY_FIELDS, get_options)
+            assert_fields(EXPERT_GET_FIELDS, get_options)
             post_options = response.data["actions"]["POST"]["properties"]
             assert_fields_required(REQUIRED_POST_FIELDS, post_options)
             assert_fields_not_required(ALL_POST_FIELDS - REQUIRED_POST_FIELDS,
