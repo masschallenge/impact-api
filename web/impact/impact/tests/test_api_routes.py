@@ -115,12 +115,6 @@ class TestApiRoute(TestCase):
         StartupFactory(is_visible=1, organization__url_slug="test1")
         StartupFactory(is_visible=1, organization__url_slug="test2")
         StartupFactory(is_visible=1, organization__url_slug="test3")
-        Permission.objects.get_or_create(
-            content_type=ContentType.objects.get(
-                app_label='mc',
-                model='startup'),
-            codename='view_startup_additional_industries'
-        )
         view_perm, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
                 app_label='mc',
@@ -141,7 +135,6 @@ class TestApiRoute(TestCase):
             'perm_user@test.com',
             perms=["mc.view_startup_additional_industries"])
         perm_user.user_permissions.add(view_perm)
-        perm_user.save()
         with self.login(perm_user):
             response = self.get(url_name, **view_kwargs)
             self.response_200(response)

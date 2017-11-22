@@ -9,9 +9,9 @@ from impact.tests.api_test_case import APITestCase
 
 
 empty_string = ''
-model_name = 'ProgramStartupStatus'
-lowercase_model_name = 'programstartupstatus'
-snake_case = 'program_startup_status'
+CAMEL_CASE_MODEL_NAME = 'ProgramStartupStatus'
+LOWER_CASE_MODEL_NAME = 'programstartupstatus'
+SNAKE_CASE_MODEL_NAME = 'program_startup_status'
 
 
 class TestUtils(APITestCase):
@@ -19,10 +19,13 @@ class TestUtils(APITestCase):
         assert model_name_to_snake(empty_string) == ''
 
     def test_model_name_to_snake_case(self):
-        assert model_name_to_snake(model_name) == snake_case
+        assert model_name_to_snake(
+            CAMEL_CASE_MODEL_NAME) == SNAKE_CASE_MODEL_NAME
 
     def test_lowercase_model_name_not_snaked(self):
-        assert model_name_to_snake(lowercase_model_name) != snake_case
+        assert model_name_to_snake(
+            LOWER_CASE_MODEL_NAME) == LOWER_CASE_MODEL_NAME
 
     def test_snake_case_to_model_name(self):
-        assert snake_to_model_name(snake_case) == model_name
+        assert snake_to_model_name(
+            SNAKE_CASE_MODEL_NAME) == CAMEL_CASE_MODEL_NAME

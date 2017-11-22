@@ -27,8 +27,4 @@ def model_name_to_snake(value):
 
 
 def snake_to_model_name(value):
-    old_value = value.split('_')
-    new_value = ""
-    for word in old_value:
-        new_value += (word[0].upper() + word[1:])
-    return new_value
+    return "".join(map(str.title, value.split("_")))
