@@ -1,22 +1,31 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from test_plus.test import TestCase
-from impact.utils import get_profile
-from impact.tests.contexts import (
-    UserContext,
+from impact.models.utils import (
+    model_name_to_snake,
+    snake_to_model_name,
 )
-from impact.models import (
-    ExpertProfile,
-    MemberProfile,
-)
+from impact.tests.api_test_case import APITestCase
 
 
-class TestUtils(TestCase):
-    def test_get_profile_for_expert(self):
-        user = UserContext("EXPERT").user
-        assert isinstance(get_profile(user), ExpertProfile)
+empty_string = ''
+CAMEL_CASE_MODEL_NAME = 'ProgramStartupStatus'
+LOWER_CASE_MODEL_NAME = 'programstartupstatus'
+SNAKE_CASE_MODEL_NAME = 'program_startup_status'
 
-    def test_get_profile_for_member(self):
-        user = UserContext("MEMBER").user
-        assert isinstance(get_profile(user), MemberProfile)
+
+class TestUtils(APITestCase):
+    def test_empty_string_snake_case_returns_nothing(self):
+        assert model_name_to_snake(empty_string) == ''
+
+    def test_model_name_to_snake_case(self):
+        assert model_name_to_snake(
+            CAMEL_CASE_MODEL_NAME) == SNAKE_CASE_MODEL_NAME
+
+    def test_lowercase_model_name_not_snaked(self):
+        assert model_name_to_snake(
+            LOWER_CASE_MODEL_NAME) == LOWER_CASE_MODEL_NAME
+
+    def test_snake_case_to_model_name(self):
+        assert snake_to_model_name(
+            SNAKE_CASE_MODEL_NAME) == CAMEL_CASE_MODEL_NAME

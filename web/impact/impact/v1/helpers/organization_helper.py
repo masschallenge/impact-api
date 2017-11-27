@@ -15,7 +15,14 @@ from impact.v1.helpers.model_helper import (
     TWITTER_FIELD,
     URL_FIELD,
     URL_SLUG_FIELD,
+    json_array,
+    json_schema,
     merge_fields,
+    serialize_list_field,
+)
+from impact.v1.helpers.industry_helper import (
+    INDUSTRY_TYPE,
+    IndustryHelper,
 )
 
 COULD_BE_STARTUP_CHECK = "could_be_startup"
@@ -33,6 +40,10 @@ STARTUP_INTEGER_ARRAY_FIELD = merge_fields(STARTUP_FIELD, INTEGER_ARRAY_FIELD)
 STARTUP_INTEGER_FIELD = merge_fields(STARTUP_FIELD, INTEGER_FIELD)
 STARTUP_STRING_FIELD = merge_fields(STARTUP_FIELD, STRING_FIELD)
 STARTUP_URL_FIELD = merge_fields(STARTUP_FIELD, URL_FIELD)
+STARTUP_INDUSTRY_FIELD = merge_fields(STARTUP_FIELD,
+                                      json_schema(INDUSTRY_TYPE))
+STARTUP_INDUSTRY_ARRAY_FIELD = merge_fields(
+    STARTUP_FIELD, json_schema(json_array(INDUSTRY_TYPE)))
 
 ORGANIZATION_FIELDS = {
     "id": PK_FIELD,
@@ -46,7 +57,7 @@ ORGANIZATION_FIELDS = {
     "website_url": URL_FIELD,
 
     # Startup specific fields
-    "additional_industry_ids": STARTUP_INTEGER_ARRAY_FIELD,
+    "additional_industries": STARTUP_INDUSTRY_ARRAY_FIELD,
     "date_founded": STARTUP_STRING_FIELD,
     "facebook_url": STARTUP_URL_FIELD,
     "full_elevator_pitch": STARTUP_STRING_FIELD,
@@ -56,7 +67,7 @@ ORGANIZATION_FIELDS = {
     "location_national": STARTUP_STRING_FIELD,
     "location_postcode": STARTUP_STRING_FIELD,
     "location_regional": STARTUP_STRING_FIELD,
-    "primary_industry_id": STARTUP_INTEGER_FIELD,
+    "primary_industry": STARTUP_INDUSTRY_FIELD,
     "short_pitch": STARTUP_STRING_FIELD,
     "video_elevator_pitch_url": STARTUP_URL_FIELD,
 }
@@ -71,29 +82,6 @@ ORGANIZATION_USER_FIELDS = {
 
 class OrganizationHelper(ModelHelper):
     model = Organization
-
-    REQUIRED_KEYS = [
-        "name",
-        "url_slug",
-        ]
-    OPTIONAL_KEYS = [
-        "additional_industry_ids",
-        "date_founded",
-        "facebook_url",
-        "full_elevator_pitch",
-        "primary_industry_id",
-        "public_inquiry_email",
-        "linked_in_url",
-        "location_city",
-        "location_national",
-        "location_postcode",
-        "location_regional",
-        "short_pitch",
-        "twitter_handle",
-        "video_elevator_pitch_url",
-        "website_url",
-        ]
-    INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -113,11 +101,16 @@ class OrganizationHelper(ModelHelper):
         return self.partner is not None
 
     @property
-    def additional_industry_ids(self):
+    def additional_industries(self):
+        return serialize_list_field(self.startup,
+                                    "additional_industries",
+                                    IndustryHelper)
+
+    @property
+    def primary_industry(self):
         if self.startup:
-            categories = self.startup.additional_industries
-            if categories.exists():
-                return list(categories.values_list("id", flat=True))
+            helper = IndustryHelper(self.startup.primary_industry)
+            return helper.serialize(helper.fields())
 
     def field_value(self, field):
         result = super().field_value(field)

@@ -111,6 +111,34 @@ class TestApiRoute(TestCase):
             response_dict = json.loads(response.content)
             self.assertIn("is_visible", response_dict.keys())
 
+    def test_api_related_object_list_get(self):
+        StartupFactory(is_visible=1, organization__url_slug="test1")
+        StartupFactory(is_visible=1, organization__url_slug="test2")
+        StartupFactory(is_visible=1, organization__url_slug="test3")
+        view_perm, _ = Permission.objects.get_or_create(
+            content_type=ContentType.objects.get(
+                app_label='mc',
+                model='startup'),
+            codename='view_startup_additional_industries'
+        )
+        url_name = "related-object-list"
+        view_kwargs = {"app": "impact",
+                       "model": "startup",
+                       "related_model": "additional_industries"}
+        self.response_401(self.get(url_name, **view_kwargs))
+
+        basic_user = self.make_user('basic_user@test.com')
+        with self.login(basic_user):
+            self.response_403(self.get(url_name, **view_kwargs))
+
+        perm_user = self.make_user(
+            'perm_user@test.com',
+            perms=["mc.view_startup_additional_industries"])
+        perm_user.user_permissions.add(view_perm)
+        with self.login(perm_user):
+            response = self.get(url_name, **view_kwargs)
+            self.response_200(response)
+
     def test_basic_user_without_permissions_cannot_create_object(self):
         url_name = "object-list"
         program_role = ProgramRoleFactory(id=1)

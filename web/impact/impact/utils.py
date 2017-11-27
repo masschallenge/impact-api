@@ -1,17 +1,19 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
+
 from datetime import datetime
+import dateutil.parser
 from pytz import utc
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection
 from django.db.models import Q
 from django.utils.formats import get_format
-import dateutil.parser
 
 
 DAWN_OF_TIME = utc.localize(datetime.strptime(
-        "2010-01-01T00:00:00Z",
-        "%Y-%m-%dT%H:%M:%SZ"))  # format based on browsable API output
+    "2010-01-01T00:00:00Z",
+    "%Y-%m-%dT%H:%M:%SZ"))  # format based on browsable API output
 
 UPDATE_STATEMENT = "UPDATE {table} SET updated_at = %s WHERE id = %s"
 
@@ -43,6 +45,12 @@ def get_profile(user):
         return user.memberprofile
     except ObjectDoesNotExist:
         return None
+
+
+def model_name_case(model, related_model):
+    if related_model:
+        return model + '_' + related_model
+    return model
 
 
 def compose_filter(key_pieces, value):
