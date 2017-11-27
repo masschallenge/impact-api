@@ -51,10 +51,10 @@ class OrganizationBecameFinalistEvent(BaseHistoryEvent):
         return self._program.cycle.name
 
     def cycle_id(self):
-        return self._program.cycle.id,
+        return self._program.cycle.id
 
     def program(self):
         return self._program.name
 
     def program_id(self):
-        return self._program.id,
+        return self._program.id
