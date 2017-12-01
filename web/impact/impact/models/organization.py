@@ -2,10 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from django.db import models
-from django.core.validators import (
-    RegexValidator,
-    validate_slug
-)
+from django.core.validators import RegexValidator
 
 from impact.models.mc_model import MCModel
 from impact.models.utils import is_managed
@@ -26,9 +23,10 @@ class Organization(MCModel):
         blank=True,
         default="",  # This actually gets replaced by a real slug.
         unique=True,
-        validators=[RegexValidator(".*\D.*",
-                                   "Slug must contain a non-numeral."),
-                    validate_slug, ]
+        validators=[
+            RegexValidator(regex="^[\w-]+$",
+                           message="Alphanumeric characters and dashes only.")
+        ]
     )
 
     class Meta(MCModel.Meta):
