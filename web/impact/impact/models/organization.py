@@ -25,7 +25,7 @@ class Organization(MCModel):
         unique=True,
         validators=[
             RegexValidator(regex="^[\w-]+$",
-                           message="Alphanumeric characters and dashes only.")
+                           message="Letters, numbers, and dashes only.")
         ]
     )
 
