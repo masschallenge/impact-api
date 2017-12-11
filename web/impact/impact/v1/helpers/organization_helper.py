@@ -14,7 +14,6 @@ from impact.v1.helpers.model_helper import (
     STRING_FIELD,
     TWITTER_FIELD,
     URL_FIELD,
-    URL_SLUG_FIELD,
     json_array,
     json_schema,
     merge_fields,
@@ -44,6 +43,8 @@ STARTUP_INDUSTRY_FIELD = merge_fields(STARTUP_FIELD,
                                       json_schema(INDUSTRY_TYPE))
 STARTUP_INDUSTRY_ARRAY_FIELD = merge_fields(
     STARTUP_FIELD, json_schema(json_array(INDUSTRY_TYPE)))
+ORGANIZATION_URL_SLUG_FIELD = merge_fields(
+    STRING_FIELD, {"json-schema": {"pattern": "^[\w-]+$"}})
 
 ORGANIZATION_FIELDS = {
     "id": PK_FIELD,
@@ -53,7 +54,7 @@ ORGANIZATION_FIELDS = {
     "public_inquiry_email": EMAIL_FIELD,
     "twitter_handle": TWITTER_FIELD,
     "updated_at": READ_ONLY_STRING_FIELD,
-    "url_slug": URL_SLUG_FIELD,
+    "url_slug": ORGANIZATION_URL_SLUG_FIELD,
     "website_url": URL_FIELD,
 
     # Startup specific fields
