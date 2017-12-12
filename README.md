@@ -265,12 +265,13 @@ question.  This mean commiting directly to the target branch such as
 Manage your secret keys and other sensitive information through environment variables. The MassChallenge team manages our environment variables in our Continuous Integration service, Travis. :More details can be found [here](https://docs.travis-ci.com/user/environment-variables/).
 
 Deploying to an environment is a matter of running ecs-deploy:
-`make deploy DOCKER_REGISTRY=$(REGISTRY) IMAGE_TAG=$(RELEASE_TAG) ENVIRONMENT=$(DEPLOY_ENVIRONMENT)`
+`make deploy DOCKER_REGISTRY=$(DOCKER_REGISTRY) IMAGE_TAG=$(IMAGE_TAG) ENVIRONMENT=$(DEPLOY_ENVIRONMENT)`
 
-An example of this might look like this: 
-`make deploy DOCKER_REGISTRY=$(REGISTRY) IMAGE_TAG=AC-4034 ENVIRONMENT=staging`
-
-(NOTE - The value for the DOCKER_REGISTRY can be grabbed from the ecr page (https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories/impact-api#images;tagStatus=ALL) listed as the "Repository URI" for the impact-api image or from running the following bash command ```aws ecr  describe-repositories --repository-name impact-api  | cut -d"\"" -f4 | cut -d"/" -f1  | grep -i "amazonaws.com"```)
+An example of this to deploy current master to staging looks like this:
+```
+DOCKER_REGISTRY=`aws ecr  describe-repositories --repository-name impact-api  | cut -d"\"" -f4 | cut -d"/" -f1  | grep -i "amazonaws.com"`
+make deploy IMAGE_TAG=master ENVIRONMENT=staging DOCKER_REGISTRY=$(DOCKER_REGISTRY)
+```
 
 A successful deploy will yield output that looks like the following:
 
