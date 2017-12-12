@@ -25,6 +25,7 @@ from impact.tests.utils import (
 from impact.v1.events import (
     UserBecameConfirmedJudgeEvent,
     UserBecameConfirmedMentorEvent,
+    UserBecameDesiredJudgeEvent,
     UserBecameFinalistEvent,
     UserCreatedEvent,
     UserJoinedStartupEvent,
@@ -163,8 +164,27 @@ class TestUserHistoryView(APITestCase):
                                  UserBecameConfirmedJudgeEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.PROGRAM_ROLE_FORMAT
-            self.assertEqual(format_string.format(name=prg.program_role.name,
-                                                  id=prg.program_role.id),
+            self.assertEqual(format_string.format(
+                    user_role=UserBecameConfirmedJudgeEvent.USER_ROLE,
+                    name=prg.program_role.name,
+                    id=prg.program_role.id),
+                             events[0]["description"])
+
+    def test_user_became_confirmed_judge_with_missing_label(self):
+        prg = ProgramRoleGrantFactory(
+            program_role__user_role__name=UserRole.JUDGE,
+            program_role__user_label=None)
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[prg.person.id])
+            response = self.client.get(url)
+            events = find_events(response.data["results"],
+                                 UserBecameConfirmedJudgeEvent.EVENT_TYPE)
+            self.assertEqual(1, len(events))
+            format_string = UserBecameConfirmedJudgeEvent.PROGRAM_ROLE_FORMAT
+            self.assertEqual(format_string.format(
+                    user_role=UserBecameConfirmedJudgeEvent.USER_ROLE,
+                    name=prg.program_role.name,
+                    id=prg.program_role.id),
                              events[0]["description"])
 
     def test_user_became_confirmed_judge_with_judging_round(self):
@@ -179,8 +199,10 @@ class TestUserHistoryView(APITestCase):
                                  UserBecameConfirmedJudgeEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.JUDGING_ROUND_FORMAT
-            self.assertEqual(format_string.format(name=jr.short_name(),
-                                                  id=jr.id),
+            self.assertEqual(format_string.format(
+                    user_role=UserBecameConfirmedJudgeEvent.USER_ROLE,
+                    name=jr.short_name(),
+                    id=jr.id),
                              events[0]["description"])
             self.assertEqual(jr.id, events[0]["judging_round_id"])
             self.assertEqual(jr.short_name(), events[0]["judging_round_name"])
@@ -198,8 +220,43 @@ class TestUserHistoryView(APITestCase):
                                  UserBecameConfirmedJudgeEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.JUDGING_ROUND_FORMAT
-            self.assertEqual(format_string.format(name=jr.short_name(),
-                                                  id=jr.id),
+            self.assertEqual(format_string.format(
+                    user_role=UserBecameConfirmedJudgeEvent.USER_ROLE,
+                    name=jr.short_name(),
+                    id=jr.id),
+                             events[0]["description"])
+
+    def test_user_became_desired_judge(self):
+        prg = ProgramRoleGrantFactory(
+            program_role__user_role__name=UserRole.DESIRED_JUDGE)
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[prg.person.id])
+            response = self.client.get(url)
+            events = find_events(response.data["results"],
+                                 UserBecameDesiredJudgeEvent.EVENT_TYPE)
+            self.assertEqual(1, len(events))
+            format_string = UserBecameDesiredJudgeEvent.PROGRAM_ROLE_FORMAT
+            self.assertEqual(format_string.format(
+                    user_role=UserBecameDesiredJudgeEvent.USER_ROLE,
+                    name=prg.program_role.name,
+                    id=prg.program_role.id),
+                             events[0]["description"])
+
+    def test_user_became_desired_judge_with_missing_label(self):
+        prg = ProgramRoleGrantFactory(
+            program_role__user_role__name=UserRole.DESIRED_JUDGE,
+            program_role__user_label=None)
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[prg.person.id])
+            response = self.client.get(url)
+            events = find_events(response.data["results"],
+                                 UserBecameDesiredJudgeEvent.EVENT_TYPE)
+            self.assertEqual(1, len(events))
+            format_string = UserBecameDesiredJudgeEvent.PROGRAM_ROLE_FORMAT
+            self.assertEqual(format_string.format(
+                    user_role=UserBecameDesiredJudgeEvent.USER_ROLE,
+                    name=prg.program_role.name,
+                    id=prg.program_role.id),
                              events[0]["description"])
 
     def test_user_became_confirmed_mentor(self):

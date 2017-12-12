@@ -18,6 +18,9 @@ from impact.v1.events.user_became_confirmed_judge_event import (
 from impact.v1.events.user_became_confirmed_mentor_event import (
     UserBecameConfirmedMentorEvent,
 )
+from impact.v1.events.user_became_desired_judge_event import (
+    UserBecameDesiredJudgeEvent,
+)
 from impact.v1.events.user_became_finalist_event import (
     UserBecameFinalistEvent,
 )
