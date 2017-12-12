@@ -273,12 +273,14 @@ question.  This mean commiting directly to the target branch such as
 
 Manage your secret keys and other sensitive information through
 environment variables. The MassChallenge team manages our environment
-variables in our Continuous Integration service, Travis. :More details
-can be found
-[here](https://docs.travis-ci.com/user/environment-variables/).
+variables in our Continuous Integration service,
+[Travis](https://docs.travis-ci.com/user/environment-variables/).
 
 Deploying to an environment is a matter of running ecs-deploy:
-`make deploy DOCKER_REGISTRY=$DOCKER_REGISTRY IMAGE_TAG=$IMAGE_TAG ENVIRONMENT=$ENVIRONMENT`
+
+```
+make deploy IMAGE_TAG=$IMAGE_TAG ENVIRONMENT=$ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY
+```
 
 An example of this to deploy current master to staging looks like this:
 ```
