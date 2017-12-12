@@ -199,10 +199,11 @@ To mark complex sentences that require literals and variables:
     {% endblocktrans %}
 
 You can use [Lazy Translation](https://docs.djangoproject.com/en/1.10/topics/i18n/translation/#lazy-translation)
-to translate strings when the value is accessed (rather than when they're called).
-To mark a string for translation in a python file, make sure to import
-'from django.utils.translation import ugettext_lazy as _ ' and mark the beginning
-of a string with an underscore.
+to translate strings when the value is accessed (rather than when
+they're called).  To mark a string for translation in a python file,
+make sure to import 'from django.utils.translation import
+ugettext_lazy as _ ' and mark the beginning of a string with an
+underscore.
 
 Example:
 
@@ -211,44 +212,52 @@ Example:
 
 ### Granting Permissions
 
-The `make grant-permissions` command can be used to assign django permissions for a given user like so:
+The `make grant-permissions` command can be used to assign django
+permissions for a given user like so:
 
 `make grant-permissions PERMISSION_CLASSES=view_startup,change_startup PERMISSION_USER=test@example.org`
 
-To give a user access to the v0 api, issue the command with 'v0_clients' specified in PERMISSION_CLASSES:
+To give a user access to the v0 api, issue the command with
+'v0_clients' specified in PERMISSION_CLASSES:
 
 `make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v0_api`
 
 ### Deployments
 
-In order to deploy, you must first install and configure
-the AWS CLI tool. Steps for setting this up can be found here: http://docs.aws.amazon.com/cli/latest/userguide/installing.html
+In order to deploy, you must first install and configure the AWS CLI
+tool. Steps for setting this up can be found here:
+http://docs.aws.amazon.com/cli/latest/userguide/installing.html
 
 You must also install the ecs-deploy tool via:
 `pip install ecs-deploy`
 
 This may require sudo depending on how your local host is configured.
 
-You will also need to configure an AWS access key and secret key for doing the deploy.
-Steps for creating access keys can be found here: http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#Using_CreateAccessKey
+You will also need to configure an AWS access key and secret key for
+doing the deploy.  Steps for creating access keys can be found here:
+http://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html#Using_CreateAccessKey
 
 At the end of this process you should know both your access key and secret key.
 
-You can confirm that you have minimally required version if the following command returns any output:
+You can confirm that you have minimally required version if the
+following command returns any output:
 ```ecs deploy --help | grep "ignore-warnings"```
 
-Once the CLI tools are installed and configured, you need to configure your local AWS tools with the access key and secret key by running:
+Once the CLI tools are installed and configured, you need to configure
+your local AWS tools with the access key and secret key by running:
 
 `aws configure`
 
-This will prompt you for the access key and secret key.  The default value is fine for the other options.
+This will prompt you for the access key and secret key.  The default
+value is fine for the other options.
 
 Next, login to AWS via the CLI:
 
 `eval $(aws ecr get-login --region us-east-1);`
 
-There are alternative ways of setting the secret keys so that the CLI tools recognize your access keys.
-You can find more information on this by reading the documentation for boto:
+There are alternative ways of setting the secret keys so that the CLI
+tools recognize your access keys.  You can find more information on
+this by reading the documentation for boto:
 http://boto3.readthedocs.org/en/latest/guide/configuration.html#configuration
 
 #### Deploying to an Environment
@@ -262,15 +271,19 @@ date/release tag for the deploy and then committed to the branch in
 question.  This mean commiting directly to the target branch such as
 'master' or 'AC-9999'.
 
-Manage your secret keys and other sensitive information through environment variables. The MassChallenge team manages our environment variables in our Continuous Integration service, Travis. :More details can be found [here](https://docs.travis-ci.com/user/environment-variables/).
+Manage your secret keys and other sensitive information through
+environment variables. The MassChallenge team manages our environment
+variables in our Continuous Integration service, Travis. :More details
+can be found
+[here](https://docs.travis-ci.com/user/environment-variables/).
 
 Deploying to an environment is a matter of running ecs-deploy:
-`make deploy DOCKER_REGISTRY=$(DOCKER_REGISTRY) IMAGE_TAG=$(IMAGE_TAG) ENVIRONMENT=$(DEPLOY_ENVIRONMENT)`
+`make deploy DOCKER_REGISTRY=$DOCKER_REGISTRY IMAGE_TAG=$IMAGE_TAG ENVIRONMENT=$ENVIRONMENT`
 
 An example of this to deploy current master to staging looks like this:
 ```
 DOCKER_REGISTRY=`aws ecr  describe-repositories --repository-name impact-api  | cut -d"\"" -f4 | cut -d"/" -f1  | grep -i "amazonaws.com"`
-make deploy IMAGE_TAG=master ENVIRONMENT=staging DOCKER_REGISTRY=$(DOCKER_REGISTRY)
+make deploy IMAGE_TAG=master ENVIRONMENT=staging DOCKER_REGISTRY=$DOCKER_REGISTRY
 ```
 
 A successful deploy will yield output that looks like the following:
@@ -292,14 +305,18 @@ Deploying task definition.......................................................
 Deployment successful
 ```
 
-Note - if the IMAGE_TAG argument is not provided to the deploy command, the name of the current branch is used as the IMAGE_TAG
+Note - if the IMAGE_TAG argument is not provided to the deploy
+command, the name of the current branch is used as the IMAGE_TAG
 
-You can also check that your environment is functioning after a successful deployment 
-by running the following commands without problems on the master branch:
+You can also check that your environment is functioning after a
+successful deployment by running the following commands without
+problems on the master branch:
 
   `make nuke; make build; make test`
 
 
 The two main environments that you can push to are 'staging' and 'production'. 
 
-Optional - A manual 'deploy' can also be triggered through the AWS ECS interface. Reference the AWS documentation for details: http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_run_task.html
+Optional - A manual 'deploy' can also be triggered through the AWS ECS
+interface. Reference the AWS documentation for details:
+http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs_run_task.html
