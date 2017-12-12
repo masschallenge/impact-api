@@ -5,7 +5,6 @@ from abc import (
     ABCMeta,
     abstractmethod,
 )
-from impact.models import UserRole
 from impact.v1.events.base_user_role_grant_event import (
     BaseUserRoleGrantEvent,
 )
@@ -18,8 +17,8 @@ from impact.v1.helpers import (
 class BaseUserBecameJudgeEvent(BaseUserRoleGrantEvent):
     __metaclass__ = ABCMeta
 
-    PROGRAM_ROLE_FORMAT = "Granted {user_role} Program Role {name} ({id})"
-    JUDGING_ROUND_FORMAT = "{user_role} for Judging Round {name} ({id})"
+    PROGRAM_ROLE_FORMAT = "Granted {role_name} Program Role {name} ({id})"
+    JUDGING_ROUND_FORMAT = "{role_name} for Judging Round {name} ({id})"
 
     CLASS_FIELDS = {
         "judging_round_id": INTEGER_FIELD,
@@ -38,12 +37,12 @@ class BaseUserBecameJudgeEvent(BaseUserRoleGrantEvent):
     def description(self):
         if self.judging_round:
             return self.JUDGING_ROUND_FORMAT.format(
-                user_role=self.USER_ROLE,
+                role_name=self.ROLE_NAME,
                 name=self.judging_round.short_name(),
                 id=self.judging_round.id)
         program_role = self.program_role_grant.program_role
         return self.PROGRAM_ROLE_FORMAT.format(
-            user_role=self.USER_ROLE,
+            role_name=self.ROLE_NAME,
             name=program_role.name,
             id=program_role.id)
 

@@ -26,6 +26,7 @@ from impact.v1.events import (
     UserBecameConfirmedJudgeEvent,
     UserBecameConfirmedMentorEvent,
     UserBecameDesiredJudgeEvent,
+    UserBecameDesiredMentorEvent,
     UserBecameFinalistEvent,
     UserCreatedEvent,
     UserJoinedStartupEvent,
@@ -165,7 +166,7 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.PROGRAM_ROLE_FORMAT
             self.assertEqual(format_string.format(
-                    user_role=UserBecameConfirmedJudgeEvent.USER_ROLE,
+                    role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
                     name=prg.program_role.name,
                     id=prg.program_role.id),
                              events[0]["description"])
@@ -182,7 +183,7 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.PROGRAM_ROLE_FORMAT
             self.assertEqual(format_string.format(
-                    user_role=UserBecameConfirmedJudgeEvent.USER_ROLE,
+                    role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
                     name=prg.program_role.name,
                     id=prg.program_role.id),
                              events[0]["description"])
@@ -200,7 +201,7 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.JUDGING_ROUND_FORMAT
             self.assertEqual(format_string.format(
-                    user_role=UserBecameConfirmedJudgeEvent.USER_ROLE,
+                    role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
                     name=jr.short_name(),
                     id=jr.id),
                              events[0]["description"])
@@ -221,7 +222,7 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.JUDGING_ROUND_FORMAT
             self.assertEqual(format_string.format(
-                    user_role=UserBecameConfirmedJudgeEvent.USER_ROLE,
+                    role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
                     name=jr.short_name(),
                     id=jr.id),
                              events[0]["description"])
@@ -237,7 +238,7 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             format_string = UserBecameDesiredJudgeEvent.PROGRAM_ROLE_FORMAT
             self.assertEqual(format_string.format(
-                    user_role=UserBecameDesiredJudgeEvent.USER_ROLE,
+                    role_name=UserBecameDesiredJudgeEvent.ROLE_NAME,
                     name=prg.program_role.name,
                     id=prg.program_role.id),
                              events[0]["description"])
@@ -254,7 +255,7 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             format_string = UserBecameDesiredJudgeEvent.PROGRAM_ROLE_FORMAT
             self.assertEqual(format_string.format(
-                    user_role=UserBecameDesiredJudgeEvent.USER_ROLE,
+                    role_name=UserBecameDesiredJudgeEvent.ROLE_NAME,
                     name=prg.program_role.name,
                     id=prg.program_role.id),
                              events[0]["description"])
@@ -267,6 +268,17 @@ class TestUserHistoryView(APITestCase):
             response = self.client.get(url)
             events = find_events(response.data["results"],
                                  UserBecameConfirmedMentorEvent.EVENT_TYPE)
+            self.assertEqual(1, len(events))
+            self.assertEqual(prg.created_at, events[0]["datetime"])
+
+    def test_user_became_desired_mentor(self):
+        prg = ProgramRoleGrantFactory(
+            program_role__user_role__name=UserRole.DESIRED_MENTOR)
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[prg.person.id])
+            response = self.client.get(url)
+            events = find_events(response.data["results"],
+                                 UserBecameDesiredMentorEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(prg.created_at, events[0]["datetime"])
 
