@@ -284,9 +284,14 @@ make deploy IMAGE_TAG=$IMAGE_TAG ENVIRONMENT=$ENVIRONMENT DOCKER_REGISTRY=$DOCKE
 
 An example of this to deploy current master to staging looks like this:
 ```
-DOCKER_REGISTRY=`aws ecr  describe-repositories --repository-name impact-api  | cut -d"\"" -f4 | cut -d"/" -f1  | grep -i "amazonaws.com"`
+DOCKER_REGISTRY=`aws ecr describe-repositories --repository-name impact-api | cut -d"\"" -f4 | cut -d"/" -f1 | grep -i "amazonaws.com"`
 make deploy IMAGE_TAG=master ENVIRONMENT=staging DOCKER_REGISTRY=$DOCKER_REGISTRY
 ```
+
+The value for DOCKER_REGISTRY is expected to be a host name typically
+ending with `.amazonaws.com`.  The value of the host should be given
+ECS repositories page as part of the value of "Repository URI".  E.g.
+https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories/impact-api#images;tagStatus=ALL 
 
 A successful deploy will yield output that looks like the following:
 
