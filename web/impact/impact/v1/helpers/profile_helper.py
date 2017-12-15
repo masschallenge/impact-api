@@ -27,10 +27,14 @@ from impact.v1.helpers.industry_helper import (
     INDUSTRY_TYPE,
     IndustryHelper,
 )
+from impact.v1.helpers.functional_expertise_helper import (
+    FunctionalExpertiseHelper,
+)
 from impact.models import (
     EntrepreneurProfile,
     ExpertCategory,
     ExpertProfile,
+    FunctionalExpertise,
     Industry,
     MemberProfile,
     ProgramFamily,
@@ -217,6 +221,12 @@ EXPERT_INDUSTRY_ARRAY_FIELD = {
     }
 }
 
+FUNCTIONAL_EXPERTISE_ID_FIELD = merge_fields(
+    {"GET": {"included": False}},
+    merge_fields(object_id_field(FunctionalExpertise),
+                 EXPERT_OBJECT_ID_FIELD))
+
+
 URL_SCHEMA = "^[hH][tT][tT][pP][sS]?://"
 NETLOC_ELEMENT = "([^/:@]+(:[^/@]+)?@)?([\w-]+)"
 DOT = "\."
@@ -312,6 +322,10 @@ def validate_primary_industry_id(helper, field, value):
     return validate_object_id(Industry, helper, field, value)
 
 
+def validate_functional_expertise_id(helper, field, value):
+    return validate_object_id(FunctionalExpertise, helper, field, value)
+
+
 def validate_home_program_family_id(helper, field, value):
     return validate_object_id(ProgramFamily, helper, field, value)
 
@@ -322,6 +336,7 @@ class ProfileHelper(ModelHelper):
         "company": validate_expert_only_string,
         "expert_category": validate_expert_categories,
         "facebook_url": validate_url,
+        'functional_expertise_id': validate_functional_expertise_id,
         "gender": validate_gender,
         "home_program_family_id": validate_home_program_family_id,
         "judge_interest": validate_expert_only_boolean,
@@ -355,6 +370,7 @@ class ProfileHelper(ModelHelper):
         ]
     EXPERT_OPTIONAL_KEYS = [
         "bio",
+        "functional_expertise_id",
         "office_hours_topics",
         "referred_by",
         "speaker_topics",
@@ -409,6 +425,17 @@ class ProfileHelper(ModelHelper):
 
     @property
     def primary_industry_id(self):
+        return None
+
+    @property
+    def functional_expertise(self):
+        if hasattr(self.subject, "functional_expertise"):
+            helper = FunctionalExpertiseHelper(
+                self.subject.functional_expertise)
+            return helper.serialize(helper.fields())
+
+    @property
+    def functional_expertise_id(self):
         return None
 
     @property
