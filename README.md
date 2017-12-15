@@ -263,13 +263,8 @@ http://boto3.readthedocs.org/en/latest/guide/configuration.html#configuration
 #### Deploying to an Environment
 
 To successfully deploy to ECS it is necessary for Travis to have a
-successful build on the branch being deployed.  Currently Travis
-builds are triggered by a change to the target branch in the
-impact-api-deploy repo.  To facilitate this the
-impact-api-deploy/VERSION file should be changed to reflect the
-date/release tag for the deploy and then committed to the branch in
-question.  This mean commiting directly to the target branch such as
-'master' or 'AC-9999'.
+successful build on the branch being deployed.  Travis is automatically
+run each time a PR is created or updated.
 
 Manage your secret keys and other sensitive information through
 environment variables. The MassChallenge team manages our environment
