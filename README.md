@@ -217,10 +217,10 @@ permissions for a given user like so:
 
 `make grant-permissions PERMISSION_CLASSES=view_startup,change_startup PERMISSION_USER=test@example.org`
 
-To give a user access to the v0 api, issue the command with
-'v0_clients' specified in PERMISSION_CLASSES:
+To give a user access to the v1 api, issue the command with
+'v1_clients' specified in PERMISSION_CLASSES:
 
-`make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v0_api`
+`make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v1_clients`
 
 ### Deployments
 
@@ -284,9 +284,10 @@ make deploy IMAGE_TAG=master ENVIRONMENT=staging DOCKER_REGISTRY=$DOCKER_REGISTR
 ```
 
 The value for DOCKER_REGISTRY is expected to be a host name typically
-ending with `.amazonaws.com`.  The value of the host should be given
-ECS repositories page as part of the value of "Repository URI".  E.g.
-https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories/impact-api#images;tagStatus=ALL 
+ending with `.amazonaws.com`.  The hostname can be found at the top of
+the [repositories
+page](https://console.aws.amazon.com/ecs/home?region=us-east-1#/repositories/impact-api#images;tagStatus=ALL)
+as part of the Repository URI.
 
 A successful deploy will yield output that looks like the following:
 
@@ -309,13 +310,6 @@ Deployment successful
 
 Note - if the IMAGE_TAG argument is not provided to the deploy
 command, the name of the current branch is used as the IMAGE_TAG
-
-You can also check that your environment is functioning after a
-successful deployment by running the following commands without
-problems on the master branch:
-
-  `make nuke; make build; make test`
-
 
 The two main environments that you can push to are 'staging' and 'production'. 
 
