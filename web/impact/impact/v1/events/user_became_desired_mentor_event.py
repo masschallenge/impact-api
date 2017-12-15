@@ -7,7 +7,7 @@ from impact.v1.events.base_user_became_mentor_event import (
 )
 
 
-class UserBecameConfirmedMentorEvent(BaseUserBecameMentorEvent):
-    EVENT_TYPE = "became confirmed mentor"
-    USER_ROLE = UserRole.MENTOR
-    ROLE_NAME = "Confirmed Mentor"
+class UserBecameDesiredMentorEvent(BaseUserBecameMentorEvent):
+    EVENT_TYPE = "became desired mentor"
+    USER_ROLE = UserRole.DESIRED_MENTOR
+    ROLE_NAME = USER_ROLE
