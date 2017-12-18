@@ -17,10 +17,11 @@ from impact.v1.helpers import (
 )
 from impact.v1.views import ImpactView
 from impact.utils import parse_date
-from impact.models.utils import model_has_field
+from impact.models.utils import model_has_field, is_int
 
-VALUE_OF_LIMIT_NOT_INTEGER_ERROR = "value of 'limit' should be an integer"
-GREATER_THAN_MAX_LIMIT_ERROR = "maximum allowed value for 'limit' is {}"
+GREATER_THAN_MAX_LIMIT_ERROR = "maximum allowed value for 'limit' is {}."
+VALUE_OF_LIMIT_NOT_INTEGER_ERROR = "value of 'limit' should be an integer."
+VALUE_OF_LIMIT_IS_NON_POSITIVE_ERROR = "value of 'limit' should be positive."
 
 DEFAULT_MAX_LIMIT = 200
 
@@ -55,12 +56,14 @@ class BaseListView(ImpactView):
         return Response(result)
 
     def _validate_limit(self, limit):
-        if not limit.isdigit():
+        if not is_int(limit):
             self.errors.append(VALUE_OF_LIMIT_NOT_INTEGER_ERROR)
-            limit = self.DEFAULT_LIMIT
-        elif int(limit) > self.MAX_LIMIT:
-            self.errors.append(
-                GREATER_THAN_MAX_LIMIT_ERROR.format(self.MAX_LIMIT))
+            return None
+        if int(limit) > self.MAX_LIMIT:
+            error_msg = GREATER_THAN_MAX_LIMIT_ERROR.format(self.MAX_LIMIT)
+            self.errors.append(error_msg)
+        elif int(limit) <= 0:
+            self.errors.append(VALUE_OF_LIMIT_IS_NON_POSITIVE_ERROR)
         return int(limit)
 
     def results(self, limit, offset):
