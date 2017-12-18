@@ -38,7 +38,7 @@ class BaseListView(ImpactView):
         count, results = self.results(limit, offset)
         result = {
             "count": count,
-            "next": _next_url(base_url, limit, offset),
+            "next": _next_url(base_url, limit, offset, count),
             "previous": _previous_url(base_url, limit, offset),
             "results": results,
         }
@@ -98,7 +98,9 @@ def _previous_url(base_url, limit, offset):
     # todo: refactor
 
 
-def _next_url(base_url, limit, offset):
+def _next_url(base_url, limit, offset, count):
+    if offset+limit >= count:
+        return None
     if offset >= 0:
         url = _update_query_param(base_url, "limit", limit)
         url = _update_query_param(url, "offset", offset + limit)
