@@ -48,6 +48,7 @@ from impact.v1.views.base_list_view import (
     DEFAULT_MAX_LIMIT,
     GREATER_THAN_MAX_LIMIT_ERROR,
     VALUE_OF_LIMIT_NOT_INTEGER_ERROR,
+    VALUE_OF_LIMIT_IS_NON_POSITIVE_ERROR,
 )
 from impact.v1.views.user_list_view import (
     EMAIL_EXISTS_ERROR,
@@ -286,6 +287,24 @@ class TestUserListView(APITestCase):
             response = self.client.get(url)
             assert response.status_code == 401
             assert VALUE_OF_LIMIT_NOT_INTEGER_ERROR in response.data
+
+    def test_get_limit_is_zero_returns_error(self):
+        with self.login(email=self.basic_user().email):
+            limit = '0'
+            limit_arg = "limit={}".format(limit)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            assert VALUE_OF_LIMIT_IS_NON_POSITIVE_ERROR in response.data
+
+    def test_get_limit_is_below_zero_returns_error(self):
+        with self.login(email=self.basic_user().email):
+            limit = '-1'
+            limit_arg = "limit={}".format(limit)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            assert VALUE_OF_LIMIT_IS_NON_POSITIVE_ERROR in response.data
 
     def test_get_adjacent_offsets_has_unique_users(self):
         limit = 3
