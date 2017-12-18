@@ -44,6 +44,11 @@ from impact.v1.helpers.model_helper import (
     INVALID_URL_ERROR,
     format_choices,
 )
+from impact.v1.views.base_list_view import (
+    DEFAULT_MAX_LIMIT,
+    GREATER_THAN_MAX_LIMIT_ERROR,
+    VALUE_OF_LIMIT_NOT_INTEGER_ERROR,
+)
 from impact.v1.views.user_list_view import (
     EMAIL_EXISTS_ERROR,
     UNSUPPORTED_KEY_ERROR,
@@ -202,7 +207,7 @@ class TestUserListView(APITestCase):
 
             assert response.data["next"] is None
 
-    def test_get_pagination_attrs_for_offset_equals_count(self):
+    def test_get_pagination_attrs_for_offset_equals_number_of_results(self):
         limit = 4
         for _ in range(limit * 5):
             UserContext()
@@ -221,7 +226,7 @@ class TestUserListView(APITestCase):
 
             assert response.data["next"] is None
 
-    def test_get_pagination_attrs_for_offset_greater_than_count(self):
+    def test_get_pagination_attrs_for_offset_greater_than_num_of_results(self):
         limit = 4
         for _ in range(limit * 5):
             UserContext()
@@ -239,6 +244,48 @@ class TestUserListView(APITestCase):
             assert prev_offset_arg in response.data["previous"]
 
             assert response.data["next"] is None
+
+    def test_get_pagination_attrs_for_limit_greater_than_num_of_results(self):
+        for _ in range(5):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            count = User.objects.count()
+            assert count < DEFAULT_MAX_LIMIT
+            limit_arg = "limit={}".format(count + 1)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            results = response.data["results"]
+            assert len(results) == count
+            assert response.data["previous"] is None
+            assert response.data["next"] is None
+
+    def test_get_limit_is_greater_than_max_limit_return_error(self):
+        with self.login(email=self.basic_user().email):
+            limit = DEFAULT_MAX_LIMIT + 1
+            limit_arg = "limit={}".format(limit)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            assert GREATER_THAN_MAX_LIMIT_ERROR.format(
+                DEFAULT_MAX_LIMIT) in response.data
+
+    def test_get_limit_is_explicitly_null_return_error(self):
+        with self.login(email=self.basic_user().email):
+            limit = ''
+            limit_arg = "limit={}".format(limit)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            assert VALUE_OF_LIMIT_NOT_INTEGER_ERROR in response.data
+
+    def test_get_limit_is_non_integer_return_error(self):
+        with self.login(email=self.basic_user().email):
+            limit = '5.5'
+            limit_arg = "limit={}".format(limit)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            assert VALUE_OF_LIMIT_NOT_INTEGER_ERROR in response.data
 
     def test_get_adjacent_offsets_has_unique_users(self):
         limit = 3
