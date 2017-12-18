@@ -29,7 +29,7 @@ DEFAULT_MAX_LIMIT = 200
 class BaseListView(ImpactView):
     __metaclass__ = ABCMeta
     MAX_LIMIT = DEFAULT_MAX_LIMIT
-    DEFAULT_LIMIT = '10'
+    DEFAULT_LIMIT = 10
 
     def metadata(self):
         result = {}
@@ -41,7 +41,7 @@ class BaseListView(ImpactView):
 
     def get(self, request):
         limit = self._validate_limit(
-            request.GET.get('limit', self.DEFAULT_LIMIT))
+            request.GET.get('limit', str(self.DEFAULT_LIMIT)))
         if self.errors:
             return Response(status=401, data=self.errors)
         offset = int(request.GET.get('offset', 0))
