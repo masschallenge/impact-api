@@ -202,6 +202,44 @@ class TestUserListView(APITestCase):
 
             assert response.data["next"] is None
 
+    def test_get_pagination_attrs_for_offset_equals_count(self):
+        limit = 4
+        for _ in range(limit * 5):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            current_offset = User.objects.count()
+            limit_arg = "limit={}".format(limit)
+            offset_arg = "offset={}".format(current_offset)
+            url = self.url + "?" + limit_arg + "&" + offset_arg
+
+            response = self.client.get(url)
+            results = response.data["results"]
+            assert len(results) == 0
+
+            prev_offset_arg = "offset={}".format(current_offset - limit)
+            assert prev_offset_arg in response.data["previous"]
+
+            assert response.data["next"] is None
+
+    def test_get_pagination_attrs_for_offset_greater_than_count(self):
+        limit = 4
+        for _ in range(limit * 5):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            count = User.objects.count()
+            current_offset = count + 1
+            limit_arg = "limit={}".format(limit)
+            offset_arg = "offset={}".format(current_offset)
+            url = self.url + "?" + limit_arg + "&" + offset_arg
+            response = self.client.get(url)
+            results = response.data["results"]
+            assert len(results) == 0
+
+            prev_offset_arg = "offset={}".format(count - limit)
+            assert prev_offset_arg in response.data["previous"]
+
+            assert response.data["next"] is None
+
     def test_get_adjacent_offsets_has_unique_users(self):
         limit = 3
         for _ in range(limit * 3):
