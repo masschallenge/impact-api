@@ -108,16 +108,96 @@ class TestUserListView(APITestCase):
             assert user2.email in emails
             assert user_count == response.data["count"]
 
-    def test_get_with_limit(self):
-        UserContext().user
-        UserContext().user
+    def test_get_returns_correct_count_attribute(self):
+        for _ in range(10):
+            UserContext()
         with self.login(email=self.basic_user().email):
-            url = self.url + "?limit=1"
             user_count = User.objects.count()
+            response = self.client.get(self.url)
+            assert user_count == response.data["count"]
+
+    def test_get_with_limit_returns_correct_number_of_results(self):
+        limit = 1
+        for _ in range(limit * 3):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            url = self.url + "?limit={}".format(limit)
             response = self.client.get(url)
             results = response.data["results"]
-            assert 1 == len(results)
-            assert user_count == response.data["count"]
+            assert limit == len(results)
+
+    def test_get_correct_pagination_attributes_for_offset_zero(self):
+        limit = 3
+        current_implicit_offset = 0
+        for _ in range(limit * 3):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            limit_arg = "limit={}".format(limit)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            results = response.data["results"]
+            assert limit == len(results)
+            assert response.data["previous"] is None
+            assert limit_arg in response.data["next"]
+            next_offset_arg = "offset={}".format(
+                current_implicit_offset + limit)
+            assert next_offset_arg in response.data["next"]
+
+    def test_get_pagination_attrs_for_offset_between_zero_and_limit(self):
+        limit = 4
+        current_offset = limit - 2
+        for _ in range(limit * 3):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            limit_arg = "limit={}".format(limit)
+            offset_arg = "offset={}".format(current_offset)
+            url = self.url + "?" + limit_arg + "&" + offset_arg
+            response = self.client.get(url)
+            results = response.data["results"]
+            assert limit == len(results)
+
+            assert response.data["previous"] is not None
+            assert "offset" not in response.data["previous"]
+
+            assert limit_arg in response.data["next"]
+            next_offset_arg = "offset={}".format(current_offset + limit)
+            assert next_offset_arg in response.data["next"]
+
+    def test_get_pagination_attrs_for_offset_in_the_middle(self):
+        limit = 4
+        current_offset = limit + 2
+        for _ in range(current_offset + limit + 2):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            limit_arg = "limit={}".format(limit)
+            offset_arg = "offset={}".format(current_offset)
+            url = self.url + "?" + limit_arg + "&" + offset_arg
+            response = self.client.get(url)
+            results = response.data["results"]
+            assert limit == len(results)
+
+            prev_offset_arg = "offset={}".format(current_offset - limit)
+            assert prev_offset_arg in response.data["previous"]
+
+            assert limit_arg in response.data["next"]
+            next_offset_arg = "offset={}".format(current_offset + limit)
+            assert next_offset_arg in response.data["next"]
+
+    def test_get_adjacent_offsets_has_unique_users(self):
+        limit = 3
+        for _ in range(limit * 3):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            limit_arg = "limit={}".format(limit)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            first_page_results = response.data["results"]
+            next_url = response.data["next"]
+            next_response = self.client.get(next_url)
+            second_page_results = next_response.data["results"]
+            first_page_ids = {result["id"] for result in first_page_results}
+            second_page_ids = {result["id"] for result in second_page_results}
+            assert not first_page_ids.intersection(second_page_ids)
 
     def test_options(self):
         with self.login(email=self.basic_user().email):
@@ -134,7 +214,6 @@ class TestUserListView(APITestCase):
 
     def test_options_against_get(self):
         with self.login(email=self.basic_user().email):
-
             options_response = self.client.options(self.url)
             get_response = self.client.get(self.url)
 
