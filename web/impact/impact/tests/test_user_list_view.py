@@ -183,6 +183,25 @@ class TestUserListView(APITestCase):
             next_offset_arg = "offset={}".format(current_offset + limit)
             assert next_offset_arg in response.data["next"]
 
+    def test_get_pagination_attrs_for_offset_between_count_and_limit(self):
+        limit = 4
+        for _ in range(limit * 5):
+            UserContext()
+        current_offset = User.objects.count() - limit + 2
+        with self.login(email=self.basic_user().email):
+            limit_arg = "limit={}".format(limit)
+            offset_arg = "offset={}".format(current_offset)
+            url = self.url + "?" + limit_arg + "&" + offset_arg
+            response = self.client.get(url)
+            results = response.data["results"]
+            assert limit > len(results)
+            assert len(results) == response.data["count"] - current_offset
+
+            prev_offset_arg = "offset={}".format(current_offset - limit)
+            assert prev_offset_arg in response.data["previous"]
+
+            assert response.data["next"] is None
+
     def test_get_adjacent_offsets_has_unique_users(self):
         limit = 3
         for _ in range(limit * 3):
