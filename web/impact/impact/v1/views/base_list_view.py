@@ -19,9 +19,16 @@ from impact.v1.views import ImpactView
 from impact.utils import parse_date
 from impact.models.utils import model_has_field
 
+VALUE_OF_LIMIT_NOT_INTEGER_ERROR = "value of 'limit' should be an integer"
+GREATER_THAN_MAX_LIMIT_ERROR = "maximum allowed value for 'limit' is {}"
+
+DEFAULT_MAX_LIMIT = 200
+
 
 class BaseListView(ImpactView):
     __metaclass__ = ABCMeta
+    MAX_LIMIT = DEFAULT_MAX_LIMIT
+    DEFAULT_LIMIT = '10'
 
     def metadata(self):
         result = {}
@@ -32,7 +39,10 @@ class BaseListView(ImpactView):
         return result
 
     def get(self, request):
-        limit = int(request.GET.get('limit', 10))
+        limit = self._validate_limit(
+            request.GET.get('limit', self.DEFAULT_LIMIT))
+        if self.errors:
+            return Response(status=401, data=self.errors)
         offset = int(request.GET.get('offset', 0))
         base_url = _base_url(request)
         count, results = self.results(limit, offset)
@@ -43,6 +53,15 @@ class BaseListView(ImpactView):
             "results": results,
         }
         return Response(result)
+
+    def _validate_limit(self, limit):
+        if not limit.isdigit():
+            self.errors.append(VALUE_OF_LIMIT_NOT_INTEGER_ERROR)
+            limit = self.DEFAULT_LIMIT
+        elif int(limit) > self.MAX_LIMIT:
+            self.errors.append(
+                GREATER_THAN_MAX_LIMIT_ERROR.format(self.MAX_LIMIT))
+        return int(limit)
 
     def results(self, limit, offset):
         queryset = self.helper_class.all_objects()
@@ -99,7 +118,7 @@ def _previous_url(base_url, limit, offset, count):
 
 
 def _next_url(base_url, limit, offset, count):
-    if offset+limit >= count:
+    if offset + limit >= count:
         return None
     if offset >= 0:
         url = _update_query_param(base_url, "limit", limit)
