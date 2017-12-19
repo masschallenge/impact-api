@@ -226,10 +226,20 @@ To give a user access to the v1 api, issue the command with
 
 In order to deploy, you must first install and configure the AWS CLI
 tool. Steps for setting this up can be found here:
+
 http://docs.aws.amazon.com/cli/latest/userguide/installing.html
+
+Note: On Dec. 18, 2017 we were not able to do the deploy with the
+latest version (1.14.11) and had to lock on a previous version using
+```sudo pip install 'awscli<1.12'```.  For Nathan this resulted in
+installed 1.12.190.  Yotam indicated that he used 1.11.75
+successfully.
 
 You must also install the ecs-deploy tool via:
 `pip install ecs-deploy`
+
+Note: On Dec. 18, 2017 Nathan used version 1.3.1 for this.  Yotam
+reports that he was using 1.4.3.
 
 This may require sudo depending on how your local host is configured.
 
