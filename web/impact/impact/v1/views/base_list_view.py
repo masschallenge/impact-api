@@ -40,11 +40,12 @@ class BaseListView(ImpactView):
         return result
 
     def get(self, request):
-        limit = self._validate_limit(
-            request.GET.get("limit", str(self.DEFAULT_LIMIT)))
+        limit = self._validate_kwarg(
+            request.GET.get("limit", str(self.DEFAULT_LIMIT)), key="limit")
+        offset = self._validate_kwarg(
+            request.GET.get("offset", str(0)), key="offset")
         if self.errors:
             return Response(status=401, data=self.errors)
-        offset = int(request.GET.get("offset", 0))
         base_url = _base_url(request)
         count, results = self.results(limit, offset)
         result = {
@@ -55,17 +56,20 @@ class BaseListView(ImpactView):
         }
         return Response(result)
 
-    def _validate_limit(self, limit):
-        if not is_int(limit):
-            self.errors.append(KWARG_VALUE_NOT_INTEGER_ERROR.format("limit"))
+    def _validate_kwarg(self, val, key="limit"):
+        if not is_int(val):
+            self.errors.append(KWARG_VALUE_NOT_INTEGER_ERROR.format(key))
             return None
-        if int(limit) > self.MAX_LIMIT:
+        if int(val) > self.MAX_LIMIT and key == "limit":
             error_msg = GREATER_THAN_MAX_LIMIT_ERROR.format(self.MAX_LIMIT)
             self.errors.append(error_msg)
-        elif int(limit) <= 0:
-            self.errors.append(KWARG_VALUE_IS_NON_POSITIVE_ERROR.format(
-                "limit"))
-        return int(limit)
+        elif int(val) <= 0 and key == "limit":
+            self.errors.append(
+                KWARG_VALUE_IS_NON_POSITIVE_ERROR.format(key))
+        elif int(val) < 0 and key == "offset":
+            self.errors.append(
+                KWARG_VALUE_IS_NON_POSITIVE_ERROR.format(key))
+        return int(val)
 
     def results(self, limit, offset):
         queryset = self.helper_class.all_objects()
@@ -124,11 +128,8 @@ def _previous_url(base_url, limit, offset, count):
 def _next_url(base_url, limit, offset, count):
     if offset + limit >= count:
         return None
-    if offset == 0:
-        url = _update_query_param(base_url, "limit", limit)
-    else:
-        url = _update_query_param(base_url, "limit", limit)
-        url = _update_query_param(url, "offset", offset + limit)
+    url = _update_query_param(base_url, "limit", limit)
+    url = _update_query_param(url, "offset", offset + limit)
     return url
     # todo: validate offset is always >=0
     # todo: refactor
