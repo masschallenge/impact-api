@@ -28,6 +28,7 @@ from impact.v1.helpers.profile_helper import (
     EXPERT_INDUSTRY_FIELD,
     EXPERT_PHONE_FIELD,
     EXPERT_STRING_FIELD,
+    FUNCTIONAL_EXPERTISE_ARRAY_FIELD,
     GENDER_FIELD,
     HOME_PROGRAM_FAMILY_ID_FIELD,
     MENTORING_SPECIALTIES_FIELD,
@@ -74,6 +75,7 @@ USER_FIELDS = {
     "facebook_url": URL_FIELD,
     "linked_in_url": URL_FIELD,
     "personal_website_url": PERSONAL_WEBSITE_URL_FIELD,
+    "functional_expertise": FUNCTIONAL_EXPERTISE_ARRAY_FIELD,
 }
 
 
