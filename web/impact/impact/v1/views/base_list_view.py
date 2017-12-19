@@ -55,20 +55,28 @@ class BaseListView(ImpactView):
         }
         return Response(result)
 
-    def _validate_kwarg(self, val, key="limit"):
+    def _validate_kwarg(self, val, key):
         if not is_int(val):
             self.errors.append(KWARG_VALUE_NOT_INTEGER_ERROR.format(key))
             return None
-        if int(val) > self.MAX_LIMIT and key == "limit":
+        if key == "limit":
+            self._validate_limit(key, val)
+        if key == "offset":
+            self._validate_offset(key, val)
+        return int(val)
+
+    def _validate_offset(self, key, val):
+        if int(val) < 0:
+            self.errors.append(
+                KWARG_VALUE_IS_NON_POSITIVE_ERROR.format(key))
+
+    def _validate_limit(self, key, val):
+        if int(val) > self.MAX_LIMIT:
             error_msg = GREATER_THAN_MAX_LIMIT_ERROR.format(self.MAX_LIMIT)
             self.errors.append(error_msg)
-        elif int(val) <= 0 and key == "limit":
+        elif int(val) <= 0:
             self.errors.append(
                 KWARG_VALUE_IS_NON_POSITIVE_ERROR.format(key))
-        elif int(val) < 0 and key == "offset":
-            self.errors.append(
-                KWARG_VALUE_IS_NON_POSITIVE_ERROR.format(key))
-        return int(val)
 
     def results(self, limit, offset):
         queryset = self.helper_class.all_objects()
