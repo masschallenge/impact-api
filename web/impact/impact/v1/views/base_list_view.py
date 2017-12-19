@@ -20,8 +20,8 @@ from impact.utils import parse_date
 from impact.models.utils import model_has_field, is_int
 
 GREATER_THAN_MAX_LIMIT_ERROR = "maximum allowed value for 'limit' is {}."
-VALUE_OF_LIMIT_NOT_INTEGER_ERROR = "value of 'limit' should be an integer."
-VALUE_OF_LIMIT_IS_NON_POSITIVE_ERROR = "value of 'limit' should be positive."
+KWARG_VALUE_NOT_INTEGER_ERROR = "value of '{}' should be an integer."
+KWARG_VALUE_IS_NON_POSITIVE_ERROR = "value of '{}' should be positive."
 
 DEFAULT_MAX_LIMIT = 200
 
@@ -41,10 +41,10 @@ class BaseListView(ImpactView):
 
     def get(self, request):
         limit = self._validate_limit(
-            request.GET.get('limit', str(self.DEFAULT_LIMIT)))
+            request.GET.get("limit", str(self.DEFAULT_LIMIT)))
         if self.errors:
             return Response(status=401, data=self.errors)
-        offset = int(request.GET.get('offset', 0))
+        offset = int(request.GET.get("offset", 0))
         base_url = _base_url(request)
         count, results = self.results(limit, offset)
         result = {
@@ -57,13 +57,14 @@ class BaseListView(ImpactView):
 
     def _validate_limit(self, limit):
         if not is_int(limit):
-            self.errors.append(VALUE_OF_LIMIT_NOT_INTEGER_ERROR)
+            self.errors.append(KWARG_VALUE_NOT_INTEGER_ERROR.format("limit"))
             return None
         if int(limit) > self.MAX_LIMIT:
             error_msg = GREATER_THAN_MAX_LIMIT_ERROR.format(self.MAX_LIMIT)
             self.errors.append(error_msg)
         elif int(limit) <= 0:
-            self.errors.append(VALUE_OF_LIMIT_IS_NON_POSITIVE_ERROR)
+            self.errors.append(KWARG_VALUE_IS_NON_POSITIVE_ERROR.format(
+                "limit"))
         return int(limit)
 
     def results(self, limit, offset):
@@ -82,9 +83,9 @@ class BaseListView(ImpactView):
 
     def _filter_by_date(self, qs):
         updated_at_after = self.request.query_params.get(
-            'updated_at.after', None)
+            "updated_at.after", None)
         updated_at_before = self.request.query_params.get(
-            'updated_at.before', None)
+            "updated_at.before", None)
         if updated_at_after or updated_at_before:
             qs = self._apply_filter_by_date(qs,
                                             updated_at_after,
@@ -101,7 +102,7 @@ class BaseListView(ImpactView):
         return qs
 
     def _filter_by_name(self, qs):
-        name_filter = self.request.query_params.get('name', None)
+        name_filter = self.request.query_params.get("name", None)
         if name_filter:
             return qs.filter(name__icontains=name_filter)
         return qs
@@ -123,12 +124,14 @@ def _previous_url(base_url, limit, offset, count):
 def _next_url(base_url, limit, offset, count):
     if offset + limit >= count:
         return None
-    if offset >= 0:
+    if offset == 0:
+        url = _update_query_param(base_url, "limit", limit)
+    else:
         url = _update_query_param(base_url, "limit", limit)
         url = _update_query_param(url, "offset", offset + limit)
-        return url
+    return url
+    # todo: validate offset is always >=0
     # todo: refactor
-    return None
 
 
 def _base_url(request):

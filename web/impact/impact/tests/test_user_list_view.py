@@ -47,8 +47,8 @@ from impact.v1.helpers.model_helper import (
 from impact.v1.views.base_list_view import (
     DEFAULT_MAX_LIMIT,
     GREATER_THAN_MAX_LIMIT_ERROR,
-    VALUE_OF_LIMIT_NOT_INTEGER_ERROR,
-    VALUE_OF_LIMIT_IS_NON_POSITIVE_ERROR,
+    KWARG_VALUE_NOT_INTEGER_ERROR,
+    KWARG_VALUE_IS_NON_POSITIVE_ERROR,
 )
 from impact.v1.views.user_list_view import (
     EMAIL_EXISTS_ERROR,
@@ -277,7 +277,8 @@ class TestUserListView(APITestCase):
             url = self.url + "?" + limit_arg
             response = self.client.get(url)
             assert response.status_code == 401
-            assert VALUE_OF_LIMIT_NOT_INTEGER_ERROR in response.data
+            error_msg = KWARG_VALUE_NOT_INTEGER_ERROR.format("limit")
+            assert error_msg in response.data
 
     def test_get_limit_is_non_integer_return_error(self):
         with self.login(email=self.basic_user().email):
@@ -286,7 +287,8 @@ class TestUserListView(APITestCase):
             url = self.url + "?" + limit_arg
             response = self.client.get(url)
             assert response.status_code == 401
-            assert VALUE_OF_LIMIT_NOT_INTEGER_ERROR in response.data
+            error_msg = KWARG_VALUE_NOT_INTEGER_ERROR.format("limit")
+            assert error_msg in response.data
 
     def test_get_limit_is_zero_returns_error(self):
         with self.login(email=self.basic_user().email):
@@ -295,16 +297,58 @@ class TestUserListView(APITestCase):
             url = self.url + "?" + limit_arg
             response = self.client.get(url)
             assert response.status_code == 401
-            assert VALUE_OF_LIMIT_IS_NON_POSITIVE_ERROR in response.data
+            error_msg = KWARG_VALUE_IS_NON_POSITIVE_ERROR.format("limit")
+            assert error_msg in response.data
 
-    def test_get_limit_is_below_zero_returns_error(self):
+    def test_get_limit_is_negative_returns_error(self):
         with self.login(email=self.basic_user().email):
             limit = '-1'
             limit_arg = "limit={}".format(limit)
             url = self.url + "?" + limit_arg
             response = self.client.get(url)
             assert response.status_code == 401
-            assert VALUE_OF_LIMIT_IS_NON_POSITIVE_ERROR in response.data
+            error_msg = KWARG_VALUE_IS_NON_POSITIVE_ERROR.format("limit")
+            assert error_msg in response.data
+
+    def test_get_offset_is_negative_returns_error(self):
+        with self.login(email=self.basic_user().email):
+            offset = '-1'
+            offset_arg = "offset={}".format(offset)
+            url = self.url + "?" + offset_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            error_msg = KWARG_VALUE_IS_NON_POSITIVE_ERROR.format("offset")
+            assert error_msg in response.data
+
+    def test_get_offset_is_empty_returns_error(self):
+        with self.login(email=self.basic_user().email):
+            offset = ''
+            offset_arg = "offset={}".format(offset)
+            url = self.url + "?" + offset_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            error_msg = KWARG_VALUE_NOT_INTEGER_ERROR.format("offset")
+            assert error_msg in response.data
+
+    def test_get_offset_is_non_integer_returns_error(self):
+        with self.login(email=self.basic_user().email):
+            offset = '5.5'
+            offset_arg = "offset={}".format(offset)
+            url = self.url + "?" + offset_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            error_msg = KWARG_VALUE_NOT_INTEGER_ERROR.format("offset")
+            assert error_msg in response.data
+
+    def test_get_offset_is_explicit_zero_returns_successfully(self):
+        with self.login(email=self.basic_user().email):
+            offset = '0'
+            offset_arg = "offset={}".format(offset)
+            url = self.url + "?" + offset_arg
+            response = self.client.get(url)
+            assert response.status_code == 200
+            implicit_zero_response = self.client.get(self.url)
+            assert response.data == implicit_zero_response.data
 
     def test_get_adjacent_offsets_has_unique_users(self):
         limit = 3
