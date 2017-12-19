@@ -22,7 +22,6 @@ from impact.models.utils import model_has_field, is_int
 GREATER_THAN_MAX_LIMIT_ERROR = "maximum allowed value for 'limit' is {}."
 KWARG_VALUE_NOT_INTEGER_ERROR = "value of '{}' should be an integer."
 KWARG_VALUE_IS_NON_POSITIVE_ERROR = "value of '{}' should be positive."
-
 DEFAULT_MAX_LIMIT = 200
 
 
@@ -115,14 +114,13 @@ class BaseListView(ImpactView):
 def _previous_url(base_url, limit, offset, count):
     if offset == 0:
         return None
-    elif 0 <= offset < limit:
+    elif 0 < offset <= limit:
         url = _update_query_param(base_url, "limit", limit)
         return url
     else:
         url = _update_query_param(base_url, "limit", limit)
         url = _update_query_param(url, "offset", min(offset, count) - limit)
         return url
-    # todo: refactor
 
 
 def _next_url(base_url, limit, offset, count):
@@ -131,8 +129,6 @@ def _next_url(base_url, limit, offset, count):
     url = _update_query_param(base_url, "limit", limit)
     url = _update_query_param(url, "offset", offset + limit)
     return url
-    # todo: validate offset is always >=0
-    # todo: refactor
 
 
 def _base_url(request):
