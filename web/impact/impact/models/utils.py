@@ -34,4 +34,4 @@ def is_int(s):
         int(str(s))
     except ValueError:
         return False
-    return
+    return True
