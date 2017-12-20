@@ -17,7 +17,10 @@ from impact.v1.helpers import (
 )
 from impact.v1.views import ImpactView
 from impact.utils import parse_date
-from impact.models.utils import model_has_field, is_int
+from impact.models.utils import (
+    is_int,
+    model_has_field,
+)
 
 GREATER_THAN_MAX_LIMIT_ERROR = "maximum allowed value for 'limit' is {}."
 KWARG_VALUE_NOT_INTEGER_ERROR = "value of '{}' should be an integer."
