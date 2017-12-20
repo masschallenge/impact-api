@@ -8,14 +8,8 @@ from django.urls import reverse
 from impact.tests.factories import IndustryFactory
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
+from impact.v1.helpers import MPTT_FIELDS
 from impact.v1.views import IndustryDetailView
-
-INDUSTRY_GET_FIELDS = [
-    "id",
-    "name",
-    "full_name",
-    "parent_id",
-]
 
 
 class TestIndustryDetailView(APITestCase):
@@ -45,7 +39,7 @@ class TestIndustryDetailView(APITestCase):
             response = self.client.options(url)
             assert response.status_code == 200
             get_options = response.data["actions"]["GET"]["properties"]
-            assert_fields(INDUSTRY_GET_FIELDS, get_options)
+            assert_fields(MPTT_FIELDS.keys(), get_options)
 
     def test_options_against_get(self):
         industry = IndustryFactory()
