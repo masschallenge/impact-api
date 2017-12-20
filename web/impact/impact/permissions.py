@@ -14,6 +14,16 @@ from impact.utils import model_name_case
 
 User = get_user_model()
 
+METHOD_TO_ACTION = {
+    "POST": "add",
+    "GET": "view",
+    "HEAD": "view",
+    "OPTIONS": "view",
+    "PUT": "change",
+    "PATCH": "change",
+    "DELETE": "delete",
+}
+
 
 class V0APIPermissions(BasePermission):
     authenticated_users_only = True
@@ -39,17 +49,11 @@ class V1ConfidentialAPIPermissions(BasePermission):
             name=settings.V1_CONFIDENTIAL_API_GROUP).exists()
 
 
-class DynamicModelPermissions(BasePermission):
-    perms_map = {
-        'GET': ['%(app)s.view_%(model_name)s'],
-        'OPTIONS': ['%(app)s.view_%(model_name)s'],
-        'HEAD': ['%(app)s.view_%(model_name)s'],
-        'POST': ['%(app)s.add_%(model_name)s'],
-        'PUT': ['%(app)s.change_%(model_name)s'],
-        'PATCH': ['%(app)s.change_%(model_name)s'],
-        'DELETE': ['%(app)s.delete_%(model_name)s'],
-    }
+def method_to_perm(method):
+    return ["%(app)s.{}_%(model_name)s".format(METHOD_TO_ACTION[method])]
 
+
+class DynamicModelPermissions(BasePermission):
     authenticated_users_only = True
 
     def has_permission(self, request, view):
@@ -58,7 +62,7 @@ class DynamicModelPermissions(BasePermission):
         model_name = model_name_case(model, related_model)
         app_label = 'mc'
         kwargs = {'app': app_label, 'model_name': model_name}
-        perms = [perm % kwargs for perm in self.perms_map[request.method]]
+        perms = [perm % kwargs for perm in method_to_perm(request.method)]
         return (
             request.user and (
                 request.user.is_authenticated or (
@@ -87,14 +91,7 @@ class DynamicModelPermissions(BasePermission):
         return action, perm_model, field, boolean_str
 
     def action_matches(self, action, request):
-        if ((request.method in ('POST') and action == 'add') or (
-            request.method in ('GET', 'HEAD', 'OPTIONS') and (
-                action == 'view')) or (
-            request.method in (
-                'PUT', 'PATCH') and (
-                action == 'change')) or (
-                request.method in ('DELETE') and (action == 'delete'))):
-            # the permission applies to our case
+        if action == METHOD_TO_ACTION.get(request.method):
             return True
         return False
 
