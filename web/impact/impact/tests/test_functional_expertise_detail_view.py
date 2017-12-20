@@ -8,14 +8,8 @@ from django.urls import reverse
 from impact.tests.factories import FunctionalExpertiseFactory
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
+from impact.v1.helpers import MPTT_FIELDS
 from impact.v1.views import FunctionalExpertiseDetailView
-
-FUNCTIONAL_EXPERTISE_GET_FIELDS = [
-    "id",
-    "name",
-    "full_name",
-    "parent_id",
-]
 
 
 class TestFunctionalExpertiseDetailView(APITestCase):
@@ -48,7 +42,7 @@ class TestFunctionalExpertiseDetailView(APITestCase):
             response = self.client.options(url)
             assert response.status_code == 200
             get_options = response.data["actions"]["GET"]["properties"]
-            assert_fields(FUNCTIONAL_EXPERTISE_GET_FIELDS, get_options)
+            assert_fields(MPTT_FIELDS.keys(), get_options)
 
     def test_options_against_get(self):
         functional_expertise = FunctionalExpertiseFactory()

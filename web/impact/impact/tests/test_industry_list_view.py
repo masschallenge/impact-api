@@ -7,8 +7,8 @@ from jsonschema import Draft4Validator
 from django.urls import reverse
 from impact.tests.factories import IndustryFactory
 from impact.tests.api_test_case import APITestCase
-from impact.tests.test_industry_detail_view import INDUSTRY_GET_FIELDS
 from impact.tests.utils import assert_fields
+from impact.v1.helpers import MPTT_FIELDS
 from impact.v1.views import IndustryListView
 
 
@@ -31,11 +31,10 @@ class TestIndustryListView(APITestCase):
             assert response.status_code == 200
             results = response.data["actions"]["GET"]["properties"]["results"]
             get_options = results["item"]["properties"]
-            assert_fields(INDUSTRY_GET_FIELDS, get_options)
+            assert_fields(MPTT_FIELDS.keys(), get_options)
 
     def test_options_against_get(self):
         with self.login(email=self.basic_user().email):
-
             options_response = self.client.options(self.url)
             get_response = self.client.get(self.url)
 

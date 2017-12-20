@@ -7,10 +7,8 @@ from jsonschema import Draft4Validator
 from django.urls import reverse
 from impact.tests.factories import FunctionalExpertiseFactory
 from impact.tests.api_test_case import APITestCase
-from impact.tests.test_functional_expertise_detail_view import (
-    FUNCTIONAL_EXPERTISE_GET_FIELDS
-)
 from impact.tests.utils import assert_fields
+from impact.v1.helpers import MPTT_FIELDS
 from impact.v1.views import FunctionalExpertiseListView
 
 
@@ -33,7 +31,7 @@ class TestFunctionalExpertiseListView(APITestCase):
             assert response.status_code == 200
             results = response.data["actions"]["GET"]["properties"]["results"]
             get_options = results["item"]["properties"]
-            assert_fields(FUNCTIONAL_EXPERTISE_GET_FIELDS, get_options)
+            assert_fields(MPTT_FIELDS.keys(), get_options)
 
     def test_options_against_get(self):
         with self.login(email=self.basic_user().email):
