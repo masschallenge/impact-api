@@ -6,6 +6,11 @@ from django.core.exceptions import (
     ValidationError,
 )
 from django.core.validators import RegexValidator
+
+from impact.v1.helpers.functional_expertise_helper import (
+    FUNCTIONAL_EXPERTISE_TYPE,
+    FunctionalExpertiseHelper,
+)
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     INVALID_URL_ERROR,
@@ -31,12 +36,10 @@ from impact.models import (
     EntrepreneurProfile,
     ExpertCategory,
     ExpertProfile,
-    FunctionalExpertise,
     Industry,
     MemberProfile,
     ProgramFamily,
 )
-
 
 COULD_BE_EXPERT_CHECK = "could_be_expert"
 COULD_BE_NON_MEMBER_CHECK = "could_be_non_member"
@@ -72,7 +75,6 @@ NON_MEMBER_STRING_FIELD = {
     "PATCH": {"required": False, "allowed": IS_NON_MEMBER_CHECK},
     "POST": {"required": False, "allowed": COULD_BE_NON_MEMBER_CHECK},
 }
-
 
 GENDER_TRANSLATIONS = {
     "female": "f",
@@ -219,10 +221,7 @@ EXPERT_INDUSTRY_ARRAY_FIELD = {
 }
 
 FUNCTIONAL_EXPERTISE_ARRAY_FIELD = {
-    "json-schema": {
-        "type": "array",
-        "items": {"type": "string"},
-    },
+    "json-schema": json_array(FUNCTIONAL_EXPERTISE_TYPE),
     "GET": {
         "included": COULD_BE_EXPERT_CHECK,
         "description": EXPERT_DESCRIPTION,
@@ -246,7 +245,6 @@ PERSONAL_WEBSITE_URL_FIELD = {
     "PATCH": {"required": False},
     "POST": {"required": False},
 }
-
 
 INVALID_ID_ERROR = "Invalid {field}: Expected valid integer {classname} id"
 
@@ -425,10 +423,9 @@ class ProfileHelper(ModelHelper):
 
     @property
     def functional_expertise(self):
-        if hasattr(self.subject, "functional_expertise"):
-            expertises = self.subject.functional_expertise
-            if expertises:
-                return [expertise.name for expertise in expertises.all()]
+        return serialize_list_field(self.subject,
+                                    "functional_expertise",
+                                    FunctionalExpertiseHelper)
 
     @property
     def expert_category(self):
