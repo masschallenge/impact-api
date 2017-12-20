@@ -31,7 +31,7 @@ def snake_to_model_name(value):
 
 def is_int(s):
     try:
-        int(s)
+        int(str(s))
     except ValueError:
         return False
-    return True
+    return
