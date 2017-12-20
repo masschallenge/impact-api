@@ -6,11 +6,19 @@ from django.core.exceptions import (
     ValidationError,
 )
 from django.core.validators import RegexValidator
+from impact.models import (
+    EntrepreneurProfile,
+    ExpertCategory,
+    ExpertProfile,
+    Industry,
+    MemberProfile,
+    ProgramFamily,
+)
 
 from impact.v1.helpers.functional_expertise_helper import (
     FunctionalExpertiseHelper,
 )
-from impact.v1.helpers.mptt_model_helper import MPTT_TYPE
+from impact.v1.helpers.industry_helper import IndustryHelper
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     INVALID_URL_ERROR,
@@ -28,15 +36,7 @@ from impact.v1.helpers.model_helper import (
     validate_string,
     validate_url,
 )
-from impact.v1.helpers.industry_helper import IndustryHelper
-from impact.models import (
-    EntrepreneurProfile,
-    ExpertCategory,
-    ExpertProfile,
-    Industry,
-    MemberProfile,
-    ProgramFamily,
-)
+from impact.v1.helpers.mptt_model_helper import MPTT_TYPE
 
 COULD_BE_EXPERT_CHECK = "could_be_expert"
 COULD_BE_NON_MEMBER_CHECK = "could_be_non_member"
