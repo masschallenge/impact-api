@@ -124,8 +124,8 @@ class TestOrganizationListView(APITestCase):
 
     def test_next_info_contains_filter(self):
         name = "foo"
-        StartupFactory(organization__name=name)
-        StartupFactory.create_batch(10)
+        for i in range(20):
+            StartupFactory(organization__name=name + str(i))
         with self.login(email=self.basic_user().email):
             name_query_parameter = "name=%s" % name
             url = self.url + "?" + name_query_parameter
