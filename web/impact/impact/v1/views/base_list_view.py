@@ -69,8 +69,8 @@ class BaseListView(ImpactView):
         return self._validate_limit(limit_input)
 
     def _validate_limit(self, val):
-        if not is_int(val):
-            self.errors.append(KWARG_VALUE_NOT_INTEGER_ERROR.format("limit"))
+        val = self._validate_integer(val, key="limit")
+        if val is None:
             return None
         val = int(val)
         if val > self.MAX_LIMIT:
@@ -82,12 +82,18 @@ class BaseListView(ImpactView):
         return val
 
     def _validate_offset(self, val):
-        if not is_int(val):
-            self.errors.append(KWARG_VALUE_NOT_INTEGER_ERROR.format("offset"))
+        val = self._validate_integer(val, key="offset")
+        if val is None:
             return None
         val = int(val)
         if val < 0:
             self.errors.append(KWARG_VALUE_IS_NEGATIVE_ERROR.format("offset"))
+        return val
+
+    def _validate_integer(self, val, key):
+        if not is_int(val):
+            self.errors.append(KWARG_VALUE_NOT_INTEGER_ERROR.format(key))
+            return None
         return val
 
     def results(self, limit, offset):
