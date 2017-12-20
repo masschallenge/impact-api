@@ -92,10 +92,10 @@ v0_urlpatterns = [
 v1_urlpatterns = [
     url(r"^functional_expertise/(?P<pk>[0-9]+)/$",
         FunctionalExpertiseDetailView.as_view(),
-        name=IndustryDetailView.view_name),
+        name=FunctionalExpertiseDetailView.view_name),
     url(r"^functional_expertise/$",
         FunctionalExpertiseListView.as_view(),
-        name=IndustryListView.view_name),
+        name=FunctionalExpertiseListView.view_name),
     url(r"^industry/(?P<pk>[0-9]+)/$",
         IndustryDetailView.as_view(),
         name=IndustryDetailView.view_name),
