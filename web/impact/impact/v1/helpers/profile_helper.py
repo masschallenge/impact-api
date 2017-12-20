@@ -8,9 +8,9 @@ from django.core.exceptions import (
 from django.core.validators import RegexValidator
 
 from impact.v1.helpers.functional_expertise_helper import (
-    FUNCTIONAL_EXPERTISE_TYPE,
     FunctionalExpertiseHelper,
 )
+from impact.v1.helpers.mptt_model_helper import MPTT_TYPE
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     INVALID_URL_ERROR,
@@ -28,10 +28,7 @@ from impact.v1.helpers.model_helper import (
     validate_string,
     validate_url,
 )
-from impact.v1.helpers.industry_helper import (
-    INDUSTRY_TYPE,
-    IndustryHelper,
-)
+from impact.v1.helpers.industry_helper import IndustryHelper
 from impact.models import (
     EntrepreneurProfile,
     ExpertCategory,
@@ -208,12 +205,12 @@ PRIMARY_INDUSTRY_ID_FIELD = merge_fields(
                  EXPERT_OBJECT_ID_FIELD))
 
 EXPERT_INDUSTRY_FIELD = {
-    "json-schema": INDUSTRY_TYPE,
+    "json-schema": MPTT_TYPE,
     "GET": {"description": EXPERT_DESCRIPTION,
             "included": COULD_BE_EXPERT_CHECK}}
 
 EXPERT_INDUSTRY_ARRAY_FIELD = {
-    "json-schema": json_array(INDUSTRY_TYPE),
+    "json-schema": json_array(MPTT_TYPE),
     "GET": {
         "included": COULD_BE_EXPERT_CHECK,
         "description": EXPERT_DESCRIPTION,
@@ -221,7 +218,7 @@ EXPERT_INDUSTRY_ARRAY_FIELD = {
 }
 
 FUNCTIONAL_EXPERTISE_ARRAY_FIELD = {
-    "json-schema": json_array(FUNCTIONAL_EXPERTISE_TYPE),
+    "json-schema": json_array(MPTT_TYPE),
     "GET": {
         "included": COULD_BE_EXPERT_CHECK,
         "description": EXPERT_DESCRIPTION,
@@ -347,34 +344,34 @@ class ProfileHelper(ModelHelper):
         "speaker_topics": validate_expert_only_string,
         "title": validate_expert_only_string,
         "twitter_handle": validate_twitter_handle,
-        }
+    }
     CORE_OPTIONAL_KEYS = [
         "facebook_url",
         "linked_in_url",
         "personal_website_url",
         "phone",
         "twitter_handle",
-        ]
+    ]
     CORE_REQUIRED_KEYS = [
         "gender",
         "user_type",
-        ]
+    ]
     CORE_PATCH_KEYS = CORE_OPTIONAL_KEYS + ["gender"]
     ENTREPRENEUR_OPTIONAL_KEYS = [
         "bio",
-        ]
+    ]
     EXPERT_OPTIONAL_KEYS = [
         "bio",
         "office_hours_topics",
         "referred_by",
         "speaker_topics",
-        ]
+    ]
     EXPERT_OPTIONAL_BOOLEAN_KEYS = [
         "judge_interest",
         "mentor_interest",
         "office_hours_interest",
         "speaker_interest",
-        ]
+    ]
     EXPERT_REQUIRED_KEYS = [
         "company",
         "expert_category",
@@ -382,7 +379,7 @@ class ProfileHelper(ModelHelper):
         "phone",
         "primary_industry_id",
         "title",
-        ]
+    ]
     EXPERT_KEYS = (EXPERT_REQUIRED_KEYS +
                    EXPERT_OPTIONAL_KEYS +
                    EXPERT_OPTIONAL_BOOLEAN_KEYS +
@@ -393,11 +390,11 @@ class ProfileHelper(ModelHelper):
                             set(ENTREPRENEUR_KEYS + CORE_KEYS))
     OPTIONAL_BOOLEAN_KEYS = EXPERT_OPTIONAL_BOOLEAN_KEYS
     OPTIONAL_KEYS = list(set(
-            CORE_OPTIONAL_KEYS + ENTREPRENEUR_OPTIONAL_KEYS +
-            EXPERT_OPTIONAL_BOOLEAN_KEYS + EXPERT_OPTIONAL_KEYS))
+        CORE_OPTIONAL_KEYS + ENTREPRENEUR_OPTIONAL_KEYS +
+        EXPERT_OPTIONAL_BOOLEAN_KEYS + EXPERT_OPTIONAL_KEYS))
     OPTIONAL_STRING_KEYS = list(set(
-            CORE_OPTIONAL_KEYS + ENTREPRENEUR_OPTIONAL_KEYS +
-            EXPERT_OPTIONAL_KEYS))
+        CORE_OPTIONAL_KEYS + ENTREPRENEUR_OPTIONAL_KEYS +
+        EXPERT_OPTIONAL_KEYS))
     REQUIRED_KEYS = CORE_REQUIRED_KEYS + EXPERT_REQUIRED_KEYS
     INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
 
