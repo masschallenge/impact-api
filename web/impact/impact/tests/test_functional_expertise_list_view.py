@@ -5,25 +5,25 @@ import json
 from jsonschema import Draft4Validator
 
 from django.urls import reverse
-from impact.tests.factories import IndustryFactory
+from impact.tests.factories import FunctionalExpertiseFactory
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
 from impact.v1.helpers import MPTT_FIELDS
-from impact.v1.views import IndustryListView
+from impact.v1.views import FunctionalExpertiseListView
 
 
-class TestIndustryListView(APITestCase):
-    url = reverse(IndustryListView.view_name)
+class TestFunctionalExpertiseListView(APITestCase):
+    url = reverse(FunctionalExpertiseListView.view_name)
 
-    def test_get_industries(self):
+    def test_get_functional_expertise(self):
         count = 5
-        industries = IndustryFactory.create_batch(count)
+        functional_expertise = FunctionalExpertiseFactory.create_batch(count)
         with self.login(email=self.basic_user().email):
             response = self.client.get(self.url)
             assert response.data['count'] == count
-            assert all([IndustryListView.serialize(industry)
+            assert all([FunctionalExpertiseListView.serialize(expertise)
                         in response.data['results']
-                        for industry in industries])
+                        for expertise in functional_expertise])
 
     def test_options(self):
         with self.login(email=self.basic_user().email):

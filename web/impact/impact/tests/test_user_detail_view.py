@@ -10,6 +10,7 @@ from django.urls import reverse
 from impact.tests.contexts import UserContext
 from impact.tests.factories import (
     ExpertCategoryFactory,
+    FunctionalExpertiseFactory,
     IndustryFactory,
     MentoringSpecialtiesFactory,
     ProgramFamilyFactory,
@@ -91,6 +92,7 @@ EXPERT_WRITE_ONLY_FIELDS = [
 
 EXPERT_READ_ONLY_FIELDS = [
     "additional_industries",
+    "functional_expertise",
     "mentoring_specialties",
     "primary_industry",
 ]
@@ -150,6 +152,19 @@ class TestUserDetailView(APITestCase):
                 in response.data["additional_industries"]]
             assert all([industry.id in additional_industry_ids
                         for industry in additional_industries])
+
+    def test_get_expert_with_functional_expertise(self):
+        functional_expertise = FunctionalExpertiseFactory.create_batch(2)
+        context = UserContext(user_type=BASE_EXPERT_TYPE,
+                              functional_expertise=functional_expertise)
+        user = context.user
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserDetailView.view_name, args=[user.id])
+            response = self.client.get(url)
+            functional_expertise_ids = [datum["id"] for datum in
+                                        response.data["functional_expertise"]]
+            assert all([expertise.id in functional_expertise_ids
+                        for expertise in functional_expertise])
 
     def test_get_with_no_profile(self):
         context = UserContext(user_type=BASE_ENTREPRENEUR_TYPE)

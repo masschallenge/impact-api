@@ -1,9 +1,15 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from impact.v1.helpers.industry_helper import (
-    INDUSTRY_FIELDS,
-    IndustryHelper,
+
+from impact.v1.helpers.functional_expertise_helper import (
+    FunctionalExpertiseHelper,
+)
+from impact.v1.helpers.industry_helper import IndustryHelper
+from impact.v1.helpers.mptt_model_helper import (
+    MPTT_FIELDS,
+    MPTT_TYPE,
+    MPTTModelHelper,
 )
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,

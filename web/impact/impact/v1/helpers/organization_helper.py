@@ -19,9 +19,9 @@ from impact.v1.helpers.model_helper import (
     merge_fields,
     serialize_list_field,
 )
-from impact.v1.helpers.industry_helper import (
-    INDUSTRY_TYPE,
+from impact.v1.helpers import (
     IndustryHelper,
+    MPTT_TYPE,
 )
 
 COULD_BE_STARTUP_CHECK = "could_be_startup"
@@ -40,9 +40,9 @@ STARTUP_INTEGER_FIELD = merge_fields(STARTUP_FIELD, INTEGER_FIELD)
 STARTUP_STRING_FIELD = merge_fields(STARTUP_FIELD, STRING_FIELD)
 STARTUP_URL_FIELD = merge_fields(STARTUP_FIELD, URL_FIELD)
 STARTUP_INDUSTRY_FIELD = merge_fields(STARTUP_FIELD,
-                                      json_schema(INDUSTRY_TYPE))
+                                      json_schema(MPTT_TYPE))
 STARTUP_INDUSTRY_ARRAY_FIELD = merge_fields(
-    STARTUP_FIELD, json_schema(json_array(INDUSTRY_TYPE)))
+    STARTUP_FIELD, json_schema(json_array(MPTT_TYPE)))
 ORGANIZATION_URL_SLUG_FIELD = merge_fields(
     STRING_FIELD, {"json-schema": {"pattern": "^[\w-]+$"}})
 
