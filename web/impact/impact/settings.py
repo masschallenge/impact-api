@@ -132,6 +132,10 @@ class Base(Configuration):
         },
     ]
 
+    NEW_RELIC_CONFIG_FILE = os.path.join(PROJECT_DIR, 'newrelic.ini')
+    NEW_RELIC_ENVIRONMENT = os.environ.get('NEW_RELIC_ENVIRONMENT',
+                                           'development')
+
     V0_SECURITY_KEY = bytes(
         os.environ.get('IMPACT_API_V0_SECURITY_KEY', 'XXX'),
         'utf-8')

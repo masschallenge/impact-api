@@ -44,6 +44,13 @@ from impact.v1.helpers.model_helper import (
     INVALID_URL_ERROR,
     format_choices,
 )
+from impact.v1.views.base_list_view import (
+    DEFAULT_MAX_LIMIT,
+    GREATER_THAN_MAX_LIMIT_ERROR,
+    KWARG_VALUE_NOT_INTEGER_ERROR,
+    KWARG_VALUE_IS_NON_POSITIVE_ERROR,
+    KWARG_VALUE_IS_NEGATIVE_ERROR,
+)
 from impact.v1.views.user_list_view import (
     EMAIL_EXISTS_ERROR,
     UNSUPPORTED_KEY_ERROR,
@@ -108,16 +115,257 @@ class TestUserListView(APITestCase):
             assert user2.email in emails
             assert user_count == response.data["count"]
 
-    def test_get_with_limit(self):
-        UserContext().user
-        UserContext().user
+    def test_get_returns_correct_count_attribute(self):
+        for _ in range(10):
+            UserContext()
         with self.login(email=self.basic_user().email):
-            url = self.url + "?limit=1"
             user_count = User.objects.count()
+            response = self.client.get(self.url)
+            assert user_count == response.data["count"]
+
+    def test_get_with_limit_returns_correct_number_of_results(self):
+        limit = 1
+        for _ in range(limit * 3):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            url = self.url + "?limit={}".format(limit)
             response = self.client.get(url)
             results = response.data["results"]
-            assert 1 == len(results)
-            assert user_count == response.data["count"]
+            assert limit == len(results)
+
+    def test_get_correct_pagination_attributes_for_offset_zero(self):
+        limit = 3
+        current_implicit_offset = 0
+        for _ in range(limit * 3):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            limit_arg = "limit={}".format(limit)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            results = response.data["results"]
+            assert limit == len(results)
+            assert response.data["previous"] is None
+            assert limit_arg in response.data["next"]
+            next_offset_arg = "offset={}".format(
+                current_implicit_offset + limit)
+            assert next_offset_arg in response.data["next"]
+
+    def test_get_pagination_attrs_for_offset_between_zero_and_limit(self):
+        limit = 4
+        current_offset = limit - 2
+        for _ in range(limit * 3):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            limit_arg = "limit={}".format(limit)
+            offset_arg = "offset={}".format(current_offset)
+            url = self.url + "?" + limit_arg + "&" + offset_arg
+            response = self.client.get(url)
+            results = response.data["results"]
+            assert limit == len(results)
+
+            assert response.data["previous"] is not None
+            assert "offset" not in response.data["previous"]
+
+            assert limit_arg in response.data["next"]
+            next_offset_arg = "offset={}".format(current_offset + limit)
+            assert next_offset_arg in response.data["next"]
+
+    def test_get_pagination_attrs_for_offset_in_the_middle(self):
+        limit = 4
+        current_offset = limit + 2
+        for _ in range(current_offset + limit + 2):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            limit_arg = "limit={}".format(limit)
+            offset_arg = "offset={}".format(current_offset)
+            url = self.url + "?" + limit_arg + "&" + offset_arg
+            response = self.client.get(url)
+            results = response.data["results"]
+            assert limit == len(results)
+
+            prev_offset_arg = "offset={}".format(current_offset - limit)
+            assert prev_offset_arg in response.data["previous"]
+
+            assert limit_arg in response.data["next"]
+            next_offset_arg = "offset={}".format(current_offset + limit)
+            assert next_offset_arg in response.data["next"]
+
+    def test_get_pagination_attrs_for_offset_between_count_and_limit(self):
+        limit = 4
+        for _ in range(limit * 5):
+            UserContext()
+        current_offset = User.objects.count() - limit + 2
+        with self.login(email=self.basic_user().email):
+            limit_arg = "limit={}".format(limit)
+            offset_arg = "offset={}".format(current_offset)
+            url = self.url + "?" + limit_arg + "&" + offset_arg
+            response = self.client.get(url)
+            results = response.data["results"]
+            assert limit > len(results)
+            assert len(results) == response.data["count"] - current_offset
+
+            prev_offset_arg = "offset={}".format(current_offset - limit)
+            assert prev_offset_arg in response.data["previous"]
+
+            assert response.data["next"] is None
+
+    def test_get_pagination_attrs_for_offset_equals_number_of_results(self):
+        limit = 4
+        for _ in range(limit * 5):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            current_offset = User.objects.count()
+            limit_arg = "limit={}".format(limit)
+            offset_arg = "offset={}".format(current_offset)
+            url = self.url + "?" + limit_arg + "&" + offset_arg
+
+            response = self.client.get(url)
+            results = response.data["results"]
+            assert len(results) == 0
+
+            prev_offset_arg = "offset={}".format(current_offset - limit)
+            assert prev_offset_arg in response.data["previous"]
+
+            assert response.data["next"] is None
+
+    def test_get_pagination_attrs_for_offset_greater_than_num_of_results(self):
+        limit = 4
+        for _ in range(limit * 5):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            count = User.objects.count()
+            current_offset = count + 1
+            limit_arg = "limit={}".format(limit)
+            offset_arg = "offset={}".format(current_offset)
+            url = self.url + "?" + limit_arg + "&" + offset_arg
+            response = self.client.get(url)
+            results = response.data["results"]
+            assert len(results) == 0
+
+            prev_offset_arg = "offset={}".format(count - limit)
+            assert prev_offset_arg in response.data["previous"]
+
+            assert response.data["next"] is None
+
+    def test_get_pagination_attrs_for_limit_greater_than_num_of_results(self):
+        for _ in range(5):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            count = User.objects.count()
+            assert count < DEFAULT_MAX_LIMIT
+            limit_arg = "limit={}".format(count + 1)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            results = response.data["results"]
+            assert len(results) == count
+            assert response.data["previous"] is None
+            assert response.data["next"] is None
+
+    def test_get_limit_is_greater_than_max_limit_return_error(self):
+        with self.login(email=self.basic_user().email):
+            limit = DEFAULT_MAX_LIMIT + 1
+            limit_arg = "limit={}".format(limit)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            assert GREATER_THAN_MAX_LIMIT_ERROR.format(
+                DEFAULT_MAX_LIMIT) in response.data
+
+    def test_get_limit_is_explicitly_null_return_error(self):
+        with self.login(email=self.basic_user().email):
+            limit = ''
+            limit_arg = "limit={}".format(limit)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            error_msg = KWARG_VALUE_NOT_INTEGER_ERROR.format("limit")
+            assert error_msg in response.data
+
+    def test_get_limit_is_non_integer_return_error(self):
+        with self.login(email=self.basic_user().email):
+            limit = '5.5'
+            limit_arg = "limit={}".format(limit)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            error_msg = KWARG_VALUE_NOT_INTEGER_ERROR.format("limit")
+            assert error_msg in response.data
+
+    def test_get_limit_is_zero_returns_error(self):
+        with self.login(email=self.basic_user().email):
+            limit = '0'
+            limit_arg = "limit={}".format(limit)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            error_msg = KWARG_VALUE_IS_NON_POSITIVE_ERROR.format("limit")
+            assert error_msg in response.data
+
+    def test_get_limit_is_negative_returns_error(self):
+        with self.login(email=self.basic_user().email):
+            limit = '-1'
+            limit_arg = "limit={}".format(limit)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            error_msg = KWARG_VALUE_IS_NON_POSITIVE_ERROR.format("limit")
+            assert error_msg in response.data
+
+    def test_get_offset_is_negative_returns_error(self):
+        with self.login(email=self.basic_user().email):
+            offset = '-1'
+            offset_arg = "offset={}".format(offset)
+            url = self.url + "?" + offset_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            error_msg = KWARG_VALUE_IS_NEGATIVE_ERROR.format("offset")
+            assert error_msg in response.data
+
+    def test_get_offset_is_empty_returns_error(self):
+        with self.login(email=self.basic_user().email):
+            offset = ''
+            offset_arg = "offset={}".format(offset)
+            url = self.url + "?" + offset_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            error_msg = KWARG_VALUE_NOT_INTEGER_ERROR.format("offset")
+            assert error_msg in response.data
+
+    def test_get_offset_is_non_integer_returns_error(self):
+        with self.login(email=self.basic_user().email):
+            offset = '5.5'
+            offset_arg = "offset={}".format(offset)
+            url = self.url + "?" + offset_arg
+            response = self.client.get(url)
+            assert response.status_code == 401
+            error_msg = KWARG_VALUE_NOT_INTEGER_ERROR.format("offset")
+            assert error_msg in response.data
+
+    def test_get_offset_is_explicit_zero_returns_successfully(self):
+        with self.login(email=self.basic_user().email):
+            offset = '0'
+            offset_arg = "offset={}".format(offset)
+            url = self.url + "?" + offset_arg
+            response = self.client.get(url)
+            assert response.status_code == 200
+            implicit_zero_response = self.client.get(self.url)
+            assert response.data == implicit_zero_response.data
+
+    def test_get_adjacent_offsets_has_unique_users(self):
+        limit = 3
+        for _ in range(limit * 3):
+            UserContext()
+        with self.login(email=self.basic_user().email):
+            limit_arg = "limit={}".format(limit)
+            url = self.url + "?" + limit_arg
+            response = self.client.get(url)
+            first_page_results = response.data["results"]
+            next_url = response.data["next"]
+            next_response = self.client.get(next_url)
+            second_page_results = next_response.data["results"]
+            first_page_ids = {result["id"] for result in first_page_results}
+            second_page_ids = {result["id"] for result in second_page_results}
+            assert not first_page_ids.intersection(second_page_ids)
 
     def test_options(self):
         with self.login(email=self.basic_user().email):
@@ -134,7 +382,6 @@ class TestUserListView(APITestCase):
 
     def test_options_against_get(self):
         with self.login(email=self.basic_user().email):
-
             options_response = self.client.options(self.url)
             get_response = self.client.get(self.url)
 

@@ -17,11 +17,25 @@ from impact.v1.helpers import (
 )
 from impact.v1.views import ImpactView
 from impact.utils import parse_date
-from impact.models.utils import model_has_field
+from impact.models.utils import (
+    is_int,
+    model_has_field,
+)
+
+GREATER_THAN_MAX_LIMIT_ERROR = "maximum allowed value for 'limit' is {}."
+KWARG_VALUE_NOT_INTEGER_ERROR = "value of '{}' should be an integer."
+KWARG_VALUE_IS_NON_POSITIVE_ERROR = ("value of '{}' should be greater than "
+                                     "zero.")
+KWARG_VALUE_IS_NEGATIVE_ERROR = ("value of '{}' should be greater than or "
+                                 "equal to zero.")
+
+DEFAULT_MAX_LIMIT = 200
 
 
 class BaseListView(ImpactView):
     __metaclass__ = ABCMeta
+    MAX_LIMIT = DEFAULT_MAX_LIMIT
+    DEFAULT_LIMIT = 10
 
     def metadata(self):
         result = {}
@@ -32,17 +46,55 @@ class BaseListView(ImpactView):
         return result
 
     def get(self, request):
-        limit = int(request.GET.get('limit', 10))
-        offset = int(request.GET.get('offset', 0))
+        limit = self._get_limit(request)
+        offset = self._get_offset(request)
+        if self.errors:
+            return Response(status=401, data=self.errors)
         base_url = _base_url(request)
         count, results = self.results(limit, offset)
         result = {
             "count": count,
-            "next": _url(base_url, limit, offset + limit),
-            "previous": _url(base_url, limit, offset - limit),
+            "next": _next_url(base_url, limit, offset, count),
+            "previous": _previous_url(base_url, limit, offset, count),
             "results": results,
         }
         return Response(result)
+
+    def _get_offset(self, request):
+        offset_input = request.GET.get("offset", str(0))
+        return self._validate_offset(offset_input)
+
+    def _get_limit(self, request):
+        limit_input = request.GET.get("limit", str(self.DEFAULT_LIMIT))
+        return self._validate_limit(limit_input)
+
+    def _validate_limit(self, val):
+        val = self._validate_integer(val, key="limit")
+        if val is None:
+            return None
+        val = int(val)
+        if val > self.MAX_LIMIT:
+            error_msg = GREATER_THAN_MAX_LIMIT_ERROR.format(self.MAX_LIMIT)
+            self.errors.append(error_msg)
+        elif val <= 0:
+            self.errors.append(
+                KWARG_VALUE_IS_NON_POSITIVE_ERROR.format("limit"))
+        return val
+
+    def _validate_offset(self, val):
+        val = self._validate_integer(val, key="offset")
+        if val is None:
+            return None
+        val = int(val)
+        if val < 0:
+            self.errors.append(KWARG_VALUE_IS_NEGATIVE_ERROR.format("offset"))
+        return val
+
+    def _validate_integer(self, val, key):
+        if not is_int(val):
+            self.errors.append(KWARG_VALUE_NOT_INTEGER_ERROR.format(key))
+            return None
+        return val
 
     def results(self, limit, offset):
         queryset = self.helper_class.all_objects()
@@ -60,9 +112,9 @@ class BaseListView(ImpactView):
 
     def _filter_by_date(self, qs):
         updated_at_after = self.request.query_params.get(
-            'updated_at.after', None)
+            "updated_at.after", None)
         updated_at_before = self.request.query_params.get(
-            'updated_at.before', None)
+            "updated_at.before", None)
         if updated_at_after or updated_at_before:
             qs = self._apply_filter_by_date(qs,
                                             updated_at_after,
@@ -79,18 +131,30 @@ class BaseListView(ImpactView):
         return qs
 
     def _filter_by_name(self, qs):
-        name_filter = self.request.query_params.get('name', None)
+        name_filter = self.request.query_params.get("name", None)
         if name_filter:
             return qs.filter(name__icontains=name_filter)
         return qs
 
 
-def _url(base_url, limit, offset):
-    if offset >= 0:
+def _previous_url(base_url, limit, offset, count):
+    if offset == 0:
+        return None
+    elif 0 < offset <= limit:
         url = _update_query_param(base_url, "limit", limit)
-        url = _update_query_param(url, "offset", offset)
         return url
-    return None
+    else:
+        url = _update_query_param(base_url, "limit", limit)
+        url = _update_query_param(url, "offset", min(offset, count) - limit)
+        return url
+
+
+def _next_url(base_url, limit, offset, count):
+    if offset + limit >= count:
+        return None
+    url = _update_query_param(base_url, "limit", limit)
+    url = _update_query_param(url, "offset", offset + limit)
+    return url
 
 
 def _base_url(request):
