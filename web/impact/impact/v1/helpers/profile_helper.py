@@ -209,21 +209,10 @@ EXPERT_INDUSTRY_FIELD = {
     "GET": {"description": EXPERT_DESCRIPTION,
             "included": COULD_BE_EXPERT_CHECK}}
 
-EXPERT_INDUSTRY_ARRAY_FIELD = {
+MPTT_ARRAY_FIELD = {
     "json-schema": json_array(MPTT_TYPE),
-    "GET": {
-        "included": COULD_BE_EXPERT_CHECK,
-        "description": EXPERT_DESCRIPTION,
-    }
-}
-
-FUNCTIONAL_EXPERTISE_ARRAY_FIELD = {
-    "json-schema": json_array(MPTT_TYPE),
-    "GET": {
-        "included": COULD_BE_EXPERT_CHECK,
-        "description": EXPERT_DESCRIPTION,
-    }
-}
+    "GET": {"included": COULD_BE_EXPERT_CHECK,
+            "description": EXPERT_DESCRIPTION }}
 
 URL_SCHEMA = "^[hH][tT][tT][pP][sS]?://"
 NETLOC_ELEMENT = "([^/:@]+(:[^/@]+)?@)?([\w-]+)"
