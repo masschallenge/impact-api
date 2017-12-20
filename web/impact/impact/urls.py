@@ -8,6 +8,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from drf_auto_endpoint.router import router as schema_router
 from rest_framework import routers
+from rest_framework_jwt.views import obtain_jwt_token
 
 from impact.models.utils import model_name_to_snake
 from impact.schema import schema_view
@@ -54,9 +55,9 @@ for model in apps.get_models('impact'):
 
 for model in apps.get_models('accelerator'):
     if (
-        model._meta.app_label == 'accelerator'
-        and hasattr(model, "Meta")
-        and not model._meta.auto_created
+            model._meta.app_label == 'accelerator'
+            and hasattr(model, "Meta")
+            and not model._meta.auto_created
     ):
         accelerator_router.register(
             model.__name__, GeneralViewSet,
@@ -146,9 +147,14 @@ v1_urlpatterns = [
         name=UserOrganizationsView.view_name),
 ]
 
+jwt_urlpatterns = [
+    url(r'^api-token-auth/', obtain_jwt_token),
+]
+
 urls = [
     url(r"^api/v0/", include(v0_urlpatterns)),
     url(r"^api/v1/", include(v1_urlpatterns)),
+    url(r"^api/jwt/", include(jwt_urlpatterns)),
     url(
         r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/'
         r'(?P<related_model>[a-z_]+)/$',
