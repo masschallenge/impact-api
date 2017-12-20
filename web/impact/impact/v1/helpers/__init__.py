@@ -1,6 +1,11 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+
+from impact.v1.helpers.functional_expertise_helper import (
+    FUNCTIONAL_EXPERTISE_FIELDS,
+    FunctionalExpertiseHelper,
+)
 from impact.v1.helpers.industry_helper import (
     INDUSTRY_FIELDS,
     IndustryHelper,
