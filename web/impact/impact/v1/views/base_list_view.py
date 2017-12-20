@@ -24,7 +24,11 @@ from impact.models.utils import (
 
 GREATER_THAN_MAX_LIMIT_ERROR = "maximum allowed value for 'limit' is {}."
 KWARG_VALUE_NOT_INTEGER_ERROR = "value of '{}' should be an integer."
-KWARG_VALUE_IS_NON_POSITIVE_ERROR = "value of '{}' should be positive."
+KWARG_VALUE_IS_NON_POSITIVE_ERROR = ("value of '{}' should be greater than "
+                                     "zero.")
+KWARG_VALUE_IS_NEGATIVE_ERROR = ("value of '{}' should be greater than or "
+                                 "equal to zero.")
+
 DEFAULT_MAX_LIMIT = 200
 
 
@@ -42,10 +46,8 @@ class BaseListView(ImpactView):
         return result
 
     def get(self, request):
-        limit = self._validate_kwarg(
-            request.GET.get("limit", str(self.DEFAULT_LIMIT)), key="limit")
-        offset = self._validate_kwarg(
-            request.GET.get("offset", str(0)), key="offset")
+        limit = self._get_limit(request)
+        offset = self._get_offset(request)
         if self.errors:
             return Response(status=401, data=self.errors)
         base_url = _base_url(request)
@@ -58,28 +60,35 @@ class BaseListView(ImpactView):
         }
         return Response(result)
 
-    def _validate_kwarg(self, val, key):
+    def _get_offset(self, request):
+        offset_input = request.GET.get("offset", str(0))
+        return self._validate_offset(offset_input)
+
+    def _get_limit(self, request):
+        limit_input = request.GET.get("limit", str(self.DEFAULT_LIMIT))
+        return self._validate_limit(limit_input)
+
+    def _validate_limit(self, val):
         if not is_int(val):
-            self.errors.append(KWARG_VALUE_NOT_INTEGER_ERROR.format(key))
+            self.errors.append(KWARG_VALUE_NOT_INTEGER_ERROR.format("limit"))
             return None
-        if key == "limit":
-            self._validate_limit(key, val)
-        if key == "offset":
-            self._validate_offset(key, val)
-        return int(val)
-
-    def _validate_offset(self, key, val):
-        if int(val) < 0:
-            self.errors.append(
-                KWARG_VALUE_IS_NON_POSITIVE_ERROR.format(key))
-
-    def _validate_limit(self, key, val):
-        if int(val) > self.MAX_LIMIT:
+        val = int(val)
+        if val > self.MAX_LIMIT:
             error_msg = GREATER_THAN_MAX_LIMIT_ERROR.format(self.MAX_LIMIT)
             self.errors.append(error_msg)
-        elif int(val) <= 0:
+        elif val <= 0:
             self.errors.append(
-                KWARG_VALUE_IS_NON_POSITIVE_ERROR.format(key))
+                KWARG_VALUE_IS_NON_POSITIVE_ERROR.format("limit"))
+        return val
+
+    def _validate_offset(self, val):
+        if not is_int(val):
+            self.errors.append(KWARG_VALUE_NOT_INTEGER_ERROR.format("offset"))
+            return None
+        val = int(val)
+        if val < 0:
+            self.errors.append(KWARG_VALUE_IS_NEGATIVE_ERROR.format("offset"))
+        return val
 
     def results(self, limit, offset):
         queryset = self.helper_class.all_objects()

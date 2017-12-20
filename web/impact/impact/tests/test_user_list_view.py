@@ -49,6 +49,7 @@ from impact.v1.views.base_list_view import (
     GREATER_THAN_MAX_LIMIT_ERROR,
     KWARG_VALUE_NOT_INTEGER_ERROR,
     KWARG_VALUE_IS_NON_POSITIVE_ERROR,
+    KWARG_VALUE_IS_NEGATIVE_ERROR,
 )
 from impact.v1.views.user_list_view import (
     EMAIL_EXISTS_ERROR,
@@ -317,7 +318,7 @@ class TestUserListView(APITestCase):
             url = self.url + "?" + offset_arg
             response = self.client.get(url)
             assert response.status_code == 401
-            error_msg = KWARG_VALUE_IS_NON_POSITIVE_ERROR.format("offset")
+            error_msg = KWARG_VALUE_IS_NEGATIVE_ERROR.format("offset")
             assert error_msg in response.data
 
     def test_get_offset_is_empty_returns_error(self):
