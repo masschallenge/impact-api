@@ -38,7 +38,7 @@ for model in apps.get_models('accelerator'):
             model.__name__, GeneralViewSet,
             base_name="accelerator.{model}".format(model=model.__name__))
 
-jwt_urlpatterns = [
+sso_urlpatterns = [
     url(r'^api-token-auth/', obtain_jwt_token),
     url(r'^api-token-refresh/', refresh_jwt_token),
     url(r'^api-token-verify/', verify_jwt_token),
@@ -49,11 +49,9 @@ account_urlpatterns = [
 ]
 
 urls = [
-    url(r"^api/v0/", include(v0_urlpatterns)),
-    url(r"^api/v1/", include(v1_urlpatterns)),
-    url(r"^api/jwt/", include(jwt_urlpatterns)),
-    url(
-        r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/'
+    url(r'^api/v0/', include(v0_urlpatterns)),
+    url(r'^api/v1/', include(v1_urlpatterns)),
+    url(r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/'
         r'(?P<related_model>[a-z_]+)/$',
         GeneralViewSet.as_view({'get': 'list', 'post': 'create'}),
         name='related-object-list'),
@@ -81,13 +79,13 @@ urls = [
     url(r'^api/simpleuser/', include(simpleuser_router.urls)),
     url(r'^api/accelerator/', include(accelerator_router.urls)),
     url(r'^api/impact/', include(schema_router.urls), name='api-root'),
-    url(r'^$', IndexView.as_view()),
-    url(r'^accounts/', include(account_urlpatterns)),
-    url(r'^schema/$', schema_view, name='schema'),
+    url(r'^sso/', include(sso_urlpatterns, namespace="sso")),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^oauth/', include(
-        'oauth2_provider.urls',
-        namespace='oauth2_provider'))
+    url(r'^accounts/', include(account_urlpatterns)),
+    url(r'^oauth/',
+        include('oauth2_provider.urls', namespace='oauth2_provider')),
+    url(r'^schema/$', schema_view, name='schema'),
+    url(r'^$', IndexView.as_view()),
 ]
 
 # use staticfiles with gunicorn (not recommneded!)
