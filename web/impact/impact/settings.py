@@ -209,7 +209,8 @@ class Base(Configuration):
         # after timedelta has passed since first obtaining the token,
         # it is no longer possible to refresh the token, even if the token
         # did not expire
-        'JWT_AUTH_COOKIE': "jwt"
+        'JWT_AUTH_COOKIE': "jwt",
+        'JWT_SECRET_KEY': bytes(os.environ.get('JWT_SECRET_KEY', ''), 'utf-8'),
     }
 
 
