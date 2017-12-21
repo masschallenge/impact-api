@@ -50,7 +50,7 @@ class V1ConfidentialAPIPermissions(BasePermission):
 
 
 def method_to_perm(method):
-    return ["%(app)s.{}_%(model_name)s".format(METHOD_TO_ACTION[method])]
+    return "%(app)s.{}_%(model_name)s".format(METHOD_TO_ACTION[method])
 
 
 class DynamicModelPermissions(BasePermission):
@@ -62,12 +62,12 @@ class DynamicModelPermissions(BasePermission):
         model_name = model_name_case(model, related_model)
         app_label = 'mc'
         kwargs = {'app': app_label, 'model_name': model_name}
-        perms = [perm % kwargs for perm in method_to_perm(request.method)]
+        perm = method_to_perm(request.method) % kwargs
         return (
             request.user and (
                 request.user.is_authenticated or (
                     not self.authenticated_users_only)) and (
-                request.user.has_perms(perms))
+                request.user.has_perms([perm]))
         )
 
     def get_field_level_perms(self, app_label, model_name):
