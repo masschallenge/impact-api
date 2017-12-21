@@ -1,6 +1,8 @@
 from django.conf.urls import url
 
 from impact.v1.views import (
+    FunctionalExpertiseDetailView,
+    FunctionalExpertiseListView,
     IndustryDetailView,
     IndustryListView,
     OrganizationDetailView,
@@ -21,13 +23,18 @@ from impact.v1.views import (
 )
 
 v1_urlpatterns = [
+    url(r"^functional_expertise/(?P<pk>[0-9]+)/$",
+        FunctionalExpertiseDetailView.as_view(),
+        name=FunctionalExpertiseDetailView.view_name),
+    url(r"^functional_expertise/$",
+        FunctionalExpertiseListView.as_view(),
+        name=FunctionalExpertiseListView.view_name),
     url(r"^industry/(?P<pk>[0-9]+)/$",
         IndustryDetailView.as_view(),
         name=IndustryDetailView.view_name),
     url(r"^industry/$",
         IndustryListView.as_view(),
         name=IndustryListView.view_name),
-
     url(r"^organization/(?P<pk>[0-9]+)/$",
         OrganizationDetailView.as_view(),
         name=OrganizationDetailView.view_name),
@@ -40,28 +47,24 @@ v1_urlpatterns = [
     url(r"^organization/(?P<pk>[0-9]+)/users/$",
         OrganizationUsersView.as_view(),
         name=OrganizationUsersView.view_name),
-
     url(r"^program/(?P<pk>[0-9]+)/$",
         ProgramDetailView.as_view(),
         name=ProgramDetailView.view_name),
     url(r"^program/$",
         ProgramListView.as_view(),
         name=ProgramListView.view_name),
-
     url(r"^program_cycle/(?P<pk>[0-9]+)/$",
         ProgramCycleDetailView.as_view(),
         name=ProgramCycleDetailView.view_name),
     url(r"^program_cycle/$",
         ProgramCycleListView.as_view(),
         name=ProgramCycleListView.view_name),
-
     url(r"^program_family/(?P<pk>[0-9]+)/$",
         ProgramFamilyDetailView.as_view(),
         name=ProgramFamilyDetailView.view_name),
     url(r"^program_family/$",
         ProgramFamilyListView.as_view(),
         name=ProgramFamilyListView.view_name),
-
     url(r"^user/(?P<pk>[0-9]+)/confidential/$",
         UserConfidentialView.as_view(),
         name=UserConfidentialView.view_name),
