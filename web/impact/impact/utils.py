@@ -67,3 +67,9 @@ def previous_instance(instance, query):
 
 def _find_instance(instance, query, order):
     return type(instance).objects.filter(query).order_by(order).first()
+
+
+def model_is_not_auto_created(_model, app_label='accelerator'):
+    return (_model._meta.app_label == app_label and
+            hasattr(_model, 'Meta') and
+            not _model._meta.auto_created)
