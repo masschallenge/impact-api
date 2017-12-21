@@ -24,13 +24,13 @@ from impact.v1.helpers.model_helper import (
 from impact.v1.helpers.profile_helper import (
     EXPERT_BOOLEAN_FIELD,
     EXPERT_CATEGORY_FIELD,
-    EXPERT_INDUSTRY_ARRAY_FIELD,
     EXPERT_INDUSTRY_FIELD,
     EXPERT_PHONE_FIELD,
     EXPERT_STRING_FIELD,
     GENDER_FIELD,
     HOME_PROGRAM_FAMILY_ID_FIELD,
     MENTORING_SPECIALTIES_FIELD,
+    MPTT_ARRAY_FIELD,
     NON_MEMBER_STRING_FIELD,
     PERSONAL_WEBSITE_URL_FIELD,
     PRIMARY_INDUSTRY_ID_FIELD,
@@ -65,7 +65,7 @@ USER_FIELDS = {
     "primary_industry": EXPERT_INDUSTRY_FIELD,
     "primary_industry_id": PRIMARY_INDUSTRY_ID_FIELD,
     "home_program_family_id": HOME_PROGRAM_FAMILY_ID_FIELD,
-    "additional_industries": EXPERT_INDUSTRY_ARRAY_FIELD,
+    "additional_industries": MPTT_ARRAY_FIELD,
     "gender": GENDER_FIELD,
     "expert_category": EXPERT_CATEGORY_FIELD,
     "mentoring_specialties": MENTORING_SPECIALTIES_FIELD,
@@ -74,6 +74,7 @@ USER_FIELDS = {
     "facebook_url": URL_FIELD,
     "linked_in_url": URL_FIELD,
     "personal_website_url": PERSONAL_WEBSITE_URL_FIELD,
+    "functional_expertise": MPTT_ARRAY_FIELD,
 }
 
 

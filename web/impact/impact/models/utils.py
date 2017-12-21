@@ -4,7 +4,6 @@
 from django.core.exceptions import FieldDoesNotExist
 from django.utils.text import camel_case_to_spaces
 
-
 LABEL_LENGTH = 255
 
 
@@ -28,3 +27,11 @@ def model_name_to_snake(value):
 
 def snake_to_model_name(value):
     return "".join(map(str.title, value.split("_")))
+
+
+def is_int(s):
+    try:
+        int(str(s))
+    except ValueError:
+        return False
+    return True
