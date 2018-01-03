@@ -7,6 +7,11 @@ services:
 
 env:
     DOCKER_COMPOSE_VERSION: 1.10.1
+    global:
+        # get all the branches referencing this commit
+        - REAL_BRANCH=$(git ls-remote origin | sed -n "\|$TRAVIS_COMMIT\s\+refs/heads/|{s///p}")
+        # or check if we are on a particular branch:
+        - IS_RELEASE=$(git ls-remote origin | grep "$TRAVIS_COMMIT\s\+refs/heads/release$"
 
 before_install:
 - sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu trusty-backports universe'
@@ -46,6 +51,5 @@ after_success:
 - git remote rm origin
 - git remote add origin https://github.com/masschallenge/impact-api.git 
 - git fetch
-- git describe --exact-match $TRAVIS_TAG
-- export BRANCH=$(if [ -z $TRAVIS_TAG]; then echo $(git describe --exact-match $TRAVIS_TAG); else echo $TRAVIS_BRANCH; fi)
-- make release AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ENVIRONMENT=$DEPLOY_ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY RELEASE_TAG=$BRANCH
+- echo $REAL_BRANCH
+- make release AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ENVIRONMENT=$DEPLOY_ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY RELEASE_TAG=$REAL_BRANCH
