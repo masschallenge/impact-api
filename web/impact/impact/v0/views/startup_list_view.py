@@ -25,7 +25,6 @@ from impact.v0.views.utils import (
     status_description,
 )
 
-
 STARTUP_TO_LIST_TAB_ID = [
     "startupstatus",
     "program_startup_status",
@@ -71,7 +70,7 @@ class StartupListView(LoggingMixin, APIView):
             return {
                 "status": first_pss.startup_list_tab_title,
                 "status_description": first_pss.startup_list_tab_description,
-                }
+            }
         return {}
 
     def _calc_result(self):
@@ -90,7 +89,7 @@ class StartupListView(LoggingMixin, APIView):
         return self._generate_group_data(startups, _top_level_industry)
 
     def _generate_group_data(self, startups, group_function):
-        statuses = self._startups_to_statuses(startups)
+        statuses = _startups_to_statuses(startups)
         self.groups = OrderedDict()  # Make sure "All" stays first
         for startup in startups:
             description = _startup_description(startup,
@@ -122,13 +121,13 @@ class StartupListView(LoggingMixin, APIView):
 
     def _startup_data(self):
         startups = self._find_startups()
-        statuses = self._startups_to_statuses(startups)
+        statuses = _startups_to_statuses(startups)
         return {
             "startups": [_startup_description(startup,
                                               statuses.get(startup.id, []),
                                               self.base_url)
                          for startup in startups]
-            }
+        }
 
     def _find_startups(self):
         startups = Startup.objects.filter(
@@ -158,20 +157,6 @@ class StartupListView(LoggingMixin, APIView):
             return startups.order_by("-organization__name")
         return startups.order_by("organization__name")
 
-    def _startups_to_statuses(self, startups):
-        statuses = StartupStatus.objects.filter(
-            program_startup_status__startup_list_include=True,
-            program_startup_status__badge_display__in=BADGE_DISPLAYS,
-            startup__in=startups).values_list(
-            "startup_id",
-            "program_startup_status__startup_status")
-        result = {}
-        for startup_id, startup_status in statuses:
-            item = result.get(startup_id, [])
-            item.append(startup_status)
-            result[startup_id] = item
-        return result
-
 
 def _startup_description(startup, statuses, base_url):
     if startup.is_visible:
@@ -183,7 +168,7 @@ def _startup_description(startup, statuses, base_url):
             "image_token": encrypt_image_token(startup.high_resolution_logo),
             "logo_url": logo_url(startup),
             "statuses": [status_description(status) for status in statuses],
-            }
+        }
     else:
         return {
             "is_visible": False,
@@ -192,10 +177,25 @@ def _startup_description(startup, statuses, base_url):
             "image_token": "",
             "logo_url": "",
             "statuses": [],
-            }
+        }
 
 
 def _top_level_industry(startup):
     if startup.primary_industry.parent:
         return startup.primary_industry.parent.name
     return startup.primary_industry.name
+
+
+def _startups_to_statuses(startups):
+    statuses = StartupStatus.objects.filter(
+        program_startup_status__startup_list_include=True,
+        program_startup_status__badge_display__in=BADGE_DISPLAYS,
+        startup__in=startups).values_list(
+        "startup_id",
+        "program_startup_status__startup_status")
+    result = {}
+    for startup_id, startup_status in statuses:
+        item = result.get(startup_id, [])
+        item.append(startup_status)
+        result[startup_id] = item
+    return result
