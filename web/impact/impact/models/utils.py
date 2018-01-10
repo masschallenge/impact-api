@@ -8,7 +8,7 @@ LABEL_LENGTH = 255
 
 
 def is_managed(db_table):
-    return False
+    return True
 
 
 def model_has_field(model, field_name):
