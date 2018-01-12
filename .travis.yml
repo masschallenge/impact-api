@@ -10,6 +10,7 @@ env:
         - DOCKER_COMPOSE_VERSION=1.10.1
         # get all the branches referencing this commit
         - REAL_BRANCH=$(git ls-remote origin | sed -n "\|$TRAVIS_COMMIT\s\+refs/heads/|{s///p}")
+        - TEST_TAG=$(git ls-remote  --tags | awk '{print $2, $1}'  | awk -F"/" '{print $3 }' | sort -n -t. -k1,1 -k2,2 -k3,3 | grep -i $TRAVIS_COMMIT | cut -d\  -f 1)
 
 before_install:
 - sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu trusty-backports universe'
@@ -45,5 +46,6 @@ after_success:
 - sudo chmod +x /usr/local/bin/ecs-cli;
 - pip install awscli;
 - export PATH=$PATH:$HOME/.local/bin;
+- echo $TEST_TAG
 - eval $(aws ecr get-login --region us-east-1 --no-include-email);
 - make release AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ENVIRONMENT=$DEPLOY_ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY IMAGE_TAG=$REAL_BRANCH
