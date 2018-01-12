@@ -52,6 +52,8 @@ class Base(Configuration):
 
     DATABASES = values.DatabaseURLValue()
 
+    DATABASE_ROUTERS = ['impact.api_router.APIRouter']
+    
     EMAIL = values.EmailURLValue()
 
     SECRET_KEY = values.Value()
