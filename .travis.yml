@@ -9,7 +9,7 @@ env:
     global:
         - DOCKER_COMPOSE_VERSION=1.10.1
         # get all the branches referencing this commit
-        - IS_RELEASE=$(git ls-remote origin | grep "$TRAVIS_COMMIT\s\+refs/heads/release$"
+        - IS_RELEASE=$(git ls-remote origin | grep "$TRAVIS_COMMIT\s\+refs/heads/release$")
         - RELEASE_TAG=$(git ls-remote  --tags | awk '{print $2, $1}'  | awk -F"/" '{print $3 }' | sort -n -t. -k1,1 -k2,2 -k3,3 | grep -i $TRAVIS_COMMIT | cut -d\  -f 1)
 
 before_install:
