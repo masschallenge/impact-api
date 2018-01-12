@@ -43,11 +43,9 @@ sso_urlpatterns = [
     url(r'^refresh-token/', refresh_jwt_token),
     url(r'^verify-token/', verify_jwt_token),
 ]
-
 account_urlpatterns = [
     url(r'^', include('registration.backends.simple.urls')),
 ]
-
 urls = [
     url(r'^api/v0/', include(v0_urlpatterns)),
     url(r'^api/v1/', include(v1_urlpatterns)),
