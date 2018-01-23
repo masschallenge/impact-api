@@ -53,7 +53,7 @@ class Base(Configuration):
     DATABASES = values.DatabaseURLValue()
 
     DATABASE_ROUTERS = ['impact.routers.APIRouter']
-    
+
     EMAIL = values.EmailURLValue()
 
     SECRET_KEY = values.Value()
@@ -85,6 +85,7 @@ class Base(Configuration):
         'rest_framework_tracking',
     ]
     ACCELERATOR_MODELS_ARE_MANAGED = True
+    IMPACT_MODELS_ARE_MANAGED = True
 
     AUTH_USER_MODEL = 'simpleuser.User'
 
