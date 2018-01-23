@@ -22,6 +22,7 @@ PROGRAM_GET_FIELDS = [
     "start_date",
     "end_date",
     "location",
+    "program_status",
     "currency_code",
     "regular_application_fee",
     "url_slug",
