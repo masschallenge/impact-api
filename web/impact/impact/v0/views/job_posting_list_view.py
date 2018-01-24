@@ -4,7 +4,6 @@
 from django.db.models import Q
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_tracking.mixins import LoggingMixin
 
 from impact.models import (
     JobPosting,
@@ -37,7 +36,7 @@ JOBS_IN_PROGRAMS = [
     "in"]
 
 
-class JobPostingListView(LoggingMixin, APIView):
+class JobPostingListView(APIView):
     permission_classes = (V0APIPermissions,)
 
     def __init__(self, *args, **kwargs):

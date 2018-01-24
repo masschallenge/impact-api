@@ -9,7 +9,6 @@ from embed_video.backends import (
 )
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_tracking.mixins import LoggingMixin
 
 from impact.permissions import (
     V0APIPermissions,
@@ -52,7 +51,7 @@ MAX_VIDEO_WIDTH = 960
 MAX_VIDEO_HEIGHT = 720
 
 
-class StartupDetailView(LoggingMixin, APIView):
+class StartupDetailView(APIView):
     permission_classes = (
         V0APIPermissions,
     )
