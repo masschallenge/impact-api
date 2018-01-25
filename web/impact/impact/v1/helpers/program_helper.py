@@ -18,6 +18,7 @@ PROGRAM_FIELDS = {
     "start_date": STRING_FIELD,
     "end_date": STRING_FIELD,
     "location": STRING_FIELD,
+    "program_status": STRING_FIELD,
     "currency_code": STRING_FIELD,
     "regular_application_fee": FLOAT_FIELD,
     "url_slug": STRING_FIELD,

@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 import os
-
+import datetime
 from configurations import Configuration, values
 from django.urls import reverse_lazy
 from unipath import Path
@@ -188,6 +188,7 @@ class Base(Configuration):
             'rest_framework.permissions.IsAuthenticated',
         ),
         'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
             'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
             'rest_framework.authentication.TokenAuthentication',
             'rest_framework.authentication.SessionAuthentication',
@@ -199,6 +200,18 @@ class Base(Configuration):
         'simpleuser.email_model_backend.EmailModelBackend',
         'django.contrib.auth.backends.ModelBackend',
     )
+    JWT_AUTH = {
+        'JWT_ALLOW_REFRESH': True,
+        'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
+        # after timedelta has passed, token is no longer valid, and cannot
+        # be refreshed any longer
+        'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+        # after timedelta has passed since first obtaining the token,
+        # it is no longer possible to refresh the token, even if the token
+        # did not expire
+        'JWT_AUTH_COOKIE': "jwt",
+        'JWT_SECRET_KEY': bytes(os.environ.get('JWT_SECRET_KEY', ''), 'utf-8'),
+    }
 
 
 class Dev(Base):
@@ -215,8 +228,8 @@ class Dev(Base):
     ]
 
     MIDDLEWARE_CLASSES = [
-        'debug_toolbar.middleware.DebugToolbarMiddleware',
-    ] + Base.MIDDLEWARE_CLASSES
+                             'debug_toolbar.middleware.DebugToolbarMiddleware',
+                         ] + Base.MIDDLEWARE_CLASSES
 
     INSTALLED_APPS = Base.INSTALLED_APPS + [
         'debug_toolbar',
