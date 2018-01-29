@@ -1,95 +1,152 @@
-
-ifeq ($(IMAGE_TAG),)
-IMAGE_TAG := $(shell git rev-parse --abbrev-ref HEAD)
-endif
-DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
-
 targets = \
-  bash \
-  build \
-  clean \
+  help \
+  \
+  test \
+  coverage \
+  coverage-html \
   code-check \
+  \
+  update-schema \
+  migration \
+  migrate \
+  models \
+  \
+  status \
+  current \
+  \
+  run-server \
+  stop-server \
+  shutdown-vms \
+  delete-vms \
+  run-all-servers \
+  stop-all-servers \
+  shutdown-all-vms \
+  delete-all-vms \
+  \
+  bash-shell \
+  db-shell \
+  django-shell \
+  \
+  load-db \
+  dump-db \
+  upload-db \
+  clean-db-cache \
+  \
+  release-list \
+  release \
+  deploy \
+  \
+  update-packages \
+  \
+  build \
+
+
+deprecated_targets = \
+  bash \
   comp-message \
   coverage \
   coverage-run \
   coverage-report \
   coverage-html \
   coverage-html-open \
-  dump-db \
-  load-db \
   load-remote-db \
-  db-shell \
-  deploy \
   dev \
   fetch-remote-db \
   grant-permissions \
-  help \
   lint \
   messages \
   nuke \
-  release \
   restart \
   setup \
   shell \
   stop \
   superuser \
-  test \
 
 
-deprecated_targets = \
-  demo \
+lower_target_help = \
+  "build - Build (or rebuild) docker environment. Refreshes dependencies." \
 
 
 target_help = \
-  "bash - Shell access to webserver (web container)." \
-  "build - Build (or rebuild) docker environment. Refreshes dependencies." \
-  "clean - Shutdown all running containers and removes data files." \
-  "code-check - Runs Flake8 and pep8 on the files changed between the current branch and and a given BRANCH (defaults to development)" \
-  "comp-message - Compiles .po files and makes them available to Django." \
-  "coverage - Run coverage and generate text report." \
-  "coverage-html - Run coverage and generate HTML report." \
-  "dump-db - Create a gzipped database dump as dump.sql.gz in local directory." \
-  "load-db - Load gzipped database file. GZ_FILE must be defined." \
-  "db-shell - Access to running MySQL." \
-  "dev - Start all containers needed to run a webserver." \
-  "fetch-remote-db - Updates a DB image from remote container." \
-  "grant-permissions - Grants PERMISSION_CLASSES to PERMISSION_USER." \
-  "help - Prints this help message." \
-  "lint - Runs any configured linters (pylint at the moment)." \
-  "load-remote-db - fetches a remote db and loads it in one target." \
-  "messages - Creates .po files for languages targeted for translation." \
-  "nuke - The nuclear option. Deletes ALL images and containers." \
-  "release - pushes to a given DOCKER_REGISTRY with the provided AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY" \
-  "restart - Restart webserver processes. Necessary after code changes." \
-  "shell - Access to Django shell." \
-  "stop - Stops all docker containers." \
-  "superuser - Creates a superuser account in the Django process." \
-  "test - Run tests. To run a single test:" \
-  "\tmake test TESTS='impact.tests.test_api_routes.TestApiRoute.test_api_object_get impact.tests.test_api_routes.TestApiRoute.test_api_object_delete'"
+  'help - Prints this help message.' \
+  ' ' \
+  'test - Run tests with no coverage. Run just those specified in $$(tests)' \
+  '\tif provided.  E.g.:' \
+  '\tmake test tests="impact.tests.test_file1 impact.tests.test_file2"' \
+  'coverage - Run tests with coverage summary in terminal.' \
+  'coverage-html - Run tests with coverage and open repot in browser.' \
+  'code-check - Runs Flake8 and pep8 on the files changed between the' \
+  '\tcurrent branch and $$(branch) (defaults to development)' \
+  ' ' \
+  'update-schema - Brings database schema up to date.  Specifically,' \
+  '\tupdates any model definitions managed in other libraries,' \
+  '\tcreates any needed migrations (uses $$(migration_name) if provided),' \
+  '\truns any pending migrations.' \
+  'migration - Create empty migration (uses $$(migration_name) if provided).' \
+  'migrate - Runs any pending migrations.' \
+  'models - Updates model definitions managed in other libraries.' \
+  ' ' \
+  'current - Switch all repos to development branch (or $$(branch)' \
+  '\tif provided and available) and pulls down any changes to the branch.' \
+  '\tReports any errors from the different repos.' \
+  'status - Reports the status of all related source code repositories.' \
+  ' ' \
+  'run-server - Starts the local server.' \
+  'stop-server - Stops the local server.' \
+  'shutdown-vms - Shutdown local server VMs.' \
+  'delete-vms - Deletes local server VMs an VM-related resources.' \
+  'run-all-servers - Starts a set of related servers.' \
+  'stop-all-server - Stops a set of related servers.' \
+  'shutdown-all-vms - Shutdown set of related server VMs' \
+  'delete-all-vms - Delets set of related server VMs' \
+  ' ' \
+  'bash-shell - Access to bash shell.' \
+  'db-shell - Access to running database server.' \
+  'django-shell - Access to Django shell.' \
+  ' ' \
+  'load-db - Load gzipped database file.' \
+  '\tDefaults to db_cache/initial_schema.sql.gz.' \
+  '\t$$(gz_file) can provide an explicit path.' \
+  '\tOtherwise db_cache/$$(db_name).sql.gz is used.' \
+  '\tIf no such file exists, then try download from S3.' \
+  'clean-db-cache - Delete db_cache/initial_schema.sql.gz if it exists.' \
+  'dump-db - Create a gzipped db dump.' \
+  '\tDefaults to db_cache/initial_schema.sql.gz.' \
+  '\t$$(gz_file) can provide an explicit path.' \
+  '\tOtherwise db_cache/$$(db_name).sql.gz is used.' \
+  'upload-db - Upload db dump to S3.' \
+  '\tDefaults to uploading db_cache/initial_schema.sql.gz.' \
+  '\t$$(db_name) defaults to initial_schema and sets the S3 key.' \
+  '\t$$(gz_file) can provide an epxlicit path without changing the S3 key.' \
+  ' ' \
+  'release-list - List all releases that are ready to be deployed.' \
+  'release - Create named release of releated servers.' \
+  '\tRelease name is applied as a tag to all the related git repos.' \
+  '\tRelease name defaults release-<version>.<number> where <version> is' \
+  '\tthe first line of impact-api/VERSION and <number> is the next unused' \
+  '\tnon-negative integer (0,1,2,...).' \
+  '\t$$(release_name) overrides the entire release name.' \
+  'deploy - Deploy $$(release_name) to a $$(target).' \
+  '\tValid targets include "staging" (the default), "production",' \
+  '\t "test-1", and "test-2"' \
 
-
-load_db_error_msg = GZ_FILE must be set. \
-  E.g. 'make load-db GZ_FILE=${DB_CACHE_DIR}initial_schema.sql.gz'
-
-fetch_remote_db_error_msg = DB_FILE_NAME must be set. \
-  E.g. 'make $(MAKECMDGOALS) DB_FILE_NAME=initial_schema.sql.gz' or
 
 grant_permissions_error_msg = PERMISSION_USER and PERMISSION_CLASSES must be \
   set.  E.g., 'make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v0_clients'
 
-registry_error_msg = DOCKER_REGISTRY must be \
-  set.  E.g., 'make release DOCKER_REGISTRY=<ecr-container>.amazonaws.com ENVIRONMENT=staging AWS_SECRET_ACCESS_KEY=abcdefghijk AWS_ACCESS_KEY_ID=ABCDEFGH12IJKL'
+RELEASE_EXAMPLE = E.g., 'make release DOCKER_REGISTRY=<ecr-container>.amazonaws.com ENVIRONMENT=staging AWS_SECRET_ACCESS_KEY=abcdefghijk AWS_ACCESS_KEY_ID=ABCDEFGH12IJKL'
+registry_error_msg = DOCKER_REGISTRY must be set.  $(RELEASE_EXAMPLE)
 
 awskey_error_msg  = AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be \
-  set.  E.g., 'make release DOCKER_REGISTRY=<ecr-container>.amazonaws.com ENVIRONMENT=staging AWS_SECRET_ACCESS_KEY=abcdefghijk AWS_ACCESS_KEY_ID=ABCDEFGH12IJKL'
+  set.  $(RELEASE_EXAMPLE)
 
 environment_error_msg = ENVIRONMENT must be \
-  set.  E.g., 'make release DOCKER_REGISTRY=<ecr-container>.amazonaws.com ENVIRONMENT=staging AWS_SECRET_ACCESS_KEY=xGDsdAsdEGS AWS_ACCESS_KEY_ID=ABCDTSDS43DXAS'
+  set.  $(RELEASE_EXAMPLE)
 
+no_release_error_msg = RELEASE must be set.  E.g., 'make deploy RELEASE=1.2.3.4'
 
 .PHONY: $(targets) $(deprecated_targets)
 
-DB_CACHE_DIR = db_cache/
 
 help:
 	@echo "Valid targets are:\n"
@@ -107,61 +164,21 @@ build: clean setup
 	@docker build -f fpdiff.Dockerfile -t masschallenge/fpdiff .
 	@docker-compose build --no-cache
 
-superuser:
-	@docker-compose run --rm web ./manage.py createsuperuser
 
-code-check: DIFFBRANCH?=$(shell if [ "${BRANCH}" == "" ]; \
-   then echo "development"; else echo "${BRANCH}"; fi;)
-code-check:
-	-@docker run --rm -v ${PWD}:/code -e BRANCH=$(DIFFBRANCH) \
-		masschallenge/fpdiff /bin/bash | grep -v "^\.\/\.venv" | \
-		grep -v "site-packages"
+# Testing, coverage, and code checking targets
 
-# you may get timeouts here occasionally
-# see https://github.com/docker-library/docs/tree/master/mysql#no-connections-until-mysql-init-completes
-dev:
-	@docker-compose up
-
+tests ?= $(TESTS)  # Backwards compatibility
 test: setup
 	@docker-compose run --rm web \
-		python3 manage.py test --configuration=Test $(TESTS)
-
-bash:
-	@docker-compose exec web /bin/bash
-
-runserver:
-	@docker-compose exec web /bin/bash /usr/bin/start-nodaemon.sh
-
-shell:
-	@docker-compose run --rm web ./manage.py shell
-
-db-shell:
-	@docker-compose run --rm web ./manage.py dbshell
-
-stop:
-	@docker-compose stop
-
-nuke: CONTAINERS?=$(shell docker ps -a -q)
-nuke: IMAGES?=$(shell  docker images -q)
-nuke:
-	@docker rm -f $(CONTAINERS)
-	@docker rmi -f $(IMAGES)
-
-clean:
-	@docker-compose down
-	@rm -rf ./mysql/data
-	@rm -rf ./redis
-
-comp-messages:
-	@docker-compose exec web python manage.py compilemessages
+		python3 manage.py test --configuration=Test $(tests)
 
 coverage: coverage-run coverage-report coverage-html
 
 coverage-run:
 	@docker-compose run --rm web coverage run --omit="*/tests/*" --source='.' manage.py test --configuration=Test
 
-coverage-report: DIFFBRANCH?=$(shell if [ "${BRANCH}" == "" ]; \
-   then echo "development"; else echo "${BRANCH}"; fi;)
+coverage-report: DIFFBRANCH?=$(shell if [ "$(branch)" == "" ]; \
+   then echo "development"; else echo "$(branch)"; fi;)
 coverage-report: diff_files:=$(shell git diff --name-only $(DIFFBRANCH))
 coverage-report: diff_sed:=$(shell echo $(diff_files)| sed s:web/impact/::g)
 coverage-report: diff_grep:=$(shell echo $(diff_sed) | tr ' ' '\n' | grep \.py | grep -v /tests/ | grep -v /django_migrations/ | tr '\n' ' ' )
@@ -174,58 +191,130 @@ coverage-html:
 coverage-html-open: coverage-html
 	@open web/impact/htmlcov/index.html
 
-demo:
-	@docker-compose run --rm web ./manage.py make_demo_users
-	@docker-compose run --rm web ./manage.py make_demo_apps
+branch ?= $(BRANCH)  # Backwards compatibility
 
-lint:
-	@docker-compose run --rm web pylint impact
+code-check: DIFFBRANCH?=$(shell if [ "$(branch)" == "" ]; \
+   then echo "development"; else echo "$(branch)"; fi;)
+code-check:
+	-@docker run --rm -v ${PWD}:/code -e BRANCH=$(DIFFBRANCH) \
+		masschallenge/fpdiff /bin/bash | grep -v "^\.\/\.venv" | \
+		grep -v "site-packages"
 
-messages:
-	@docker-compose exec web python manage.py makemessages -a
 
-dump-db:
-	@docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev | gzip > dump.sql.gz
-	@echo Created dump.sql.gz
+# Repos
+REPOS = ../accelerate ../django-accelerator ../impact-api
 
-GZ_FILE ?= $(DB_CACHE_DIR)$(DB_FILE_NAME)
 
-load-db:
-ifeq ($(GZ_FILE), $(DB_CACHE_DIR))
-	$(error $(load_db_error_msg))
+# Database migration related targets
+migrate:
+	@docker-compose run --rm web ./manage.py migrate
+
+ifdef MIGRATION_NAME
+  MIGRATION_ARGS = --name $(MIGRATION_NAME)
 endif
+ifeq ($(EMPTY),1)
+  MIGRATION_ARGS += --empty
+endif
+
+# migrations vs migration.  Should be run in django-accelerator.
+# I don't think it should be run in impact-api.
+migrations:
+	@docker-compose run --rm web ./manage.py makemigrations $(MIGRATION_ARGS)
+
+
+
+# Cross repo targets
+
+status:
+	@for r in $(REPOS) ; do \
+	    echo ; echo Status of $$r; cd $$r; git status; done
+
+
+# Server and Virtual Machine related targets
+debug ?= 1
+
+run-server: run-server-$(debug)
+
+run-server-0:
+	@docker-compose up
+
+run-server-1:
+	@docker-compose up -d
+	@docker-compose exec web /bin/bash /usr/bin/start-nodaemon.sh
+
+dev: run-server-0
+runserver: run-server-1
+
+stop-server:
+	@docker-compose stop
+
+shutdown-vms:
+	@docker-compose down
+	@rm -rf ./mysql/data
+	@rm -rf ./redis
+
+delete-vms: CONTAINERS?=$(shell docker ps -a -q)
+delete-vms: IMAGES?=$(shell  docker images -q)
+delete-vms:
+	@docker rm -f $(CONTAINERS)
+	@docker rmi -f $(IMAGES)
+
+
+# Interactive shell Targets
+
+bash-shell:
+	@docker-compose exec web /bin/bash
+
+db-shell:
+	@docker-compose run --rm web ./manage.py dbshell
+
+django-shell:
+	@docker-compose run --rm web ./manage.py shell
+
+
+# Database dump related targets
+
+DB_CACHE_DIR = db_cache/
+db_name ?= initial_schema
+gz_file ?= $(DB_CACHE_DIR)$(db_name).sql.gz
+
+load-db: $(DB_CACHE_DIR) $(gz_file)
+	@echo "Loading $(gz_file)"
 	@echo "drop database mc_dev; create database mc_dev;" | docker-compose run --rm web ./manage.py dbshell
-	@gzcat $(GZ_FILE) | docker-compose run --rm web ./manage.py dbshell
-	@docker-compose run --rm web ./manage.py migrate --no-input
+	@gzcat $(gz_file) | docker-compose run --rm web ./manage.py dbshell
+	@docker-compose run --rm web ./manage.py migrate
+
+%.sql.gz:
+	@echo downloading db...
+	@wget -P ${dir $@} https://s3.amazonaws.com/public-clean-saved-db-states/$(notdir $@)
 
 ${DB_CACHE_DIR}:
 	mkdir -p ${DB_CACHE_DIR}
 
-fetch-remote-db: ${DB_CACHE_DIR}
-fetch-remote-db:
-ifndef DB_FILE_NAME
-	$(error $(fetch_remote_db_error_msg))
-endif
-	@echo cleaning cache for ${DB_FILE_NAME}
-	@rm -f ${DB_CACHE_DIR}$(DB_FILE_NAME)
-	@echo downloading db...
-	@wget -P ${DB_CACHE_DIR} https://s3.amazonaws.com/public-clean-saved-db-states/${DB_FILE_NAME}
+clean-db-cache:
+	@rm -rf $(gz_file)
 
-load-remote-db: fetch-remote-db load-db
+dump-db:
+	@docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev | gzip > $(gz_file)
+	@echo Created $(gz_file)
+
+upload-db:
+	@aws s3api put-object --acl public-read --bucket public-clean-saved-db-states --key $(db_name) --body $(gz_file)
 
 
-restart:
-	@docker-compose restart web
+TARGET ?= staging
 
-grant-permissions:
-ifndef PERMISSION_CLASSES
-	$(error $(grant_permissions_error_msg))
-endif
-	@docker-compose run --rm web ./manage.py grant_permissions $(PERMISSION_USER) $(PERMISSION_CLASSES)
 
+deploy: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
 deploy:
-	@ecs deploy --ignore-warnings $(ENVIRONMENT) impact --image web $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG) --image redis $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
+ifndef RELEASE
+	$(error $(no_release_error_msg))
+endif
+	@ecs deploy --ignore-warnings $(TARGET) impact \
+	--image web $(DOCKER_REGISTRY)/impact-api:$(RELEASE) \
+	--image redis $(DOCKER_REGISTRY)/redis:$(RELEASE)
 
+release: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
 release:
 ifndef AWS_SECRET_ACCESS_KEY
 	$(error $(awskey_error_msg))
@@ -246,11 +335,25 @@ endif
 	@ecs-cli compose -f docker-compose.prod.yml down
 	@ecs-cli compose -f docker-compose.prod.yml up
 
+
+
+# Deprecated targets
+
 dbdump:
-	@echo ERROR: dbdump has been replaced by db-dump
+	@echo ERROR: dbdump has been replaced by dump-db
 
 dbload:
 	@echo ERROR: dbload has been replaced by load-db
 
 dbshell:
 	@echo ERROR: dbshell has been replaced by db-shell
+
+
+comp-messages:
+	@docker-compose exec web python manage.py compilemessages
+
+messages:
+	@docker-compose exec web python manage.py makemessages -a
+
+lint:
+	@docker-compose run --rm web pylint impact
