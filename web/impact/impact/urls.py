@@ -24,19 +24,12 @@ from impact.views import (
     IndexView,
 )
 
-accelerator_router = routers.DefaultRouter()
 simpleuser_router = routers.DefaultRouter()
 simpleuser_router.register('User', GeneralViewSet, base_name='User')
 
 for model in apps.get_models('impact'):
     if model._meta.app_label == 'impact' and not model._meta.auto_created:
         schema_router.register(model, url=model_name_to_snake(model.__name__))
-
-for model in apps.get_models('accelerator'):
-    if model_is_not_auto_created(model, app_label='accelerator'):
-        accelerator_router.register(
-            model.__name__, GeneralViewSet,
-            base_name="accelerator.{model}".format(model=model.__name__))
 
 sso_urlpatterns = [
     url(r'^obtain-token/', obtain_jwt_token),
@@ -77,7 +70,6 @@ urls = [
         }),
         name='object-detail'),
     url(r'^api/simpleuser/', include(simpleuser_router.urls)),
-    url(r'^api/accelerator/', include(accelerator_router.urls)),
     url(r'^api/impact/', include(schema_router.urls), name='api-root'),
     url(r'^sso/', include(sso_urlpatterns, namespace="sso")),
     url(r'^admin/', include(admin.site.urls)),
