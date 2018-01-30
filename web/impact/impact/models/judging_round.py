@@ -184,7 +184,7 @@ class JudgingRound(MCModel):
         objects = JudgingRoundManager()  # pragma: no cover
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_judginground'
+        db_table = 'accelerator_judginground'
         managed = is_managed(db_table)
         unique_together = ('program', 'name')
         ordering = ['program__program_status',

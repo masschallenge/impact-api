@@ -15,7 +15,7 @@ class ProgramRoleGrant(MCModel):
     program_role = models.ForeignKey(ProgramRole)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_programrolegrant'
+        db_table = 'accelerator_programrolegrant'
         managed = is_managed(db_table)
         unique_together = ('person', 'program_role')
         verbose_name = "Program Role Grant"

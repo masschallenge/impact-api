@@ -30,7 +30,7 @@ class Organization(MCModel):
     )
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_organization'
+        db_table = 'accelerator_organization'
         managed = is_managed(db_table)
         verbose_name_plural = 'Organizations'
         ordering = ['name', ]

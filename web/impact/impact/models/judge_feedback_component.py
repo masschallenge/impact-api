@@ -20,7 +20,7 @@ class JudgeFeedbackComponent(MCModel):
     answer_text = models.CharField(max_length=2000, blank=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_judgefeedbackcomponent'
+        db_table = 'accelerator_judgefeedbackcomponent'
         managed = is_managed(db_table)
         verbose_name_plural = 'Feedback Components'
         unique_together = ('judge_feedback', 'feedback_element')

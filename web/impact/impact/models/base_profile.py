@@ -29,7 +29,7 @@ class BaseProfile(MCModel):
         null=False)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_baseprofile'
+        db_table = 'accelerator_baseprofile'
         managed = is_managed(db_table)
 
     def __str__(self):

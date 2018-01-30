@@ -28,7 +28,7 @@ class ExpertInterest(MCModel):
     )
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_expertinterest'
+        db_table = 'accelerator_expertinterest'
         managed = is_managed(db_table)
         verbose_name_plural = "Expert Interests"
 

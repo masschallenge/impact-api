@@ -13,7 +13,7 @@ class Currency(MCModel):
     usd_exchange = models.FloatField()
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_currency'
+        db_table = 'accelerator_currency'
         managed = is_managed(db_table)
 
     def __str__(self):

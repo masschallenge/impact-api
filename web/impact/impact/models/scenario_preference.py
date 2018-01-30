@@ -106,7 +106,7 @@ class ScenarioPreference(MCModel):
                                          blank=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_scenariopreference'
+        db_table = 'accelerator_scenariopreference'
         managed = is_managed(db_table)
         unique_together = ('scenario', 'priority', 'entity_type')
         ordering = ['priority']

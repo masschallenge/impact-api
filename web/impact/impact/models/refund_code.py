@@ -38,6 +38,6 @@ class RefundCode(MCModel):
                    "directly by users."))
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_refundcode'
+        db_table = 'accelerator_refundcode'
         managed = is_managed(db_table)
         verbose_name_plural = 'Refund Codes'

@@ -24,7 +24,7 @@ class ProgramPartner(MCModel):
         'to a Program would go here.')
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_programpartner'
+        db_table = 'accelerator_programpartner'
         managed = is_managed(db_table)
         verbose_name_plural = 'Program Partner'
         ordering = ['program__name', 'partner_type__sort_order', 'partner', ]

@@ -14,7 +14,7 @@ class NamedGroup(MCModel):
     name = models.CharField(max_length=LABEL_LENGTH, default="")
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_namedgroup'
+        db_table = 'accelerator_namedgroup'
         managed = is_managed(db_table)
         ordering = ["name"]
 

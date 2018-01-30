@@ -15,7 +15,7 @@ class StartupOverrideGrant(MCModel):
     program_override = models.ForeignKey(ProgramOverride)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_startupoverridegrant'
+        db_table = 'accelerator_startupoverridegrant'
         managed = is_managed(db_table)
         verbose_name_plural = 'Startup Override Grants'
 

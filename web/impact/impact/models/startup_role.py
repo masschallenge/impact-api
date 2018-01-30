@@ -23,7 +23,7 @@ class StartupRole(MCModel):
     name = CharField(max_length=255)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_startuprole'
+        db_table = 'accelerator_startuprole'
         managed = is_managed(db_table)
 
     def __str__(self):

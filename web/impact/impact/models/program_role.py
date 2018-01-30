@@ -30,7 +30,7 @@ class ProgramRole(MCModel):
                                    related_name="dont_use_commit_fail")
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_programrole'
+        db_table = 'accelerator_programrole'
         managed = is_managed(db_table)
         ordering = ['name', ]
         verbose_name = "Program Role"

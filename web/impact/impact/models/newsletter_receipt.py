@@ -18,7 +18,7 @@ class NewsletterReceipt(MCModel):
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_newsletterreceipt'
+        db_table = 'accelerator_newsletterreceipt'
         managed = is_managed(db_table)
         pass
 

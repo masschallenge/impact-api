@@ -40,7 +40,7 @@ class ProgramPartnerType(MCModel):
                                      max_length=30, default="NONE")
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_programpartnertype'
+        db_table = 'accelerator_programpartnertype'
         managed = is_managed(db_table)
         verbose_name_plural = 'Program Partner Types'
         ordering = ['program', 'sort_order', ]

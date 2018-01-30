@@ -61,6 +61,6 @@ class StartupProgramInterest(cls):
         order = models.IntegerField()
 
     class Meta:
-        db_table = 'mc_startupprograminterest'
+        db_table = 'accelerator_startupprograminterest'
         managed = is_managed(db_table)
         ordering = ['order']

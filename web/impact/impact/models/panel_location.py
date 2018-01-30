@@ -13,7 +13,7 @@ class PanelLocation(MCModel):
     judging_round = models.ForeignKey("JudgingRound", blank=True, null=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_panellocation'
+        db_table = 'accelerator_panellocation'
         managed = is_managed(db_table)
         verbose_name_plural = "Panel Locations"
 

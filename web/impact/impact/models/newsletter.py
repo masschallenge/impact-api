@@ -45,7 +45,7 @@ class Newsletter(MCModel):
     date_mailed = models.DateTimeField(blank=True, null=True, editable=False)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_newsletter'
+        db_table = 'accelerator_newsletter'
         managed = is_managed(db_table)
         ordering = ('-created_at', 'name', )
 

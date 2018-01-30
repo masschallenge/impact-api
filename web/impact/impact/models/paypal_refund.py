@@ -23,5 +23,5 @@ class PayPalRefund(MCModel):
                                  default=decimal.Decimal("0.00"))
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_paypalrefund'
+        db_table = 'accelerator_paypalrefund'
         managed = is_managed(db_table)

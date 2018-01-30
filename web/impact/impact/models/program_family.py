@@ -46,7 +46,7 @@ class ProgramFamily(MCModel):
     )
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_programfamily'
+        db_table = 'accelerator_programfamily'
         managed = is_managed(db_table)
         verbose_name_plural = "program families"
 

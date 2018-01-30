@@ -38,7 +38,7 @@ class Panel(MCModel):
         default='NOT STARTED')
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_panel'
+        db_table = 'accelerator_panel'
         managed = is_managed(db_table)
         verbose_name_plural = 'Panels'
 

@@ -35,7 +35,7 @@ class StartupTeamMember(MCModel):
                                                  blank=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_startupteammember'
+        db_table = 'accelerator_startupteammember'
         managed = is_managed(db_table)
         unique_together = ('startup', 'user')
         verbose_name_plural = 'Startup Team Members'

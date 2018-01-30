@@ -21,7 +21,7 @@ class JudgeRoundCommitment(MCModel):
     current_quota = models.IntegerField(blank=True, null=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_judgeroundcommitment'
+        db_table = 'accelerator_judgeroundcommitment'
         managed = is_managed(db_table)
         verbose_name_plural = ("Judge commitment to participate in a "
                                "Judging Round")

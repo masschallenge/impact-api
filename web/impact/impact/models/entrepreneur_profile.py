@@ -35,5 +35,5 @@ class EntrepreneurProfile(MCModel):
     newsletter_sender = models.IntegerField()
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_entrepreneurprofile'
+        db_table = 'accelerator_entrepreneurprofile'
         managed = is_managed(db_table)

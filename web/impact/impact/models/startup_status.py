@@ -15,7 +15,7 @@ class StartupStatus(MCModel):
     program_startup_status = models.ForeignKey(ProgramStartupStatus)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_startupstatus'
+        db_table = 'accelerator_startupstatus'
         managed = is_managed(db_table)
         verbose_name_plural = 'Startup Statuses'
         unique_together = ('startup', 'program_startup_status')

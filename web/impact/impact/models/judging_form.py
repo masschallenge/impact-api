@@ -12,7 +12,7 @@ class JudgingForm(MCModel):
     description = models.CharField(max_length=500, blank=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_judgingform'
+        db_table = 'accelerator_judgingform'
         managed = is_managed(db_table)
         verbose_name_plural = 'Judging Forms'
 

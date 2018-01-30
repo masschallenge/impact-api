@@ -19,7 +19,7 @@ class ScenarioJudge(MCModel):
         return self.scenario.stage
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_scenariojudge'
+        db_table = 'accelerator_scenariojudge'
         managed = is_managed(db_table)
         verbose_name_plural = 'Scenario Judges'
         unique_together = ('scenario', 'judge')

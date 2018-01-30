@@ -15,5 +15,5 @@ class Site(MCModel):
     site_url = models.URLField(blank=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_site'
+        db_table = 'accelerator_site'
         managed = is_managed(db_table)

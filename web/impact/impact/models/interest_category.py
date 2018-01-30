@@ -14,7 +14,7 @@ class InterestCategory(MCModel):
     program = models.ForeignKey(Program)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_interestcategory'
+        db_table = 'accelerator_interestcategory'
         managed = is_managed(db_table)
         verbose_name_plural = "Interest Categories"
 

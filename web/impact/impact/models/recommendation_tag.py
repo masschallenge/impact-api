@@ -16,6 +16,6 @@ class RecommendationTag(MCModel):
     text = models.TextField()
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_recommendationtag'
+        db_table = 'accelerator_recommendationtag'
         managed = is_managed(db_table)
         pass

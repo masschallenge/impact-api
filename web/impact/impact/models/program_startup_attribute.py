@@ -68,7 +68,7 @@ class ProgramStartupAttribute(MCModel):
     objects = ProgramStartupAttributeManager()
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_programstartupattribute'
+        db_table = 'accelerator_programstartupattribute'
         managed = is_managed(db_table)
         ordering = ['program', 'attribute_label']
         unique_together = ('program', 'attribute_label')

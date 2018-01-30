@@ -41,7 +41,7 @@ class JudgePanelAssignment(MCModel):
     objects = JudgePanelAssignmentManager()
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_judgepanelassignment'
+        db_table = 'accelerator_judgepanelassignment'
         managed = is_managed(db_table)
         verbose_name_plural = "assignments of judge to panel"
         unique_together = ('judge', 'panel', 'scenario')

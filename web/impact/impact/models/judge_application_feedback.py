@@ -56,7 +56,7 @@ class JudgeApplicationFeedback(MCModel):
     objects = JudgeApplicationFeedbackManager()
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_judgeapplicationfeedback'
+        db_table = 'accelerator_judgeapplicationfeedback'
         managed = is_managed(db_table)
         verbose_name_plural = 'Judge Application Feedback'
         unique_together = ('application', 'judge', 'panel')

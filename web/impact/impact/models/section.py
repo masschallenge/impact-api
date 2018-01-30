@@ -31,7 +31,7 @@ class Section(MCModel):
     sequence = models.PositiveIntegerField(help_text=SECTION_SEQUENCE_HELP)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_section'
+        db_table = 'accelerator_section'
         managed = is_managed(db_table)
         ordering = ('newsletter', 'sequence', )
 

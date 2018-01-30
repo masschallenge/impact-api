@@ -33,7 +33,7 @@ class Reference(MCModel):
     requesting_user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True)
 
     class Meta(MCModel.Meta):
-        db_table = "mc_reference"
+        db_table = "accelerator_reference"
         managed = is_managed(db_table)
         pass
 

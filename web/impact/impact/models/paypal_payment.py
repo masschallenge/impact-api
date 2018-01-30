@@ -26,5 +26,5 @@ class PayPalPayment(MCModel):
     refundable = models.BooleanField(default=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_paypalpayment'
+        db_table = 'accelerator_paypalpayment'
         managed = is_managed(db_table)

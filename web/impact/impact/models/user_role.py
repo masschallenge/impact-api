@@ -45,7 +45,7 @@ class UserRole(MCModel):
     sort_order = PositiveIntegerField()
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_userrole'
+        db_table = 'accelerator_userrole'
         managed = is_managed(db_table)
 
     def __str__(self):

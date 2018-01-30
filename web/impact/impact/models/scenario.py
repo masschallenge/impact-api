@@ -41,7 +41,7 @@ class Scenario(MCModel):
         null=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_scenario'
+        db_table = 'accelerator_scenario'
         managed = is_managed(db_table)
         unique_together = (('name', 'judging_round'),
                            ('judging_round', 'sequence_number'), )

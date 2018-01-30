@@ -37,7 +37,7 @@ class ProgramOverride(MCModel):
     )
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_programoverride'
+        db_table = 'accelerator_programoverride'
         managed = is_managed(db_table)
         verbose_name_plural = 'Program Overrides'
 

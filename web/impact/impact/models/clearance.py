@@ -40,7 +40,7 @@ class Clearance(MCModel):
 
     class Meta(MCModel.Meta):
         unique_together = ("user", "program_family")
-        db_table = 'mc_clearance'
+        db_table = 'accelerator_clearance'
         managed = is_managed(db_table)
 
     def __str__(self):

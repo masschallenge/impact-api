@@ -21,7 +21,7 @@ class Observer(MCModel):
     newsletter_sender = models.BooleanField(default=False)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_observer'
+        db_table = 'accelerator_observer'
         managed = is_managed(db_table)
         ordering = ['last_name', 'first_name']
         verbose_name = "Observer"

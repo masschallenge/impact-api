@@ -28,7 +28,7 @@ class SiteProgramAuthorization(MCModel):
     jobs = models.BooleanField(default=False)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_siteprogramauthorization'
+        db_table = 'accelerator_siteprogramauthorization'
         managed = is_managed(db_table)
         unique_together = (("site", "program"), )
         verbose_name_plural = 'Site Program Authorizations'

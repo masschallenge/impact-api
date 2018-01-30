@@ -39,7 +39,7 @@ class ProgramCycle(MCModel):
     hidden = models.BooleanField(default=False)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_programcycle'
+        db_table = 'accelerator_programcycle'
         managed = is_managed(db_table)
         verbose_name_plural = "program cycles"
 
