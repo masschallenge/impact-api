@@ -31,18 +31,17 @@ from .startup_cycle_interest import StartupCycleInterest
 
 from .recommendation_tag import RecommendationTag
 
-from .program_administrator import ProgramAdministrator
 from .site_program_authorization import SiteProgramAuthorization
 from .mentor_program_office_hour import (
     LOCATION_CHOICES,
     MC_BOS_LOCATION,
     MC_CH_LOCATION,
-    MC_IL_LOCATION,
+    MC_IL_JLM_LOCATION,
+    MC_IL_TLV_LOCATION,
     MC_MX_LOCATION,
     MC_NIC_LOCATION,
     MC_PULSE_LOCATION,
     MC_REMOTE_LOCATION,
-    MC_UK_LOCATION,
     MentorProgramOfficeHour,
 )
 from .program_override import ProgramOverride
@@ -258,9 +257,6 @@ from .paypal_payment import PayPalPayment
 from .paypal_refund import PayPalRefund
 from .startup_label import StartupLabel
 from .user_label import UserLabel
-from .program_administrator_permission import (
-    ProgramAdministratorPermission
-)
 from .bucket_state import (
     BucketState,
     BUCKET_TYPES,

@@ -9,19 +9,18 @@ from impact.models.mc_model import MCModel
 from impact.models.program import Program
 from impact.models.utils import is_managed
 
-
 MC_BOS_LOCATION = "MassChallenge Boston"
 MC_CH_LOCATION = "MassChallenge Switzerland"
-MC_IL_LOCATION = "MassChallenge Israel - Kitchen"
+MC_IL_JLM_LOCATION = "MassChallenge Israel - Jerusalem"
+MC_IL_TLV_LOCATION = "MassChallenge Israel - Tel Aviv"
 MC_MX_LOCATION = "MassChallenge Mexico"
 MC_NIC_LOCATION = "Newton Innovation Center (NIC)"
 MC_PULSE_LOCATION = "Pulse@MassChallenge"
 MC_REMOTE_LOCATION = "Remote"
-MC_UK_LOCATION = "MassChallenge UK"
 LOCATION_CHOICES = (
     (MC_BOS_LOCATION, MC_BOS_LOCATION),
-    (MC_UK_LOCATION, MC_UK_LOCATION),
-    (MC_IL_LOCATION, MC_IL_LOCATION),
+    (MC_IL_JLM_LOCATION, MC_IL_JLM_LOCATION),
+    (MC_IL_TLV_LOCATION, MC_IL_TLV_LOCATION),
     (MC_CH_LOCATION, MC_CH_LOCATION),
     (MC_MX_LOCATION, MC_MX_LOCATION),
     (MC_PULSE_LOCATION, MC_PULSE_LOCATION),
