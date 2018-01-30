@@ -138,7 +138,7 @@ from .expert_category import ExpertCategory
 from .expert_interest_type import ExpertInterestType
 from .job_posting import (
     JobPosting,
-    JOB_TYPE_VALUES
+    JOB_TYPE_VALUES,
 )
 from .newsletter_receipt import NewsletterReceipt
 from .newsletter import Newsletter
@@ -149,7 +149,7 @@ from .section import (
 from .program_partner import ProgramPartner
 from .program_partner_type import (
     PARTNER_BADGE_DISPLAY_VALUES,
-    ProgramPartnerType
+    ProgramPartnerType,
 )
 from .site import Site
 from .judging_form import JudgingForm
@@ -271,3 +271,5 @@ from .bucket_state import (
     UNPAID_BUCKET_TYPE,
     UNSUBMITTED_BUCKET_TYPE,
 )
+
+from .currency import Currency

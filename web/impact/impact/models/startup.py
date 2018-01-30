@@ -10,11 +10,12 @@ from django.core.validators import RegexValidator
 
 try:
     from sorl.thumbnail import ImageField
+
     HAS_SORL = True  # pragma: no cover
 except ImportError:  # pragma: no cover - handle in AC-4750
     HAS_SORL = False  # pragma: no cover
 
-from accelerator.models.currency import Currency
+from impact.models.currency import Currency as Currency
 from impact.models.mc_model import MCModel
 from impact.models.organization import Organization
 from impact.models.industry import Industry
