@@ -7,7 +7,7 @@ from factory import (
     SubFactory,
     post_generation,
 )
-from impact.models import StartupTeamMember
+from accelerator.models import StartupTeamMember
 from .startup_factory import StartupFactory
 from .user_factory import UserFactory
 

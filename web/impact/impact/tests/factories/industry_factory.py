@@ -6,7 +6,7 @@ from factory import (
     Sequence,
 )
 
-from impact.models import Industry
+from accelerator.models import Industry
 
 
 class IndustryFactory(DjangoModelFactory):

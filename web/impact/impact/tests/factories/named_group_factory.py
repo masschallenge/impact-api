@@ -6,7 +6,7 @@ from factory import (
     Sequence,
 )
 
-from impact.models import NamedGroup
+from accelerator.models import NamedGroup
 
 
 class NamedGroupFactory(DjangoModelFactory):

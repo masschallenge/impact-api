@@ -5,7 +5,7 @@ from factory import (
     DjangoModelFactory,
     Sequence,
 )
-from impact.models import Organization
+from accelerator.models import Organization
 
 
 class OrganizationFactory(DjangoModelFactory):

@@ -6,7 +6,7 @@ from factory import (
     post_generation,
     Sequence,
 )
-from impact.models import StartupLabel
+from accelerator.models import StartupLabel
 
 
 class StartupLabelFactory(DjangoModelFactory):

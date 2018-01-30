@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from impact.models import Organization
+from accelerator.models import Organization
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     EMAIL_FIELD,

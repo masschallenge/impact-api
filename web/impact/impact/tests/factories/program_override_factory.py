@@ -8,7 +8,7 @@ from factory import (
     Sequence,
     SubFactory,
 )
-from impact.models import ProgramOverride
+from accelerator.models import ProgramOverride
 
 from .program_cycle_factory import ProgramCycleFactory
 from .program_factory import ProgramFactory

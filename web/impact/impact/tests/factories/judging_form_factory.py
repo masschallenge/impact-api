@@ -8,7 +8,7 @@ from factory import (
     Sequence,
 )
 
-from impact.models import JudgingForm
+from accelerator.models import JudgingForm
 
 
 class JudgingFormFactory(DjangoModelFactory):

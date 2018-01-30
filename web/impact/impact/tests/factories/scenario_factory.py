@@ -10,7 +10,7 @@ from factory import (
     post_generation,
 )
 
-from impact.models import (
+from accelerator.models import (
     DEFAULT_PANEL_SIZE,
     Scenario,
 )

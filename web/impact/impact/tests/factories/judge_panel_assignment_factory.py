@@ -9,7 +9,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import (
+from accelerator.models import (
     COMPLETE_PANEL_ASSIGNMENT_STATUS,
     JudgePanelAssignment,
 )

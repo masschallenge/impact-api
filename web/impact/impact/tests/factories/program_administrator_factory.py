@@ -5,7 +5,7 @@ from factory import (
     DjangoModelFactory,
     SubFactory,
 )
-from impact.models import ProgramAdministrator
+from accelerator.models import ProgramAdministrator
 from .user_factory import UserFactory
 
 

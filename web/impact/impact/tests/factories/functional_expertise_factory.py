@@ -6,7 +6,7 @@ from factory import (
     Sequence,
 )
 
-from impact.models import FunctionalExpertise
+from accelerator.models import FunctionalExpertise
 
 
 class FunctionalExpertiseFactory(DjangoModelFactory):

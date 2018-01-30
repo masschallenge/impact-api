@@ -7,7 +7,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import StartupMentorTrackingRecord
+from accelerator.models import StartupMentorTrackingRecord
 
 from .program_factory import ProgramFactory
 from .startup_factory import StartupFactory

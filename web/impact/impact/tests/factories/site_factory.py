@@ -5,7 +5,7 @@ from factory import (
     DjangoModelFactory,
     Sequence,
 )
-from impact.models import Site
+from accelerator.models import Site
 
 
 class SiteFactory(DjangoModelFactory):

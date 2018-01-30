@@ -6,7 +6,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import NewsletterReceipt
+from accelerator.models import NewsletterReceipt
 
 from .entrepreneur_factory import EntrepreneurFactory
 from .newsletter_factory import NewsletterFactory

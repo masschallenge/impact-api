@@ -6,7 +6,7 @@ from factory import (
     Sequence,
 )
 
-from impact.models import ExpertInterestType
+from accelerator.models import ExpertInterestType
 
 
 class ExpertInterestTypeFactory(DjangoModelFactory):

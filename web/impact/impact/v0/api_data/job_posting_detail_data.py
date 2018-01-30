@@ -2,9 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from impact.api_data import APIData
-from impact.models import (
-    JobPosting,
-)
+from accelerator.models import JobPosting
 
 
 JOB_TYPES = {"NONE": "None",

@@ -10,7 +10,7 @@ from factory import (
     post_generation,
 )
 
-from impact.models import (
+from accelerator.models import (
     DEFAULT_PROFILE_BACKGROUND_COLOR,
     DEFAULT_PROFILE_TEXT_COLOR,
     STARTUP_COMMUNITIES,

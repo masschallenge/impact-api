@@ -13,7 +13,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import (
+from accelerator.models import (
     BucketState,
     STALE_NOSTARTUP_BUCKET_TYPE,
 )

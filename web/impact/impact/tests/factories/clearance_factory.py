@@ -7,7 +7,7 @@ from factory import (
 )
 from impact.tests.factories.user_factory import UserFactory
 from impact.tests.factories.program_family_factory import ProgramFamilyFactory
-from impact.models import (
+from accelerator.models import (
     Clearance,
     CLEARANCE_LEVEL_POM,
 )

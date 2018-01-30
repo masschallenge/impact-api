@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
-from impact.models import (
+from accelerator.models import (
     Program,
     Startup,
 )

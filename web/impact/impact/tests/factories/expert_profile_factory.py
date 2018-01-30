@@ -7,7 +7,7 @@ from factory import (
     post_generation,
 )
 
-from impact.models import ExpertProfile
+from accelerator.models import ExpertProfile
 
 from .core_profile_factory import CoreProfileFactory
 from .expert_category_factory import ExpertCategoryFactory

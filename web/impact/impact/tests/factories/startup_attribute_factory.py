@@ -7,7 +7,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import StartupAttribute
+from accelerator.models import StartupAttribute
 
 from .program_startup_attribute_factory import (
     ProgramStartupAttributeFactory,

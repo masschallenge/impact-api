@@ -9,7 +9,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import (
+from accelerator.models import (
     CAPTURE_AVAILABILITY_DISABLED,
     DEFAULT_BUFFER_BEFORE_EVENT,
     FEEDBACK_DISPLAY_DISABLED,

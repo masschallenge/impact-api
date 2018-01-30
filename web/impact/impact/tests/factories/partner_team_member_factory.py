@@ -5,7 +5,7 @@ from factory import (
     DjangoModelFactory,
     SubFactory,
 )
-from impact.models import PartnerTeamMember
+from accelerator.models import PartnerTeamMember
 
 from .partner_factory import PartnerFactory
 from .entrepreneur_factory import EntrepreneurFactory

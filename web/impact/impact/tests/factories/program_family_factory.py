@@ -5,7 +5,7 @@ from factory import (
     DjangoModelFactory,
     Sequence,
 )
-from impact.models import ProgramFamily
+from accelerator.models import ProgramFamily
 
 
 class ProgramFamilyFactory(DjangoModelFactory):

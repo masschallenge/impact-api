@@ -6,7 +6,7 @@ from factory import (
     post_generation,
     Sequence,
 )
-from impact.models import UserLabel
+from accelerator.models import UserLabel
 
 
 class UserLabelFactory(DjangoModelFactory):

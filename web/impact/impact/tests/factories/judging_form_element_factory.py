@@ -9,7 +9,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import JudgingFormElement
+from accelerator.models import JudgingFormElement
 
 from .application_question_factory import ApplicationQuestionFactory
 from .judging_form_factory import JudgingFormFactory

@@ -9,7 +9,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import PanelTime
+from accelerator.models import PanelTime
 from impact.tests.utils import months_from_now
 
 from .judging_round_factory import JudgingRoundFactory

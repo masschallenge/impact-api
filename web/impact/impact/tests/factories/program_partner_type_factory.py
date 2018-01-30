@@ -6,7 +6,7 @@ from factory import (
     Sequence,
     SubFactory,
 )
-from impact.models import ProgramPartnerType
+from accelerator.models import ProgramPartnerType
 
 
 class ProgramPartnerTypeFactory(DjangoModelFactory):

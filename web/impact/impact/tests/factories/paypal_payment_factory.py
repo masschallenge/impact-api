@@ -7,7 +7,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import PayPalPayment
+from accelerator.models import PayPalPayment
 
 from .program_cycle_factory import ProgramCycleFactory
 from .startup_factory import StartupFactory

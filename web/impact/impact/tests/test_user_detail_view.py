@@ -29,7 +29,7 @@ from impact.v1.helpers import (
     UserHelper,
     VALID_KEYS_NOTE,
 )
-from impact.models.base_profile import (
+from accelerator.models.base_profile import (
     BASE_ENTREPRENEUR_TYPE,
     BASE_EXPERT_TYPE,
     BASE_MEMBER_TYPE,
