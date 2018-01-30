@@ -77,7 +77,7 @@ class Base(Configuration):
     WSGI_APPLICATION = 'impact.wsgi.application'
 
     INSTALLED_APPS = [
-        'accelerator.apps.AcceleratorConfig',
+        # 'accelerator.apps.AcceleratorConfig',
         'simpleuser.apps.SimpleuserConfig',
         'corsheaders',
         'django.contrib.admin',
