@@ -8,7 +8,7 @@ from factory import (
     Sequence,
     SubFactory,
 )
-from impact.models import (
+from accelerator.models import (
     PanelType,
 )
 

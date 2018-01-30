@@ -6,7 +6,7 @@ from factory import (
     post_generation,
     Sequence,
 )
-from impact.models import Observer
+from accelerator.models import Observer
 
 
 class ObserverFactory(DjangoModelFactory):

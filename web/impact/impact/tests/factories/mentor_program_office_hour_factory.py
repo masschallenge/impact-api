@@ -11,7 +11,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import (
+from accelerator.models import (
     MC_BOS_LOCATION,
     MentorProgramOfficeHour,
 )

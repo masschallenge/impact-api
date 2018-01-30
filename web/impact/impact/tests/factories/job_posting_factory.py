@@ -13,7 +13,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import JobPosting
+from accelerator.models import JobPosting
 
 from impact.tests.factories.startup_factory import StartupFactory
 

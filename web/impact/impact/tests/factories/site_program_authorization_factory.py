@@ -6,7 +6,7 @@ from factory import (
     Sequence,
     SubFactory,
 )
-from impact.models import SiteProgramAuthorization
+from accelerator.models import SiteProgramAuthorization
 from .program_factory import ProgramFactory
 from .site_factory import SiteFactory
 

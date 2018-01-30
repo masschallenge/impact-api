@@ -7,7 +7,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import InterestCategory
+from accelerator.models import InterestCategory
 
 from .program_factory import ProgramFactory
 

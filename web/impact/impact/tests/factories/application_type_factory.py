@@ -7,7 +7,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import ApplicationType
+from accelerator.models import ApplicationType
 
 from .startup_label_factory import StartupLabelFactory
 

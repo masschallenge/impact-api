@@ -7,7 +7,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import ProgramStartupStatus
+from accelerator.models import ProgramStartupStatus
 
 from .program_factory import ProgramFactory
 from .startup_role_factory import StartupRoleFactory

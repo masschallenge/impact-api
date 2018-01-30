@@ -6,7 +6,7 @@ from factory import (
     Sequence,
     SubFactory,
 )
-from impact.models import Partner
+from accelerator.models import Partner
 from .organization_factory import OrganizationFactory
 
 

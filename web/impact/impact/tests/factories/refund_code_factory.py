@@ -8,7 +8,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import RefundCode
+from accelerator.models import RefundCode
 
 from .partner_factory import PartnerFactory
 

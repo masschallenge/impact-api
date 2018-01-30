@@ -5,7 +5,7 @@ from factory import (
     DjangoModelFactory,
     Sequence,
 )
-from impact.models import StartupRole
+from accelerator.models import StartupRole
 
 
 class StartupRoleFactory(DjangoModelFactory):

@@ -7,7 +7,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import ApplicationQuestion
+from accelerator.models import ApplicationQuestion
 
 from .application_type_factory import ApplicationTypeFactory
 from .question_factory import QuestionFactory

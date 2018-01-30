@@ -4,7 +4,7 @@
 from datetime import datetime
 from pytz import utc
 from django.db.models import Q
-from impact.models import (
+from accelerator.models import (
     ProgramCycle,
     SUBMITTED_APP_STATUS,
     StartupRole,

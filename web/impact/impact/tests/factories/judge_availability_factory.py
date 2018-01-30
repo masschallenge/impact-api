@@ -8,7 +8,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import JudgeAvailability
+from accelerator.models import JudgeAvailability
 
 from .judge_round_commitment_factory import JudgeRoundCommitmentFactory
 from .panel_location_factory import PanelLocationFactory

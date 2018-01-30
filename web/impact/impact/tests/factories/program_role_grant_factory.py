@@ -6,7 +6,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import ProgramRoleGrant
+from accelerator.models import ProgramRoleGrant
 
 from .member_factory import MemberFactory
 from .program_role_factory import ProgramRoleFactory

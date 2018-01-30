@@ -6,7 +6,7 @@ from factory import (
     Sequence,
 )
 
-from impact.models import MentoringSpecialties
+from accelerator.models import MentoringSpecialties
 
 
 class MentoringSpecialtiesFactory(DjangoModelFactory):

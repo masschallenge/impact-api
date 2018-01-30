@@ -8,7 +8,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import ScenarioJudge
+from accelerator.models import ScenarioJudge
 
 from .expert_factory import ExpertFactory
 from .scenario_factory import ScenarioFactory

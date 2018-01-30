@@ -10,7 +10,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import Reference
+from accelerator.models import Reference
 
 from .application_factory import ApplicationFactory
 from .entrepreneur_factory import EntrepreneurFactory

@@ -7,7 +7,7 @@ from django.core.validators import (
     URLValidator,
     validate_email,
 )
-from impact.models.base_profile import (
+from accelerator.models import (
     PHONE_MAX_LENGTH,
     TWITTER_HANDLE_MAX_LENGTH,
 )

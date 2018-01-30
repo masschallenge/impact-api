@@ -7,7 +7,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import ExpertInterest
+from accelerator.models import ExpertInterest
 
 from .expert_factory import ExpertFactory
 from .expert_interest_type_factory import ExpertInterestTypeFactory

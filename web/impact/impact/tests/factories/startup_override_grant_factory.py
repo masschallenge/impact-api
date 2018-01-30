@@ -6,7 +6,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import StartupOverrideGrant
+from accelerator.models import StartupOverrideGrant
 
 from .program_override_factory import ProgramOverrideFactory
 from .startup_factory import StartupFactory

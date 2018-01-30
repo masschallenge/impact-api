@@ -5,7 +5,7 @@ from factory import (
     DjangoModelFactory,
     Sequence,
 )
-from impact.models import RecommendationTag
+from accelerator.models import RecommendationTag
 
 
 class RecommendationTagFactory(DjangoModelFactory):

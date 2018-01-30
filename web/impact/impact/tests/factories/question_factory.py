@@ -5,7 +5,7 @@ from factory import (
     DjangoModelFactory,
     Sequence,
 )
-from impact.models import (
+from accelerator.models import (
     CHOICE_LAYOUT_HORIZONTAL,
     Question,
     QUESTION_TYPE_MULTILINE,

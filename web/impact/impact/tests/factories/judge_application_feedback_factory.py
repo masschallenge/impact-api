@@ -8,7 +8,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import (
+from accelerator.models import (
     JUDGING_STATUS_NO_CONFLICT,
     JudgeApplicationFeedback,
 )

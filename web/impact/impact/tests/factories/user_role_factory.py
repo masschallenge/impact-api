@@ -5,7 +5,7 @@ from factory import (
     DjangoModelFactory,
     Sequence,
 )
-from impact.models import UserRole
+from accelerator.models import UserRole
 
 
 class UserRoleFactory(DjangoModelFactory):

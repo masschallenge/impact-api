@@ -6,7 +6,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import BaseProfile
+from accelerator.models import BaseProfile
 
 from .user_factory import UserFactory
 

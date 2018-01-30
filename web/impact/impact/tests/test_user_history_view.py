@@ -6,7 +6,7 @@ from jsonschema import Draft4Validator
 
 from django.urls import reverse
 
-from impact.models import UserRole
+from accelerator.models import UserRole
 from impact.tests.factories import (
     JudgingRoundFactory,
     NewsletterReceiptFactory,

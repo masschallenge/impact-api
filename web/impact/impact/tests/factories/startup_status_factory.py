@@ -5,7 +5,7 @@ from factory import (
     DjangoModelFactory,
     SubFactory,
 )
-from impact.models import StartupStatus
+from accelerator.models import StartupStatus
 from .startup_factory import StartupFactory
 from .program_startup_status_factory import ProgramStartupStatusFactory
 

@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from impact.permissions import (
     V0APIPermissions,
 )
-from impact.models import ProgramStartupStatus
+from accelerator.models import ProgramStartupStatus
 from impact.utils import get_profile
 from impact.v0.api_data.startup_detail_data import StartupDetailData
 from impact.v0.views.base_media_info import BaseMediaInfo

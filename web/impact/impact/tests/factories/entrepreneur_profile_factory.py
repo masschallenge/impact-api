@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from impact.models import EntrepreneurProfile
+from accelerator.models import EntrepreneurProfile
 from .core_profile_factory import CoreProfileFactory
 
 

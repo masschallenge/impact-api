@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from impact.models import Industry
+from accelerator.models import Industry
 from impact.v1.helpers.mptt_model_helper import MPTTModelHelper
 
 

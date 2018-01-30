@@ -6,7 +6,7 @@ from factory import (
     Sequence,
 )
 
-from impact.models.currency import Currency
+from accelerator.models.currency import Currency
 
 
 def _char_range(start, end):

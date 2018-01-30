@@ -7,7 +7,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import StartupProgramInterest
+from accelerator.models import StartupProgramInterest
 
 from .program_factory import ProgramFactory
 from .startup_factory import StartupFactory

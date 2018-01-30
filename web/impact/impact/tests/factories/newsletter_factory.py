@@ -7,7 +7,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import Newsletter
+from accelerator.models import Newsletter
 
 from .program_factory import ProgramFactory
 

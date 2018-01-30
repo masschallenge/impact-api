@@ -5,7 +5,7 @@ from factory import (
     DjangoModelFactory,
     Iterator,
 )
-from impact.models import ExpertCategory
+from accelerator.models import ExpertCategory
 
 # The next import is indicative of a deeper problem with how
 # ExpertCategorys are currently used.  See AC-5022 for the underlying

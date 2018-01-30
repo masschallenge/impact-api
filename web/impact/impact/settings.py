@@ -3,7 +3,10 @@
 
 import os
 import datetime
-from configurations import Configuration, values
+from configurations import (
+    Configuration,
+    values,
+)
 from django.urls import reverse_lazy
 from unipath import Path
 
@@ -65,7 +68,7 @@ class Base(Configuration):
     WSGI_APPLICATION = 'impact.wsgi.application'
 
     INSTALLED_APPS = [
-        # 'accelerator.apps.AcceleratorConfig',
+        'accelerator.apps.AcceleratorConfig',
         'simpleuser.apps.SimpleuserConfig',
         'corsheaders',
         'django.contrib.admin',
@@ -83,6 +86,8 @@ class Base(Configuration):
         'rest_framework.authtoken',
         'rest_framework_swagger',
         'rest_framework_tracking',
+        'paypal.standard',
+        'paypal.pro',
     ]
     ACCELERATOR_MODELS_ARE_MANAGED = True
     IMPACT_MODELS_ARE_MANAGED = True
@@ -213,6 +218,17 @@ class Base(Configuration):
         'JWT_AUTH_COOKIE': "jwt",
         'JWT_SECRET_KEY': bytes(os.environ.get('JWT_SECRET_KEY', ''), 'utf-8'),
     }
+
+    PAYPAL_WPP_USER = ""
+    PAYPAL_WPP_PASSWORD = ""
+    PAYPAL_WPP_SIGNATURE = ""
+    PAYPAL_RECEIVER_EMAIL = ''
+    PAYPAL_IDENTITY_TOKEN = ''
+
+    MPTT_SWAPPABLE_INDUSTRY_MODEL = "accelerator.Industry"
+    MPTT_SWAPPABLE_INDUSTRY_MODEL_ADDITIONAL = "accelerator.Industry"
+    MPTT_SWAPPABLE_INDUSTRY_DB_TABLE_NAME = "accelerator_startup_related_industry"
+    MPTT_SWAPPABLE_FUNCTIONALEXPERTISE_MODEL = "accelerator.FunctionalExpertise"
 
 
 class Dev(Base):

@@ -8,7 +8,7 @@ from factory import (
     Sequence,
     SubFactory,
 )
-from impact.models import PanelLocation
+from accelerator.models import PanelLocation
 from .judging_round_factory import JudgingRoundFactory
 
 

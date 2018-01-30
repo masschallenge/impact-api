@@ -7,7 +7,7 @@ from factory import (
     SubFactory,
 )
 
-from impact.models import ProgramCycle
+from accelerator.models import ProgramCycle
 from impact.tests.utils import months_from_now
 
 from .application_type_factory import ApplicationTypeFactory
