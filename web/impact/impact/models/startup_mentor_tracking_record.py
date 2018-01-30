@@ -47,7 +47,7 @@ class StartupMentorTrackingRecord(MCModel):
         null=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_startupmentortrackingrecord'
+        db_table = 'accelerator_startupmentortrackingrecord'
         managed = is_managed(db_table)
         verbose_name = "Mentor Tracking Record"
         verbose_name_plural = "Mentor Tracking Records"

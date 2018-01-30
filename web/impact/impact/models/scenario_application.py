@@ -18,7 +18,7 @@ class ScenarioApplication(MCModel):
     priority = models.IntegerField(default=1)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_scenarioapplication'
+        db_table = 'accelerator_scenarioapplication'
         managed = is_managed(db_table)
         verbose_name_plural = 'Scenario Applications'
         unique_together = ('scenario', 'application')

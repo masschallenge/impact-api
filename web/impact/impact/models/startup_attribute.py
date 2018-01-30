@@ -19,7 +19,7 @@ class StartupAttribute(MCModel):
         help_text='Stored text representation of the value')
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_startupattribute'
+        db_table = 'accelerator_startupattribute'
         managed = is_managed(db_table)
         verbose_name_plural = 'Startup Attributes'
 

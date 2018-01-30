@@ -21,5 +21,5 @@ class StartupCycleInterest(MCModel):
         through=StartupProgramInterest)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_startupcycleinterest'
+        db_table = 'accelerator_startupcycleinterest'
         managed = is_managed(db_table)

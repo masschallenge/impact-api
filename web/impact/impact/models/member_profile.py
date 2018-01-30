@@ -34,5 +34,5 @@ class MemberProfile(MCModel):
     newsletter_sender = models.IntegerField()
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_memberprofile'
+        db_table = 'accelerator_memberprofile'
         managed = is_managed(db_table)

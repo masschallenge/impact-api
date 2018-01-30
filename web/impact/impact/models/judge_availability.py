@@ -24,7 +24,7 @@ class JudgeAvailability(MCModel):
     )
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_judgeavailability'
+        db_table = 'accelerator_judgeavailability'
         managed = is_managed(db_table)
         verbose_name_plural = ("Judge availability for specific Panel types, "
                                "times, locations")

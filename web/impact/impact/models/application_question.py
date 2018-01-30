@@ -52,7 +52,7 @@ class ApplicationQuestion(MCModel):
     question = models.ForeignKey(Question, blank=True, null=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_applicationquestion'
+        db_table = 'accelerator_applicationquestion'
         managed = is_managed(db_table)
         ordering = ['application_type', 'question_number', ]
         verbose_name_plural = 'Application Questions'

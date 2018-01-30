@@ -38,7 +38,7 @@ class Question(MCModel):
     )
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_question'
+        db_table = 'accelerator_question'
         managed = is_managed(db_table)
 
     def __str__(self):

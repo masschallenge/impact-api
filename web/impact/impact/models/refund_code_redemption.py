@@ -43,7 +43,7 @@ class RefundCodeRedemption(MCModel):
     )
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_refundcoderedemption'
+        db_table = 'accelerator_refundcoderedemption'
         managed = is_managed(db_table)
 
     def __str__(self):

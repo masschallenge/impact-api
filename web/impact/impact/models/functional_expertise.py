@@ -30,7 +30,7 @@ class FunctionalExpertise(cls):
             order_insertion_by = ['name', ]
 
         class Meta:
-            db_table = 'mc_functionalexpertise'
+            db_table = 'accelerator_functionalexpertise'
             managed = is_managed(db_table)
     else:
         parent = models.ForeignKey('self', blank=True, null=True)
@@ -40,7 +40,7 @@ class FunctionalExpertise(cls):
         level = models.IntegerField()
 
         class Meta:
-            db_table = 'mc_functionalexpertise'
+            db_table = 'accelerator_functionalexpertise'
             managed = is_managed(db_table)
 
     def __str__(self):

@@ -21,7 +21,7 @@ class ApplicationPanelAssignment(MCModel):
     remote_pitch = models.BooleanField(default=False)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_applicationpanelassignment'
+        db_table = 'accelerator_applicationpanelassignment'
         managed = is_managed(db_table)
         verbose_name_plural = "assignments of startup applications to panel"
         unique_together = ('application', 'panel', 'scenario')

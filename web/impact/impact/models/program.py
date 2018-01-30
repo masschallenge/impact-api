@@ -117,7 +117,7 @@ class Program(MCModel):
     overview_deadline_date = models.DateTimeField(blank=True, null=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_program'
+        db_table = 'accelerator_program'
         managed = is_managed(db_table)
         verbose_name_plural = 'Programs'
         ordering = ['-end_date', 'name']

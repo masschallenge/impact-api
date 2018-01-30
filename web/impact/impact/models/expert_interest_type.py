@@ -15,7 +15,7 @@ class ExpertInterestType(MCModel):
     short_description = models.CharField(max_length=255)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_expertinteresttype'
+        db_table = 'accelerator_expertinteresttype'
         managed = is_managed(db_table)
         verbose_name_plural = "Expert Interest Types"
 

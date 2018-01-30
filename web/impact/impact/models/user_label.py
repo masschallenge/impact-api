@@ -17,7 +17,7 @@ class UserLabel(MCModel):
     users = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_userlabel'
+        db_table = 'accelerator_userlabel'
         managed = is_managed(db_table)
         ordering = ["label", ]
 

@@ -16,7 +16,7 @@ class PartnerTeamMember(MCModel):
     partner_administrator = models.BooleanField(default=False)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_partnerteammember'
+        db_table = 'accelerator_partnerteammember'
         managed = is_managed(db_table)
         verbose_name_plural = 'Partner Team Members'
         ordering = ['team_member__first_name']

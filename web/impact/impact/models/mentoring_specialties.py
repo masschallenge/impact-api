@@ -11,7 +11,7 @@ class MentoringSpecialties(MCModel):
     name = models.CharField(max_length=255, unique=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_mentoringspecialties'
+        db_table = 'accelerator_mentoringspecialties'
         managed = is_managed(db_table)
         ordering = ['name', ]
         verbose_name = "Mentoring Specialty"

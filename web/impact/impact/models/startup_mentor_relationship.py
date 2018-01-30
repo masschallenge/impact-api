@@ -30,7 +30,7 @@ class StartupMentorRelationship(MCModel):
     primary = models.BooleanField(default=False)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_startupmentorrelationship'
+        db_table = 'accelerator_startupmentorrelationship'
         managed = is_managed(db_table)
         verbose_name_plural = 'Startup Mentor Relationships'
 

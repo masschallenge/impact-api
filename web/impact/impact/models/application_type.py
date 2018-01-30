@@ -15,7 +15,7 @@ class ApplicationType(MCModel):
     submission_label = models.ForeignKey(StartupLabel, null=True, blank=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_applicationtype'
+        db_table = 'accelerator_applicationtype'
         managed = is_managed(db_table)
         verbose_name_plural = 'Application Types'
 

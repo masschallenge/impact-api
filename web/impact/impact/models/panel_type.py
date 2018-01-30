@@ -13,7 +13,7 @@ class PanelType(MCModel):
     judging_round = models.ForeignKey("JudgingRound", blank=True, null=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_paneltype'
+        db_table = 'accelerator_paneltype'
         managed = is_managed(db_table)
         verbose_name_plural = "Panel Types"
 

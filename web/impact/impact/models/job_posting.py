@@ -29,7 +29,7 @@ class JobPosting(MCModel):
     more_info_url = models.URLField(max_length=100, null=True, blank=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_jobposting'
+        db_table = 'accelerator_jobposting'
         managed = is_managed(db_table)
         verbose_name_plural = 'Job postings for startups'
 

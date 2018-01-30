@@ -47,7 +47,7 @@ class MentorProgramOfficeHour(MCModel):
     topics = models.CharField(max_length=500, blank=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_mentorprogramofficehour'
+        db_table = 'accelerator_mentorprogramofficehour'
         managed = is_managed(db_table)
         verbose_name = "Office Hour"
         unique_together = ('program', 'mentor', 'date', 'start_time')

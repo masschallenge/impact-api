@@ -85,7 +85,7 @@ class JudgingFormElement(MCModel):
     )
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_judgingformelement'
+        db_table = 'accelerator_judgingformelement'
         managed = is_managed(db_table)
         ordering = ['form_type', 'element_number', ]
         verbose_name_plural = 'Judging Form Elements'

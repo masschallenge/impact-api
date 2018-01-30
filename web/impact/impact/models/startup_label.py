@@ -15,7 +15,7 @@ class StartupLabel(MCModel):
     startups = models.ManyToManyField(Startup, blank=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_startuplabel'
+        db_table = 'accelerator_startuplabel'
         managed = is_managed(db_table)
         ordering = ["label", ]
 

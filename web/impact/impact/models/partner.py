@@ -62,7 +62,7 @@ class Partner(MCModel):
         return self.organization.public_inquiry_email
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_partner'
+        db_table = 'accelerator_partner'
         managed = is_managed(db_table)
         verbose_name_plural = 'Partners'
         ordering = ['organization__name', ]

@@ -65,7 +65,7 @@ class ProgramStartupStatus(MCModel):
         help_text="Order")
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_programstartupstatus'
+        db_table = 'accelerator_programstartupstatus'
         managed = is_managed(db_table)
         verbose_name_plural = 'Program Startup Statuses'
         ordering = ['program', 'sort_order', 'startup_status']

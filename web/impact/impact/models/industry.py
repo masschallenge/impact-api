@@ -32,7 +32,7 @@ class Industry(cls):
             verbose_name_plural = 'Industries'
 
         class Meta:
-            db_table = 'mc_industry'
+            db_table = 'accelerator_industry'
             managed = is_managed(db_table)
             verbose_name_plural = "Industries"
     else:
@@ -43,7 +43,7 @@ class Industry(cls):
         level = models.IntegerField()
 
         class Meta:
-            db_table = 'mc_industry'
+            db_table = 'accelerator_industry'
             managed = is_managed(db_table)
             verbose_name_plural = "Industries"
 

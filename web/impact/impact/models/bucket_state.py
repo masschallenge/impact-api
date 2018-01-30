@@ -42,7 +42,7 @@ class BucketState(MCModel):
     program_role = models.ForeignKey(ProgramRole)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_bucketstate'
+        db_table = 'accelerator_bucketstate'
         managed = is_managed(db_table)
         ordering = ["sort_order", ]
 

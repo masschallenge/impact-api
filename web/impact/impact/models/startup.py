@@ -53,7 +53,7 @@ class Startup(MCModel):
         Industry,
         verbose_name="Additional Industries",
         related_name="secondary_startups",
-        db_table="mc_startup_related_industry",
+        db_table = "accelerator_startup_related_industry",
         blank=True,
         help_text="You may select up to 5 related industries.",
     )
@@ -173,7 +173,7 @@ class Startup(MCModel):
         return self.organization.public_inquiry_email
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_startup'
+        db_table = 'accelerator_startup'
         managed = is_managed(db_table)
         verbose_name_plural = "Startups"
         ordering = ["organization__name"]

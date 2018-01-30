@@ -11,7 +11,7 @@ class ExpertCategory(MCModel):
     name = models.CharField(max_length=255, unique=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_expertcategory'
+        db_table = 'accelerator_expertcategory'
         managed = is_managed(db_table)
         ordering = ['name', ]
         verbose_name = "Expert Category"

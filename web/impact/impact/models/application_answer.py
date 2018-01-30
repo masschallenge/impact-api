@@ -15,7 +15,7 @@ class ApplicationAnswer(MCModel):
     answer_text = models.CharField(max_length=2000, blank=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_applicationanswer'
+        db_table = 'accelerator_applicationanswer'
         managed = is_managed(db_table)
         verbose_name_plural = 'Application Answers'
 

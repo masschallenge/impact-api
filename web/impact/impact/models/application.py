@@ -58,7 +58,7 @@ class Application(MCModel):
     submission_datetime = models.DateTimeField(blank=True, null=True)
 
     class Meta(MCModel.Meta):
-        db_table = 'mc_application'
+        db_table = 'accelerator_application'
         managed = is_managed(db_table)
         verbose_name_plural = 'Applications'
         ordering = ['startup']
