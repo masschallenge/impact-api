@@ -84,7 +84,8 @@ class Base(Configuration):
         'rest_framework_swagger',
         'rest_framework_tracking',
     ]
-    ACCELERATOR_MODELS_ARE_MANAGED = False
+    ACCELERATOR_MODELS_ARE_MANAGED = True
+    IMPACT_MODELS_ARE_MANAGED = True
 
     AUTH_USER_MODEL = 'simpleuser.User'
 
