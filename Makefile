@@ -105,18 +105,18 @@ target_help = \
   'django-shell - Access to Django shell.' \
   ' ' \
   'load-db - Load gzipped database file.' \
-  '\tDefaults to db_cache/initial_schema.sql.gz.' \
+  '\tDefaults to db_cache/django_1-10_schema.sql.gz.' \
   '\t$$(gz_file) can provide an explicit path.' \
   '\tOtherwise db_cache/$$(db_name).sql.gz is used.' \
   '\tIf no such file exists, then try download from S3.' \
-  'clean-db-cache - Delete db_cache/initial_schema.sql.gz if it exists.' \
+  'clean-db-cache - Delete db_cache/django_1-10_schema.sql.gz if it exists.' \
   'dump-db - Create a gzipped db dump.' \
-  '\tDefaults to db_cache/initial_schema.sql.gz.' \
+  '\tDefaults to db_cache/django_1-10_schema.sql.gz.' \
   '\t$$(gz_file) can provide an explicit path.' \
   '\tOtherwise db_cache/$$(db_name).sql.gz is used.' \
   'upload-db - Upload db dump to S3.' \
-  '\tDefaults to uploading db_cache/initial_schema.sql.gz.' \
-  '\t$$(db_name) defaults to initial_schema and sets the S3 key.' \
+  '\tDefaults to uploading db_cache/django_1-10_schema.sql.gz.' \
+  '\t$$(db_name) defaults to django_1-10_schema and sets the S3 key.' \
   '\t$$(gz_file) can provide an epxlicit path without changing the S3 key.' \
   ' ' \
   'release-list - List all releases that are ready to be deployed.' \
@@ -229,6 +229,13 @@ status:
 	@for r in $(REPOS) ; do \
 	    echo ; echo Status of $$r; cd $$r; git status; done
 
+branch =? development
+
+current:
+	@for r in $(REPOS) ; do \
+	  cd $$r; \
+	  git checkout development && git checkout $(branch) && git pull; \
+	  done
 
 # Server and Virtual Machine related targets
 debug ?= 1
@@ -275,7 +282,7 @@ django-shell:
 # Database dump related targets
 
 DB_CACHE_DIR = db_cache/
-db_name ?= initial_schema
+db_name ?= django_1-10_schema
 gz_file ?= $(DB_CACHE_DIR)$(db_name).sql.gz
 
 load-db: $(DB_CACHE_DIR) $(gz_file)
@@ -294,8 +301,15 @@ ${DB_CACHE_DIR}:
 clean-db-cache:
 	@rm -rf $(gz_file)
 
-dump-db:
-	@docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev | gzip > $(gz_file)
+mysql-container:
+	@docker-compose up -d
+	@until $$(curl --output /dev/null --silent --head --fail http://web:800); do \
+	  echo \"Waiting for web:8000...\" \
+	  sleep 5 \
+	done;
+
+dump-db: mysql-container
+	@docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev -r foo.sql
 	@echo Created $(gz_file)
 
 upload-db:
