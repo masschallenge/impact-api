@@ -29,10 +29,10 @@ from impact.v1.helpers import (
     UserHelper,
     VALID_KEYS_NOTE,
 )
-from accelerator.models.base_profile import (
-    BASE_ENTREPRENEUR_TYPE,
-    BASE_EXPERT_TYPE,
-    BASE_MEMBER_TYPE,
+from accelerator_abstract.models.base_base_profile import (
+    ENTREPRENEUR_USER_TYPE,
+    EXPERT_USER_TYPE,
+    MEMBER_USER_TYPE,
     PHONE_MAX_LENGTH,
     TWITTER_HANDLE_MAX_LENGTH,
 )
@@ -122,7 +122,7 @@ class TestUserDetailView(APITestCase):
                     response.data["user_type"])
 
     def test_get_expert_fields(self):
-        context = UserContext(user_type=BASE_EXPERT_TYPE)
+        context = UserContext(user_type=EXPERT_USER_TYPE)
         user = context.user
         profile = context.profile
         category = profile.expert_category
@@ -138,7 +138,7 @@ class TestUserDetailView(APITestCase):
     def test_get_expert_with_industries(self):
         primary_industry = IndustryFactory()
         additional_industries = IndustryFactory.create_batch(2)
-        context = UserContext(user_type=BASE_EXPERT_TYPE,
+        context = UserContext(user_type=EXPERT_USER_TYPE,
                               primary_industry=primary_industry,
                               additional_industries=additional_industries)
         user = context.user
@@ -155,7 +155,7 @@ class TestUserDetailView(APITestCase):
 
     def test_get_expert_with_functional_expertise(self):
         functional_expertise = FunctionalExpertiseFactory.create_batch(2)
-        context = UserContext(user_type=BASE_EXPERT_TYPE,
+        context = UserContext(user_type=EXPERT_USER_TYPE,
                               functional_expertise=functional_expertise)
         user = context.user
         with self.login(email=self.basic_user().email):
@@ -167,7 +167,7 @@ class TestUserDetailView(APITestCase):
                         for expertise in functional_expertise])
 
     def test_get_with_no_profile(self):
-        context = UserContext(user_type=BASE_ENTREPRENEUR_TYPE)
+        context = UserContext(user_type=ENTREPRENEUR_USER_TYPE)
         user = context.user
         user.entrepreneurprofile.delete()
         user.entrepreneurprofile = None
@@ -203,7 +203,7 @@ class TestUserDetailView(APITestCase):
             assert_fields_missing(["POST"], response.data["actions"])
 
     def test_expert_options(self):
-        context = UserContext(user_type=BASE_EXPERT_TYPE)
+        context = UserContext(user_type=EXPERT_USER_TYPE)
         user = context.user
         with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
@@ -215,7 +215,7 @@ class TestUserDetailView(APITestCase):
             assert_fields(EXPERT_ONLY_MUTABLE_FIELDS, patch_options)
 
     def test_member_options(self):
-        context = UserContext(user_type=BASE_MEMBER_TYPE)
+        context = UserContext(user_type=MEMBER_USER_TYPE)
         user = context.user
         with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
@@ -226,7 +226,7 @@ class TestUserDetailView(APITestCase):
             assert_fields_missing(NON_MEMBER_MUTABLE_FIELDS, patch_options)
 
     def test_options_against_get(self):
-        context = UserContext(user_type=BASE_EXPERT_TYPE)
+        context = UserContext(user_type=EXPERT_USER_TYPE)
         user = context.user
         with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
@@ -292,7 +292,7 @@ class TestUserDetailView(APITestCase):
             assert response.data == NO_USER_ERROR.format(_id)
 
     def test_patch_expert_fields(self):
-        context = UserContext(user_type=BASE_EXPERT_TYPE)
+        context = UserContext(user_type=EXPERT_USER_TYPE)
         user = context.user
         profile = get_profile(user)
         with self.login(email=self.basic_user().email):
@@ -332,7 +332,7 @@ class TestUserDetailView(APITestCase):
             assert helper.field_value("mentor_interest") is True
 
     def test_patch_personal_website_url_with_email_and_password_url(self):
-        context = UserContext(user_type=BASE_ENTREPRENEUR_TYPE)
+        context = UserContext(user_type=ENTREPRENEUR_USER_TYPE)
         user = context.user
         profile = get_profile(user)
         with self.login(email=self.basic_user().email):
@@ -348,7 +348,7 @@ class TestUserDetailView(APITestCase):
             assert helper.field_value("personal_website_url") == website_url
 
     def test_patch_expert_field_fails_for_entrepreneur(self):
-        context = UserContext(user_type=BASE_ENTREPRENEUR_TYPE)
+        context = UserContext(user_type=ENTREPRENEUR_USER_TYPE)
         user = context.user
         with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
@@ -362,7 +362,7 @@ class TestUserDetailView(APITestCase):
             assert "bio" in valid_note
 
     def test_patch_bio_fails_for_member(self):
-        context = UserContext(user_type=BASE_MEMBER_TYPE)
+        context = UserContext(user_type=MEMBER_USER_TYPE)
         user = context.user
         with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
@@ -492,7 +492,7 @@ class TestUserDetailView(APITestCase):
                        for datum in response.data)
 
     def test_patch_ids(self):
-        context = UserContext(user_type=BASE_EXPERT_TYPE)
+        context = UserContext(user_type=EXPERT_USER_TYPE)
         user = context.user
         profile = get_profile(user)
         industry = IndustryFactory()
@@ -551,7 +551,7 @@ class TestUserDetailView(APITestCase):
             assert helper.field_value("twitter_handle") == empty_value
 
     def test_patch_invalid_primary_industry_id(self):
-        context = UserContext(user_type=BASE_EXPERT_TYPE)
+        context = UserContext(user_type=EXPERT_USER_TYPE)
         user = context.user
         with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
@@ -572,7 +572,7 @@ class TestUserDetailView(APITestCase):
             assert "home_program_family_id" in _valid_note(response.data)
 
     def test_patch_with_no_profile(self):
-        context = UserContext(user_type=BASE_ENTREPRENEUR_TYPE)
+        context = UserContext(user_type=ENTREPRENEUR_USER_TYPE)
         user = context.user
         user.entrepreneurprofile.delete()
         user.entrepreneurprofile = None
@@ -586,7 +586,7 @@ class TestUserDetailView(APITestCase):
             assert user.last_name == new_last_name
 
     def test_patch_user_with_no_profile_not_allowed_on_missing_fields(self):
-        context = UserContext(user_type=BASE_ENTREPRENEUR_TYPE)
+        context = UserContext(user_type=ENTREPRENEUR_USER_TYPE)
         user = context.user
         user.entrepreneurprofile.delete()
         user.entrepreneurprofile = None
