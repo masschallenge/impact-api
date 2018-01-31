@@ -48,10 +48,6 @@ from .partner_factory import PartnerFactory
 from .partner_team_member_factory import PartnerTeamMemberFactory
 from .paypal_payment_factory import PayPalPaymentFactory
 from .permission_factory import PermissionFactory
-from .program_administrator_factory import ProgramAdministratorFactory
-from .program_administrator_permission_factory import (
-    ProgramAdministratorPermissionFactory
-)
 from .program_cycle_factory import ProgramCycleFactory
 from .program_factory import ProgramFactory
 from .program_family_factory import ProgramFamilyFactory
