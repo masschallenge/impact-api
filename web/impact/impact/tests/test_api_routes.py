@@ -56,7 +56,7 @@ class TestApiRoute(TestCase):
             codename='view_startup'
         )
         url_name = "object-list"
-        view_kwargs = {'app': 'impact', "model": "startup"}
+        view_kwargs = {'app': 'accelerator', "model": "startup"}
         self.response_401(self.get(url_name, **view_kwargs))
 
         basic_user = self.make_user('basic_user@test.com')
@@ -82,7 +82,7 @@ class TestApiRoute(TestCase):
         url_name = "object-detail"
         StartupFactory(id=1)
         view_kwargs = {
-            'app': 'impact',
+            'app': 'accelerator',
             "model": "startup",
             "pk": 1,
         }
@@ -122,7 +122,7 @@ class TestApiRoute(TestCase):
             codename='view_startup_additional_industries'
         )
         url_name = "related-object-list"
-        view_kwargs = {"app": "impact",
+        view_kwargs = {"app": "accelerator",
                        "model": "startup",
                        "related_model": "additional_industries"}
         self.response_401(self.get(url_name, **view_kwargs))
@@ -144,7 +144,7 @@ class TestApiRoute(TestCase):
         program_role = ProgramRoleFactory(id=1)
         startup_status = StartupStatusFactory(id=1)
         view_kwargs = {
-            'app': 'impact',
+            'app': 'accelerator',
             "model": "programrole",
         }
         basic_user = self.make_user('basic_user@test.com')
@@ -162,7 +162,7 @@ class TestApiRoute(TestCase):
         program_role = ProgramRoleFactory(id=1)
         startup_status = StartupStatusFactory(id=1)
         view_kwargs = {
-            'app': 'impact',
+            'app': 'accelerator',
             "model": "programrole",
         }
         response = self.post(url_name, data={
@@ -178,7 +178,7 @@ class TestApiRoute(TestCase):
         program_role = ProgramRoleFactory(id=1)
         startup_status = StartupStatusFactory(id=1)
         view_kwargs = {
-            'app': 'impact',
+            'app': 'accelerator',
             "model": "programrole",
         }
         self.response_401(self.get(url_name, **view_kwargs))
@@ -210,7 +210,7 @@ class TestApiRoute(TestCase):
         StartupFactory(id=2)
         url_name = "object-detail"
         view_kwargs = {
-            'app': 'impact',
+            'app': 'accelerator',
             "model": "startup",
             "pk": 2,
         }
@@ -257,7 +257,7 @@ class TestApiRoute(TestCase):
         StartupFactory(id=3, is_visible=0)
         url_name = "object-detail"
         view_kwargs = {
-            'app': 'impact',
+            'app': 'accelerator',
             "model": "startup",
             "pk": 3,  # has stealth mode enabled
         }
@@ -301,7 +301,7 @@ class TestApiRoute(TestCase):
         url_name = "object-detail"
         startup = StartupFactory(id=1, is_visible=False)
         get_kwargs = {
-            'app': 'impact',
+            'app': 'accelerator',
             "model": "startup",
             "pk": 1,
         }
