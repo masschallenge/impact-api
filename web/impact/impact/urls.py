@@ -3,7 +3,10 @@
 
 from django.apps import apps
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import (
+    include,
+    url,
+)
 from django.conf.urls.static import static
 from django.contrib import admin
 from drf_auto_endpoint.router import router as schema_router
@@ -24,11 +27,12 @@ from impact.views import (
     IndexView,
 )
 
+accelerator_router = routers.DefaultRouter()
 simpleuser_router = routers.DefaultRouter()
 simpleuser_router.register('User', GeneralViewSet, base_name='User')
 
-for model in apps.get_models('impact'):
-    if model._meta.app_label == 'impact' and not model._meta.auto_created:
+for model in apps.get_models('accelerator'):
+    if model._meta.app_label == 'accelerator' and not model._meta.auto_created:
         schema_router.register(model, url=model_name_to_snake(model.__name__))
 
 sso_urlpatterns = [
@@ -70,7 +74,8 @@ urls = [
         }),
         name='object-detail'),
     url(r'^api/simpleuser/', include(simpleuser_router.urls)),
-    url(r'^api/impact/', include(schema_router.urls), name='api-root'),
+    url(r'^api/accelerator/', include(schema_router.urls),
+        name='api-root'),
     url(r'^sso/', include(sso_urlpatterns, namespace="sso")),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include(account_urlpatterns)),
