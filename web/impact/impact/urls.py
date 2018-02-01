@@ -19,7 +19,6 @@ from rest_framework_jwt.views import (
 
 from impact.models.utils import model_name_to_snake
 from impact.schema import schema_view
-from impact.utils import model_is_not_auto_created
 from impact.v0.urls import v0_urlpatterns
 from impact.v1.urls import v1_urlpatterns
 from impact.views import (

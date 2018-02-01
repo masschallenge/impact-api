@@ -21,7 +21,6 @@ from impact.tests.factories import (
     UserFactory,
     StartupStatusFactory
 )
-from impact.tests.factories import ContentTypeFactory
 from impact.tests.factories import PermissionFactory
 from accelerator.models import Startup
 

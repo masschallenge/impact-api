@@ -14,7 +14,6 @@ from oauth2_provider.models import get_application_model
 from test_plus.test import TestCase
 
 from impact.tests.factories import (
-    ContentTypeFactory,
     PermissionFactory,
     UserFactory,
 )

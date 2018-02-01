@@ -238,8 +238,10 @@ class Base(Configuration):
 
     MPTT_SWAPPABLE_INDUSTRY_MODEL = "accelerator.Industry"
     MPTT_SWAPPABLE_INDUSTRY_MODEL_ADDITIONAL = "accelerator.Industry"
-    MPTT_SWAPPABLE_INDUSTRY_DB_TABLE_NAME = "accelerator_startup_related_industry"
-    MPTT_SWAPPABLE_FUNCTIONALEXPERTISE_MODEL = "accelerator.FunctionalExpertise"
+    MPTT_SWAPPABLE_INDUSTRY_DB_TABLE_NAME = (
+        "accelerator_startup_related_industry")
+    MPTT_SWAPPABLE_FUNCTIONALEXPERTISE_MODEL = (
+        "accelerator.FunctionalExpertise")
 
 
 class Dev(Base):

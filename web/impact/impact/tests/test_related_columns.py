@@ -54,7 +54,6 @@ class TestRelatedColumns(TestCase):
             model='user').delete()
         super().tearDownClass()
 
-
     def test_api_object_relation_link_is_valid(self):
         url_name = "object-list"
         view_kwargs = {'app': 'accelerator', "model": "startupteammember"}
