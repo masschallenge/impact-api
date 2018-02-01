@@ -29,7 +29,7 @@ class OrganizationBecameFinalistEvent(BaseHistoryEvent):
     @classmethod
     def events(cls, organization):
         result = []
-        for startup in organization.startup_set.all():
+        for startup in organization.startups.all():
             for ss in startup.startupstatus_set.filter(**compose_filter(
                     ["program_startup_status",
                      "startup_role",

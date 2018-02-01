@@ -59,7 +59,7 @@ class OrganizationBecameEntrantEvent(BaseHistoryEvent):
     @classmethod
     def events(cls, organization):
         result = []
-        for startup in organization.startup_set.all():
+        for startup in organization.startups.all():
             entrant_app_types = [cycle.default_application_type for
                                  cycle in ProgramCycle.objects.all()]
             result += cls._events_for_startup(startup, entrant_app_types)

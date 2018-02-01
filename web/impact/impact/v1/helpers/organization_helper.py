@@ -87,7 +87,7 @@ class OrganizationHelper(ModelHelper):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.startup = self.subject.startup_set.order_by("-id").first()
+        self.startup = self.subject.startups.order_by("-id").first()
         self.partner = self.subject.partner_set.order_by("-id").first()
 
     @classmethod
