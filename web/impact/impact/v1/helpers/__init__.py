@@ -69,6 +69,10 @@ from impact.v1.helpers.program_family_helper import (
     PROGRAM_FAMILY_FIELDS,
     ProgramFamilyHelper,
 )
+from impact.v1.helpers.refund_code_helper import (
+    REFUND_CODE_FIELDS,
+    RefundCodeHelper,
+)
 from impact.v1.helpers.user_helper import (
     USER_FIELDS,
     UserHelper,
