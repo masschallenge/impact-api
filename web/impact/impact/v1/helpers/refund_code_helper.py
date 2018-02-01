@@ -43,11 +43,10 @@ class RefundCodeHelper(ModelHelper):
 
     @property
     def issued_to(self):
-        return self.field_pk("issued_to")
+        return self.get_field_value("issued_to").pk
 
     @property
     def programs(self):
-        if hasattr(self.subject, "programs"):
-            programs = self.subject.programs
-            if programs:
-                return [program.pk for program in programs.all()]
+        programs = self.get_field_value("programs")
+        if programs:
+            return [program.pk for program in programs.all()]
