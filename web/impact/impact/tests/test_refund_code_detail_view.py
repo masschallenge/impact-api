@@ -22,6 +22,7 @@ REFUND_CODE_GET_FIELDS = [
     "programs",
 ]
 
+
 class TestRefundCodeDetailView(APITestCase):
     def test_get(self):
         code = RefundCodeFactory()
@@ -32,7 +33,8 @@ class TestRefundCodeDetailView(APITestCase):
             assert response.data["discount"] == code.discount
             assert response.data["issued_to"] == code.issued_to.organization.id
             assert response.data["unique_code"] == code.unique_code
-            assert response.data["programs"] == [program.pk for program in code.programs.all()]
+            assert response.data["programs"] == [
+                program.pk for program in code.programs.all()]
 
     def test_options(self):
         code = RefundCodeFactory()

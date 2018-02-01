@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from impact.models import RefundCode
-from impact.v1.helpers.model_helper import(
+from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     INTEGER_ARRAY_FIELD,
     INTEGER_FIELD,
@@ -51,4 +51,3 @@ class RefundCodeHelper(ModelHelper):
             programs = self.subject.programs
             if programs:
                 return [program.pk for program in programs.all()]
-
