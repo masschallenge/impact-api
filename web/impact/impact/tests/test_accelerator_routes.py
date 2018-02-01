@@ -39,19 +39,6 @@ class TestAcceleratorRoutes(TestCase):
     client_class = APIClient
     user_factory = UserFactory
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        for model in MC_CONTENTTYPES:
-            ContentTypeFactory(app_label='mc', model=model)
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        ContentType.objects.filter(
-            app_label='mc',
-            model__in=MC_CONTENTTYPES).delete()
-
     def _grant_permissions(
             self,
             user,
@@ -75,7 +62,7 @@ class TestAcceleratorRoutes(TestCase):
         self.response_401(self.get(url_name, **view_kwargs))
         startup_add_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startup'),
             codename='add_startup',
         )
@@ -142,7 +129,7 @@ class TestAcceleratorRoutes(TestCase):
         self.response_401(self.get(url_name, **view_kwargs))
         startup_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startup'),
             codename='view_startup',
         )

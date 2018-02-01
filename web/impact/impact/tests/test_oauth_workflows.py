@@ -19,7 +19,6 @@ from impact.tests.factories import (
     UserFactory,
 )
 
-
 OAuth_App = get_application_model()
 
 
@@ -28,38 +27,32 @@ class TestOAuthRoutes(TestCase):
     user_factory = UserFactory
 
     @classmethod
-    def tearDownClass(cls):
-        Permission.objects.get(
-            content_type=ContentType.objects.get(
-                app_label='mc',
-                model='startup'),
-            codename='view_startup_stealth_mode_true',
-            name='Can view Startups in Stealth Mode',
-        ).delete()
-
-        ContentType.objects.filter(
-            app_label='mc',
-            model__in=[
-                'startup',
-                'startupteammember']).delete()
-
-    @classmethod
     def setUpClass(cls):
-        ContentTypeFactory(app_label='mc', model='startup')
-        ContentTypeFactory(app_label='mc', model='startupteammember')
+        super().setUpClass()
         Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startup'),
             codename='view_startup_stealth_mode_true',
             name='Can view Startups in Stealth Mode',
         )
 
+    @classmethod
+    def tearDownClass(cls):
+        Permission.objects.get(
+            content_type=ContentType.objects.get(
+                app_label='accelerator',
+                model='startup'),
+            codename='view_startup_stealth_mode_true',
+            name='Can view Startups in Stealth Mode',
+        ).delete()
+        super().tearDownClass()
+
     def test_oauth_auth_code_grant_workflow(self):
         # project setup
         basic_user = self.make_user(
             'basic_user@test.com', perms=["mc.view_startup"])
-        startup_content_type = ContentType.objects.get(app_label='mc',
+        startup_content_type = ContentType.objects.get(app_label='accelerator',
                                                        model='startup')
         perm = PermissionFactory.create(content_type=startup_content_type,
                                         codename='view_startup')
@@ -70,7 +63,7 @@ class TestOAuthRoutes(TestCase):
         )
         startup_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startupteammember'),
             codename='view_startupteammember',
         )
@@ -80,19 +73,19 @@ class TestOAuthRoutes(TestCase):
         basic_user.save()
         app = OAuth_App.objects.create(
             user=basic_user,
-            name="Test666",
+            name='Test666',
             client_type=OAuth_App.CLIENT_PUBLIC,
             authorization_grant_type=OAuth_App.GRANT_AUTHORIZATION_CODE,
-            redirect_uris="http://thirdparty.com/exchange/",
+            redirect_uris='http://thirdparty.com/exchange/',
         )
 
         # a user is directed to a link, and asked to login
         self.get(
-            "oauth2_provider:authorize",
+            'oauth2_provider:authorize',
             data={
-                "client_id": app.client_id,
-                "response_type": "code",
-                "state": "random_state_string",
+                'client_id': app.client_id,
+                'response_type': 'code',
+                "state": 'random_state_string',
             },
         )
         self.response_302()
@@ -163,7 +156,7 @@ class TestOAuthRoutes(TestCase):
             # this token can be used to access data
             self.get_check_200(
                 self.reverse(
-                    "object-list", model='startup', app='impact'),
+                    "object-list", model='startup', app='accelerator'),
                 extra={
                     "HTTP_AUTHORIZATION":
                         "{} {}".format(
@@ -176,7 +169,7 @@ class TestOAuthRoutes(TestCase):
     def test_oauth_password_grant_workflow(self):
         Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startup'),
             codename='view_startup'
         )
@@ -191,20 +184,20 @@ class TestOAuthRoutes(TestCase):
         )
         startup_stealth_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startup'),
             codename='view_startup_stealth_mode_true',
             name='Can view Startups in Stealth Mode',
         )
         startup_member_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startupteammember'),
             codename='view_startupteammember',
         )
         startup_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startup'),
             codename='view_startup',
         )
@@ -241,7 +234,7 @@ class TestOAuthRoutes(TestCase):
         token_type = content["token_type"]
         self.get_check_200(
             self.reverse(
-                "object-list", model='startup', app='impact'),
+                "object-list", model='startup', app='accelerator'),
             extra={
                 "HTTP_AUTHORIZATION":
                     "{} {}".format(token_type, access_token),

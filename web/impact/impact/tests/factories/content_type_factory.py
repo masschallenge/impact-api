@@ -14,5 +14,5 @@ class ContentTypeFactory(DjangoModelFactory):
         model = ContentType
 
     # name = Sequence(lambda n: "test_contenttype{0}".format(n))
-    app_label = "mc"
+    app_label = 'accelerator'
     model = Sequence(lambda n: "test_contenttypemodel{0}".format(n))
