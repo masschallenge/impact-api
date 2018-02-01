@@ -3,6 +3,7 @@
 
 from impact.models import RefundCode
 from impact.v1.helpers.model_helper import(
+    BOOLEAN_FIELD,
     INTEGER_ARRAY_FIELD,
     INTEGER_FIELD,
     ModelHelper,
@@ -28,6 +29,8 @@ REFUND_CODE_FIELDS = {
     "discount": INTEGER_FIELD,
     "maximum_uses": INTEGER_FIELD,
     "programs": INTEGER_ARRAY_FIELD,
+    "notes": STRING_FIELD,
+    "internal": BOOLEAN_FIELD,
 }
 
 
