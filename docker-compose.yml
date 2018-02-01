@@ -1,16 +1,40 @@
 version: '2'
 services:
   mysql:
-    image: mysql
-    ports:
-      - "3307:3306"
-    volumes:
-      - ./mysql/conf.d/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ./mysql/data:/var/lib/mysql
-      - ./sql/initial.sql:/docker-entrypoint-initdb.d/init.sql
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: mc_dev
+      image: twang2218/mysql:5.7-replica
+      restart: unless-stopped
+      ports:
+        - "3307:3306"
+      volumes:
+        - ./mysql/conf.d/my.cnf:/etc/mysql/conf.d/my.cnf
+        - ./mysql/data:/var/lib/mysql
+        - ./sql/replica.sh:/docker-entrypoint-initdb.d/replica.sh:ro
+        - ./sql/initial.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: mc_dev
+        MYSQL_REPLICA_USER: replica
+        MYSQL_REPLICA_PASS: replica_Passw0rd
+      command: ["mysqld", "--log-bin=mysql-bin", "--server-id=1"]
+  slave:
+      image: twang2218/mysql:5.7-replica
+      restart: unless-stopped
+      ports:
+          - 3306:3306
+      environment:
+          - MYSQL_ROOT_PASSWORD=root
+          - MYSQL_REPLICA_USER=replica
+          - MYSQL_DATABASE=mc_dev
+          - MYSQL_REPLICA_PASS=replica_Passw0rd
+          - MYSQL_MASTER_SERVER=mysql
+          - MYSQL_MASTER_PORT_NUMBER=3307
+          - MYSQL_MASTER_WAIT_TIME=100
+      command: ["mysqld", "--log-bin=mysql-bin", "--server-id=2"]
+      volumes:
+        - ./sql/initial.sql:/docker-entrypoint-initdb.d/init.sql:ro
+        - ./sql/replica.sh:/docker-entrypoint-initdb.d/replica.sh:ro
+      links:
+        - mysql
   # Redis
   redis:
     build:
@@ -48,6 +72,7 @@ services:
     links:
       - mysql
       - redis
+      - slave
     env_file: .dev.env
     user: root
   start_dependencies:
