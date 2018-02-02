@@ -3,7 +3,6 @@
 
 from abc import ABCMeta
 from rest_framework.views import APIView
-from rest_framework_tracking.mixins import LoggingMixin
 from impact.permissions import V1APIPermissions
 from impact.v1.helpers import (
     json_object,
@@ -12,7 +11,7 @@ from impact.v1.helpers import (
 from impact.v1.metadata import ImpactMetadata
 
 
-class ImpactView(LoggingMixin, APIView):
+class ImpactView(APIView):
     __metaclass__ = ABCMeta
 
     permission_classes = (
