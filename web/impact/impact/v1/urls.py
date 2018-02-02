@@ -1,6 +1,8 @@
 from django.conf.urls import url
 
 from impact.v1.views import (
+    CreditCodeDetailView,
+    CreditCodeListView,
     FunctionalExpertiseDetailView,
     FunctionalExpertiseListView,
     IndustryDetailView,
@@ -15,8 +17,6 @@ from impact.v1.views import (
     ProgramCycleListView,
     ProgramFamilyDetailView,
     ProgramFamilyListView,
-    RefundCodeDetailView,
-    RefundCodeListView,
     UserConfidentialView,
     UserDetailView,
     UserHistoryView,
@@ -25,6 +25,12 @@ from impact.v1.views import (
 )
 
 v1_urlpatterns = [
+    url(r"^credit_code/(?P<pk>[0-9]+)/$",
+        CreditCodeDetailView.as_view(),
+        name=CreditCodeDetailView.view_name),
+    url(r"^credit_code/$",
+        CreditCodeListView.as_view(),
+        name=CreditCodeListView.view_name),
     url(r"^functional_expertise/(?P<pk>[0-9]+)/$",
         FunctionalExpertiseDetailView.as_view(),
         name=FunctionalExpertiseDetailView.view_name),
@@ -67,12 +73,6 @@ v1_urlpatterns = [
     url(r"^program_family/$",
         ProgramFamilyListView.as_view(),
         name=ProgramFamilyListView.view_name),
-    url(r"^refund_code/(?P<pk>[0-9]+)/$",
-        RefundCodeDetailView.as_view(),
-        name=RefundCodeDetailView.view_name),
-    url(r"^refund_code/$",
-        RefundCodeListView.as_view(),
-        name=RefundCodeListView.view_name),
     url(r"^user/(?P<pk>[0-9]+)/confidential/$",
         UserConfidentialView.as_view(),
         name=UserConfidentialView.view_name),
