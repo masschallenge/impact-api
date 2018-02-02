@@ -104,20 +104,20 @@ target_help = \
   'db-shell - Access to running database server.' \
   'django-shell - Access to Django shell.' \
   ' ' \
+  '** Database targets **' \
+  'Database targets use the make variables db_name and gz_file.' \
+  'db_name defaults to django_1-10_schema' \
+  'gz_file defaults to db_cache/$$(db_name).sql.gz' \
   'load-db - Load gzipped database file.' \
-  '\tDefaults to db_cache/django_1-10_schema.sql.gz.' \
-  '\t$$(gz_file) can provide an explicit path.' \
-  '\tOtherwise db_cache/$$(db_name).sql.gz is used.' \
-  '\tIf no such file exists, then try download from S3.' \
-  'clean-db-cache - Delete db_cache/django_1-10_schema.sql.gz if it exists.' \
+  '\tIf $$(gz_file) does not exist, then try to download from S3' \
+  '\tusing the key "$$(db_name).sql.gz".' \
+  'clean-db-cache - Delete $$(gz_file) if it exists.' \
   'dump-db - Create a gzipped db dump.' \
-  '\tDefaults to db_cache/django_1-10_schema.sql.gz.' \
-  '\t$$(gz_file) can provide an explicit path.' \
-  '\tOtherwise db_cache/$$(db_name).sql.gz is used.' \
+  '\tCreates db_cache/$$(db_name).sql.gz.' \
+  '\tNote that dump-db ignores $$(gz_file).' \
   'upload-db - Upload db dump to S3.' \
-  '\tDefaults to uploading db_cache/django_1-10_schema.sql.gz.' \
-  '\t$$(db_name) defaults to django_1-10_schema and sets the S3 key.' \
-  '\t$$(gz_file) can provide an epxlicit path without changing the S3 key.' \
+  '\tS3 key is always $$(db_name).sql.gz' \
+  '\tUploads $$(gz_file) and make it publicly accessible.' \
   ' ' \
   'release-list - List all releases that are ready to be deployed.' \
   'release - Create named release of releated servers.' \
@@ -160,7 +160,7 @@ setup:
 	@mkdir -p ./mysql/data
 	@mkdir -p ./redis
 
-build: clean setup
+build: shutdown-vms setup
 	@docker build -f fpdiff.Dockerfile -t masschallenge/fpdiff .
 	@docker-compose build --no-cache
 
@@ -234,7 +234,8 @@ branch =? development
 current:
 	@for r in $(REPOS) ; do \
 	  cd $$r; \
-	  git checkout development && git checkout $(branch) && git pull; \
+	  git checkout $(branch) || git checkout development; \
+	  git pull; \
 	  done
 
 # Server and Virtual Machine related targets
@@ -283,7 +284,8 @@ django-shell:
 
 DB_CACHE_DIR = db_cache/
 db_name ?= django_1-10_schema
-gz_file ?= $(DB_CACHE_DIR)$(db_name).sql.gz
+s3_key = $(db_name).sql.gz
+gz_file ?= $(DB_CACHE_DIR)$(s3_key)
 
 load-db: $(DB_CACHE_DIR) $(gz_file)
 	@echo "Loading $(gz_file)"
@@ -299,21 +301,29 @@ ${DB_CACHE_DIR}:
 	mkdir -p ${DB_CACHE_DIR}
 
 clean-db-cache:
-	@rm -rf $(gz_file)
+	@rm -f $(gz_file)
 
 mysql-container:
-	@docker-compose up -d
-	@until $$(curl --output /dev/null --silent --head --fail http://web:800); do \
-	  echo \"Waiting for web:8000...\" \
-	  sleep 5 \
-	done;
+	docker-compose up -d
+	docker-compose run --rm web /usr/bin/mysqlwait.sh
 
 dump-db: mysql-container
-	@docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev -r foo.sql
-	@echo Created $(gz_file)
+	docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev -r /$(DB_CACHE_DIR)$(db_name).sql
+	rm -f $(DB_CACHE_DIR)$(s3_key)
+	gzip $(DB_CACHE_DIR)$(db_name).sql
+	echo Created $(DB_CACHE_DIR)$(s3_key)
+
+MAX_UPLOAD_SIZE = 80000000
 
 upload-db:
-	@aws s3api put-object --acl public-read --bucket public-clean-saved-db-states --key $(db_name) --body $(gz_file)
+	@if [ `wc -c < $(gz_file)` \> $(MAX_UPLOAD_SIZE) ]; \
+	then \
+	  echo Dump file exceeds $(MAX_UPLOAD_SIZE) bytes.; \
+	  echo This may indicate that this dump contains sensitive data; \
+	  false; \
+	fi
+	@echo Uploading $(gz_file) as $(s3_key)...
+	@aws s3api put-object --acl public-read --bucket public-clean-saved-db-states --key $(s3_key) --body $(gz_file)
 
 
 TARGET ?= staging

@@ -8,6 +8,8 @@ COPY scripts/start.sh /usr/bin
 
 COPY scripts/start-nodaemon.sh /usr/bin
 
+COPY scripts/mysqlwait.sh /usr/bin
+
 RUN apt-get update -y
 
 # python2.7 is required to run supervisor
