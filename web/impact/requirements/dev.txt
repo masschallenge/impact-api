@@ -1,6 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+-e git+file:../django-accelerator#egg=django-accelerator
 -r base.txt
 
 coverage
