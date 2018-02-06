@@ -7,7 +7,8 @@ targets = \
   code-check \
   \
   update-schema \
-  migration \
+  data-migration \
+  migrations \
   migrate \
   models \
   \
@@ -82,7 +83,10 @@ target_help = \
   '\tupdates any model definitions managed in other libraries,' \
   '\tcreates any needed migrations (uses $$(migration_name) if provided),' \
   '\truns any pending migrations.' \
-  'migration - Create empty migration (uses $$(migration_name) if provided).' \
+  'data-migration - Create empty migration.' \
+  '\tUses $$(migration_name) if provided.' \
+  'migrations - Create any needed auto-generated migrations.' \
+  '\tUses $$(migration_name) if provided.' \
   'migrate - Runs any pending migrations.' \
   'models - Updates model definitions managed in other libraries.' \
   ' ' \
@@ -206,20 +210,16 @@ REPOS = ../accelerate ../django-accelerator ../impact-api
 
 
 # Database migration related targets
+
+data-migration migrations:
+	@cd ../django-accelerator && $(MAKE) $@ \
+	  migration_name=$(migration_name)
+
 migrate:
 	@docker-compose run --rm web ./manage.py migrate
 
-ifdef MIGRATION_NAME
-  MIGRATION_ARGS = --name $(MIGRATION_NAME)
-endif
-ifeq ($(EMPTY),1)
-  MIGRATION_ARGS += --empty
-endif
-
-# migrations vs migration.  Should be run in django-accelerator.
-# I don't think it should be run in impact-api.
-migrations:
-	@docker-compose run --rm web ./manage.py makemigrations $(MIGRATION_ARGS)
+models:
+	@echo models target not yet implemented
 
 
 
