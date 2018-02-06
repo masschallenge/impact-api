@@ -32,6 +32,7 @@ django-registration
 django-rest-framework-proxy
 django-rest-swagger
 Django==1.10.3
+django-multidb-router
 djangorestframework
 djangorestframework-jwt
 drf-schema-adapter
