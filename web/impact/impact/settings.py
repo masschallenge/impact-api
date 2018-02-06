@@ -99,6 +99,8 @@ class Base(Configuration):
         'rest_framework_swagger',
         'paypal.standard',
         'paypal.pro',
+        'fluent_pages',
+
     ]
     ACCELERATOR_MODELS_ARE_MANAGED = True
     IMPACT_MODELS_ARE_MANAGED = True
@@ -242,6 +244,8 @@ class Base(Configuration):
         "accelerator_startup_related_industry")
     MPTT_SWAPPABLE_FUNCTIONALEXPERTISE_MODEL = (
         "accelerator.FunctionalExpertise")
+
+    CMS_FILE_ROOT = '/var/www/cms-files'
 
 
 class Dev(Base):
