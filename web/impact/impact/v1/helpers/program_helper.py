@@ -30,10 +30,6 @@ PROGRAM_FIELDS = {
 class ProgramHelper(ModelHelper):
     model = Program
 
-    @classmethod
-    def fields(cls):
-        return PROGRAM_FIELDS
-
     @property
     def cycle_name(self):
         return self.field_element("cycle", "name")
@@ -41,3 +37,7 @@ class ProgramHelper(ModelHelper):
     @property
     def program_family_name(self):
         return self.field_element("program_family", "name")
+
+    @classmethod
+    def fields(cls):
+        return PROGRAM_FIELDS
