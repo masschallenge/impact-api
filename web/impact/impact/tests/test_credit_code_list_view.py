@@ -14,7 +14,7 @@ from impact.tests.utils import assert_fields
 from impact.v1.views import CreditCodeListView
 
 
-class TestProgramListView(APITestCase):
+class TestCreditCodeListView(APITestCase):
     url = reverse(CreditCodeListView.view_name)
 
     def test_get(self):

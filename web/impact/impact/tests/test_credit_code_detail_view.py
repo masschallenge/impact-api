@@ -23,7 +23,7 @@ CREDIT_CODE_GET_FIELDS = [
 ]
 
 
-class TestRefundCodeDetailView(APITestCase):
+class TestCreditCodeDetailView(APITestCase):
     def test_get(self):
         code = RefundCodeFactory()
         with self.login(email=self.basic_user().email):

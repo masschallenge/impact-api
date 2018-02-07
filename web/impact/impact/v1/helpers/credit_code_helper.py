@@ -39,7 +39,7 @@ class CreditCodeHelper(ModelHelper):
 
     @classmethod
     def fields(self):
-        return CREDIT_CODE_FIELDS
+        return self.fields_dictionary(fields=CREDIT_CODE_FIELDS)
 
     @property
     def issued_to(self):
