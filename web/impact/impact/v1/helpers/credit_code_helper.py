@@ -38,8 +38,9 @@ class CreditCodeHelper(ModelHelper):
     model = RefundCode
 
     @classmethod
-    def fields(self):
-        return self.fields_dictionary(fields=CREDIT_CODE_FIELDS)
+    def fields(cls):
+        # return self.fields_dictionary(fields=CREDIT_CODE_FIELDS)
+        return CREDIT_CODE_FIELDS
 
     @property
     def issued_to(self):

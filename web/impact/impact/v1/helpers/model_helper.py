@@ -197,7 +197,8 @@ class ModelHelper(object):
     @classmethod
     def all_objects(cls):
         return cls.model.objects.all()
-
+    
+    @classmethod
     def fields_dictionary(fields):
         return fields
 
