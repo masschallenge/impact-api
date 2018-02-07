@@ -198,8 +198,14 @@ class ModelHelper(object):
     def all_objects(cls):
         return cls.model.objects.all()
 
-    def get_field_value(self, field):
-        return getattr(self.subject, field, None)
+    def list_of_field_elements(self, field, attribute):
+        objects = getattr(self.subject, field, None)
+        if objects:
+            return [getattr(item, attribute, None) for item in objects.all()]
+
+    def field_element(self, field, attribute):
+        field_property = getattr(self.subject, field, None)
+        return getattr(field_property, attribute, None)
 
 
 def serialize_list_field(object, field, helper_class):

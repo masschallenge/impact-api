@@ -43,10 +43,8 @@ class CreditCodeHelper(ModelHelper):
 
     @property
     def issued_to(self):
-        return self.get_field_value("issued_to").pk
+        return self.field_element("issued_to", "pk")
 
     @property
     def programs(self):
-        programs = self.get_field_value("programs")
-        if programs:
-            return [program.pk for program in programs.all()]
+        return self.list_of_field_elements("programs", "pk")
