@@ -36,8 +36,8 @@ class ProgramHelper(ModelHelper):
 
     @property
     def cycle_name(self):
-        return self.get_field_value("cycle").name
+        return self.field_element("cycle", "name")
 
     @property
     def program_family_name(self):
-        return self.get_field_value("program_family").name
+        return self.field_element("program_family", "name")
