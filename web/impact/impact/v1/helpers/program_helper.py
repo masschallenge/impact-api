@@ -33,7 +33,6 @@ class ProgramHelper(ModelHelper):
     @classmethod
     def fields(cls):
         return PROGRAM_FIELDS
-        # return self.fields_dictionary(fields=PROGRAM_FIELDS)
 
     @property
     def cycle_name(self):
