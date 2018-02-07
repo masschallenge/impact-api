@@ -37,6 +37,10 @@ CREDIT_CODE_FIELDS = {
 class CreditCodeHelper(ModelHelper):
     model = RefundCode
 
+    @classmethod
+    def fields(cls):
+        return CREDIT_CODE_FIELDS
+
     @property
     def issued_to(self):
         return self.field_element("issued_to", "pk")
@@ -44,7 +48,3 @@ class CreditCodeHelper(ModelHelper):
     @property
     def programs(self):
         return self.list_of_field_elements("programs", "pk")
-
-    @classmethod
-    def fields(cls):
-        return CREDIT_CODE_FIELDS
