@@ -80,6 +80,8 @@ class Base(Configuration):
     WSGI_APPLICATION = 'impact.wsgi.application'
 
     INSTALLED_APPS = [
+        'paypal.standard',
+        'paypal.pro',
         'accelerator.apps.AcceleratorConfig',
         'simpleuser.apps.SimpleuserConfig',
         'corsheaders',
@@ -92,7 +94,6 @@ class Base(Configuration):
         'django.contrib.sites',
         'django.contrib.staticfiles',
         'embed_video',
-        'impact',
         'oauth2_provider',
         'rest_framework',
         'rest_framework.authtoken',
@@ -100,6 +101,7 @@ class Base(Configuration):
         'paypal.standard',
         'paypal.pro',
         'fluent_pages',
+        'impact',
 
     ]
     ACCELERATOR_MODELS_ARE_MANAGED = True
