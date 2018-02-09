@@ -50,9 +50,19 @@ class Base(Configuration):
 
     MEDIA_URL = '/media/'
 
-    DATABASES = values.DatabaseURLValue()
+    DATABASES = values.DatabaseURLValue().value
 
     DATABASE_ROUTERS = ['impact.routers.APIRouter']
+
+    if os.environ.get('READ_REPLICA_DATABASE_URL'):
+
+        DATABASES.update(values.DatabaseURLValue(
+            alias='read-replica',
+            environ_name='READ_REPLICA_DATABASE_URL').value)
+
+        SLAVE_DATABASES = ['read-replica']
+
+        DATABASE_ROUTERS = ('impact.routers.MasterSlaveAPIRouter',)
 
     EMAIL = values.EmailURLValue()
 

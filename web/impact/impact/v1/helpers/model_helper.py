@@ -91,6 +91,15 @@ STRING_FIELD = {
 }
 REQUIRED_STRING_FIELD = merge_fields(POST_REQUIRED, STRING_FIELD)
 
+STRING_ARRAY_FIELD = {
+    "json-schema": {
+        "type": "array",
+        "item": {
+            "type": "string"
+        },
+    },
+}
+
 EMAIL_FIELD = {
     "json-schema": {
         "type": "string",
@@ -188,11 +197,19 @@ class ModelHelper(object):
     @classmethod
     def all_objects(cls):
         return cls.model.objects.all()
+    
+    @classmethod
+    def fields_dictionary(fields):
+        return fields
 
-    def field_name(self, field):
-        obj = getattr(self.subject, field, None)
-        if hasattr(obj, "name"):
-            return obj.name
+    def list_of_field_elements(self, field, attribute):
+        objects = getattr(self.subject, field, None)
+        if objects:
+            return [getattr(item, attribute, None) for item in objects.all()]
+
+    def field_element(self, field, attribute):
+        field_property = getattr(self.subject, field, None)
+        return getattr(field_property, attribute, None)
 
 
 def serialize_list_field(object, field, helper_class):
