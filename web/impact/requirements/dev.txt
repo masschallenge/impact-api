@@ -1,7 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
--e git+file:../django-accelerator#egg=django-accelerator
 -r base.txt
 
 coverage
@@ -13,3 +12,4 @@ git+https://github.com/PyCQA/pylint#egg=pylint
 ipdb==0.8.1
 ipython==4.0.0
 jsonschema
+-e git+file:///wwwroot/django-accelerator#egg=django-accelerator
