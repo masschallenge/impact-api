@@ -1,6 +1,8 @@
 from django.conf.urls import url
 
 from impact.v1.views import (
+    CreditCodeDetailView,
+    CreditCodeListView,
     FunctionalExpertiseDetailView,
     FunctionalExpertiseListView,
     IndustryDetailView,
@@ -23,6 +25,12 @@ from impact.v1.views import (
 )
 
 v1_urlpatterns = [
+    url(r"^credit_code/(?P<pk>[0-9]+)/$",
+        CreditCodeDetailView.as_view(),
+        name=CreditCodeDetailView.view_name),
+    url(r"^credit_code/$",
+        CreditCodeListView.as_view(),
+        name=CreditCodeListView.view_name),
     url(r"^functional_expertise/(?P<pk>[0-9]+)/$",
         FunctionalExpertiseDetailView.as_view(),
         name=FunctionalExpertiseDetailView.view_name),
