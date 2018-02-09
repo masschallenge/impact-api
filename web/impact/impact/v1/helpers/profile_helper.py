@@ -415,14 +415,11 @@ class ProfileHelper(ModelHelper):
 
     @property
     def expert_category(self):
-        return self.field_name("expert_category")
+        return self.field_element("expert_category", "name")
 
     @property
     def mentoring_specialties(self):
-        if hasattr(self.subject, "mentoring_specialties"):
-            specialties = self.subject.mentoring_specialties
-            if specialties:
-                return [specialty.name for specialty in specialties.all()]
+        return self.list_of_field_elements("mentoring_specialties", "name")
 
     def is_expert(self):
         if hasattr(self.subject, "user_type"):
