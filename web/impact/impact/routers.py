@@ -3,7 +3,7 @@
 from multidb import MasterSlaveRouter
 
 
-class APIRouter(object):
+class ImpactRouter(object):
 
     def allow_migrate(
             self,

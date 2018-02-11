@@ -55,7 +55,7 @@ class Base(Configuration):
 
     DATABASES = values.DatabaseURLValue().value
 
-    DATABASE_ROUTERS = ['impact.routers.APIRouter']
+    DATABASE_ROUTERS = ['impact.routers.ImpactRouter']
 
     SLAVE_DATABASES = ['default']
 
