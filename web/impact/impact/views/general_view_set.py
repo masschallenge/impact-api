@@ -5,7 +5,7 @@ from django.apps import apps
 from rest_framework import viewsets
 from rest_framework import permissions
 
-from impact.models.utils import snake_to_model_name
+from impact.model_utils import snake_to_model_name
 from impact.permissions import DynamicModelPermissions
 from impact.serializers import GeneralSerializer
 from impact.utils import model_name_case

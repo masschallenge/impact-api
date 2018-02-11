@@ -17,7 +17,7 @@ from rest_framework_jwt.views import (
     verify_jwt_token,
 )
 
-from impact.models.utils import model_name_to_snake
+from impact.model_utils import model_name_to_snake
 from impact.schema import schema_view
 from impact.v0.urls import v0_urlpatterns
 from impact.v1.urls import v1_urlpatterns

@@ -17,7 +17,7 @@ from impact.v1.helpers import (
 )
 from impact.v1.views import ImpactView
 from impact.utils import parse_date
-from impact.models.utils import (
+from impact.model_utils import (
     is_int,
     model_has_field,
 )
