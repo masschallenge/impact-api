@@ -1,5 +1,8 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
+from datetime import timedelta
+
+from django.utils import timezone
 
 from impact.tests.factories import (
     BaseProfileFactory,
@@ -17,7 +20,7 @@ class UserContext(object):
                  primary_industry=None,
                  additional_industries=None,
                  functional_expertise=None):
-        user = UserFactory()
+        user = UserFactory(date_joined=(timezone.now() + timedelta(-10)))
         self.user = user
         self.baseprofile = BaseProfileFactory(user=user, user_type=user_type)
         if user_type == "ENTREPRENEUR":
