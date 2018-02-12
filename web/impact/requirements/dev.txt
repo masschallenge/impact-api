@@ -12,4 +12,4 @@ git+https://github.com/PyCQA/pylint#egg=pylint
 ipdb==0.8.1
 ipython==4.0.0
 jsonschema
--e git+file:///wwwroot/django-accelerator#egg=django-accelerator
+-e git+https://github.com/masschallenge/django-accelerator#egg=django-accelerator

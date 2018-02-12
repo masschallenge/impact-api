@@ -21,7 +21,7 @@ RUN pip install --upgrade pip
 
 RUN easy_install-2.7 supervisor
 
-RUN pip3 install -r requirements/dev.txt
+RUN cd /root && pip3 install -r /wwwroot/requirements/dev.txt
 
 RUN useradd -s /bin/bash -u 3000 -M impact_user
 
