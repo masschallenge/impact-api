@@ -54,6 +54,8 @@ class Base(Configuration):
 
     DATABASE_ROUTERS = ['impact.routers.APIRouter']
 
+    SLAVE_DATABASES = ['default']
+
     if os.environ.get('READ_REPLICA_DATABASE_URL'):
 
         DATABASES.update(values.DatabaseURLValue(
