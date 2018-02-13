@@ -109,8 +109,6 @@ class DynamicModelPermissions(BasePermission):
         related_model = view.kwargs.get('related_model', '').lower()
         model_name = model_name_case(model, related_model)
         app_label = obj._meta.app_label
-        if app_label == "impact":
-            app_label = 'accelerator'
         # This needs to be revised.  See AC-4573
         for permission in self.get_field_level_perms(app_label, model_name):
             action, perm_model, field, boolean_str = (

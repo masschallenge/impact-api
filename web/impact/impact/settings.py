@@ -105,7 +105,6 @@ class Base(Configuration):
 
     ]
     ACCELERATOR_MODELS_ARE_MANAGED = True
-    IMPACT_MODELS_ARE_MANAGED = True
 
     AUTH_USER_MODEL = 'simpleuser.User'
 
@@ -289,7 +288,6 @@ class Test(Base):
     }
     DATABASE_ROUTERS = []
     DEBUG = False
-    TEST_RUNNER = 'impact.test_runner.UnManagedModelTestRunner'
     LANGUAGE_CODE = 'en'
 
 
