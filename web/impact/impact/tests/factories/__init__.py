@@ -79,7 +79,6 @@ from accelerator.tests.factories.startup_program_interest_factory import Startup
 from accelerator.tests.factories.startup_role_factory import StartupRoleFactory
 from accelerator.tests.factories.startup_status_factory import StartupStatusFactory
 from accelerator.tests.factories.startup_team_member_factory import StartupTeamMemberFactory
-from accelerator.tests.factories.user_factory import UserFactory
 from accelerator.tests.factories.user_label_factory import UserLabelFactory
 from accelerator.tests.factories.user_role_factory import UserRoleFactory
 from accelerator.tests.factories.program_startup_attribute_factory import ProgramStartupAttributeFactory
@@ -98,3 +97,4 @@ from accelerator.tests.factories.startup_mentor_relationship_factory import (
 
 # Other utility methods
 from accelerator.tests.factories.factory_utils import expert_data
+from simpleuser.tests.factories.user_factory import UserFactory
