@@ -102,7 +102,6 @@ class Base(Configuration):
         'paypal.pro',
         'fluent_pages',
         'impact',
-
     ]
     ACCELERATOR_MODELS_ARE_MANAGED = True
 
