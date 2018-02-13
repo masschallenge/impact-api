@@ -55,8 +55,6 @@ class Base(Configuration):
 
     DATABASES = values.DatabaseURLValue().value
 
-    DATABASE_ROUTERS = ['impact.routers.ImpactRouter']
-
     SLAVE_DATABASES = ['default']
 
     if os.environ.get('READ_REPLICA_DATABASE_URL'):
@@ -67,7 +65,7 @@ class Base(Configuration):
 
         SLAVE_DATABASES = ['read-replica']
 
-        DATABASE_ROUTERS = ('impact.routers.MasterSlaveAPIRouter',)
+        DATABASE_ROUTERS = ('multidb.MasterSlaveRouter',)
 
     EMAIL = values.EmailURLValue()
 
