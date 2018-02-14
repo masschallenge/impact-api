@@ -80,6 +80,7 @@ class Base(Configuration):
     INSTALLED_APPS = [
         'paypal.standard',
         'paypal.pro',
+        'paypal.standard.pdt',
         'accelerator.apps.AcceleratorConfig',
         'simpleuser.apps.SimpleuserConfig',
         'corsheaders',
