@@ -87,7 +87,9 @@ target_help = \
   '\tUses $$(migration_name) if provided.' \
   'migrations - Create any needed auto-generated migrations.' \
   '\tUses $$(migration_name) if provided.' \
-  'migrate - Runs any pending migrations.' \
+  'migrate - Runs migrations. If $$(migration) is given then then that ' \
+  '\tmigration is targeted in the accelerator package unless another ' \
+  '\t$$(application) is given.' \
   'models - Updates model definitions managed in other libraries.' \
   ' ' \
   'current - Switch all repos to development branch (or $$(branch)' \
@@ -215,8 +217,11 @@ data-migration migrations:
 	@cd ../django-accelerator && $(MAKE) $@ \
 	  migration_name=$(migration_name)
 
+
+application ?= accelerator
+
 migrate:
-	@docker-compose run --rm web ./manage.py migrate
+	@docker-compose run --rm web ./manage.py migrate $(application) $(migration)
 
 models:
 	@echo models target not yet implemented
