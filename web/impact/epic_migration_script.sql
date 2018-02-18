@@ -1,37 +1,3 @@
-/*
-
-pre:
-setup mcproject+impact to share a DB
-
-in mcproject:
-
-git checkout AC-5039
-git pull
-vagrant ssh
-cd /vagrant
-sudo rm -rf src/django-accelerator/
-sudo bin/buildout
-find mcproject -name '*.pyc' | xargs rm
-
-in impact:
-git checkout AC-5039
-git pull
-make clean;make build;make dev;
-
-in mcproject:
-resetremotedb
-or
-load prod-db...
-
-in impact:
-make bash
-(for initial schema only:) ./manage.py migrate simpleuser 0002 --fake (mcproject runs it)
-run fake migrations:
-./manage.py migrate pdt 0002 --fake
-./manage.py migrate
-./manage.py dbshell
- */
-
 -- un-apply deleted migrations
 DELETE
 FROM `django_migrations`
@@ -1455,7 +1421,6 @@ ALTER TABLE accelerator_applicationpanelassignment DROP INDEX mc_applicationpane
 ALTER TABLE pagetype_accelerator_userrolemenu DROP INDEX pagetyp_program_family_id_c6e7ccad603a44c_fk_mc_programfamily_id;
 ALTER TABLE pagetype_accelerator_userrolemenu DROP INDEX pagetype_mc_user_user_role_id_6cac5fbcc4d13adc_fk_mc_userrole_id;
 ALTER TABLE pagetype_accelerator_userrolemenu DROP INDEX pagetype_mc_userrolemenu_429b1823;
-ALTER TABLE accelerator_startupteammember_recommendation_tags DROP INDEX mc_startupteammember_recommendation_tags_7486611;
 
 
 
