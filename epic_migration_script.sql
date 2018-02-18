@@ -20,11 +20,12 @@ make clean;make build;make dev;
 
 in mcproject:
 resetremotedb
-
+or
+load prod-db...
 
 in impact:
 make bash
-./manage.py migrate simpleuser 0002 --fake (mcproject runs it)
+(for initial schema only:) ./manage.py migrate simpleuser 0002 --fake (mcproject runs it)
 run fake migrations:
 ./manage.py migrate pdt 0002 --fake
 ./manage.py migrate
@@ -302,7 +303,7 @@ WHERE `auth_user_user_permissions`.`permission_id` IN (512,
                                                        508,
                                                        509,
                                                        510,
-                                                       511) [2.70ms]
+                                                       511);
 DELETE
 FROM `auth_group_permissions`
 WHERE `auth_group_permissions`.`permission_id` IN (512,
@@ -554,7 +555,7 @@ WHERE `auth_group_permissions`.`permission_id` IN (512,
                                                    508,
                                                    509,
                                                    510,
-                                                   511) [2.48ms]
+                                                   511);
 DELETE
 FROM `auth_permission`
 WHERE `auth_permission`.`id` IN (625,
