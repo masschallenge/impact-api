@@ -130,7 +130,7 @@ def _image_fields(user, base_url):
     profile = get_profile(user)
     image = profile.image if profile else None
     return {
-        "photo_url": base_url + image if image else "",
+        "photo_url": base_url + str(image) if image else "",
         "photo_token": encrypt_image_token(image) if image else "",
     }
 
