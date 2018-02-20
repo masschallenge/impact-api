@@ -97,8 +97,6 @@ class Base(Configuration):
         'rest_framework',
         'rest_framework.authtoken',
         'rest_framework_swagger',
-        'paypal.standard',
-        'paypal.pro',
         'fluent_pages',
         'impact',
     ]
