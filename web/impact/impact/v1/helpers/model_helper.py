@@ -199,10 +199,6 @@ class ModelHelper(object):
     def all_objects(cls):
         return cls.model.objects.all()
 
-    @classmethod
-    def fields_dictionary(cls, fields):
-        return fields
-
     def list_of_field_elements(self, field, attribute):
         objects = getattr(self.subject, field, None)
         if objects:
