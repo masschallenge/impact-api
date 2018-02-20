@@ -56,7 +56,8 @@ ORGANIZATION_FIELDS = {
     "updated_at": READ_ONLY_STRING_FIELD,
     "url_slug": ORGANIZATION_URL_SLUG_FIELD,
     "website_url": URL_FIELD,
-
+    "startup_id": PK_FIELD,
+    "partner_id": PK_FIELD,
     # Startup specific fields
     "additional_industries": STARTUP_INDUSTRY_ARRAY_FIELD,
     "date_founded": STARTUP_STRING_FIELD,
@@ -92,6 +93,16 @@ class OrganizationHelper(ModelHelper):
     @classmethod
     def fields(cls):
         return ORGANIZATION_FIELDS
+
+    @property
+    def startup_id(self):
+        if self.startup:
+            return self.startup.id
+
+    @property
+    def partner_id(self):
+        if self.partner:
+            return self.partner.id
 
     @property
     def is_startup(self):

@@ -48,6 +48,24 @@ class TestOrganizationListView(APITestCase):
                         in response.data['results']
                         for partner in partners])
 
+    def test_partner_organization_has_partner_id(self):
+        count = 5
+        PartnerFactory.create_batch(count)
+        with self.login(email=self.basic_user().email):
+            response = self.client.get(self.url)
+            [self.assertTrue(
+                result.get('partner_id') > 0
+            ) for result in response.data['results']]
+
+    def test_startup_organization_has_startup_id(self):
+        count = 5
+        StartupFactory.create_batch(count)
+        with self.login(email=self.basic_user().email):
+            response = self.client.get(self.url)
+            [self.assertTrue(
+                result.get('startup_id') > 0
+            ) for result in response.data['results']]
+
     def test_get_with_limit(self):
         count = 5
         StartupFactory.create_batch(count)
