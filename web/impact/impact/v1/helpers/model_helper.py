@@ -2,11 +2,13 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 import re
+
 from django.core.exceptions import ValidationError
 from django.core.validators import (
     URLValidator,
     validate_email,
 )
+
 from accelerator.models import (
     PHONE_MAX_LENGTH,
     TWITTER_HANDLE_MAX_LENGTH,
@@ -126,7 +128,7 @@ URL_FIELD = merge_fields(
     {
         "json-schema": {
             "description": "Must be valid URL per the Django URLValidator",
-         },
+        },
     })
 
 URL_SLUG_FIELD = merge_fields(STRING_FIELD,
@@ -136,7 +138,6 @@ TWITTER_PATTERN = '^\S{{0,{}}}$'.format(TWITTER_HANDLE_MAX_LENGTH)
 TWITTER_REGEX = re.compile(TWITTER_PATTERN)
 TWITTER_FIELD = merge_fields(STRING_FIELD,
                              {"json-schema": {"pattern": TWITTER_PATTERN}})
-
 
 INVALID_BOOLEAN_ERROR = ("Invalid {field}: "
                          "Expected 'true' or 'false' not {value}")
@@ -197,9 +198,9 @@ class ModelHelper(object):
     @classmethod
     def all_objects(cls):
         return cls.model.objects.all()
-    
+
     @classmethod
-    def fields_dictionary(fields):
+    def fields_dictionary(cls, fields):
         return fields
 
     def list_of_field_elements(self, field, attribute):
@@ -246,7 +247,7 @@ def validate_choices(helper, field, value, choices):
     validate_string(helper, field, value)
     if value not in choices:
         helper.errors.append(INVALID_CHOICE_ERROR.format(
-                field=field, value=value, choices=format_choices(choices)))
+            field=field, value=value, choices=format_choices(choices)))
     return value
 
 
@@ -310,10 +311,10 @@ def json_array(item):
 
 def json_list_wrapper(item):
     return json_object({
-            "count": INTEGER_FIELD,
-            "next": URL_FIELD,
-            "previous": URL_FIELD,
-            "results": json_array(item)})
+        "count": INTEGER_FIELD,
+        "next": URL_FIELD,
+        "previous": URL_FIELD,
+        "results": json_array(item)})
 
 
 def json_simple_list(item, list_key):
