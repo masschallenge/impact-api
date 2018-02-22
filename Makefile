@@ -110,7 +110,7 @@ target_help = \
   'db-shell - Access to running database server.' \
   'django-shell - Access to Django shell.' \
   ' ' \
-  '** Database targets **' \
+  '-- Database targets --' \
   'Database targets use the make variables db_name and gz_file.' \
   'db_name defaults to django_1-10_schema' \
   'gz_file defaults to db_cache/$$(db_name).sql.gz' \
@@ -208,25 +208,30 @@ code-check:
 
 
 # Repos
-REPOS = ../accelerate ../django-accelerator ../impact-api
+ACCELERATE = ../accelerate
+DJANGO_ACCELERATOR = ../django-accelerator
+IMPACT_API = ../impact-api
+REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(IMPACT_API)
 
 
 # Database migration related targets
 
 data-migration migrations:
-	@cd ../django-accelerator && $(MAKE) $@ \
+	@cd $(DJANGO_ACCELERATOR) && $(MAKE) $@ \
 	  migration_name=$(migration_name)
 
 
 application ?= accelerator
 
+MIGRATE_CMD = docker-compose run --rm web ./manage.py migrate $(application) $(migration)
 migrate:
-	@docker-compose run --rm web ./manage.py migrate $(application) $(migration)
+	@$(MIGRATE_CMD)
 
 models:
 	@echo models target not yet implemented
 
-
+update-schema: migrations
+	@$(MIGRATE_CMD)
 
 # Cross repo targets
 
@@ -251,8 +256,10 @@ run-server: run-server-$(debug)
 run-server-0:
 	@docker-compose up
 
-run-server-1:
+run-detached-server:
 	@docker-compose up -d
+
+run-server-1: run-detached-server
 	@docker-compose exec web /bin/bash /usr/bin/start-nodaemon.sh
 
 dev: run-server-0
@@ -272,6 +279,17 @@ delete-vms:
 	@docker rm -f $(CONTAINERS)
 	@docker rmi -f $(IMAGES)
 
+run-all-servers: run-detached-server
+	@cd $(ACCELERATE) && $(MAKE) run-server
+
+stop-all-servers: stop-server
+	@cd $(ACCELERATE) && $(MAKE) stop-server
+
+shutdown-all-vms: shutdown-vms
+	@cd $(ACCELERATE) && $(MAKE) shutdown-vms
+
+delete-all-vms: delete-vms
+	@cd $(ACCELERATE) && $(MAKE) delete-vms
 
 # Interactive shell Targets
 
