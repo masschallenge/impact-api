@@ -184,9 +184,8 @@ class Base(Configuration):
     CORS_ORIGIN_ALLOW_ALL = True
     # settings.py
     REST_PROXY = {
-        'HOST': bytes(
-            os.environ.get('ACCELERATE_SITE_URL',
-                           'https://accelerate.masschallenge.org'), 'utf-8'),
+        'HOST': os.environ.get('ACCELERATE_SITE_URL',
+                               'https://accelerate.masschallenge.org'),
         'AUTH': {
             'user': None,
             'password': None,
