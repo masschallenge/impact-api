@@ -258,6 +258,7 @@ run-server-0:
 
 run-detached-server:
 	@docker-compose up -d
+	@docker-compose run --rm web /usr/bin/mysqlwait.sh
 
 run-server-1: run-detached-server
 	@docker-compose exec web /bin/bash /usr/bin/start-nodaemon.sh
@@ -280,7 +281,7 @@ delete-vms:
 	@docker rmi -f $(IMAGES)
 
 run-all-servers: run-detached-server
-	@cd $(ACCELERATE) && $(MAKE) run-server
+	@cd $(ACCELERATE) && $(MAKE) run-detached-server
 
 stop-all-servers: stop-server
 	@cd $(ACCELERATE) && $(MAKE) stop-server
