@@ -21,13 +21,15 @@ RUN pip install --upgrade pip
 
 RUN easy_install-2.7 supervisor
 
-RUN cd /root && pip3 install -r /wwwroot/requirements/dev.txt
+RUN useradd -s /bin/bash -u 3000 -m impact_user
 
-RUN useradd -s /bin/bash -u 3000 -M impact_user
+RUN cd /home/impact_user && pip3 install -r /wwwroot/requirements/dev.txt
 
 RUN chown impact_user /usr/bin/start.sh
 
 RUN chown -R impact_user /wwwroot
+
+RUN chown -R impact_user /home/impact_user
 
 RUN apt-get install -y gettext
 
@@ -37,4 +39,4 @@ ENV PYTHONUNBUFFERED 1
 
 EXPOSE 8000
 
-CMD ["/bin/bash" , "/usr/bin/start.sh"]
+CMD ["/bin/bash", "/usr/bin/start.sh"]
