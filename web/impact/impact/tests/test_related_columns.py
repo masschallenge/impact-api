@@ -23,20 +23,13 @@ class TestRelatedColumns(TestCase):
     client_class = APIClient
 
     @classmethod
-    def tearDownClass(cls):
-        ContentType.objects.filter(
-            app_label='mc',
-            model__in=[
-                'startup',
-                'startupteammember',
-                'user']).delete()
-
-    @classmethod
     def setUpClass(cls):
-        startup_ctype = ContentTypeFactory(app_label='mc', model='startup')
-        teammember_ctype = ContentTypeFactory(app_label='mc',
-                                              model='startupteammember')
-        ContentTypeFactory(app_label='mc', model='user')
+        super().setUpClass()
+        startup_ctype = ContentType.objects.get(app_label='accelerator',
+                                                model='startup')
+        teammember_ctype = ContentType.objects.get(app_label='accelerator',
+                                                   model='startupteammember')
+        ContentTypeFactory(app_label='accelerator', model='user')
         Permission.objects.get_or_create(
             content_type=startup_ctype,
             codename='view_startup_stealth_mode_true',
@@ -47,23 +40,37 @@ class TestRelatedColumns(TestCase):
             codename='view_startupteammember',
         )
 
+    @classmethod
+    def tearDownClass(cls):
+        content_types = ContentType.objects.filter(
+            app_label='accelerator',
+            model__in=[
+                'startup',
+                'startupteammember',
+                'user'])
+        Permission.objects.filter(content_type__in=content_types).delete()
+        ContentType.objects.filter(
+            app_label='accelerator',
+            model='user').delete()
+        super().tearDownClass()
+
     def test_api_object_relation_link_is_valid(self):
         url_name = "object-list"
-        view_kwargs = {'app': 'impact', "model": "startupteammember"}
+        view_kwargs = {'app': 'accelerator', "model": "startupteammember"}
         StartupTeamMemberFactory()
         User = get_user_model()
         perm = PermissionFactory.create(codename='change_user')
         user = User.objects.create_superuser("admin@test.com", "password")
         startup_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startup'),
             codename='view_startup_stealth_mode_true',
             name='Can view Startups in Stealth Mode',
         )
         startup_member_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startupteammember'),
             codename='view_startupteammember',
         )
@@ -95,21 +102,21 @@ class TestRelatedColumns(TestCase):
 
     def test_api_list_contains_url_to_related_object(self):
         url_name = "object-list"
-        view_kwargs = {'app': 'impact', "model": "startupteammember"}
+        view_kwargs = {'app': 'accelerator', "model": "startupteammember"}
         StartupTeamMemberFactory()
         User = get_user_model()
         user = User.objects.create_superuser("admin@test.com", "password")
         perm = PermissionFactory.create(codename='change_user')
         startup_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startup'),
             codename='view_startup_stealth_mode_true',
             name='Can view Startups in Stealth Mode',
         )
         _, startupteammember_permission = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startupteammember'),
             codename='view_startupteammember',
         )

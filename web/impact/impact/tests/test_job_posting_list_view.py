@@ -10,7 +10,7 @@ import json
 from django.urls import reverse
 
 from impact.tests.api_test_case import APITestCase
-from impact.models import (
+from accelerator.models import (
     JobPosting,
     Site,
     Startup,

@@ -2,11 +2,13 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 import json
+
+from accelerator.models import UserRole
+from django.urls import reverse
+from django.utils import timezone
 from jsonschema import Draft4Validator
 
-from django.urls import reverse
-
-from impact.models import UserRole
+from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import (
     JudgingRoundFactory,
     NewsletterReceiptFactory,
@@ -15,13 +17,11 @@ from impact.tests.factories import (
     StartupTeamMemberFactory,
     UserFactory,
 )
-from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import (
     assert_fields,
     days_from_now,
     find_events,
 )
-
 from impact.v1.events import (
     UserBecameConfirmedJudgeEvent,
     UserBecameConfirmedMentorEvent,
@@ -37,7 +37,7 @@ from impact.v1.views import UserHistoryView
 
 class TestUserHistoryView(APITestCase):
     def test_user_created(self):
-        user = UserFactory()
+        user = UserFactory(date_joined=timezone.now())
         with self.login(email=self.basic_user().email):
             url = reverse(UserHistoryView.view_name, args=[user.id])
             response = self.client.get(url)
@@ -166,10 +166,10 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.PROGRAM_ROLE_FORMAT
             self.assertEqual(format_string.format(
-                    role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
-                    name=prg.program_role.name,
-                    id=prg.program_role.id),
-                             events[0]["description"])
+                role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
+                name=prg.program_role.name,
+                id=prg.program_role.id),
+                events[0]["description"])
 
     def test_user_became_confirmed_judge_with_missing_label(self):
         prg = ProgramRoleGrantFactory(
@@ -183,10 +183,10 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.PROGRAM_ROLE_FORMAT
             self.assertEqual(format_string.format(
-                    role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
-                    name=prg.program_role.name,
-                    id=prg.program_role.id),
-                             events[0]["description"])
+                role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
+                name=prg.program_role.name,
+                id=prg.program_role.id),
+                events[0]["description"])
 
     def test_user_became_confirmed_judge_with_judging_round(self):
         prg = ProgramRoleGrantFactory(
@@ -201,10 +201,10 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.JUDGING_ROUND_FORMAT
             self.assertEqual(format_string.format(
-                    role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
-                    name=jr.short_name(),
-                    id=jr.id),
-                             events[0]["description"])
+                role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
+                name=jr.short_name(),
+                id=jr.id),
+                events[0]["description"])
             self.assertEqual(jr.id, events[0]["judging_round_id"])
             self.assertEqual(jr.short_name(), events[0]["judging_round_name"])
 
@@ -222,10 +222,10 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.JUDGING_ROUND_FORMAT
             self.assertEqual(format_string.format(
-                    role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
-                    name=jr.short_name(),
-                    id=jr.id),
-                             events[0]["description"])
+                role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
+                name=jr.short_name(),
+                id=jr.id),
+                events[0]["description"])
 
     def test_user_became_desired_judge(self):
         prg = ProgramRoleGrantFactory(
@@ -238,10 +238,10 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             format_string = UserBecameDesiredJudgeEvent.PROGRAM_ROLE_FORMAT
             self.assertEqual(format_string.format(
-                    role_name=UserBecameDesiredJudgeEvent.ROLE_NAME,
-                    name=prg.program_role.name,
-                    id=prg.program_role.id),
-                             events[0]["description"])
+                role_name=UserBecameDesiredJudgeEvent.ROLE_NAME,
+                name=prg.program_role.name,
+                id=prg.program_role.id),
+                events[0]["description"])
 
     def test_user_became_desired_judge_with_missing_label(self):
         prg = ProgramRoleGrantFactory(
@@ -255,10 +255,10 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             format_string = UserBecameDesiredJudgeEvent.PROGRAM_ROLE_FORMAT
             self.assertEqual(format_string.format(
-                    role_name=UserBecameDesiredJudgeEvent.ROLE_NAME,
-                    name=prg.program_role.name,
-                    id=prg.program_role.id),
-                             events[0]["description"])
+                role_name=UserBecameDesiredJudgeEvent.ROLE_NAME,
+                name=prg.program_role.name,
+                id=prg.program_role.id),
+                events[0]["description"])
 
     def test_user_became_confirmed_mentor(self):
         prg = ProgramRoleGrantFactory(

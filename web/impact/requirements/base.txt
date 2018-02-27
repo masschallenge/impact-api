@@ -31,6 +31,7 @@ django-redis-cache
 django-registration
 django-rest-framework-proxy
 django-rest-swagger
+django-paypal
 Django==1.10.3
 django-multidb-router
 djangorestframework

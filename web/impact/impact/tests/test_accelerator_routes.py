@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from test_plus.test import TestCase
-from impact.urls import accelerator_router
+from impact.urls import schema_router
 from django.apps import apps
 from rest_framework.test import APIClient
 from django.contrib.contenttypes.models import ContentType
@@ -21,7 +21,6 @@ from impact.tests.factories import (
     UserFactory,
     StartupStatusFactory
 )
-from impact.tests.factories import ContentTypeFactory
 from impact.tests.factories import PermissionFactory
 from accelerator.models import Startup
 
@@ -38,19 +37,6 @@ MC_CONTENTTYPES = [
 class TestAcceleratorRoutes(TestCase):
     client_class = APIClient
     user_factory = UserFactory
-
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
-        for model in MC_CONTENTTYPES:
-            ContentTypeFactory(app_label='mc', model=model)
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-        ContentType.objects.filter(
-            app_label='mc',
-            model__in=MC_CONTENTTYPES).delete()
 
     def _grant_permissions(
             self,
@@ -75,7 +61,7 @@ class TestAcceleratorRoutes(TestCase):
         self.response_401(self.get(url_name, **view_kwargs))
         startup_add_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startup'),
             codename='add_startup',
         )
@@ -142,7 +128,7 @@ class TestAcceleratorRoutes(TestCase):
         self.response_401(self.get(url_name, **view_kwargs))
         startup_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startup'),
             codename='view_startup',
         )
@@ -163,7 +149,7 @@ class TestAcceleratorRoutes(TestCase):
             self.assertIn("is_visible", response_dict.keys())
 
     def test_accelerator_app_is_registered(self):
-        urls = [url for url in accelerator_router.get_urls() if (
+        urls = [url for url in schema_router.get_urls() if (
             url.name != 'api-root')]
         url_count = len(urls)
         accelerate_models = [

@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from impact.permissions import (
     V0APIPermissions,
 )
-from impact.models import ProgramStartupStatus
+from accelerator.models import ProgramStartupStatus
 from impact.utils import get_profile
 from impact.v0.api_data.startup_detail_data import StartupDetailData
 from impact.v0.views.base_media_info import BaseMediaInfo
@@ -130,7 +130,7 @@ def _image_fields(user, base_url):
     profile = get_profile(user)
     image = profile.image if profile else None
     return {
-        "photo_url": base_url + image if image else "",
+        "photo_url": base_url + str(image) if image else "",
         "photo_token": encrypt_image_token(image) if image else "",
     }
 

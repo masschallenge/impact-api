@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from impact.models import StartupRole
+from accelerator.models import StartupRole
 from impact.utils import compose_filter
 from impact.v1.events.base_history_event import BaseHistoryEvent
 from impact.v1.helpers import (
@@ -29,7 +29,7 @@ class OrganizationBecameFinalistEvent(BaseHistoryEvent):
     @classmethod
     def events(cls, organization):
         result = []
-        for startup in organization.startup_set.all():
+        for startup in organization.startups.all():
             for ss in startup.startupstatus_set.filter(**compose_filter(
                     ["program_startup_status",
                      "startup_role",
