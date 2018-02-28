@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from impact.api_data import APIData
-from impact.models import ProgramStartupStatus
+from accelerator.models import ProgramStartupStatus
 
 
 class StartupListData(APIData):

@@ -2,6 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from ast import literal_eval
+
+from accelerator.apps import AcceleratorConfig
 from django.conf import settings
 from django.contrib.auth import get_user
 from django.contrib.auth import get_user_model
@@ -57,11 +59,10 @@ class DynamicModelPermissions(BasePermission):
     authenticated_users_only = True
 
     def has_permission(self, request, view):
-        model = model = view.kwargs.get('model', '').lower()
+        model = view.kwargs.get('model', '').lower()
         related_model = view.kwargs.get('related_model', '').lower()
         model_name = model_name_case(model, related_model)
-        app_label = 'mc'
-        kwargs = {'app': app_label, 'model_name': model_name}
+        kwargs = {'app': AcceleratorConfig.name, 'model_name': model_name}
         perm = method_to_perm(request.method) % kwargs
         return (
             request.user and (
@@ -104,12 +105,10 @@ class DynamicModelPermissions(BasePermission):
         return boolean_value
 
     def has_object_permission(self, request, view, obj):
-        model = model = view.kwargs.get('model', '').lower()
+        model = view.kwargs.get('model', '').lower()
         related_model = view.kwargs.get('related_model', '').lower()
         model_name = model_name_case(model, related_model)
         app_label = obj._meta.app_label
-        if app_label == "impact":
-            app_label = "mc"
         # This needs to be revised.  See AC-4573
         for permission in self.get_field_level_perms(app_label, model_name):
             action, perm_model, field, boolean_str = (

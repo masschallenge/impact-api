@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 import re
-from impact.models import ProgramFamily
+from accelerator.models import ProgramFamily
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     ModelHelper,

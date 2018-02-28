@@ -15,13 +15,13 @@ def create_users_and_stealth_view_perm():
     # Create the Permission object
     stealth_view_perm, _ = Permission.objects.get_or_create(
         content_type=ContentType.objects.get(
-            app_label="mc", model="startup"),
+            app_label='accelerator', model="startup"),
         codename="view_startup_stealth_mode_true",
         name="Can view Startups in Stealth Mode"
     )
     startup_view_perm, _ = Permission.objects.get_or_create(
         content_type=ContentType.objects.get(
-            app_label="mc", model="startup"),
+            app_label='accelerator', model="startup"),
         codename="view_startup"
     )
 
