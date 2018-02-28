@@ -3,11 +3,11 @@
 
 import json
 
-from accelerator.models import UserRole
 from django.urls import reverse
 from django.utils import timezone
 from jsonschema import Draft4Validator
 
+from accelerator.models import UserRole
 from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import (
     JudgingRoundFactory,
@@ -166,10 +166,10 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.PROGRAM_ROLE_FORMAT
             self.assertEqual(format_string.format(
-                role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
-                name=prg.program_role.name,
-                id=prg.program_role.id),
-                events[0]["description"])
+                    role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
+                    name=prg.program_role.name,
+                    id=prg.program_role.id),
+                    events[0]["description"])
 
     def test_user_became_confirmed_judge_with_missing_label(self):
         prg = ProgramRoleGrantFactory(
