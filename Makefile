@@ -64,6 +64,9 @@ deprecated_targets = \
   superuser \
 
 
+DEFAULT_DB_NAME = initial_schema_post_transition
+db_name ?= $(DEFAULT_DB_NAME)
+
 lower_target_help = \
   "build - Build (or rebuild) docker environment. Refreshes dependencies." \
 
@@ -112,7 +115,7 @@ target_help = \
   ' ' \
   '-- Database targets --' \
   'Database targets use the make variables db_name and gz_file.' \
-  'db_name defaults to django_1-10_schema' \
+  'db_name defaults to $(DEFAULT_DB_NAME)' \
   'gz_file defaults to db_cache/$$(db_name).sql.gz' \
   'load-db - Load gzipped database file.' \
   '\tIf $$(gz_file) does not exist, then try to download from S3' \
@@ -308,7 +311,6 @@ django-shell:
 # Database dump related targets
 
 DB_CACHE_DIR = db_cache/
-db_name ?= django_1-10_schema
 s3_key = $(db_name).sql.gz
 gz_file ?= $(DB_CACHE_DIR)$(s3_key)
 
