@@ -38,7 +38,7 @@ djangorestframework
 djangorestframework-jwt
 drf-schema-adapter
 drf-tracking
-git+https://github.com/masschallenge/django-accelerator.git@AC-5039#egg=django-accelerator
+git+https://github.com/masschallenge/django-accelerator.git@modular-models-epic#egg=django-accelerator
 
 # django-configurations from Git master (needed for Django 1.8 support)
 git+https://github.com/jezdez/django-configurations
