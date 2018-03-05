@@ -204,10 +204,8 @@ ifdef BRANCH
   branch = $(BRANCH)  # Backwards compatibility
 endif
 
-code-check: DIFFBRANCH = $(shell if [ "$(branch)" == "" ]; \
-   then echo "development"; else echo "$(branch)"; fi;)
 code-check:
-	-@docker run --rm -v ${PWD}:/code -e BRANCH=$(DIFFBRANCH) \
+	-@docker run --rm -v ${PWD}:/code -e BRANCH=$(branch) \
 		masschallenge/fpdiff /bin/bash | grep -v "^\.\/\.venv" | \
 		grep -v "site-packages"
 
