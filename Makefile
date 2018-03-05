@@ -78,7 +78,7 @@ target_help = \
   '\tif provided.  E.g.:' \
   '\tmake test tests="impact.tests.test_file1 impact.tests.test_file2"' \
   'coverage - Run tests with coverage summary in terminal.' \
-  'coverage-html - Run tests with coverage and open repot in browser.' \
+  'coverage-html - Run tests with coverage and open report in browser.' \
   'code-check - Runs Flake8 and pep8 on the files changed between the' \
   '\tcurrent branch and $$(branch) (defaults to development)' \
   ' ' \
@@ -93,12 +93,11 @@ target_help = \
   'migrate - Runs migrations. If $$(migration) is given then then that ' \
   '\tmigration is targeted in the accelerator package unless another ' \
   '\t$$(application) is given.' \
-  'models - Updates model definitions managed in other libraries.' \
   ' ' \
+  'status - Reports the status of all related source code repositories.' \
   'current - Switch all repos to development branch (or $$(branch)' \
   '\tif provided and available) and pulls down any changes to the branch.' \
   '\tReports any errors from the different repos.' \
-  'status - Reports the status of all related source code repositories.' \
   ' ' \
   'run-server - Starts the local server.' \
   'stop-server - Stops the local server.' \
@@ -192,7 +191,7 @@ coverage-report: diff_files:=$(shell git diff --name-only $(DIFFBRANCH))
 coverage-report: diff_sed:=$(shell echo $(diff_files)| sed s:web/impact/::g)
 coverage-report: diff_grep:=$(shell echo $(diff_sed) | tr ' ' '\n' | grep \.py | grep -v /tests/ | grep -v /django_migrations/ | tr '\n' ' ' )
 coverage-report:
-	@docker-compose run --rm web coverage report --skip-covered $(diff_grep) | grep -v "NoSource:"
+	@docker-compose run --rm web coverage report -i --skip-covered $(diff_grep) | grep -v "NoSource:"
 
 coverage-html:
 	@docker-compose run --rm web coverage html --omit="*/tests/*"
@@ -200,9 +199,12 @@ coverage-html:
 coverage-html-open: coverage-html
 	@open web/impact/htmlcov/index.html
 
-branch ?= $(BRANCH)  # Backwards compatibility
+branch ?= development
+ifdef BRANCH
+  branch = $(BRANCH)  # Backwards compatibility
+endif
 
-code-check: DIFFBRANCH?=$(shell if [ "$(branch)" == "" ]; \
+code-check: DIFFBRANCH = $(shell if [ "$(branch)" == "" ]; \
    then echo "development"; else echo "$(branch)"; fi;)
 code-check:
 	-@docker run --rm -v ${PWD}:/code -e BRANCH=$(DIFFBRANCH) \
@@ -221,7 +223,9 @@ REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(IMPACT_API)
 
 data-migration migrations:
 	@cd $(DJANGO_ACCELERATOR) && $(MAKE) $@ \
-	  migration_name=$(migration_name)
+	  migration_name=$(migration_name) | \
+	  sed "s|accelerator/|$(DJANGO_ACCELERATOR)/accelerator/|" | \
+	  sed "s|simpleuser/|$(DJANGO_ACCELERATOR)/simpleuser/|"
 
 
 application ?= accelerator
@@ -229,9 +233,6 @@ application ?= accelerator
 MIGRATE_CMD = docker-compose run --rm web ./manage.py migrate $(application) $(migration)
 migrate:
 	@$(MIGRATE_CMD)
-
-models:
-	@echo models target not yet implemented
 
 update-schema: migrations
 	@$(MIGRATE_CMD)
@@ -241,8 +242,6 @@ update-schema: migrations
 status:
 	@for r in $(REPOS) ; do \
 	    echo ; echo Status of $$r; cd $$r; git status; done
-
-branch =? development
 
 current:
 	@for r in $(REPOS) ; do \
