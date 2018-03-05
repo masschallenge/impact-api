@@ -355,6 +355,24 @@ class TestOrganizationHistoryView(APITestCase):
             self.assertEqual(program.cycle.id, events[0]["cycle_id"])
             self.assertEqual(role.name, events[0]["winner_level"])
 
+    def test_startup_became_winner_no_created_at(self):
+        startup = StartupFactory()
+        end_date = days_from_now(-10)
+        startup_status = StartupStatusFactory(
+            program_startup_status__startup_role__name=StartupRole.GOLD_WINNER,
+            program_startup_status__program__end_date=end_date,
+            startup=startup)
+        startup_status.created_at = None
+        startup_status.save()
+        with self.login(email=self.basic_user().email):
+            url = reverse(OrganizationHistoryView.view_name,
+                          args=[startup.organization.id])
+            response = self.client.get(url)
+            events = find_events(response.data["results"],
+                                 OrganizationBecameWinnerEvent.EVENT_TYPE)
+            self.assertEqual(1, len(events))
+            self.assertEqual(end_date, events[0]["datetime"])
+
     def test_options(self):
         startup = StartupFactory()
         with self.login(email=self.basic_user().email):
