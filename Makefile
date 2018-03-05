@@ -353,8 +353,11 @@ upload-db:
 TARGET ?= staging
 
 
-deploy: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
-deploy:
+release-list release deploy:
+	@echo $@ not yet implemented
+
+old-deploy: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
+old-deploy:
 ifndef RELEASE
 	$(error $(no_release_error_msg))
 endif
@@ -362,8 +365,8 @@ endif
 	--image web $(DOCKER_REGISTRY)/impact-api:$(RELEASE) \
 	--image redis $(DOCKER_REGISTRY)/redis:$(RELEASE)
 
-release: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
-release:
+travis-release: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
+travis-release:
 ifndef AWS_SECRET_ACCESS_KEY
 	$(error $(awskey_error_msg))
 endif
