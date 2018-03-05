@@ -1,7 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from impact.models import StartupRole
 from impact.utils import compose_filter
 from impact.v1.events.base_history_event import BaseHistoryEvent
 from impact.v1.helpers import (
@@ -34,9 +33,9 @@ class OrganizationBecameWinnerEvent(BaseHistoryEvent):
         for startup in organization.startup_set.all():
             for ss in startup.startupstatus_set.filter(**compose_filter(
                     ["program_startup_status",
-                    "startup_role",
-                    "name",
-                    "icontains"],
+                     "startup_role",
+                     "name",
+                     "icontains"],
                     "winner")):
                 result.append(cls(ss))
         return result
@@ -67,8 +66,7 @@ class OrganizationBecameWinnerEvent(BaseHistoryEvent):
         return self.startup_status.program_startup_status.startup_role.name
 
     def winner_level_name(self):
-        program = self.startup_status.program_startup_status.program.name
-        winner_level = self.startup_status.program_startup_status.startup_role.name
+        pss = self.startup_status.program_startup_status
+        program = pss.program.name
+        winner_level = pss.startup_role.name
         return program + " " + winner_level
-
-

@@ -31,6 +31,7 @@ from impact.utils import DAWN_OF_TIME
 from impact.v1.events import (
     OrganizationBecameEntrantEvent,
     OrganizationBecameFinalistEvent,
+    OrganizationBecameWinnerEvent,
     OrganizationCreatedEvent,
 )
 from impact.v1.views import OrganizationHistoryView
@@ -332,6 +333,27 @@ class TestOrganizationHistoryView(APITestCase):
                                  OrganizationBecameFinalistEvent.EVENT_TYPE)
             self.assertEqual(1, len(events))
             self.assertEqual(start_date, events[0]["datetime"])
+
+    def test_startup_became_winner(self):
+        startup = StartupFactory()
+        startup_status = StartupStatusFactory(
+            program_startup_status__startup_role__name=StartupRole.SILVER_WINNER,
+            startup=startup)
+        program = startup_status.program_startup_status.program
+        role = startup_status.program_startup_status.startup_role
+        with self.login(email=self.basic_user().email):
+            url = reverse(OrganizationHistoryView.view_name,
+                          args=[startup.organization.id])
+            response = self.client.get(url)
+            events = find_events(response.data["results"],
+                                 OrganizationBecameWinnerEvent.EVENT_TYPE)
+            self.assertEqual(1, len(events))
+            self.assertTrue(program.name in events[0]["description"])
+            self.assertEqual(program.name, events[0]["program"])
+            self.assertEqual(program.id, events[0]["program_id"])
+            self.assertEqual(program.cycle.name, events[0]["cycle"])
+            self.assertEqual(program.cycle.id, events[0]["cycle_id"])
+            self.assertEqual(role.name, events[0]["winner_level"])
 
     def test_options(self):
         startup = StartupFactory()
