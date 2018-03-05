@@ -299,7 +299,7 @@ delete-all-vms: delete-vms
 # Interactive shell Targets
 
 bash-shell:
-	@docker-compose exec web /bin/bash
+	@docker-compose exec web /bin/bash || docker-compose run --rm web /bin/bash
 
 db-shell:
 	@docker-compose run --rm web ./manage.py dbshell
