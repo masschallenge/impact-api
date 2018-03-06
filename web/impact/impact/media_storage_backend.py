@@ -5,6 +5,3 @@ class MediaStorageBackend(S3Boto3Storage):
     custom_domain = False
     default_acl = 'private'
     file_overwrite = False
-
-    def path(self, name):
-        return None
