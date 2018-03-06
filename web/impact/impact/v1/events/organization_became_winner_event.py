@@ -24,8 +24,9 @@ class OrganizationBecameWinnerEvent(BaseHistoryEvent):
 
     def __init__(self, startup_status):
         super().__init__()
+        self._program = startup_status.program_startup_status.program
         self.startup_status = startup_status
-        self._program = self.startup_status.program_startup_status.program
+        
 
     @classmethod
     def events(cls, organization):
