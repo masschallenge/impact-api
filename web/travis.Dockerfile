@@ -23,7 +23,7 @@ RUN easy_install-2.7 supervisor
 
 RUN useradd -s /bin/bash -u 3000 -m impact_user
 
-RUN pip3 install -r /wwwroot/requirements/prod.txt
+RUN pip3 install -r /wwwroot/requirements/travis.txt
 
 RUN chown impact_user /usr/bin/start.sh
 
