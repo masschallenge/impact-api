@@ -25,7 +25,7 @@ before_install:
 - docker-compose --version
 
 before_script:
-- export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+- export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 - if [ -z $TRAVIS_TAG ]; then git remote set-branches origin $BRANCH; fi
 - git fetch
 - git checkout $BRANCH
@@ -38,14 +38,15 @@ before_script:
 - docker-compose -f travis.docker-compose.yml up -d 
 
 script:
+- ls
 - make test
 
 after_success:
-- if [ "$DEPLOY_ENVIRONMENT" == "" ]; then export DEPLOY_ENVIRONMENT=$(if [ "$BRANCH" == "master" ]; then echo "production"; else echo "staging"; fi); fi;
+- if [ "$DEPLOY_ENVIRONMENT" = "" ]; then export DEPLOY_ENVIRONMENT=$(if [ "$BRANCH" = "master" ]; then echo "production"; else echo "staging"; fi); fi;
 - sudo curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest;
 - sudo chmod +x /usr/local/bin/ecs-cli;
 - pip install awscli;
 - export PATH=$PATH:$HOME/.local/bin;
-- export TAG=$(if [ "$IS_RELEASE" == "" ]; then echo "$BRANCH"; else echo "$RELEASE_TAG"; fi);
+- export TAG=$(if [ "$IS_RELEASE" = "" ]; then echo "$BRANCH"; else echo "$RELEASE_TAG"; fi);
 - eval $(aws ecr get-login --region us-east-1 --no-include-email);
 - make release AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ENVIRONMENT=$DEPLOY_ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY IMAGE_TAG=$TAG
