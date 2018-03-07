@@ -1,0 +1,68 @@
+version: '2'
+services:
+  mysql:
+    image: mysql
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql/conf.d/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./mysql/data:/var/lib/mysql
+      - ./sql/initial.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mc_dev
+  # Redis
+  redis:
+    build:
+      dockerfile: redis.Dockerfile
+      context: .
+    volumes:
+      - ./redis:/var/lib/redis/data
+    ports:
+      - "6379:6379"
+  assets:
+    image: donnex/assets
+    ports:
+      - "35729:35729"
+    volumes:
+      - ./assets/gulpfile.js:/gulp/gulpfile.js:ro
+      - ./web/impact/sass:/gulp/sass
+      - ./web/impact/static/css:/gulp/css
+      - ./web/impact/static/js:/gulp/js
+  # Web python
+  web:
+    build: ./web
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8000:8000"
+    expose:
+      - "80"
+      - "443"
+    volumes:
+      - ./web/impact:/wwwroot
+      - ./db_cache:/db_cache
+      - ./web/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./web/impact/media:/media:ro
+    depends_on:
+      - mysql
+    links:
+      - mysql
+      - redis
+    env_file: .dev.env
+    user: root
+  start_dependencies:
+    image: "python:3.6"
+    depends_on:
+      - web
+      - mysql
+    links:
+      - mysql
+      - redis
+      - web
+    command: >
+      /bin/bash -c "
+      until $$(curl --output /dev/null --silent --head --fail http://web:8000); do
+        echo \"BUILDING...\"
+        sleep 5
+      done; echo \"BUILD COMPLETE - visit http://localhost:8000 in a browser\";"
