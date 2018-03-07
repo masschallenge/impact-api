@@ -38,7 +38,8 @@ before_script:
 - docker-compose -f travis.docker-compose.yml up -d 
 
 script:
-- ls /packages
+- pwd
+- ls ..
 - make test
 
 after_success:
