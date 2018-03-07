@@ -38,8 +38,7 @@ before_script:
 - docker-compose -f travis.docker-compose.yml up -d 
 
 script:
-- pwd
-- ls ~impact_user
+- ls /packages
 - make test
 
 after_success:
