@@ -1,1 +1,1 @@
-git+https://github.com/masschallenge/django-accelerator.git@release-1.0.0.0#egg=django-accelerator
+git+https://github.com/masschallenge/django-accelerator.git@AC-4598#egg=django-accelerator

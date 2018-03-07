@@ -31,7 +31,9 @@ services:
       - ./web/impact/static/js:/gulp/js
   # Web python
   web:
-    build: ./web
+    build:
+      dockerfile: travis.Dockerfile
+      context: ./web
     ports:
       - "80:80"
       - "443:443"
