@@ -20,7 +20,7 @@ class StartupRole(MCModel):
     SILVER_WINNER = "Silver Winner"
     PLATINUM_WINNER = "Platinum Winner"
     DIAMOND_WINNER = "Diamond Winner"
-    INKIND_WINNER = "In-Kind Winner"
+    IN_KIND_WINNER = "In-Kind Winner"
     SIDECAR_WINNER = "Sidecar Winner"
 
     FINALIST_STARTUP_ROLES = [FINALIST,
@@ -32,7 +32,7 @@ class StartupRole(MCModel):
                             SILVER_WINNER,
                             PLATINUM_WINNER,
                             DIAMOND_WINNER,
-                            INKIND_WINNER,
+                            IN_KIND_WINNER,
                             SILVER_WINNER]
 
     name = CharField(max_length=255)

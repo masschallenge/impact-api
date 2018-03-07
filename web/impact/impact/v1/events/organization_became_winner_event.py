@@ -26,7 +26,6 @@ class OrganizationBecameWinnerEvent(BaseHistoryEvent):
         super().__init__()
         self._program = startup_status.program_startup_status.program
         self.startup_status = startup_status
-        
 
     @classmethod
     def events(cls, organization):
@@ -42,10 +41,8 @@ class OrganizationBecameWinnerEvent(BaseHistoryEvent):
         return result
 
     def calc_datetimes(self):
-        self.earliest = self.startup_status.created_at
-        program_end_date = self._program.end_date
-        if self.earliest is None:
-            self.earliest = program_end_date
+        self.earliest = (self.startup_status.created_at
+                         or self._program.end_date)
 
     def description(self):
         return self.DESCRIPTION_FORMAT.format(
@@ -70,4 +67,4 @@ class OrganizationBecameWinnerEvent(BaseHistoryEvent):
         pss = self.startup_status.program_startup_status
         program = pss.program.name
         winner_level = pss.startup_role.name
-        return program + " " + winner_level
+        return '{} {}'.format(program, winner_level)
