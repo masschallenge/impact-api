@@ -61,13 +61,14 @@ class Base(Configuration):
     SLAVE_DATABASES = ['default']
 
     if os.environ.get('READ_REPLICA_DATABASE_URL'):
-        DATABASES.update(values.DatabaseURLValue(
+        DATABASES.update(values.DatabaseURLValue(  # pragma: no cover
             alias='read-replica',
             environ_name='READ_REPLICA_DATABASE_URL').value)
 
-        SLAVE_DATABASES = ['read-replica']
+        SLAVE_DATABASES = ['read-replica']  # pragma: no cover
 
-        DATABASE_ROUTERS = ('impact.routers.MasterSlaveAPIRouter',)
+        DATABASE_ROUTERS = ('impact.routers.MasterSlaveAPIRouter',
+                            )  # pragma: no cover
 
     EMAIL = values.EmailURLValue()
 
