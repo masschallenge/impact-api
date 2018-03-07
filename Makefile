@@ -19,6 +19,7 @@ targets = \
   stop-server \
   shutdown-vms \
   delete-vms \
+  build \
   run-all-servers \
   stop-all-servers \
   shutdown-all-vms \
@@ -38,8 +39,6 @@ targets = \
   deploy \
   \
   update-packages \
-  \
-  build \
 
 
 deprecated_targets = \
@@ -68,7 +67,6 @@ DEFAULT_DB_NAME = initial_schema_post_transition
 db_name ?= $(DEFAULT_DB_NAME)
 
 lower_target_help = \
-  "build - Build (or rebuild) docker environment. Refreshes dependencies." \
 
 
 target_help = \
@@ -103,6 +101,7 @@ target_help = \
   'stop-server - Stops the local server.' \
   'shutdown-vms - Shutdown local server VMs.' \
   'delete-vms - Deletes local server VMs an VM-related resources.' \
+  'build - Build (or rebuild) docker environment. Refreshes dependencies.' \
   'run-all-servers - Starts a set of related servers.' \
   'stop-all-server - Stops a set of related servers.' \
   'shutdown-all-vms - Shutdown set of related server VMs' \
