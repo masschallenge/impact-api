@@ -32,8 +32,8 @@ services:
   # Web python
   web:
     build:
-      dockerfile: travis.Dockerfile
       context: ./web
+      dockerfile: travis.Dockerfile
     ports:
       - "80:80"
       - "443:443"
