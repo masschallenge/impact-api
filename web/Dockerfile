@@ -23,8 +23,6 @@ RUN easy_install-2.7 supervisor
 
 RUN useradd -s /bin/bash -u 3000 -m impact_user
 
-WORKDIR /packages
-
 RUN pip3 install -r /wwwroot/requirements/dev.txt
 
 RUN chown impact_user /usr/bin/start.sh
