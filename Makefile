@@ -13,7 +13,7 @@ targets = \
   models \
   \
   status \
-  current \
+  checkout \
   \
   run-server \
   stop-server \
@@ -24,6 +24,7 @@ targets = \
   stop-all-servers \
   shutdown-all-vms \
   delete-all-vms \
+  build-all \
   \
   bash-shell \
   db-shell \
@@ -77,8 +78,8 @@ target_help = \
   '\tmake test tests="impact.tests.test_file1 impact.tests.test_file2"' \
   'coverage - Run tests with coverage summary in terminal.' \
   'coverage-html - Run tests with coverage and open report in browser.' \
-  'code-check - Runs Flake8 and pep8 on the files changed between the' \
-  '\tcurrent branch and $$(branch) (defaults to development)' \
+  'code-check - Runs Flake8 and pycodestyle on the files changed between the' \
+  '\tcurrent branch and $$(branch) (defaults to $(DEFAULT_BRANCH))' \
   ' ' \
   'update-schema - Brings database schema up to date.  Specifically,' \
   '\tupdates any model definitions managed in other libraries,' \
@@ -93,7 +94,7 @@ target_help = \
   '\t$$(application) is given.' \
   ' ' \
   'status - Reports the status of all related source code repositories.' \
-  'current - Switch all repos to development branch (or $$(branch)' \
+  'checkout - Switch all repos to $(DEFAULT_BRANCH) branch (or $$(branch)' \
   '\tif provided and available) and pulls down any changes to the branch.' \
   '\tReports any errors from the different repos.' \
   ' ' \
@@ -105,7 +106,8 @@ target_help = \
   'run-all-servers - Starts a set of related servers.' \
   'stop-all-server - Stops a set of related servers.' \
   'shutdown-all-vms - Shutdown set of related server VMs' \
-  'delete-all-vms - Delets set of related server VMs' \
+  'delete-all-vms - Deletes set of related server VMs' \
+  'build-all - Builds dependencies for set of related servers' \
   ' ' \
   'bash-shell - Access to bash shell.' \
   'db-shell - Access to running database server.' \
@@ -115,6 +117,7 @@ target_help = \
   'Database targets use the make variables db_name and gz_file.' \
   'db_name defaults to $(DEFAULT_DB_NAME)' \
   'gz_file defaults to db_cache/$$(db_name).sql.gz' \
+
   'load-db - Load gzipped database file.' \
   '\tIf $$(gz_file) does not exist, then try to download from S3' \
   '\tusing the key "$$(db_name).sql.gz".' \
@@ -182,9 +185,7 @@ coverage: coverage-run coverage-report coverage-html
 coverage-run:
 	@docker-compose run --rm web coverage run --omit="*/tests/*" --source='.' manage.py test --configuration=Test
 
-coverage-report: DIFFBRANCH?=$(shell if [ "$(branch)" == "" ]; \
-   then echo "development"; else echo "$(branch)"; fi;)
-coverage-report: diff_files:=$(shell git diff --name-only $(DIFFBRANCH))
+coverage-report: diff_files:=$(shell git diff --name-only $(branch))
 coverage-report: diff_sed:=$(shell echo $(diff_files)| sed s:web/impact/::g)
 coverage-report: diff_grep:=$(shell echo $(diff_sed) | tr ' ' '\n' | grep \.py | grep -v /tests/ | grep -v /django_migrations/ | tr '\n' ' ' )
 coverage-report:
@@ -196,7 +197,10 @@ coverage-html:
 coverage-html-open: coverage-html
 	@open web/impact/htmlcov/index.html
 
-branch ?= development
+DEFAULT_BRANCH = modular-models-epic
+# Change after modular-models-epic branch has merged
+# DEFAULT_BRANCH = development
+branch ?= $(modular-models-epic)
 ifdef BRANCH
   branch = $(BRANCH)  # Backwards compatibility
 endif
@@ -236,13 +240,18 @@ update-schema: migrations
 
 status:
 	@for r in $(REPOS) ; do \
-	    echo ; echo Status of $$r; cd $$r; git status; done
+	    echo ; echo Status of $$r; cd $$r; \
+	    git -c 'color.ui=always' status | sed "s|^|$$r: |"; done
 
-current:
+checkout:
 	@for r in $(REPOS) ; do \
 	  cd $$r; \
-	  git checkout $(branch) || git checkout development; \
-	  git pull; \
+	  ((git -c 'color.ui=always' checkout $(branch) 2>&1 | \
+	   sed "s|^|$$r: |") || \
+	  (git -c 'color.ui=always' checkout $(DEFAULT_BRANCH) 2>&1 | \
+	   sed "s|^|$$r: |")) && \
+	  git pull | sed "s|^|$$r: |"; \
+	  echo; \
 	  done
 
 # Server and Virtual Machine related targets
@@ -278,17 +287,22 @@ delete-vms:
 	@docker rm -f $(CONTAINERS)
 	@docker rmi -f $(IMAGES)
 
+ACCELERATE_MAKE = cd $(ACCELERATE) && $(MAKE)
+
 run-all-servers: run-detached-server
-	@cd $(ACCELERATE) && $(MAKE) run-detached-server
+	@$(ACCELERATE_MAKE) run-detached-server
 
 stop-all-servers: stop-server
-	@cd $(ACCELERATE) && $(MAKE) stop-server
+	@$(ACCELERATE_MAKE) stop-server
 
 shutdown-all-vms: shutdown-vms
-	@cd $(ACCELERATE) && $(MAKE) shutdown-vms
+	@$(ACCELERATE_MAKE) shutdown-vms
 
 delete-all-vms: delete-vms
-	@cd $(ACCELERATE) && $(MAKE) delete-vms
+	@$(ACCELERATE_MAKE) delete-vms
+
+build-all: build
+	@$(ACCELERATE_MAKE) build
 
 # Interactive shell Targets
 
