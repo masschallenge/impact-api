@@ -117,7 +117,7 @@ target_help = \
   'Database targets use the make variables db_name and gz_file.' \
   'db_name defaults to $(DEFAULT_DB_NAME)' \
   'gz_file defaults to db_cache/$$(db_name).sql.gz' \
-
+  ' ' \
   'load-db - Load gzipped database file.' \
   '\tIf $$(gz_file) does not exist, then try to download from S3' \
   '\tusing the key "$$(db_name).sql.gz".' \
