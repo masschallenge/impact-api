@@ -97,7 +97,7 @@ target_help = \
   '\tif provided and available) and pulls down any changes to the branch.' \
   '\tReports any errors from the different repos.' \
   ' ' \
-  'run-server - Starts the local server.' \
+  'run-server - Starts the local server. Set debug=0 for supervisor output.' \
   'stop-server - Stops the local server.' \
   'shutdown-vms - Shutdown local server VMs.' \
   'delete-vms - Deletes local server VMs an VM-related resources.' \
