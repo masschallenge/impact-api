@@ -119,6 +119,7 @@ target_help = \
   '\tIf $$(gz_file) does not exist, then try to download from S3' \
   '\tusing the key "$$(db_name).sql.gz".' \
   'clean-db-cache - Delete $$(gz_file) if it exists.' \
+  'load-remote-db - Delete $$(gz_file) if it exists, then run load-db.' \
   'dump-db - Create a gzipped db dump.' \
   '\tCreates db_cache/$$(db_name).sql.gz.' \
   '\tNote that dump-db ignores $$(gz_file).' \
@@ -137,9 +138,6 @@ target_help = \
   '\tValid targets include "staging" (the default), "production",' \
   '\t "test-1", and "test-2"' \
 
-
-grant_permissions_error_msg = PERMISSION_USER and PERMISSION_CLASSES must be \
-  set.  E.g., 'make grant-permissions PERMISSION_USER=test@example.org PERMISSION_CLASSES=v0_clients'
 
 RELEASE_EXAMPLE = E.g., 'make release DOCKER_REGISTRY=<ecr-container>.amazonaws.com ENVIRONMENT=staging AWS_SECRET_ACCESS_KEY=abcdefghijk AWS_ACCESS_KEY_ID=ABCDEFGH12IJKL'
 registry_error_msg = DOCKER_REGISTRY must be set.  $(RELEASE_EXAMPLE)
@@ -325,6 +323,9 @@ ${DB_CACHE_DIR}:
 
 clean-db-cache:
 	@rm -f $(gz_file)
+
+load-remote-db: clean-db-cache
+	$(MAKE) load-db gz_file=$(gz_file)
 
 mysql-container:
 	docker-compose up -d
