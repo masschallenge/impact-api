@@ -176,7 +176,7 @@ test: setup
 	@docker-compose run --rm web \
 		python3 manage.py test --configuration=Test $(tests)
 
-coverage: coverage-run coverage-report coverage-html
+coverage: coverage-run coverage-report coverage-html-report
 
 coverage-run:
 	@docker-compose run --rm web coverage run --omit="*/tests/*" --source='.' manage.py test --configuration=Test
@@ -187,10 +187,10 @@ coverage-report: diff_grep:=$(shell echo $(diff_sed) | tr ' ' '\n' | grep \.py |
 coverage-report:
 	@docker-compose run --rm web coverage report -i --skip-covered $(diff_grep) | grep -v "NoSource:"
 
-coverage-html:
+coverage-html-report:
 	@docker-compose run --rm web coverage html --omit="*/tests/*"
 
-coverage-html-open: coverage-html
+coverage-html: coverage
 	@open web/impact/htmlcov/index.html
 
 DEFAULT_BRANCH = modular-models-epic
