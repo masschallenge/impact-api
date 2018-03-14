@@ -87,7 +87,9 @@ target_help = \
   '\tUses $$(migration_name) if provided.' \
   'migrate - Runs migrations. If $$(migration) is given then then that ' \
   '\tmigration is targeted in the accelerator package unless another ' \
-  '\t$$(application) is given.' \
+  '\t$$(application) is given.  Examples:' \
+  '\taccelerate 0123: make migrate migration=0123' \
+  '\tsimpleuser 0123: make migrate migration=0123 application=simpleuser' \
   ' ' \
   'status - Reports the status of all related source code repositories.' \
   'checkout - Switch all repos to $(DEFAULT_BRANCH) branch (or $$(branch)' \
