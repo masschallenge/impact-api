@@ -1,9 +1,13 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-import os
 import datetime
-from configurations import Configuration, values
+import os
+
+from configurations import (
+    Configuration,
+    values,
+)
 from django.urls import reverse_lazy
 from unipath import Path
 
@@ -57,14 +61,14 @@ class Base(Configuration):
     SLAVE_DATABASES = ['default']
 
     if os.environ.get('READ_REPLICA_DATABASE_URL'):
-
-        DATABASES.update(values.DatabaseURLValue(
+        DATABASES.update(values.DatabaseURLValue(  # pragma: no cover
             alias='read-replica',
             environ_name='READ_REPLICA_DATABASE_URL').value)
 
-        SLAVE_DATABASES = ['read-replica']
+        SLAVE_DATABASES = ['read-replica']  # pragma: no cover
 
-        DATABASE_ROUTERS = ('impact.routers.MasterSlaveAPIRouter',)
+        DATABASE_ROUTERS = ('impact.routers.MasterSlaveAPIRouter',
+                            )  # pragma: no cover
 
     EMAIL = values.EmailURLValue()
 
@@ -88,6 +92,7 @@ class Base(Configuration):
         'django.contrib.sessions',
         'django.contrib.sites',
         'django.contrib.staticfiles',
+        'sorl.thumbnail',
         'embed_video',
         'impact',
         'oauth2_provider',
@@ -179,9 +184,8 @@ class Base(Configuration):
     CORS_ORIGIN_ALLOW_ALL = True
     # settings.py
     REST_PROXY = {
-        'HOST': bytes(
-            os.environ.get('ACCELERATE_SITE_URL',
-                           'https://accelerate.masschallenge.org'), 'utf-8'),
+        'HOST': os.environ.get('ACCELERATE_SITE_URL',
+                               'https://accelerate.masschallenge.org'),
         'AUTH': {
             'user': None,
             'password': None,
@@ -272,3 +276,19 @@ class Prod(Base):
     ALLOWED_HOSTS = Base.ALLOWED_HOSTS + [
         os.environ.get('DJANGO_ALLOWED_HOST', '*'),
     ]
+
+    AWS_LOCATION = 'media'
+    AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+    AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+    AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+    AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+    AWS_S3_OBJECT_PARAMETERS = {
+        'CacheControl': 'max-age=86400',
+    }
+
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+    MEDIA_ROOT = AWS_LOCATION
+
+    DEFAULT_FILE_STORAGE = 'impact.media_storage_backend.MediaStorageBackend'
+    STATICFILES_STORAGE = (
+        'django.contrib.staticfiles.storage.StaticFilesStorage')
