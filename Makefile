@@ -361,7 +361,7 @@ upload-db:
 	  false; \
 	fi
 	@echo Uploading $(gz_file) as $(s3_key)...
-	@aws s3api put-object --acl public-read --bucket public-clean-saved-db-states --key $(s3_key) --body $(gz_file)
+	aws s3 cp $(gz_file) s3://public-clean-saved-db-states/$(s3_key) --acl public-read
 
 
 TARGET ?= staging
