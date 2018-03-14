@@ -10,7 +10,6 @@ targets = \
   data-migration \
   migrations \
   migrate \
-  models \
   \
   status \
   checkout \
@@ -31,6 +30,7 @@ targets = \
   django-shell \
   \
   load-db \
+  load-remote-db \
   dump-db \
   upload-db \
   clean-db-cache \
@@ -38,9 +38,6 @@ targets = \
   release-list \
   release \
   deploy \
-  \
-  update-packages \
-
 
 deprecated_targets = \
   bash \
@@ -50,7 +47,6 @@ deprecated_targets = \
   coverage-report \
   coverage-html \
   coverage-html-open \
-  load-remote-db \
   dev \
   fetch-remote-db \
   grant-permissions \
