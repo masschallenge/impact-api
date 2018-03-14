@@ -200,7 +200,7 @@ coverage-html-open: coverage-html
 DEFAULT_BRANCH = modular-models-epic
 # Change after modular-models-epic branch has merged
 # DEFAULT_BRANCH = development
-branch ?= $(modular-models-epic)
+branch ?= $(DEFAULT_BRANCH)
 ifdef BRANCH
   branch = $(BRANCH)  # Backwards compatibility
 endif
