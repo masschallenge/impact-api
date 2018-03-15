@@ -42,7 +42,7 @@ sorl-thumbnail==12.4.1
 django-storages==1.6.5
 boto3==1.6.0
 
-git+https://github.com/masschallenge/django-accelerator.git@modular-models-epic#egg=django-accelerator
+git+https://github.com/masschallenge/django-accelerator.git@AC-5347#egg=django-accelerator
 
 # django-configurations from Git master (needed for Django 1.8 support)
 git+https://github.com/jezdez/django-configurations
