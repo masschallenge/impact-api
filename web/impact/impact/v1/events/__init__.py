@@ -8,6 +8,9 @@ from impact.v1.events.organization_became_entrant_event import (
 from impact.v1.events.organization_became_finalist_event import (
     OrganizationBecameFinalistEvent,
 )
+from impact.v1.events.organization_became_winner_event import (
+    OrganizationBecameWinnerEvent,
+)
 from impact.v1.events.organization_created_event import (
     DAWN_OF_TIME,
     OrganizationCreatedEvent,
