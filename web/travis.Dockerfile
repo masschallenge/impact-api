@@ -23,9 +23,7 @@ RUN easy_install-2.7 supervisor
 
 RUN useradd -s /bin/bash -u 3000 -m impact_user
 
-WORKDIR /packages
-
-RUN pip3 install -r /wwwroot/requirements/dev.txt
+RUN pip3 install -r /wwwroot/requirements/travis.txt
 
 RUN chown impact_user /usr/bin/start.sh
 
@@ -34,8 +32,6 @@ RUN chown -R impact_user /wwwroot
 RUN chown -R impact_user /home/impact_user
 
 RUN apt-get install -y gettext
-
-WORKDIR /wwwroot
 
 USER impact_user
 
