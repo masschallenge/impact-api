@@ -367,8 +367,19 @@ upload-db:
 TARGET ?= staging
 
 
-release-list release deploy:
+release-list deploy:
 	@echo $@ not yet implemented
+
+
+release: tag-release
+release: TAG=$(shell semantic-release version --noop | grep "Current version: " | cut -d ' ' -f 3)
+release:
+	@cd ../accelerate && git tag $(TAG) && git push origin --tags
+	@cd ../django-accelerator && git tag $(TAG) && git push origin --tags
+
+tag-release:
+	@sudo pip install python-semantic-release
+	@semantic-release --major version
 
 old-deploy: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
 old-deploy:
