@@ -80,6 +80,76 @@ class Base(Configuration):
 
     WSGI_APPLICATION = 'impact.wsgi.application'
 
+    HOSTNAME = os.getenv('HOSTNAME', 'localhost')
+
+    LOG_FORMAT_STRING = "host:%s " % (
+        HOSTNAME,) + ' %(name)s[%(process)d]: %(levelname)s %(message)s'
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'filters': {
+            'require_debug_false': {
+                '()': 'django.utils.log.RequireDebugFalse'
+            }
+        },
+        'formatters': {
+            'detail': {
+                'format': LOG_FORMAT_STRING,
+                'datefmt': '%Y-%m-%dT%H:%M:%S',
+            },
+        },
+        'handlers': {
+            'null': {
+                'class': 'logging.NullHandler',
+            },
+            'file': {
+                'level': 'INFO',
+                'class': 'logging.handlers.RotatingFileHandler',
+                'maxBytes': 1024 * 1024 * 5,
+                'backupCount': 5,
+                'formatter': 'detail',
+                'filename': 'debug.log',
+            },
+            'mail_admins': {
+                'level': 'ERROR',
+                'filters': ['require_debug_false'],
+                'class': 'django.utils.log.AdminEmailHandler'
+            },
+            'SysLog': {
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+                'class': 'logging.handlers.SysLogHandler',
+                'formatter': 'detail',
+                'filters': ['require_debug_false'],
+                'address': ('logs2.papertrailapp.com', 19120)
+            },
+            'console': {
+                'level': 'INFO',
+                'class': 'logging.StreamHandler',
+                'formatter': 'detail'
+            }
+        },
+        'loggers': {
+            'root': {
+                'handlers': ['console', 'file', 'SysLog'],
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+                'propagate': True
+            },
+            'django.request': {
+                'handlers': ['SysLog', 'file', 'mail_admins', 'console'],
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+                'propagate': True,
+            }, '': {
+                'handlers': ['file', 'console', 'SysLog'],
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+                'propagate': True,
+            }, 'django.security.DisallowedHost': {
+                'handlers': ['null'],
+                'propagate': False,
+            },
+        }
+    }
+
     INSTALLED_APPS = [
         'accelerator.apps.AcceleratorConfig',
         'simpleuser.apps.SimpleuserConfig',
@@ -243,8 +313,8 @@ class Dev(Base):
     ]
 
     MIDDLEWARE_CLASSES = [
-                             'debug_toolbar.middleware.DebugToolbarMiddleware',
-                         ] + Base.MIDDLEWARE_CLASSES
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    ] + Base.MIDDLEWARE_CLASSES
 
     INSTALLED_APPS = Base.INSTALLED_APPS + [
         'debug_toolbar',
