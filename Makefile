@@ -367,15 +367,25 @@ upload-db:
 TARGET ?= staging
 
 
-release-list deploy:
+release-list:
+	@git ls-remote --tags | grep -o 'refs/tags/[0-9]*\.[0-9]*\.[0-9]*' | sort -r | head | grep -o '[^\/]*$'
+
+deploy:
 	@echo $@ not yet implemented
 
-
-release: tag-release
-release: TAG=$(shell semantic-release version --noop | grep "Current version: " | cut -d ' ' -f 3)
+release: RELEASE_MADE:=$(shell semantic-release version --noop | grep "Should have bumped")
 release:
-	@cd ../accelerate && git tag $(TAG) && git push origin --tags
-	@cd ../django-accelerator && git tag $(TAG) && git push origin --tags
+	@if [ -d "$DIRECTORY" ]; then \
+		source .venv/bin/activate; \
+	else \
+		virtualenv --no-site-packages .venv; \
+		source .venv/bin/activate; \
+	fi;
+	@pip install python-semantic-release
+	@echo $(RELEASE_MADE)
+	@if [[ -z "$(RELEASE_MADE)" ]]; then echo "tags equal"; else echo "new tag created" && bash create_release.sh; fi;
+
+	
 
 tag-release:
 	@sudo pip install python-semantic-release
