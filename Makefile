@@ -368,8 +368,7 @@ TARGET ?= staging
 
 
 release-list:
-	@git ls-remote --tags | grep -o 'refs/tags/[0-9]*\.[0-9]*\.[0-9]*' | sort -r | head | grep -o '[^\/]*$$'
-
+	@git ls-remote --tags | grep -o 'refs/tags/v[0-9]*\.[0-9]*\.[0-9]*' | sort -r | grep -o '[^\/]*$$'
 
 
 install-releasedeps:
