@@ -373,14 +373,18 @@ release-list:
 deploy:
 	@echo $@ not yet implemented
 
-release: RELEASE_MADE:=$(shell semantic-release version --noop | grep "Should have bumped")
-release:
+install-releasedeps:
 	@if [ -d "$DIRECTORY" ]; then \
 		source .venv/bin/activate; \
 	else \
 		virtualenv --no-site-packages .venv && source .venv/bin/activate; \
 	fi;
 	@pip install python-semantic-release
+
+
+release: install-releasedeps
+release: RELEASE_MADE:=$(shell semantic-release version --noop | grep "Should have bumped")
+release:
 	@echo $(RELEASE_MADE)
 	@if [[ -z "$(RELEASE_MADE)" ]]; then echo "there is no new release to tag"; else echo "a new release will be created" && bash create_release.sh; fi;
 
