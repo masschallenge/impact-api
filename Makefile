@@ -370,8 +370,7 @@ TARGET ?= staging
 release-list:
 	@git ls-remote --tags | grep -o 'refs/tags/[0-9]*\.[0-9]*\.[0-9]*' | sort -r | head | grep -o '[^\/]*$$'
 
-deploy:
-	@echo $@ deprecated
+
 
 install-releasedeps:
 	@if [ -d "$DIRECTORY" ]; then \
@@ -422,6 +421,8 @@ endif
 
 
 # Deprecated targets
+deploy:
+	@echo $@ ERROR: see deployment steps for accelerate
 
 dbdump:
 	@echo ERROR: dbdump has been replaced by dump-db
