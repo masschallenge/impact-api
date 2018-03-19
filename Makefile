@@ -378,18 +378,12 @@ release:
 	@if [ -d "$DIRECTORY" ]; then \
 		source .venv/bin/activate; \
 	else \
-		virtualenv --no-site-packages .venv; \
-		source .venv/bin/activate; \
+		virtualenv --no-site-packages .venv && source .venv/bin/activate; \
 	fi;
 	@pip install python-semantic-release
 	@echo $(RELEASE_MADE)
-	@if [[ -z "$(RELEASE_MADE)" ]]; then echo "tags equal"; else echo "new tag created" && bash create_release.sh; fi;
+	@if [[ -z "$(RELEASE_MADE)" ]]; then echo "tags equal no new release to tag"; else echo "a new release will be created" && bash create_release.sh; fi;
 
-	
-
-tag-release:
-	@sudo pip install python-semantic-release
-	@semantic-release --major version
 
 old-deploy: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
 old-deploy:
