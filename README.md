@@ -51,6 +51,18 @@ Note that this command will reset the DB, so any changes you've made
 before (i.e. `make dbload`, `make superuser`...) should be
 re-executed.
 
+
+### Creating a release:
+
+To create a release run the ```make release``` command which will tag your current HEAD
+with a semantic release tag and also tag the related django-accelerator and accelerate repos.
+
+run:
+    make release
+
+Upon tagging the release, a new commit will be created and pushed with the release tag.
+This will trigger a new travis build (and subsequently a new tagged ECR image)
+
 ### Reloading on Code change:
 
 This should be done whenever the code changes. Otherwise the changes
