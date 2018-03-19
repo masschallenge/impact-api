@@ -368,7 +368,7 @@ TARGET ?= staging
 
 
 release-list:
-	@git ls-remote --tags | grep -o 'refs/tags/[0-9]*\.[0-9]*\.[0-9]*' | sort -r | head | grep -o '[^\/]*$'
+	@git ls-remote --tags | grep -o 'refs/tags/[0-9]*\.[0-9]*\.[0-9]*' | sort -r | head | grep -o '[^\/]*$$'
 
 deploy:
 	@echo $@ not yet implemented
@@ -382,7 +382,7 @@ release:
 	fi;
 	@pip install python-semantic-release
 	@echo $(RELEASE_MADE)
-	@if [[ -z "$(RELEASE_MADE)" ]]; then echo "tags equal no new release to tag"; else echo "a new release will be created" && bash create_release.sh; fi;
+	@if [[ -z "$(RELEASE_MADE)" ]]; then echo "there is no new release to tag"; else echo "a new release will be created" && bash create_release.sh; fi;
 
 
 old-deploy: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
