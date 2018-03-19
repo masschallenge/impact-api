@@ -371,7 +371,7 @@ release-list:
 	@git ls-remote --tags | grep -o 'refs/tags/[0-9]*\.[0-9]*\.[0-9]*' | sort -r | head | grep -o '[^\/]*$$'
 
 deploy:
-	@echo $@ not yet implemented
+	@echo $@ deprecated
 
 install-releasedeps:
 	@if [ -d "$DIRECTORY" ]; then \
