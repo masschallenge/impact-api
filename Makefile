@@ -372,7 +372,7 @@ release-list:
 
 
 install-releasedeps:
-	@if [ -d "$DIRECTORY" ]; then \
+	@if [ -d ".venv" ]; then \
 		source .venv/bin/activate; \
 	else \
 		virtualenv --no-site-packages .venv && source .venv/bin/activate; \
