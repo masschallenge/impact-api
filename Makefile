@@ -170,6 +170,7 @@ setup:
 
 build: shutdown-vms setup
 	@docker build -f fpdiff.Dockerfile -t masschallenge/fpdiff .
+	@docker build -t semantic-release -f Dockerfile.semantic-release .
 	@docker-compose build --no-cache
 
 
@@ -381,7 +382,7 @@ install-releasedeps:
 
 
 release: install-releasedeps
-release: RELEASE_MADE:=$(shell semantic-release version --noop | grep "Should have bumped")
+release: RELEASE_MADE:=$(shell docker run --rm  -v"$$(pwd)":/app  -i semantic-release  -- semantic-release version --noop | grep "Should have bumped")
 release:
 	@echo $(RELEASE_MADE)
 	@if [[ -z "$(RELEASE_MADE)" ]]; then echo "there is no new release to tag"; else echo "a new release will be created" && bash create_release.sh; fi;
