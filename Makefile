@@ -372,16 +372,6 @@ release-list:
 	@git ls-remote --tags | grep -o 'refs/tags/v[0-9]*\.[0-9]*\.[0-9]*' | sort -r | grep -o '[^\/]*$$'
 
 
-install-releasedeps:
-	@if [ -d ".venv" ]; then \
-		source .venv/bin/activate; \
-	else \
-		virtualenv --no-site-packages .venv && source .venv/bin/activate; \
-	fi;
-	@pip install python-semantic-release
-
-
-release: install-releasedeps
 release: RELEASE_MADE:=$(shell docker run --rm  -v"$$(pwd)":/app  -i semantic-release  -- semantic-release version --noop | grep "Should have bumped")
 release:
 	@echo $(RELEASE_MADE)
