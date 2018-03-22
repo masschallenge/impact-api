@@ -370,10 +370,11 @@ release-list:
 	@git ls-remote --tags | grep -o 'refs/tags/v[0-9]*\.[0-9]*\.[0-9]*' | sort -r | grep -o '[^\/]*$$'
 
 
-release: RELEASE_MADE:=$(shell docker run --rm  -v"$$(pwd)":/app  -i semantic-release  -- semantic-release version --noop | grep "Should have bumped")
+
 release:
-	@echo $(RELEASE_MADE)
-	@if [[ -z "$(RELEASE_MADE)" ]]; then echo "there is no new release to tag"; else echo "a new release will be created" && bash create_release.sh; fi;
+	@git commit --allow-empty -m "generating a new release"
+	@git push
+	@bash create_release.sh
 
 
 old-deploy: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
