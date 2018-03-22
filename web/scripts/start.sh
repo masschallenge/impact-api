@@ -13,3 +13,4 @@ python3 manage.py migrate --noinput
 python3 manage.py collectstatic --noinput
 service nginx restart
 supervisord -c supervisord.conf
+remote_syslog
