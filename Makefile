@@ -10,7 +10,6 @@ targets = \
   data-migration \
   migrations \
   migrate \
-  models \
   \
   status \
   checkout \
@@ -31,6 +30,7 @@ targets = \
   django-shell \
   \
   load-db \
+  load-remote-db \
   dump-db \
   upload-db \
   clean-db-cache \
@@ -38,9 +38,6 @@ targets = \
   release-list \
   release \
   deploy \
-  \
-  update-packages \
-
 
 deprecated_targets = \
   bash \
@@ -50,7 +47,6 @@ deprecated_targets = \
   coverage-report \
   coverage-html \
   coverage-html-open \
-  load-remote-db \
   dev \
   fetch-remote-db \
   grant-permissions \
@@ -91,7 +87,9 @@ target_help = \
   '\tUses $$(migration_name) if provided.' \
   'migrate - Runs migrations. If $$(migration) is given then then that ' \
   '\tmigration is targeted in the accelerator package unless another ' \
-  '\t$$(application) is given.' \
+  '\t$$(application) is given.  Examples:' \
+  '\taccelerate 0123: make migrate migration=0123' \
+  '\tsimpleuser 0123: make migrate migration=0123 application=simpleuser' \
   ' ' \
   'status - Reports the status of all related source code repositories.' \
   'checkout - Switch all repos to $(DEFAULT_BRANCH) branch (or $$(branch)' \
@@ -181,7 +179,7 @@ test: setup
 	@docker-compose run --rm web \
 		python3 manage.py test --configuration=Test $(tests)
 
-coverage: coverage-run coverage-report coverage-html
+coverage: coverage-run coverage-report coverage-html-report
 
 coverage-run:
 	@docker-compose run --rm web coverage run --omit="*/tests/*" --source='.' manage.py test --configuration=Test
@@ -192,16 +190,16 @@ coverage-report: diff_grep:=$(shell echo $(diff_sed) | tr ' ' '\n' | grep \.py |
 coverage-report:
 	@docker-compose run --rm web coverage report -i --skip-covered $(diff_grep) | grep -v "NoSource:"
 
-coverage-html:
+coverage-html-report:
 	@docker-compose run --rm web coverage html --omit="*/tests/*"
 
-coverage-html-open: coverage-html
+coverage-html: coverage
 	@open web/impact/htmlcov/index.html
 
 DEFAULT_BRANCH = modular-models-epic
 # Change after modular-models-epic branch has merged
 # DEFAULT_BRANCH = development
-branch ?= $(modular-models-epic)
+branch ?= $(DEFAULT_BRANCH)
 ifdef BRANCH
   branch = $(BRANCH)  # Backwards compatibility
 endif
@@ -350,7 +348,7 @@ dump-db: mysql-container
 	docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev -r /$(DB_CACHE_DIR)$(db_name).sql
 	rm -f $(DB_CACHE_DIR)$(s3_key)
 	gzip $(DB_CACHE_DIR)$(db_name).sql
-	echo Created $(DB_CACHE_DIR)$(s3_key)
+	@echo Created $(DB_CACHE_DIR)$(s3_key)
 
 MAX_UPLOAD_SIZE = 80000000
 
@@ -362,7 +360,7 @@ upload-db:
 	  false; \
 	fi
 	@echo Uploading $(gz_file) as $(s3_key)...
-	@aws s3api put-object --acl public-read --bucket public-clean-saved-db-states --key $(s3_key) --body $(gz_file)
+	aws s3 cp $(gz_file) s3://public-clean-saved-db-states/$(s3_key) --acl public-read
 
 
 TARGET ?= staging

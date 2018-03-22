@@ -3,4 +3,4 @@
 
 -r test.txt
 
-git+https://github.com/masschallenge/django-accelerator.git@AC-4598#egg=django-accelerator
+git+https://github.com/masschallenge/django-accelerator.git@modular-models-epic#egg=django-accelerator
