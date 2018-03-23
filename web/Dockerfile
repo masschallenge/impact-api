@@ -9,7 +9,7 @@ COPY scripts/start-nodaemon.sh /usr/bin
 RUN apt-get update -y
 
 # python2.7 is required to run supervisor
-RUN apt-get install -y gettext netcat mysql-client nginx python2.7 python-setuptools
+RUN apt-get install -y gettext mysql-client netcat nginx python-setuptools python2.7
 
 # Install remote_syslog2 to talk to papertrail
 RUN cd /tmp/ && curl -LO https://github.com/papertrail/remote_syslog2/releases/download/v0.20/remote-syslog2_0.20_amd64.deb
