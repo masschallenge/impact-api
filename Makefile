@@ -411,7 +411,8 @@ endif
 
 # Deprecated targets
 deploy:
-	@echo $@ ERROR: see deployment steps for accelerate
+	@echo $@ ERROR: see deployment steps for accelerate.
+	@echo see: https://github.com/masschallenge/standards/blob/376d290b41a202acc5c2263d7275ba4a57330ad7/create_new_release.md#deploy-to-staging
 
 dbdump:
 	@echo ERROR: dbdump has been replaced by dump-db
