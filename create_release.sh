@@ -1,4 +1,4 @@
-docker run --rm  -v"$(pwd)":/app  -ti semantic-release  -- semantic-release --major version
+docker run --rm  -v"$(pwd)":/app  -ti semantic-release  -- semantic-release version
 export pwd=$(pwd)
 export TAG=$(docker run --tty=false --rm  -v$pwd:/app  -i semantic-release -- semantic-release version --noop | grep "Current version: " | cut -d ' ' -f 3 | sed -e "s/\r//")
 echo $TAG
