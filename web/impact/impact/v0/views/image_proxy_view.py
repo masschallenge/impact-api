@@ -2,7 +2,6 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 import magic
-
 from django.conf import settings
 from django.http import HttpResponse
 from rest_framework.response import Response
@@ -57,6 +56,4 @@ class ImageProxyView(ProxyView):
         self.request.query_params._mutable = False
 
     def _secure_image_token(self):
-        image_token = encrypt_image_token(self.request.GET["ImageToken"],
-                                          settings.V0_SECURITY_KEY)
-        return image_token + b"="
+        return encrypt_image_token(self.request.GET["ImageToken"])
