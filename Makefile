@@ -168,6 +168,7 @@ setup:
 
 build: shutdown-vms setup
 	@docker build -f fpdiff.Dockerfile -t masschallenge/fpdiff .
+	@docker build -t semantic-release -f Dockerfile.semantic-release .
 	@docker-compose build --no-cache
 
 
@@ -365,8 +366,16 @@ upload-db:
 TARGET ?= staging
 
 
-release-list release deploy:
-	@echo $@ not yet implemented
+release-list:
+	@git ls-remote --tags | grep -o 'refs/tags/v[0-9]*\.[0-9]*\.[0-9]*' | sort -r | grep -o '[^\/]*$$'
+
+
+
+release:
+	@git commit --allow-empty -m "generating a new release"
+	@git push
+	@bash create_release.sh
+
 
 old-deploy: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
 old-deploy:
@@ -401,6 +410,9 @@ endif
 
 
 # Deprecated targets
+deploy:
+	@echo $@ ERROR: see deployment steps for accelerate.
+	@echo see: https://github.com/masschallenge/standards/blob/376d290b41a202acc5c2263d7275ba4a57330ad7/create_new_release.md#deploy-to-staging
 
 dbdump:
 	@echo ERROR: dbdump has been replaced by dump-db
