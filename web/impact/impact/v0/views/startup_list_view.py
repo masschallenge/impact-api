@@ -179,7 +179,9 @@ def _startup_description(startup, statuses, base_url):
             "name": startup.name,
             "id": startup.id,
             "profile_url": base_url + startup.organization.url_slug,
-            "image_token": encrypt_image_token(startup.high_resolution_logo),
+            "image_token": encrypt_image_token(
+                startup.high_resolution_logo.name)
+                   if startup.high_resolution_logo else '',
             "logo_url": logo_url(startup),
             "statuses": [status_description(status) for status in statuses],
             }

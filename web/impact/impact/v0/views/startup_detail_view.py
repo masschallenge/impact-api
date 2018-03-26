@@ -3,17 +3,17 @@
 
 from django.utils.safestring import mark_safe
 from embed_video.backends import (
-    detect_backend,
     UnknownBackendException,
-    UnknownIdException
+    UnknownIdException,
+    detect_backend,
 )
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from impact.models import ProgramStartupStatus
 from impact.permissions import (
     V0APIPermissions,
 )
-from impact.models import ProgramStartupStatus
 from impact.utils import get_profile
 from impact.v0.api_data.startup_detail_data import StartupDetailData
 from impact.v0.views.base_media_info import BaseMediaInfo
@@ -23,7 +23,6 @@ from impact.v0.views.utils import (
     logo_url,
     status_description,
 )
-
 
 DEFAULT_PROFILE_BACKGROUND_COLOR = "217181"
 DEFAULT_PROFILE_TEXT_COLOR = "FFFFFF"
@@ -84,7 +83,9 @@ class StartupDetailView(APIView):
             "twitter_handle": startup.twitter_handle,
             "website_url": startup.website_url,
 
-            "image_token": encrypt_image_token(startup.high_resolution_logo),
+            "image_token": encrypt_image_token(
+                startup.high_resolution_logo.name) if
+            startup.high_resolution_logo else '',
             "logo_url": logo_url(startup),
             "profile_background_color":
                 "#" + (startup.profile_background_color or
