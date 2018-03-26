@@ -98,6 +98,6 @@ if settings.DEBUG:
 
     urls += [  # pragma: no cover
         url(r"^__debug__/", include(debug_toolbar.urls)),  # pragma: no cover
-    ]
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns = urls
