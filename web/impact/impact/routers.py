@@ -21,6 +21,7 @@ class APIRouter(object):
                 'sessions',
                 'simpleuser',
                 'sites',
+                'thumbnail',
                 'contenttypes']:
             return False
         return True
