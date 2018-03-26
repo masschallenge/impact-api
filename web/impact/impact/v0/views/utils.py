@@ -1,22 +1,18 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-import os
-import re
-from time import time
-
 import base64
 import hashlib
-from Crypto.Cipher import AES
+import os
+from time import time
 
+from Crypto.Cipher import AES
 from django.conf import settings
 
 from impact.models import (
     Site,
     SiteProgramAuthorization,
 )
-from impact.v0.views.base_media_info import BaseMediaInfo
-
 
 BADGE_DISPLAYS = ("STARTUP_LIST", "STARTUP_LIST_AND_PROFILE")
 IMAGE_TOKEN_BLOCK_SIZE = 16
@@ -45,10 +41,7 @@ def _pad(text):
 def logo_url(startup):
     if not startup.high_resolution_logo:
         return ""
-    schema = "^(http|https)://"
-    if re.match(schema, str(startup.high_resolution_logo), re.IGNORECASE):
-        return startup.high_resolution_logo
-    return BaseMediaInfo.url(str(startup.high_resolution_logo))
+    return startup.high_resolution_logo.url
 
 
 def status_description(status):
