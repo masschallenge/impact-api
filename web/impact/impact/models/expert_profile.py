@@ -18,6 +18,7 @@ from impact.models.industry import Industry
 from impact.models.mentoring_specialties import MentoringSpecialties
 from impact.models.program_family import ProgramFamily
 from impact.models.utils import is_managed
+from sorl.thumbnail import ImageField
 
 
 PRIVACY_CHOICES = (("staff", "MC Staff Only"),
@@ -65,7 +66,10 @@ class ExpertProfile(MCModel):
     facebook_url = models.URLField(blank=True)
     twitter_handle = models.CharField(max_length=TWITTER_HANDLE_MAX_LENGTH)
     personal_website_url = models.CharField(max_length=255)
-    image = models.CharField(max_length=100)
+    image = ImageField(
+        upload_to='profile_pics',
+        verbose_name="Profile Picture",
+        blank=True)
     drupal_id = models.IntegerField(blank=True, null=True)
     drupal_creation_date = models.DateTimeField(blank=True, null=True)
     drupal_last_login = models.DateTimeField(blank=True, null=True)

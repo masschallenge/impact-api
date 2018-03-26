@@ -16,7 +16,6 @@ from impact.permissions import (
 )
 from impact.utils import get_profile
 from impact.v0.api_data.startup_detail_data import StartupDetailData
-from impact.v0.views.base_media_info import BaseMediaInfo
 from impact.v0.views.utils import (
     BADGE_DISPLAYS,
     encrypt_image_token,
@@ -99,8 +98,7 @@ class StartupDetailView(APIView):
         }
 
     def _team_members(self):
-        base_url = BaseMediaInfo.url()
-        return [_user_description(member, base_url)
+        return [_user_description(member)
                 for member in _find_members(self.data.startup)]
 
 
@@ -115,7 +113,7 @@ def _statuses(startup, program):
             for status in statuses]
 
 
-def _user_description(member, base_url):
+def _user_description(member):
     user = member.user
     result = {
         "first_name": user.last_name,
@@ -123,15 +121,15 @@ def _user_description(member, base_url):
         "email": user.email,
         "title": member.title,
     }
-    result.update(_image_fields(user, base_url))
+    result.update(_image_fields(user))
     return result
 
 
-def _image_fields(user, base_url):
+def _image_fields(user):
     profile = get_profile(user)
-    image = profile.image if profile else None
+    image = profile and profile.image
     return {
-        "photo_url": base_url + image if image else "",
+        "photo_url": image.url if image else "",
         "photo_token": encrypt_image_token(image) if image else "",
     }
 
