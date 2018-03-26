@@ -56,4 +56,6 @@ class ImageProxyView(ProxyView):
         self.request.query_params._mutable = False
 
     def _secure_image_token(self):
-        return encrypt_image_token(self.request.GET["ImageToken"])
+        return encrypt_image_token(
+            self.request.GET["ImageToken"],
+            password=settings.V0_SECURITY_KEY)
