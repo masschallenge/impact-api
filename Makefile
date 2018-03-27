@@ -377,7 +377,7 @@ release:
 	@bash create_release.sh
 
 
-old-deploy: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
+old-deploy: DOCKER_REGISTRY = $(aws ecr describe-repositories --repository-name impact-api | cut -d"\"" -f4 | cut -d"/" -f1 | grep -i "amazonaws.com")
 old-deploy:
 ifndef RELEASE
 	$(error $(no_release_error_msg))
