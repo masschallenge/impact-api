@@ -60,7 +60,7 @@ deprecated_targets = \
   superuser \
 
 
-DEFAULT_DB_NAME = initial_schema_post_transition
+DEFAULT_DB_NAME = initial_schema
 db_name ?= $(DEFAULT_DB_NAME)
 
 lower_target_help = \
