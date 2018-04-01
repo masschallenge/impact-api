@@ -7,6 +7,7 @@ from accelerator.models import Organization
 from impact.v1.events import (
     OrganizationBecameEntrantEvent,
     OrganizationBecameFinalistEvent,
+    OrganizationBecameWinnerEvent,
     OrganizationCreatedEvent,
 )
 
@@ -16,4 +17,5 @@ class OrganizationHistoryView(BaseHistoryView):
     model = Organization
     event_classes = [OrganizationCreatedEvent,
                      OrganizationBecameEntrantEvent,
-                     OrganizationBecameFinalistEvent]
+                     OrganizationBecameFinalistEvent,
+                     OrganizationBecameWinnerEvent]

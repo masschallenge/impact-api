@@ -2,15 +2,14 @@ sudo: required
 
 language: python
 
-services:
-  - docker
+services: docker
 
 env:
-    global:
-        - DOCKER_COMPOSE_VERSION=1.10.1
-        # get all the branches referencing this commit
-        - IS_RELEASE=$(git ls-remote origin | grep "$TRAVIS_COMMIT\s\+refs/heads/release$")
-        - RELEASE_TAG=$(git tag -l --points-at HEAD | head -n1)
+  global:
+    - DOCKER_COMPOSE_VERSION=1.10.1
+      # get all the branches referencing this commit
+    - IS_RELEASE=$(git ls-remote origin | grep "$TRAVIS_COMMIT\s\+refs/heads/release$")
+    - RELEASE_TAG=$(git tag -l --points-at HEAD | head -n1)
 
 before_install:
 - sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu trusty-backports universe'
@@ -48,4 +47,4 @@ after_success:
 - export PATH=$PATH:$HOME/.local/bin;
 - export TAG=$(if [ "$RELEASE_TAG" = "" ]; then echo "$BRANCH"; else echo "$RELEASE_TAG"; fi);
 - eval $(aws ecr get-login --region us-east-1 --no-include-email);
-- make travis-release AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ENVIRONMENT=$DEPLOY_ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY IMAGE_TAG=$TAG
+- make travis-release AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ENVIRONMENT=$DEPLOY_ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY IMAGE_TAG=$TAG;
