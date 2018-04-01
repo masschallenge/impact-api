@@ -1,0 +1,14 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
+-r base.txt
+
+coverage
+django-debug-toolbar==1.6
+django-factory-boy==1.0.0
+django-test-plus==1.0.16
+git+https://github.com/PyCQA/astroid.git#egg=astroid
+git+https://github.com/PyCQA/pylint#egg=pylint
+ipdb==0.8.1
+ipython==4.0.0
+jsonschema

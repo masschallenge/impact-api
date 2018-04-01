@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from rest_framework.response import Response
 
-from impact.models import (
+from accelerator.models import (
     BaseProfile,
     ExpertProfile,
     MemberProfile,

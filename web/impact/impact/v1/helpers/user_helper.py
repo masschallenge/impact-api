@@ -3,7 +3,7 @@
 
 from django.contrib.auth import get_user_model
 
-from impact.models import (
+from accelerator.models import (
     EntrepreneurProfile,
     ExpertProfile,
 )

@@ -1,4 +1,4 @@
-from impact.models import Program
+from accelerator.models import Program
 from impact.v1.helpers.model_helper import (
     FLOAT_FIELD,
     INTEGER_FIELD,

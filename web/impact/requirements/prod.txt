@@ -5,3 +5,4 @@
 
 setproctitle==1.1.8
 
+-r mc.txt

@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 
-from impact.models import (
+from accelerator.models import (
     PartnerTeamMember,
     StartupTeamMember,
 )
