@@ -7,6 +7,7 @@ if [ "${DJANGO_CONFIGURATION}" == "Dev" ]; then
         echo "..."
   done
 fi
+
 PDT_MIGRATION_APPLIED=$(python3 manage.py showmigrations pdt | grep 0002 | grep X);
 if [[ -z $PDT_MIGRATION_APPLIED ]];
 then
@@ -15,6 +16,13 @@ then
 fi
 # todo: remove this conditional after the transition is over
 python3 manage.py migrate --noinput
+
 python3 manage.py collectstatic --noinput
+
+if [ "${DJANGO_CONFIGURATION}" == "Prod" ]
+then
+    remote_syslog
+fi
+
 service nginx restart
 supervisord -c supervisord.conf
