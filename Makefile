@@ -196,9 +196,7 @@ coverage-html-report:
 coverage-html: coverage
 	@open web/impact/htmlcov/index.html
 
-DEFAULT_BRANCH = modular-models-epic
-# Change after modular-models-epic branch has merged
-# DEFAULT_BRANCH = development
+DEFAULT_BRANCH = development
 branch ?= $(DEFAULT_BRANCH)
 ifdef BRANCH
   branch = $(BRANCH)  # Backwards compatibility
