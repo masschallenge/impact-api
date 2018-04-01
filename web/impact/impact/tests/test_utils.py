@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from impact.models.utils import (
+from impact.model_utils import (
     model_name_to_snake,
     snake_to_model_name,
 )

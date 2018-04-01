@@ -11,7 +11,7 @@ from impact.tests.factories import (
 
 
 class TestTimestamps(TestCase):
-    def test_currency(self):
+    def test_startup(self):
         startup = StartupFactory()
         assert startup.created_at <= startup.updated_at
 
@@ -20,5 +20,4 @@ class TestTimestamps(TestCase):
                         IndustryFactory,
                         StartupProgramInterestFactory]:
             obj = factory()
-            with self.assertRaises(AttributeError):
-                assert obj.created_at <= obj.updated_at
+            assert obj.created_at <= obj.updated_at

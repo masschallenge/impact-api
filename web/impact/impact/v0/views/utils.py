@@ -11,12 +11,11 @@ from Crypto.Cipher import AES
 
 from django.conf import settings
 
-from impact.models import (
-    Site,
+from accelerator.models.site import Site
+from accelerator.models import (
     SiteProgramAuthorization,
 )
 from impact.v0.views.base_media_info import BaseMediaInfo
-
 
 BADGE_DISPLAYS = ("STARTUP_LIST", "STARTUP_LIST_AND_PROFILE")
 IMAGE_TOKEN_BLOCK_SIZE = 16

@@ -3,7 +3,10 @@
 
 from django.apps import apps
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import (
+    include,
+    url,
+)
 from django.conf.urls.static import static
 from django.contrib import admin
 from drf_auto_endpoint.router import router as schema_router
@@ -14,9 +17,8 @@ from rest_framework_jwt.views import (
     verify_jwt_token,
 )
 
-from impact.models.utils import model_name_to_snake
+from impact.model_utils import model_name_to_snake
 from impact.schema import schema_view
-from impact.utils import model_is_not_auto_created
 from impact.v0.urls import v0_urlpatterns
 from impact.v1.urls import v1_urlpatterns
 from impact.views import (
@@ -28,15 +30,9 @@ accelerator_router = routers.DefaultRouter()
 simpleuser_router = routers.DefaultRouter()
 simpleuser_router.register('User', GeneralViewSet, base_name='User')
 
-for model in apps.get_models('impact'):
-    if model._meta.app_label == 'impact' and not model._meta.auto_created:
-        schema_router.register(model, url=model_name_to_snake(model.__name__))
-
 for model in apps.get_models('accelerator'):
-    if model_is_not_auto_created(model, app_label='accelerator'):
-        accelerator_router.register(
-            model.__name__, GeneralViewSet,
-            base_name="accelerator.{model}".format(model=model.__name__))
+    if model._meta.app_label == 'accelerator' and not model._meta.auto_created:
+        schema_router.register(model, url=model_name_to_snake(model.__name__))
 
 sso_urlpatterns = [
     url(r'^obtain-token/', obtain_jwt_token),
@@ -77,8 +73,8 @@ urls = [
         }),
         name='object-detail'),
     url(r'^api/simpleuser/', include(simpleuser_router.urls)),
-    url(r'^api/accelerator/', include(accelerator_router.urls)),
-    url(r'^api/impact/', include(schema_router.urls), name='api-root'),
+    url(r'^api/accelerator/', include(schema_router.urls),
+        name='api-root'),
     url(r'^sso/', include(sso_urlpatterns, namespace="sso")),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include(account_urlpatterns)),

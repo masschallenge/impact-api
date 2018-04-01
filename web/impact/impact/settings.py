@@ -56,8 +56,6 @@ class Base(Configuration):
 
     DATABASES = values.DatabaseURLValue().value
 
-    DATABASE_ROUTERS = ['impact.routers.APIRouter']
-
     SLAVE_DATABASES = ['default']
 
     if os.environ.get('READ_REPLICA_DATABASE_URL'):
@@ -67,8 +65,7 @@ class Base(Configuration):
 
         SLAVE_DATABASES = ['read-replica']  # pragma: no cover
 
-        DATABASE_ROUTERS = ('impact.routers.MasterSlaveAPIRouter',
-                            )  # pragma: no cover
+        DATABASE_ROUTERS = ('multidb.MasterSlaveRouter',)  # pragma: no cover
 
     EMAIL = values.EmailURLValue()
 
@@ -81,6 +78,9 @@ class Base(Configuration):
     WSGI_APPLICATION = 'impact.wsgi.application'
 
     INSTALLED_APPS = [
+        'paypal.standard',
+        'paypal.pro',
+        'paypal.standard.pdt',
         'accelerator.apps.AcceleratorConfig',
         'simpleuser.apps.SimpleuserConfig',
         'corsheaders',
@@ -94,13 +94,14 @@ class Base(Configuration):
         'django.contrib.staticfiles',
         'sorl.thumbnail',
         'embed_video',
-        'impact',
         'oauth2_provider',
         'rest_framework',
         'rest_framework.authtoken',
         'rest_framework_swagger',
+        'fluent_pages',
+        'impact',
     ]
-    ACCELERATOR_MODELS_ARE_MANAGED = False
+    ACCELERATOR_MODELS_ARE_MANAGED = True
 
     AUTH_USER_MODEL = 'simpleuser.User'
 
@@ -228,6 +229,21 @@ class Base(Configuration):
         'JWT_SECRET_KEY': bytes(os.environ.get('JWT_SECRET_KEY', ''), 'utf-8'),
     }
 
+    PAYPAL_WPP_USER = ""
+    PAYPAL_WPP_PASSWORD = ""
+    PAYPAL_WPP_SIGNATURE = ""
+    PAYPAL_RECEIVER_EMAIL = ''
+    PAYPAL_IDENTITY_TOKEN = ''
+
+    MPTT_SWAPPABLE_INDUSTRY_MODEL = "accelerator.Industry"
+    MPTT_SWAPPABLE_INDUSTRY_MODEL_ADDITIONAL = "accelerator.Industry"
+    MPTT_SWAPPABLE_INDUSTRY_DB_TABLE_NAME = (
+        "accelerator_startup_related_industry")
+    MPTT_SWAPPABLE_FUNCTIONALEXPERTISE_MODEL = (
+        "accelerator.FunctionalExpertise")
+
+    CMS_FILE_ROOT = '/var/www/cms-files'
+
 
 class Dev(Base):
     DEBUG = True
@@ -268,7 +284,6 @@ class Test(Base):
     }
     DATABASE_ROUTERS = []
     DEBUG = False
-    TEST_RUNNER = 'impact.test_runner.UnManagedModelTestRunner'
     LANGUAGE_CODE = 'en'
 
 

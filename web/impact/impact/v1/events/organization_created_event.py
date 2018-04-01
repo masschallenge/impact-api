@@ -24,7 +24,7 @@ class OrganizationCreatedEvent(BaseHistoryEvent):
         return [cls(organization)]
 
     def calc_datetimes(self):
-        startup = self.organization.startup_set.order_by("id").first()
+        startup = self.organization.startups.order_by("id").first()
         if startup:
             self._created_datetimes(startup)
             return

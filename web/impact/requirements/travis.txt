@@ -1,0 +1,6 @@
+# MIT License
+# Copyright (c) 2017 MassChallenge, Inc.
+
+-r test.txt
+
+git+https://github.com/masschallenge/django-accelerator.git@2018.04.01#egg=django-accelerator
