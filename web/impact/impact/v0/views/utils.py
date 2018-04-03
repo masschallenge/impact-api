@@ -9,10 +9,11 @@ from time import time
 from Crypto.Cipher import AES
 from django.conf import settings
 
-from impact.models import (
+from accelerator.models import (
     Site,
     SiteProgramAuthorization,
 )
+
 
 BADGE_DISPLAYS = ("STARTUP_LIST", "STARTUP_LIST_AND_PROFILE")
 IMAGE_TOKEN_BLOCK_SIZE = 16

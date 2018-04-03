@@ -6,7 +6,7 @@ from django.core.exceptions import (
     ValidationError,
 )
 from django.core.validators import RegexValidator
-from impact.models import (
+from accelerator.models import (
     EntrepreneurProfile,
     ExpertCategory,
     ExpertProfile,

@@ -1,4 +1,4 @@
-from impact.models import ProgramCycle
+from accelerator.models import ProgramCycle
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     ModelHelper,

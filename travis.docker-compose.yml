@@ -31,7 +31,9 @@ services:
       - ./web/impact/static/js:/gulp/js
   # Web python
   web:
-    build: ./web
+    build:
+      context: ./web
+      dockerfile: travis.Dockerfile
     ports:
       - "80:80"
       - "443:443"
@@ -41,7 +43,6 @@ services:
       - "443"
     volumes:
       - ./web/impact:/wwwroot
-      - ../django-accelerator:/packages/src/django-accelerator
       - ./db_cache:/db_cache
       - ./web/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./web/impact/media:/media:ro
