@@ -14,6 +14,7 @@ from accelerator.models import (
     SiteProgramAuthorization,
 )
 
+PADDING_CHAR = '='
 
 BADGE_DISPLAYS = ("STARTUP_LIST", "STARTUP_LIST_AND_PROFILE")
 IMAGE_TOKEN_BLOCK_SIZE = 16
@@ -39,7 +40,7 @@ def _pad(text):
     length = len(encoded_bytes)
     leftover_size = length % IMAGE_TOKEN_BLOCK_SIZE
     pad_size = IMAGE_TOKEN_BLOCK_SIZE - leftover_size
-    padding = pad_size * chr(pad_size)
+    padding = pad_size * PADDING_CHAR
     return encoded_bytes + padding.encode("utf-8")
 
 
