@@ -25,16 +25,20 @@ def encrypt_image_token(token, password=None):
             password = settings.V0_IMAGE_PASSWORD
         iv = os.urandom(IMAGE_TOKEN_BLOCK_SIZE)
         key = hashlib.sha256(password).hexdigest()[:32]
-        cipher = AES.new(key, AES.MODE_CBC, iv)
-        raw = _pad(str(token) + ":" + str(time()))
-        return base64.urlsafe_b64encode((iv + cipher.encrypt(raw)))
+        aes = AES.new(key, AES.MODE_CBC, iv)
+        time_block = str(time())
+        raw = _pad(str(token) + ":" + time_block)
+        encrypted = aes.encrypt(raw)
+        encoded = base64.urlsafe_b64encode((iv + encrypted))
+        return encoded
     return b""
 
 
 def _pad(text):
     encoded_bytes = text.encode("utf-8")
     length = len(encoded_bytes)
-    pad_size = IMAGE_TOKEN_BLOCK_SIZE - length % IMAGE_TOKEN_BLOCK_SIZE
+    leftover_size = length % IMAGE_TOKEN_BLOCK_SIZE
+    pad_size = IMAGE_TOKEN_BLOCK_SIZE - leftover_size
     padding = pad_size * chr(pad_size)
     return encoded_bytes + padding.encode("utf-8")
 
