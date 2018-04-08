@@ -10,6 +10,8 @@ env:
       # get all the branches referencing this commit
     - IS_RELEASE=$(git ls-remote origin | grep "$TRAVIS_COMMIT\s\+refs/heads/release$")
     - RELEASE_TAG=$(git tag -l --points-at HEAD | head -n1)
+    - BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+    - DJANGO_ACCELERATOR_REVISION=`./infer_django_accelerator_revision.sh $BRANCH`
 
 before_install:
 - sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu trusty-backports universe'
@@ -24,7 +26,6 @@ before_install:
 - docker-compose --version
 
 before_script:
-- export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 - if [ -z $TRAVIS_TAG ]; then git remote set-branches origin $BRANCH; fi
 - git fetch
 - git checkout $BRANCH
@@ -33,7 +34,7 @@ before_script:
 - for key in $keys; do echo "$key=${!key}" >> .prod.env; echo "" >> .prod.env; done
 - echo "DATABASE_URL=mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}/${DATABASE_NAME}" >> .prod.env
 - echo "" >> .prod.env
-- docker-compose -f travis.docker-compose.yml build --no-cache
+- docker-compose -f travis.docker-compose.yml build --no-cache --build-arg DJANGO_ACCELERATOR_REVISION=$DJANGO_ACCELERATOR_REVISION
 - docker-compose -f travis.docker-compose.yml up -d 
 
 script:
