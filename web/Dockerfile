@@ -1,16 +1,21 @@
 FROM python:3.6
 
 WORKDIR /wwwroot
-
 COPY impact /wwwroot
 COPY scripts/start.sh /usr/bin
 COPY scripts/start-nodaemon.sh /usr/bin
 
 COPY scripts/mysqlwait.sh /usr/bin
 
-RUN apt-get update -y
 # python2.7 is required to run supervisor
-RUN apt-get install -y gettext mysql-client netcat nginx python-setuptools python2.7
+RUN apt-get update -y && apt-get install -y \
+    gettext \
+    mysql-client \
+    netcat \
+    nginx \
+    python-setuptools \
+    python2.7 \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install remote_syslog2 to talk to papertrail
 RUN cd /tmp/ && curl -LOs https://github.com/papertrail/remote_syslog2/releases/download/v0.20/remote-syslog2_0.20_amd64.deb
