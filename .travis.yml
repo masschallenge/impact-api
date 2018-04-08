@@ -6,7 +6,7 @@ services: docker
 
 env:
   global:
-    - DOCKER_COMPOSE_VERSION=1.10.1
+    - DOCKER_COMPOSE_VERSION=2.3
       # get all the branches referencing this commit
     - IS_RELEASE=$(git ls-remote origin | grep "$TRAVIS_COMMIT\s\+refs/heads/release$")
     - RELEASE_TAG=$(git tag -l --points-at HEAD | head -n1)
