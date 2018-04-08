@@ -6,7 +6,7 @@ services: docker
 
 env:
   global:
-    - DOCKER_COMPOSE_VERSION=2.3
+#    - DOCKER_COMPOSE_VERSION=1.10.1
       # get all the branches referencing this commit
     - IS_RELEASE=$(git ls-remote origin | grep "$TRAVIS_COMMIT\s\+refs/heads/release$")
     - RELEASE_TAG=$(git tag -l --points-at HEAD | head -n1)
@@ -19,11 +19,11 @@ before_install:
 - docker-compose --version
 - sudo apt-get update
 - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-ce
-- sudo rm /usr/local/bin/docker-compose
-- curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-- chmod +x docker-compose
-- sudo mv docker-compose /usr/local/bin
-- docker-compose --version
+#- sudo rm /usr/local/bin/docker-compose
+#- curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+#- chmod +x docker-compose
+#- sudo mv docker-compose /usr/local/bin
+#- docker-compose --version
 
 before_script:
 - if [ -z $TRAVIS_TAG ]; then git remote set-branches origin $BRANCH; fi
@@ -35,7 +35,7 @@ before_script:
 - echo "DATABASE_URL=mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}/${DATABASE_NAME}" >> .prod.env
 - echo "" >> .prod.env
 - docker-compose -f travis.docker-compose.yml build --no-cache --build-arg DJANGO_ACCELERATOR_REVISION=$DJANGO_ACCELERATOR_REVISION
-- docker-compose -f travis.docker-compose.yml up -d 
+- docker-compose -f travis.docker-compose.yml up -d
 
 script:
 - make test
