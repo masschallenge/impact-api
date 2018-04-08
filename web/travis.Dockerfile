@@ -31,7 +31,7 @@ RUN useradd -s /bin/bash -u 3000 -m impact_user
 RUN pip3 install -r /wwwroot/requirements/travis.txt
 
 ARG DJANGO_ACCELERATOR_REVISION=development
-pip3 install git+https://github.com/masschallenge/django-accelerator.git@${DJANGO_ACCELERATOR_REVISION}#egg=django-accelerator
+RUN pip3 install git+https://github.com/masschallenge/django-accelerator.git@${DJANGO_ACCELERATOR_REVISION}#egg=django-accelerator
 
 RUN chown impact_user /usr/bin/start.sh
 RUN chown -R impact_user /wwwroot
