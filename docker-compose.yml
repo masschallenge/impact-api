@@ -47,6 +47,7 @@ services:
       - ./web/impact/media:/media:ro
     depends_on:
       - mysql
+      - assets
     links:
       - mysql
       - redis
