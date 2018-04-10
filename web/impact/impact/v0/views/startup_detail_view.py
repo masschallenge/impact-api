@@ -83,8 +83,7 @@ class StartupDetailView(APIView):
             "website_url": startup.website_url,
 
             "image_token": encrypt_image_token(
-                startup.high_resolution_logo.name) if
-            startup.high_resolution_logo else '',
+                startup.high_resolution_logo.name),
             "logo_url": logo_url(startup),
             "profile_background_color":
                 "#" + (startup.profile_background_color or
