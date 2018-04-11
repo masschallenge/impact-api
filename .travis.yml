@@ -49,5 +49,4 @@ after_success:
 - export ECR_TOKEN=`aws ecr get-authorization-token --output text --query 'authorizationData[].authorizationToken' | base64 -D | cut -d':' -f2`
 - export ECR_HOST=$(aws ecr get-authorization-token --output text --query 'authorizationData[].proxyEndpoint')
 - echo $ECR_TOKEN | docker login -u AWS --password-stdin $ECR_HOST
-#- eval $(aws ecr get-login --region us-east-1 --no-include-email);
 - make travis-release AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ENVIRONMENT=$DEPLOY_ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY IMAGE_TAG=$TAG;
