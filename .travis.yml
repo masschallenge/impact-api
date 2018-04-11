@@ -46,7 +46,7 @@ after_success:
 - pip install awscli;
 - export PATH=$PATH:$HOME/.local/bin;
 - export TAG=$(if [ "$RELEASE_TAG" = "" ]; then echo "$BRANCH"; else echo "$RELEASE_TAG"; fi);
-- export ECR_TOKEN=`aws ecr get-authorization-token --output text --query 'authorizationData[].authorizationToken' | base64 -D | cut -d':' -f2`
+- export ECR_TOKEN=`aws ecr get-authorization-token --output text --query 'authorizationData[].authorizationToken' | cut -d':' -f2`
 - export ECR_HOST=$(aws ecr get-authorization-token --output text --query 'authorizationData[].proxyEndpoint')
 - export DOCKER_USER=AWS
 - export DOCKER_PASSWORD=$ECR_TOKEN
