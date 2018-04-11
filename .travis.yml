@@ -43,8 +43,12 @@ after_success:
 - if [ "$DEPLOY_ENVIRONMENT" = "" ]; then export DEPLOY_ENVIRONMENT=$(if [ "$BRANCH" = "master" ]; then echo "production"; else echo "staging"; fi); fi;
 - sudo curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest;
 - sudo chmod +x /usr/local/bin/ecs-cli;
-- pip install awscli;
+- pip install awscli==1.15.3;
 - export PATH=$PATH:$HOME/.local/bin;
 - export TAG=$(if [ "$RELEASE_TAG" = "" ]; then echo "$BRANCH"; else echo "$RELEASE_TAG"; fi);
-- eval $(aws ecr get-login --region us-east-1 --no-include-email);
+- export ECR_TOKEN=`aws ecr get-authorization-token --region us-east-1 --output text --query 'authorizationData[].authorizationToken' | base64 --decode | cut -d':' -f2`
+- export ECR_HOST=`aws ecr get-authorization-token --region us-east-1 --output text --query 'authorizationData[].proxyEndpoint'`
+- export DOCKER_USER=AWS
+- export DOCKER_PASSWORD=$ECR_TOKEN
+- echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin $ECR_HOST
 - make travis-release AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ENVIRONMENT=$DEPLOY_ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY IMAGE_TAG=$TAG;
