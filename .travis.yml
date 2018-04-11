@@ -47,7 +47,7 @@ after_success:
 - export PATH=$PATH:$HOME/.local/bin;
 - export TAG=$(if [ "$RELEASE_TAG" = "" ]; then echo "$BRANCH"; else echo "$RELEASE_TAG"; fi);
 - export ECR_TOKEN=`aws ecr get-authorization-token --region us-east-1 --output text --query 'authorizationData[].authorizationToken' | base64 --decode | cut -d':' -f2`
-- export ECR_HOST=$(aws ecr get-authorization-token --region us-east-1 --output text --query 'authorizationData[].proxyEndpoint')
+- export ECR_HOST=`aws ecr get-authorization-token --region us-east-1 --output text --query 'authorizationData[].proxyEndpoint'`
 - export DOCKER_USER=AWS
 - export DOCKER_PASSWORD=$ECR_TOKEN
 - echo $ECR_HOST
