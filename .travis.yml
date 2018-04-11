@@ -46,5 +46,5 @@ after_success:
 - pip install awscli;
 - export PATH=$PATH:$HOME/.local/bin;
 - export TAG=$(if [ "$RELEASE_TAG" = "" ]; then echo "$BRANCH"; else echo "$RELEASE_TAG"; fi);
-- eval $(aws ecr get-login --region us-east-1 --no-include-email);
+- eval $(aws ecr get-login --region us-east-1 --no-include-email|sed 's|https://||');
 - make travis-release AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ENVIRONMENT=$DEPLOY_ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY IMAGE_TAG=$TAG;

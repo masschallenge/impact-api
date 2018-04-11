@@ -396,7 +396,7 @@ ifndef ENVIRONMENT
 	$(error $(environment_error_msg))
 endif
 	@echo "tagging image ${IMAGE_TAG}"
-	@eval $(aws ecr get-login --region us-east-1);
+	@eval $(aws ecr get-login --region us-east-1 --no-include-email|sed 's|https://||');
 	@ecs-cli configure --region us-east-1 --access-key $(AWS_ACCESS_KEY_ID) --secret-key $(AWS_SECRET_ACCESS_KEY) --cluster $(ENVIRONMENT);
 	@docker tag impactapi_web:latest $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG)
 	@docker push $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG)
