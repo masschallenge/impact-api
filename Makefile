@@ -384,7 +384,7 @@ endif
 	--image web $(DOCKER_REGISTRY)/impact-api:$(RELEASE) \
 	--image redis $(DOCKER_REGISTRY)/redis:$(RELEASE)
 
-travis-release: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
+travis-release: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $3}')
 travis-release:
 ifndef AWS_SECRET_ACCESS_KEY
 	$(error $(awskey_error_msg))
@@ -396,7 +396,6 @@ ifndef ENVIRONMENT
 	$(error $(environment_error_msg))
 endif
 	@echo "tagging image ${IMAGE_TAG}"
-	@eval $(aws ecr get-login --region us-east-1 --no-include-email|sed 's|https://||');
 	@ecs-cli configure --region us-east-1 --access-key $(AWS_ACCESS_KEY_ID) --secret-key $(AWS_SECRET_ACCESS_KEY) --cluster $(ENVIRONMENT);
 	@docker tag impactapi_web:latest $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG)
 	@docker push $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG)
