@@ -46,9 +46,9 @@ after_success:
 - pip install awscli;
 - export PATH=$PATH:$HOME/.local/bin;
 - export TAG=$(if [ "$RELEASE_TAG" = "" ]; then echo "$BRANCH"; else echo "$RELEASE_TAG"; fi);
-- export ECR_TOKEN=`aws ecr get-authorization-token --output text --query 'authorizationData[].authorizationToken' | base64 --decode | cut -d':' -f2`
-- export ECR_HOST=$(aws ecr get-authorization-token --output text --query 'authorizationData[].proxyEndpoint')
+- export ECR_TOKEN=`aws ecr get-authorization-token --region us-east-1 --output text --query 'authorizationData[].authorizationToken' | base64 --decode | cut -d':' -f2`
+- export ECR_HOST=$(aws ecr get-authorization-token --region us-east-1 --output text --query 'authorizationData[].proxyEndpoint')
 - export DOCKER_USER=AWS
 - export DOCKER_PASSWORD=$ECR_TOKEN
-- echo DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin $ECR_HOST
+- echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin $ECR_HOST
 - make travis-release AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ENVIRONMENT=$DEPLOY_ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY IMAGE_TAG=$TAG;
