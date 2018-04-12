@@ -343,9 +343,10 @@ mysql-container:
 	docker-compose run --rm web /usr/bin/mysqlwait.sh
 
 dump-db: mysql-container
-	docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev -r /$(DB_CACHE_DIR)$(db_name).sql
-	rm -f $(DB_CACHE_DIR)$(s3_key)
-	gzip $(DB_CACHE_DIR)$(db_name).sql
+	@echo Creating a new dump for $(DB_CACHE_DIR)$(s3_key)
+	@docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev -r /$(DB_CACHE_DIR)$(db_name).sql
+	@rm -f $(DB_CACHE_DIR)$(s3_key)
+	@gzip $(DB_CACHE_DIR)$(db_name).sql
 	@echo Created $(DB_CACHE_DIR)$(s3_key)
 
 MAX_UPLOAD_SIZE = 80000000
