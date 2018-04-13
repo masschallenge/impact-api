@@ -6,7 +6,7 @@ COPY web/scripts/fpdiff.sh /usr/bin
 
 RUN apt-get update -y
 
-RUN pip3 install pycodestyle flake8
+RUN pip3 install "pycodestyle<2.4" flake8
 
 WORKDIR /code
 
