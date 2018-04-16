@@ -289,10 +289,9 @@ shutdown-vms:
 	@rm -rf ./redis
 
 delete-vms: CONTAINERS?=$(shell docker ps -a -q --filter network=impactapi_default)
-delete-vms: IMAGES?=$(shell  docker images -q)
 delete-vms:
 	@echo $(shell if [ ! -z "$(CONTAINERS)" ]; then docker rm -f $(CONTAINERS); fi;)
-	@echo $(shell if [ ! -z "$(IMAGES)" ]; then docker rmi -f $(IMAGES); fi;)
+	@echo $(shell docker image prune -a -f;)
 
 ACCELERATE_MAKE = cd $(ACCELERATE) && $(MAKE)
 
