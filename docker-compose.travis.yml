@@ -33,7 +33,7 @@ services:
   web:
     build:
       context: ./web
-      dockerfile: travis.Dockerfile
+      dockerfile: web/Dockerfile.travis
     ports:
       - "80:80"
       - "443:443"
