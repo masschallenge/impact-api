@@ -14,7 +14,7 @@ services:
   # Redis
   redis:
     build:
-      dockerfile: redis.Dockerfile
+      dockerfile: Dockerfile.redis
       context: .
     volumes:
       - ./redis:/var/lib/redis/data
