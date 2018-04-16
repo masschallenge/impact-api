@@ -171,7 +171,6 @@ build: shutdown-vms setup
 	@docker build -t semantic-release -f Dockerfile.semantic-release .
 	@docker-compose build
 
-
 # Testing, coverage, and code checking targets
 
 tests ?= $(TESTS)  # Backwards compatibility
@@ -281,8 +280,8 @@ shutdown-vms:
 delete-vms: CONTAINERS?=$(shell docker ps -a -q)
 delete-vms: IMAGES?=$(shell  docker images -q)
 delete-vms:
-	@$(shell if [ ! -z "$(CONTAINERS)" ]; then docker rm -f $(CONTAINERS); fi;)
-	@$(shell if [ ! -z "$(IMAGES)" ]; then docker rmi -f $(IMAGES); fi;)
+	@echo $(shell if [ ! -z "$(CONTAINERS)" ]; then docker rm -f $(CONTAINERS); fi;)
+	@echo $(shell if [ ! -z "$(IMAGES)" ]; then docker rmi -f $(IMAGES); fi;)
 
 ACCELERATE_MAKE = cd $(ACCELERATE) && $(MAKE)
 
