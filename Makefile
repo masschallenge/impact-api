@@ -271,7 +271,7 @@ runserver: run-server-1
 
 stop-server:
 	@docker-compose stop
-	-@killall -9 docker-compose
+	-@killall -9 docker-compose || true
 
 shutdown-vms:
 	@docker-compose down
