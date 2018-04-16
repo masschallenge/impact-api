@@ -358,7 +358,7 @@ dump-db: mysql-container
 
 MAX_UPLOAD_SIZE = 80000000
 
-upload-db:
+upload-db: build-aws
 	@if [ `wc -c < $(gz_file)` \> $(MAX_UPLOAD_SIZE) ]; \
 	then \
 	  echo Dump file exceeds $(MAX_UPLOAD_SIZE) bytes.; \
@@ -366,7 +366,14 @@ upload-db:
 	  false; \
 	fi
 	@echo Uploading $(gz_file) as $(s3_key)...
-	aws s3 cp $(gz_file) s3://public-clean-saved-db-states/$(s3_key) --acl public-read
+	@docker run -v $$PWD/$(gz_file):/data/$(notdir $(gz_file)) --rm  \
+		--env-file .dev.env \
+		masschallenge/aws \
+		aws s3 cp $(notdir $(gz_file)) \
+		s3://public-clean-saved-db-states/$(s3_key) --acl public-read
+
+build-aws:
+	docker build -f Dockerfile.aws db_cache/ -t masschallenge/aws:latest
 
 
 TARGET ?= staging
