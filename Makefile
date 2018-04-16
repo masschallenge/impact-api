@@ -272,12 +272,12 @@ dev: run-server-0
 runserver: run-server-1
 
 
-initial-db-setup: CONTAINER_CREATED?=$(shell docker ps -a -q --filter ancestor=mysql --filter network=impactapi_default)
+initial-db-setup: CONTAINER_CREATED:=$(shell docker ps -a -q --filter ancestor=mysql --filter network=impactapi_default)
 initial-db-setup:
-ifndef CONTAINER_CREATED
-	@rm -f ./mysql_entrypoint/0002*
-	@cp $(gz_file) ./mysql_entrypoint/0002_$(notdir $(gz_file))
-endif
+	@if [ -z "$(CONTAINER_CREATED)" ]; then \
+		rm -f ./mysql_entrypoint/0002*; \
+		cp $(gz_file) ./mysql_entrypoint/0002_$(notdir $(gz_file)); \
+	fi;
 
 stop-server:
 	@docker-compose stop
