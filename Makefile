@@ -171,7 +171,7 @@ setup:
 
 build: shutdown-vms setup
 	@docker build -f fpdiff.Dockerfile -t masschallenge/fpdiff .
-	@docker build -t semantic-release -f Dockerfile.semantic-release .
+	@docker build  -f Dockerfile.semantic-release -t semantic-release .
 	@docker-compose build
 
 # Testing, coverage, and code checking targets
