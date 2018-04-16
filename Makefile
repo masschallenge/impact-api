@@ -288,7 +288,7 @@ shutdown-vms:
 	@rm -rf ./mysql/data
 	@rm -rf ./redis
 
-delete-vms: CONTAINERS?=$(shell docker ps -a -q)
+delete-vms: CONTAINERS?=$(shell docker ps -a -q --filter network=impactapi_default)
 delete-vms: IMAGES?=$(shell  docker images -q)
 delete-vms:
 	@echo $(shell if [ ! -z "$(CONTAINERS)" ]; then docker rm -f $(CONTAINERS); fi;)
