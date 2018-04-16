@@ -338,9 +338,7 @@ clean-db-cache:
 load-remote-db: clean-db-cache
 	$(MAKE) load-db gz_file=$(gz_file)
 
-mysql-container:
-	docker-compose up -d
-	docker-compose run --rm web /usr/bin/mysqlwait.sh
+mysql-container: run-detached-server
 
 dump-db: mysql-container
 	@echo Creating a new dump for $(DB_CACHE_DIR)$(s3_key)
