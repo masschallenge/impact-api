@@ -97,6 +97,9 @@ target_help = \
   '\tReports any errors from the different repos.' \
   ' ' \
   'run-server - Starts the local server. Set debug=0 for supervisor output.' \
+  '\t When running the server for the first time after a build, the database' \
+  '\t sepcified by $(gz_file) will be loaded.' \
+  ' ' \
   'stop-server - Stops the local server.' \
   'shutdown-vms - Shutdown local server VMs.' \
   'delete-vms - Deletes local server VMs an VM-related resources.' \
@@ -255,10 +258,10 @@ debug ?= 1
 
 run-server: run-server-$(debug)
 
-run-server-0:
+run-server-0: initial-db-setup
 	@docker-compose up
 
-run-detached-server:
+run-detached-server: initial-db-setup
 	@docker-compose up -d
 	@docker-compose run --rm web /usr/bin/mysqlwait.sh
 
@@ -267,6 +270,14 @@ run-server-1: run-detached-server
 
 dev: run-server-0
 runserver: run-server-1
+
+
+initial-db-setup: CONTAINER_CREATED?=$(shell docker ps -a -q --filter ancestor=mysql --filter network=impactapi_default)
+initial-db-setup:
+ifndef CONTAINER_CREATED
+	@rm -f ./mysql_entrypoint/0002*
+	@cp $(gz_file) ./mysql_entrypoint/0002_$(notdir $(gz_file))
+endif
 
 stop-server:
 	@docker-compose stop
