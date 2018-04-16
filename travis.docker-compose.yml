@@ -1,4 +1,4 @@
-version: '2'
+version: '2.3'
 services:
   mysql:
     image: mysql
@@ -48,6 +48,7 @@ services:
       - ./web/impact/media:/media:ro
     depends_on:
       - mysql
+      - assets
     links:
       - mysql
       - redis
