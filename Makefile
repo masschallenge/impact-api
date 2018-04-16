@@ -170,7 +170,7 @@ setup:
 	@mkdir -p ./redis
 
 build: shutdown-vms setup
-	@docker build -f fpdiff.Dockerfile -t masschallenge/fpdiff .
+	@docker build -f Dockerfile.fpdiff -t masschallenge/fpdiff .
 	@docker build  -f Dockerfile.semantic-release -t semantic-release .
 	@docker-compose build
 
