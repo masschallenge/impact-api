@@ -6,7 +6,7 @@ COPY web/scripts/fpdiff.sh /usr/bin
 
 RUN pip3 install \
     flake8 \
-    pycodestyle
+    "pycodestyle<2.4"
 
 WORKDIR /code
 
