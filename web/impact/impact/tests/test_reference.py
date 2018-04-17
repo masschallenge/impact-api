@@ -6,7 +6,6 @@ from impact.tests.factories import ReferenceFactory
 
 
 class TestReference(TestCase):
-
     def test_submitted_str(self):
         assert "request" not in str(ReferenceFactory())
 
