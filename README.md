@@ -3,11 +3,12 @@ _Copyright (c) 2017 MassChallenge, Inc._
 
 # Impact API Server
 
+
+ ![apm](https://img.shields.io/apm/l/vim-mode.svg) ![Travis](https://img.shields.io/travis/masschallenge/impact-api.svg)
 <a href="https://codeclimate.com/github/masschallenge/impact-api/maintainability">
   <img src="https://api.codeclimate.com/v1/badges/919b52c7bf78bfc67bb6/maintainability" />
 </a>
-![apm](https://img.shields.io/apm/l/vim-mode.svg)
-
+ 
 
 ## Quickstart
 
