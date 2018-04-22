@@ -365,12 +365,19 @@ upload-db: build-aws
 	  echo This may indicate that this dump contains sensitive data; \
 	  false; \
 	fi
-	@echo Uploading $(gz_file) as $(s3_key)...
-	@docker run -v $$PWD/$(gz_file):/data/$(notdir $(gz_file)) --rm  \
+	@echo Uploading $(gz_file) as $(s3_key)
+	@read -r -p "Are you sure? [y/N] " response; \
+	if [[ "$$response" =~ ^([yY][eE][sS]|[yY])+$$ ]]; \
+	then \
+	  echo Uploading $(gz_file) as $(s3_key)...; \
+	  docker run -v $$PWD/$(gz_file):/data/$(notdir $(gz_file)) --rm  \
 		--env-file .dev.env \
 		masschallenge/aws \
 		aws s3 cp $(notdir $(gz_file)) \
-		s3://public-clean-saved-db-states/$(s3_key) --acl public-read
+		s3://public-clean-saved-db-states/$(s3_key) --acl public-read; \
+	else \
+	  echo Cancelled upload successfully.; \
+	fi
 
 build-aws:
 	docker build -f Dockerfile.aws db_cache/ -t masschallenge/aws:latest
