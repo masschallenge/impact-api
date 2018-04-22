@@ -129,7 +129,9 @@ target_help = \
   '\tNote that dump-db ignores $$(gz_file).' \
   'upload-db - Upload db dump to S3.' \
   '\tS3 key is always $$(db_name).sql.gz' \
-  '\tUploads $$(gz_file) and make it publicly accessible.' \
+  '\tUploads $$(gz_file) and make it publicly accessible. The command uses' \
+  'the AWS KEY and SECRET specified in .dev.env, make sure they are ' \
+  'configured with a user who has upload permissions prior to execution.' \
   ' ' \
   'release-list - List all releases that are ready to be deployed.' \
   'release - Create named release of releated servers.' \
