@@ -13,9 +13,18 @@ _Copyright (c) 2017 MassChallenge, Inc._
 
 ## Quickstart
 
-1. Install [Docker](https://docs.docker.com/docker-for-mac/)
-   (download the stable channel).
-2. Start Docker from the Applications folder.
+* **For Installation Instructions that include Accelerate, see [here](
+https://github.com/masschallenge/standards/blob/AC-5050/setup_development_environment.md)**.
+
+
+1. Make sure you have the following installed:
+   - [Docker](https://docs.docker.com/docker-for-mac/) (download the stable channel).
+   - git
+   - GNU Wget
+   - GNU Make
+   - (some deprecated commands require the installation and configuration of
+   python2.7 with ecs, ecs-cli and aws-cli)
+2. If just installed, start Docker from the Applications folder.
 3. Build the project.
 
     ```
@@ -35,8 +44,6 @@ http://localhost:8000 in a browser.
     shutdown-vms
     ```
     
-* **For Installation Instructions that include Accelerate, see [here](
-https://github.com/masschallenge/standards/blob/AC-5050/setup_development_environment.md)**
 * To see all available commands, run `make help`.
 
 ## Commands
