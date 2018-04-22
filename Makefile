@@ -98,7 +98,7 @@ target_help = \
   ' ' \
   'run-server - Starts the local server. Set debug=0 for supervisor output.' \
   '\t When running the server for the first time after a build, the database' \
-  '\t sepcified by $(gz_file) will be loaded.' \
+  '\t specified by $$(gz_file) will be loaded.' \
   ' ' \
   'stop-server - Stops the local server.' \
   'shutdown-vms - Shutdown local server VMs.' \
@@ -120,7 +120,7 @@ target_help = \
   'gz_file defaults to db_cache/$$(db_name).sql.gz' \
   ' ' \
   'load-db - Load gzipped database file.' \
-  '\tIf $$(gz_file) does not exist, then try to download from S3' \
+  '\tIf $S$(gz_file) does not exist, then try to download from S3' \
   '\tusing the key "$$(db_name).sql.gz".' \
   'clean-db-cache - Delete $$(gz_file) if it exists.' \
   'load-remote-db - Delete $$(gz_file) if it exists, then run load-db.' \
