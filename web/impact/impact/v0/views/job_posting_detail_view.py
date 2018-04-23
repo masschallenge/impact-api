@@ -33,7 +33,8 @@ class JobPostingDetailView(APIView):
         program = job.startup.startupstatus_set.latest(
             "id").program_startup_status.program
         if job.startup.high_resolution_logo:
-            image_token = encrypt_image_token(job.startup.high_resolution_logo)
+            image_token = encrypt_image_token(
+                job.startup.high_resolution_logo.name)
         else:
             image_token = ""
         url = ""
