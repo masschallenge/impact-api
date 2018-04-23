@@ -67,6 +67,20 @@ changes you've made before to the databse should be re-applied.
   * Combining this option with `make dump-db db_name=<name>` will
   allow you to keep the state after a re-build
 
+### Managing The Local Database
+
+We maintain a copy of production database with cleaned and 
+anonymized data, that is made available for local development. 
+
+The db-dump file is named `initial_schema.sql.gz`, and is 
+the implicit default of all database-related commands.
+
+loading a copy of the database dump into to mysql database, 
+can be done by running `make load-db`. Unapplied migrations will
+be executed as well. Running `make load-remote-db` will 
+first clear the local cached copy of this file, if exists.
+
+For more advanced use cases, see [Database Management](https://github.com/masschallenge/standards/blob/master/database_management.md) or `make help`.
 
 ### Creating a release:
 
