@@ -6,10 +6,12 @@ services: docker
 
 env:
   global:
-    - DOCKER_COMPOSE_VERSION=1.10.1
+    - DOCKER_COMPOSE_VERSION=1.20.1
       # get all the branches referencing this commit
     - IS_RELEASE=$(git ls-remote origin | grep "$TRAVIS_COMMIT\s\+refs/heads/release$")
     - RELEASE_TAG=$(git tag -l --points-at HEAD | head -n1)
+    - BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
+    - DJANGO_ACCELERATOR_REVISION=`./infer_django_accelerator_revision.sh $BRANCH`
 
 before_install:
 - sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu trusty-backports universe'
@@ -24,7 +26,6 @@ before_install:
 - docker-compose --version
 
 before_script:
-- export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
 - if [ -z $TRAVIS_TAG ]; then git remote set-branches origin $BRANCH; fi
 - git fetch
 - git checkout $BRANCH
@@ -33,8 +34,8 @@ before_script:
 - for key in $keys; do echo "$key=${!key}" >> .prod.env; echo "" >> .prod.env; done
 - echo "DATABASE_URL=mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}/${DATABASE_NAME}" >> .prod.env
 - echo "" >> .prod.env
-- docker-compose -f travis.docker-compose.yml build --no-cache
-- docker-compose -f travis.docker-compose.yml up -d 
+- docker-compose -f travis.docker-compose.yml build --no-cache --build-arg DJANGO_ACCELERATOR_REVISION=$DJANGO_ACCELERATOR_REVISION
+- docker-compose -f travis.docker-compose.yml up -d
 
 script:
 - make test
@@ -43,8 +44,12 @@ after_success:
 - if [ "$DEPLOY_ENVIRONMENT" = "" ]; then export DEPLOY_ENVIRONMENT=$(if [ "$BRANCH" = "master" ]; then echo "production"; else echo "staging"; fi); fi;
 - sudo curl -o /usr/local/bin/ecs-cli https://s3.amazonaws.com/amazon-ecs-cli/ecs-cli-linux-amd64-latest;
 - sudo chmod +x /usr/local/bin/ecs-cli;
-- pip install awscli;
+- pip install awscli==1.15.3;
 - export PATH=$PATH:$HOME/.local/bin;
 - export TAG=$(if [ "$RELEASE_TAG" = "" ]; then echo "$BRANCH"; else echo "$RELEASE_TAG"; fi);
-- eval $(aws ecr get-login --region us-east-1 --no-include-email);
+- export ECR_TOKEN=`aws ecr get-authorization-token --region us-east-1 --output text --query 'authorizationData[].authorizationToken' | base64 --decode | cut -d':' -f2`
+- export ECR_HOST=`aws ecr get-authorization-token --region us-east-1 --output text --query 'authorizationData[].proxyEndpoint'`
+- export DOCKER_USER=AWS
+- export DOCKER_PASSWORD=$ECR_TOKEN
+- echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin $ECR_HOST
 - make travis-release AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ENVIRONMENT=$DEPLOY_ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY IMAGE_TAG=$TAG;
