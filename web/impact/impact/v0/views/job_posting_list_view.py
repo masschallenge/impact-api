@@ -80,7 +80,7 @@ class JobPostingListView(APIView):
         for job in jobs:
             if job.startup.high_resolution_logo:
                 image_token = encrypt_image_token(
-                    job.startup.high_resolution_logo)
+                    job.startup.high_resolution_logo.name)
             else:
                 image_token = ""
             url = ""
