@@ -97,6 +97,9 @@ target_help = \
   '\tReports any errors from the different repos.' \
   ' ' \
   'run-server - Starts the local server. Set debug=0 for supervisor output.' \
+  '\t When running the server for the first time after a build, the database' \
+  '\t specified by $$(gz_file) will be loaded.' \
+  ' ' \
   'stop-server - Stops the local server.' \
   'shutdown-vms - Shutdown local server VMs.' \
   'delete-vms - Deletes local server VMs an VM-related resources.' \
@@ -117,7 +120,7 @@ target_help = \
   'gz_file defaults to db_cache/$$(db_name).sql.gz' \
   ' ' \
   'load-db - Load gzipped database file.' \
-  '\tIf $$(gz_file) does not exist, then try to download from S3' \
+  '\tIf $S$(gz_file) does not exist, then try to download from S3' \
   '\tusing the key "$$(db_name).sql.gz".' \
   'clean-db-cache - Delete $$(gz_file) if it exists.' \
   'load-remote-db - Delete $$(gz_file) if it exists, then run load-db.' \
@@ -126,7 +129,9 @@ target_help = \
   '\tNote that dump-db ignores $$(gz_file).' \
   'upload-db - Upload db dump to S3.' \
   '\tS3 key is always $$(db_name).sql.gz' \
-  '\tUploads $$(gz_file) and make it publicly accessible.' \
+  '\tUploads $$(gz_file) and make it publicly accessible. The command uses' \
+  'the AWS KEY and SECRET specified in .dev.env, make sure they are ' \
+  'configured with a user who has upload permissions prior to execution.' \
   ' ' \
   'release-list - List all releases that are ready to be deployed.' \
   'release - Create named release of releated servers.' \
@@ -167,10 +172,9 @@ setup:
 	@mkdir -p ./redis
 
 build: shutdown-vms setup
-	@docker build -f fpdiff.Dockerfile -t masschallenge/fpdiff .
-	@docker build -t semantic-release -f Dockerfile.semantic-release .
-	@docker-compose build --no-cache
-
+	@docker build -f Dockerfile.fpdiff -t masschallenge/fpdiff .
+	@docker build  -f Dockerfile.semantic-release -t semantic-release .
+	@docker-compose build
 
 # Testing, coverage, and code checking targets
 
@@ -256,10 +260,10 @@ debug ?= 1
 
 run-server: run-server-$(debug)
 
-run-server-0:
+run-server-0: initial-db-setup
 	@docker-compose up
 
-run-detached-server:
+run-detached-server: initial-db-setup
 	@docker-compose up -d
 	@docker-compose run --rm web /usr/bin/mysqlwait.sh
 
@@ -269,20 +273,27 @@ run-server-1: run-detached-server
 dev: run-server-0
 runserver: run-server-1
 
+
+initial-db-setup: CONTAINER_CREATED:=$(shell docker ps -a -q --filter ancestor=mysql --filter network=impactapi_default)
+initial-db-setup:
+	@if [ -z "$(CONTAINER_CREATED)" ]; then \
+		rm -f ./mysql_entrypoint/0002*; \
+		cp $(gz_file) ./mysql_entrypoint/0002_$(notdir $(gz_file)); \
+	fi;
+
 stop-server:
 	@docker-compose stop
-	-@killall -9 docker-compose
+	-@killall -9 docker-compose || true
 
 shutdown-vms:
 	@docker-compose down
 	@rm -rf ./mysql/data
 	@rm -rf ./redis
 
-delete-vms: CONTAINERS?=$(shell docker ps -a -q)
-delete-vms: IMAGES?=$(shell  docker images -q)
+delete-vms: CONTAINERS?=$(shell docker ps -a -q --filter network=impactapi_default)
 delete-vms:
-	@docker rm -f $(CONTAINERS)
-	@docker rmi -f $(IMAGES)
+	@echo $(shell if [ ! -z "$(CONTAINERS)" ]; then docker rm -f $(CONTAINERS); fi;)
+	@echo $(shell docker image prune -a -f;)
 
 ACCELERATE_MAKE = cd $(ACCELERATE) && $(MAKE)
 
@@ -338,27 +349,40 @@ clean-db-cache:
 load-remote-db: clean-db-cache
 	$(MAKE) load-db gz_file=$(gz_file)
 
-mysql-container:
-	docker-compose up -d
-	docker-compose run --rm web /usr/bin/mysqlwait.sh
+mysql-container: run-detached-server
 
 dump-db: mysql-container
-	docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev -r /$(DB_CACHE_DIR)$(db_name).sql
-	rm -f $(DB_CACHE_DIR)$(s3_key)
-	gzip $(DB_CACHE_DIR)$(db_name).sql
+	@echo Creating a new dump for $(DB_CACHE_DIR)$(s3_key)
+	@docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev -r /$(DB_CACHE_DIR)$(db_name).sql
+	@rm -f $(DB_CACHE_DIR)$(s3_key)
+	@gzip $(DB_CACHE_DIR)$(db_name).sql
 	@echo Created $(DB_CACHE_DIR)$(s3_key)
 
 MAX_UPLOAD_SIZE = 80000000
 
-upload-db:
+upload-db: build-aws
 	@if [ `wc -c < $(gz_file)` \> $(MAX_UPLOAD_SIZE) ]; \
 	then \
 	  echo Dump file exceeds $(MAX_UPLOAD_SIZE) bytes.; \
 	  echo This may indicate that this dump contains sensitive data; \
 	  false; \
 	fi
-	@echo Uploading $(gz_file) as $(s3_key)...
-	aws s3 cp $(gz_file) s3://public-clean-saved-db-states/$(s3_key) --acl public-read
+	@echo Uploading $(gz_file) as $(s3_key)
+	@read -r -p "Are you sure? [y/N] " response; \
+	if [[ "$$response" =~ ^([yY][eE][sS]|[yY])+$$ ]]; \
+	then \
+	  echo Uploading $(gz_file) as $(s3_key)...; \
+	  docker run -v $$PWD/$(gz_file):/data/$(notdir $(gz_file)) --rm  \
+		--env-file .dev.env \
+		masschallenge/aws \
+		aws s3 cp $(notdir $(gz_file)) \
+		s3://public-clean-saved-db-states/$(s3_key) --acl public-read; \
+	else \
+	  echo Cancelled upload successfully.; \
+	fi
+
+build-aws:
+	docker build -f Dockerfile.aws db_cache/ -t masschallenge/aws:latest
 
 
 TARGET ?= staging

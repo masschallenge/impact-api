@@ -3,27 +3,25 @@
 
 from django.utils.safestring import mark_safe
 from embed_video.backends import (
-    detect_backend,
     UnknownBackendException,
-    UnknownIdException
+    UnknownIdException,
+    detect_backend,
 )
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accelerator.models import ProgramStartupStatus
 from impact.permissions import (
     V0APIPermissions,
 )
-from accelerator.models import ProgramStartupStatus
 from impact.utils import get_profile
 from impact.v0.api_data.startup_detail_data import StartupDetailData
-from impact.v0.views.base_media_info import BaseMediaInfo
 from impact.v0.views.utils import (
     BADGE_DISPLAYS,
     encrypt_image_token,
     logo_url,
     status_description,
 )
-
 
 DEFAULT_PROFILE_BACKGROUND_COLOR = "217181"
 DEFAULT_PROFILE_TEXT_COLOR = "FFFFFF"
@@ -84,7 +82,8 @@ class StartupDetailView(APIView):
             "twitter_handle": startup.twitter_handle,
             "website_url": startup.website_url,
 
-            "image_token": encrypt_image_token(startup.high_resolution_logo),
+            "image_token": encrypt_image_token(
+                startup.high_resolution_logo.name),
             "logo_url": logo_url(startup),
             "profile_background_color":
                 "#" + (startup.profile_background_color or
@@ -98,8 +97,7 @@ class StartupDetailView(APIView):
         }
 
     def _team_members(self):
-        base_url = BaseMediaInfo.url()
-        return [_user_description(member, base_url)
+        return [_user_description(member)
                 for member in _find_members(self.data.startup)]
 
 
@@ -114,7 +112,7 @@ def _statuses(startup, program):
             for status in statuses]
 
 
-def _user_description(member, base_url):
+def _user_description(member):
     user = member.user
     result = {
         "first_name": user.last_name,
@@ -122,16 +120,16 @@ def _user_description(member, base_url):
         "email": user.email,
         "title": member.title,
     }
-    result.update(_image_fields(user, base_url))
+    result.update(_image_fields(user))
     return result
 
 
-def _image_fields(user, base_url):
+def _image_fields(user):
     profile = get_profile(user)
-    image = profile.image if profile else None
+    image = profile and profile.image
     return {
-        "photo_url": base_url + str(image) if image else "",
-        "photo_token": encrypt_image_token(image) if image else "",
+        "photo_url": image.url if image else "",
+        "photo_token": encrypt_image_token(image.name) if image else "",
     }
 
 

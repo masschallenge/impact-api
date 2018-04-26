@@ -1,4 +1,4 @@
-version: '2'
+version: '2.3'
 services:
   mysql:
     image: mysql
@@ -7,14 +7,14 @@ services:
     volumes:
       - ./mysql/conf.d/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./mysql/data:/var/lib/mysql
-      - ./sql/initial.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./mysql_entrypoint:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mc_dev
   # Redis
   redis:
     build:
-      dockerfile: redis.Dockerfile
+      dockerfile: Dockerfile.redis
       context: .
     volumes:
       - ./redis:/var/lib/redis/data
@@ -33,7 +33,7 @@ services:
   web:
     build:
       context: ./web
-      dockerfile: travis.Dockerfile
+      dockerfile: Dockerfile.travis
     ports:
       - "80:80"
       - "443:443"
@@ -48,6 +48,7 @@ services:
       - ./web/impact/media:/media:ro
     depends_on:
       - mysql
+      - assets
     links:
       - mysql
       - redis

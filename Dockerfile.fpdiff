@@ -4,9 +4,9 @@ RUN pip install --upgrade pip
 
 COPY web/scripts/fpdiff.sh /usr/bin
 
-RUN apt-get update -y
-
-RUN pip3 install "pycodestyle<2.4" flake8
+RUN pip3 install \
+    flake8 \
+    "pycodestyle<2.4"
 
 WORKDIR /code
 
