@@ -48,20 +48,24 @@ http://localhost:8000 in a browser.
 
 ## Commands
 
-This section describes the more common commands you may,
+This section describes the more common commands you may
 need when working on this platform. For a full list of the
 commands, refer to `make help`.
 
 ### Rebuilding the container
 
-This should be done whenever the requirements change.
+This should be done whenever the project's dependencies
+change, e.g. Python [requirements](
+https://github.com/masschallenge/impact-api/tree/development/web/impact/requirements)
+, or one of the [Dockerfiles](
+https://github.com/masschallenge/impact-api/blob/development/web/Dockerfile).
 
 This can be done with:
 
     `make build;make run-server;`
     
-* Note that these commands will delete the DB, so any 
-changes you've made before to the databse should be re-applied.
+* Note that `make build` deletes the DB, so any 
+changes you've made before to the database should be re-applied.
 * It is possible to specify a dump file to load, by running
 `make build;make run-server gz_file=<path_to_file.sql.gz>`.
   * Combining this option with `make dump-db db_name=<name>` will
@@ -89,9 +93,9 @@ https://github.com/masschallenge/standards/blob/master/create_new_release.md).
 
 ### Accessing The Shell
 * In order to access the default shell of the Docker container
-on which the django project is running (service "web"), run make bash-shell.
-* In order to access the Django shell, run make django-shell.
-* In order to access the mysql shell, run make db-shell.
+on which the Django project is running (service "web"), run `make bash-shell`.
+* In order to access the Django shell, run `make django-shell`.
+* In order to access the mysql shell, run `make db-shell`.
 
 
 ### Running A Web Server In Supervisor/Debug Mode
@@ -103,7 +107,8 @@ Usually, you'll want to run a Django webserver locally,
 especially in the case where you have calls to pdb.set_trace()
 and want to get to a debug prompt.
 
-To run an interactive instance of Django, run:
+To run an interactive instance of Django, run one of the
+equivalent commands below:
 `make run-server`
 or
 `make run-server-1`
@@ -113,7 +118,7 @@ or
 * Note that exiting run-server (via ctrl+c) will **not** kill
 the server, but instead it will return to detached mode, and
 run in the background.
-To stop to server, run `make stop-server` as well.
+To stop the server, run `make stop-server` as well.
 
 * In this mode you can also invoke a debugger inline
 by adding the following line in your code: 
@@ -132,7 +137,7 @@ that is executed in the background.
 This can be done by running
 `make run-server-0`
 or
-`make run-serer debug=0`
+`make run-server debug=0`
 
 Visiting your locally running API instance at
 http://localhost:8000/, will now show the output
@@ -154,7 +159,7 @@ To give a user access to the v1 api, issue the command with
 
 ### Release and Deploy
 
-Impact-api is configured such that every successful travis build
+Impact-api is configured such that every successful Travis build
 is made available as a deployable image in AWS ECS. Accelerate's
 Deploy command in OpsWorks is configured to also trigger a deploy
 for impact-api, automatically. 
