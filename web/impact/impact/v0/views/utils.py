@@ -1,21 +1,20 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-import os
-import re
-from time import time
-
 import base64
 import hashlib
-from Crypto.Cipher import AES
+import os
+from time import time
 
+from Crypto.Cipher import AES
 from django.conf import settings
 
-from accelerator.models.site import Site
 from accelerator.models import (
+    Site,
     SiteProgramAuthorization,
 )
-from impact.v0.views.base_media_info import BaseMediaInfo
+
+PADDING_CHAR = '='
 
 BADGE_DISPLAYS = ("STARTUP_LIST", "STARTUP_LIST_AND_PROFILE")
 IMAGE_TOKEN_BLOCK_SIZE = 16
@@ -27,27 +26,28 @@ def encrypt_image_token(token, password=None):
             password = settings.V0_IMAGE_PASSWORD
         iv = os.urandom(IMAGE_TOKEN_BLOCK_SIZE)
         key = hashlib.sha256(password).hexdigest()[:32]
-        cipher = AES.new(key, AES.MODE_CBC, iv)
-        raw = _pad(str(token) + ":" + str(time()))
-        return base64.urlsafe_b64encode((iv + cipher.encrypt(raw)))
+        aes = AES.new(key, AES.MODE_CBC, iv)
+        time_block = str(time())[:IMAGE_TOKEN_BLOCK_SIZE]  # trim if 17 or 18
+        raw = _pad(str(token) + ":" + time_block)
+        encrypted = aes.encrypt(raw)
+        encoded = base64.urlsafe_b64encode((iv + encrypted))
+        return encoded
     return b""
 
 
 def _pad(text):
     encoded_bytes = text.encode("utf-8")
     length = len(encoded_bytes)
-    pad_size = IMAGE_TOKEN_BLOCK_SIZE - length % IMAGE_TOKEN_BLOCK_SIZE
-    padding = pad_size * chr(pad_size)
+    leftover_size = length % IMAGE_TOKEN_BLOCK_SIZE
+    pad_size = IMAGE_TOKEN_BLOCK_SIZE - leftover_size
+    padding = pad_size * PADDING_CHAR
     return encoded_bytes + padding.encode("utf-8")
 
 
 def logo_url(startup):
     if not startup.high_resolution_logo:
         return ""
-    schema = "^(http|https)://"
-    if re.match(schema, str(startup.high_resolution_logo), re.IGNORECASE):
-        return startup.high_resolution_logo
-    return BaseMediaInfo.url(str(startup.high_resolution_logo))
+    return startup.high_resolution_logo.url
 
 
 def status_description(status):
