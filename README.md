@@ -107,10 +107,9 @@ Usually, you'll want to run a Django webserver locally,
 especially in the case where you have calls to pdb.set_trace()
 and want to get to a debug prompt.
 
-To run an interactive instance of Django, run one of the
-equivalent commands below:
-`make run-server`
-or
+To run an interactive instance of Django, run 
+`make run-server`, or one of its aliases:
+
 `make run-server-1`
 or
 `make run-server debug=1`
