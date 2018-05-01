@@ -1,7 +1,7 @@
 version: '2.3'
 services:
   mysql:
-    image: mysql
+    image: mysql:5.7.21
     ports:
       - "3307:3306"
     volumes:
@@ -47,7 +47,7 @@ services:
       - ./web/impact/media:/media:ro
     depends_on:
       - mysql
-      - assets
+#      - assets
     links:
       - mysql
       - redis
