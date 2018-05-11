@@ -102,7 +102,10 @@ target_help = \
   ' ' \
   'stop-server - Stops the local server.' \
   'shutdown-vms - Shutdown local server VMs.' \
-  'delete-vms - Deletes local server VMs an VM-related resources.' \
+  'delete-vms - Deletes local server containers. In order to delete Docker ' \
+  '\t images, run `make delete-vms remove_images=`, and related images will ' \
+  '\t be pruned.' \
+  ' ' \
   'build - Build (or rebuild) docker environment. Refreshes dependencies.' \
   'run-all-servers - Starts a set of related servers.' \
   'stop-all-server - Stops a set of related servers.' \
@@ -171,7 +174,7 @@ setup:
 	@mkdir -p ./mysql/data
 	@mkdir -p ./redis
 
-build: shutdown-vms setup
+build: shutdown-vms delete-vms setup
 	@docker build -f Dockerfile.fpdiff -t masschallenge/fpdiff .
 	@docker build  -f Dockerfile.semantic-release -t semantic-release .
 	@docker-compose build
@@ -290,10 +293,12 @@ shutdown-vms:
 	@rm -rf ./mysql/data
 	@rm -rf ./redis
 
+REMOVE_IMAGES = no
+remove_images ?= $(REMOVE_IMAGES)
 delete-vms: CONTAINERS?=$(shell docker ps -a -q --filter network=impactapi_default)
 delete-vms:
 	@echo $(shell if [ ! -z "$(CONTAINERS)" ]; then docker rm -f $(CONTAINERS); fi;)
-	@echo $(shell docker image prune -a -f;)
+	@echo $(shell if [ -z "$(remove_images)" ]; then docker image prune -a -f; fi;)
 
 ACCELERATE_MAKE = cd $(ACCELERATE) && $(MAKE)
 
