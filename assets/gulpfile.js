@@ -53,7 +53,7 @@ gulp.task('build_js', function() {
       }
     }))
     .pipe(addsrc.prepend(['/gulp/js/dev/lib/*.js', '!/gulp/js/dev/lib/jquery.min.js']))
-    .pipe(addsrc.prepend('/gulp/js/dev/lib/jquery.min.js'))
+    .pipe(addsrc.prepend('/gulp/js/dev/lib/jquery.min.js', { allowEmpty: true }))
     .pipe(concat('main.min.js'))
     .pipe(uglify({
       compress: false,

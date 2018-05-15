@@ -225,13 +225,13 @@ class Base(Configuration):
         # after timedelta has passed since first obtaining the token,
         # it is no longer possible to refresh the token, even if the token
         # did not expire
-        'JWT_AUTH_COOKIE': "jwt",
-        'JWT_SECRET_KEY': bytes(os.environ.get('JWT_SECRET_KEY', ''), 'utf-8'),
+        'JWT_AUTH_COOKIE': os.environ.get('JWT_AUTH_COOKIE', ''),
+        'JWT_SECRET_KEY': os.environ.get('JWT_SECRET_KEY', ''),
     }
 
-    PAYPAL_WPP_USER = ""
-    PAYPAL_WPP_PASSWORD = ""
-    PAYPAL_WPP_SIGNATURE = ""
+    PAYPAL_WPP_USER = ''
+    PAYPAL_WPP_PASSWORD = ''
+    PAYPAL_WPP_SIGNATURE = ''
     PAYPAL_RECEIVER_EMAIL = ''
     PAYPAL_IDENTITY_TOKEN = ''
 
