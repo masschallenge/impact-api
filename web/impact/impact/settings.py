@@ -153,6 +153,11 @@ class Base(Configuration):
     NEW_RELIC_ENVIRONMENT = os.environ.get('NEW_RELIC_ENVIRONMENT',
                                            'development')
 
+    ALGOLIA_APPLICATION_ID = os.environ.get('ALGOLIA_APPLICATION_ID', '')
+    ALGOLIA_API_KEY = os.environ.get('ALGOLIA_API_KEY', '')
+    ALGOLIA_SEARCH_ONLY_API_KEY = os.environ.get(
+        'ALGOLIA_SEARCH_ONLY_API_KEY', '')
+
     V0_SECURITY_KEY = bytes(
         os.environ.get('IMPACT_API_V0_SECURITY_KEY', 'XXX'),
         'utf-8')
