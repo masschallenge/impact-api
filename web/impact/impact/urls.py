@@ -9,6 +9,7 @@ from django.conf.urls import (
 )
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.views.generic import TemplateView
 from drf_auto_endpoint.router import router as schema_router
 from rest_framework import routers
 from rest_framework_jwt.views import (
@@ -81,6 +82,8 @@ urls = [
     url(r'^oauth/',
         include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^schema/$', schema_view, name='schema'),
+    url(r'^directory/$', TemplateView.as_view(template_name='directory.html'),
+        name="directory"),
     url(r'^$', IndexView.as_view()),
 ]
 
