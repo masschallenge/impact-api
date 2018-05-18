@@ -16,6 +16,7 @@ gunicorn
 oauth2_provider
 pycrypto
 pytz
+urllib3
 mock
 pycrypto
 python-magic

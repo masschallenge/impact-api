@@ -148,7 +148,10 @@ class Base(Configuration):
             },
         },
     ]
-
+    ALGOLIA_INDEX_PREFIX = os.environ.get('ALGOLIA_INDEX_PREFIX', 'dev')
+    ALGOLIA_INDEXES = [
+        '{algolia_prefix}_mentor'.format(algolia_prefix=ALGOLIA_INDEX_PREFIX)
+    ]
     NEW_RELIC_CONFIG_FILE = os.path.join(PROJECT_DIR, 'newrelic.ini')
     NEW_RELIC_ENVIRONMENT = os.environ.get('NEW_RELIC_ENVIRONMENT',
                                            'development')
