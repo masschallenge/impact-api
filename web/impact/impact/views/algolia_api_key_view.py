@@ -8,7 +8,6 @@ from algoliasearch import algoliasearch
 from django.conf import settings
 from urllib.parse import urlparse
 import time
-from impact.permissions import DynamicModelPermissions
 
 
 class AlgoliaApiKeyView(APIView):
@@ -16,7 +15,6 @@ class AlgoliaApiKeyView(APIView):
 
     permission_classes = (
         permissions.IsAuthenticated,
-        DynamicModelPermissions
     )
 
     actions = ["GET"]
@@ -38,4 +36,4 @@ class AlgoliaApiKeyView(APIView):
         public_key = client.generateSecuredApiKey(
             settings.ALGOLIA_SEARCH_ONLY_API_KEY,
             params)
-        return Response(public_key)
+        return Response({'token': public_key})
