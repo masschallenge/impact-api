@@ -14,7 +14,8 @@ env:
     - DJANGO_ACCELERATOR_REVISION=`./infer_django_accelerator_revision.sh $BRANCH`
 
 before_install:
-- sudo apt-get update -qq --fix-missing
+- sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu trusty-backports main universe multiverse'
+- sudo apt-get update -qq
 - docker-compose --version
 - sudo apt-get update
 - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-ce
