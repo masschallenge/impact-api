@@ -3,21 +3,20 @@
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from impact.v1.helpers import (
-    json_object,
-    json_simple_list,
-)
+from rest_framework import permissions
 from algoliasearch import algoliasearch
 from django.conf import settings
 from urllib.parse import urlparse
 import time
+from impact.permissions import DynamicModelPermissions
 
 
 class AlgoliaApiKeyView(APIView):
     view_name = 'algolia_api_key_view'
 
     permission_classes = (
-
+        permissions.IsAuthenticated,
+        DynamicModelPermissions
     )
 
     actions = ["GET"]

@@ -47,7 +47,7 @@ account_urlpatterns = [
 
 urls = [
     url(r'^api/algolia/api_key/$', AlgoliaApiKeyView.as_view(),
-        name='algolia-api-key-view'),
+        name=AlgoliaApiKeyView.view_name),
     url(r'^api/v0/', include(v0_urlpatterns)),
     url(r'^api/v1/', include(v1_urlpatterns)),
     url(r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/'
