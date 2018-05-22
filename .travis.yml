@@ -15,7 +15,7 @@ env:
 
 before_install:
 - sudo apt-add-repository 'deb http://archive.ubuntu.com/ubuntu trusty-backports main universe multiverse'
-- sudo apt-get update -qq -m -f
+- sudo apt-get update -qq
 - docker-compose --version
 - sudo apt-get update
 - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-ce
