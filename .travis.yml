@@ -14,9 +14,9 @@ env:
     - DJANGO_ACCELERATOR_REVISION=`./infer_django_accelerator_revision.sh $BRANCH`
 
 before_install:
-- sudo apt-get upgrade -y
 - sudo apt-get update -qq -m
 - docker-compose --version
+- sudo apt-get upgrade -y
 - sudo apt-get update -qq
 - sudo apt-get install -o Dpkg::Options::="--force-confold" --force-yes -y docker-ce
 - sudo rm /usr/local/bin/docker-compose
