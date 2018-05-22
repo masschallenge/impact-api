@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from rest_framework import permissions
 from algoliasearch import algoliasearch
 from django.conf import settings
-from urllib.parse import urlparse
 import time
 
 
@@ -27,10 +26,14 @@ class AlgoliaApiKeyView(APIView):
             'hitsPerPage': 20,
             'filters': '',
             'validUntil': int(time.time()) + 3600,
-            'restrictIndices': ",".join(settings.ALGOLIA_INDEXES),
             'userToken': request.user.id
         }
+        search_key = settings.ALGOLIA_SEARCH_ONLY_API_KEY
+        if request.user.is_staff:
+            search_key = settings.ALGOLIA_STAFF_SEARCH_ONLY_API_KEY
+
         public_key = client.generateSecuredApiKey(
-            settings.ALGOLIA_SEARCH_ONLY_API_KEY,
+            search_key,
             params)
+
         return Response({'token': public_key})

@@ -157,7 +157,12 @@ class Base(Configuration):
                                            'development')
 
     ALGOLIA_APPLICATION_ID = os.environ.get('ALGOLIA_APPLICATION_ID', '')
+
     ALGOLIA_API_KEY = os.environ.get('ALGOLIA_API_KEY', '')
+
+    ALGOLIA_STAFF_SEARCH_ONLY_API_KEY = os.environ.get(
+        'ALGOLIA_STAFF_SEARCH_ONLY_API_KEY', '')
+
     ALGOLIA_SEARCH_ONLY_API_KEY = os.environ.get(
         'ALGOLIA_SEARCH_ONLY_API_KEY', '')
 
