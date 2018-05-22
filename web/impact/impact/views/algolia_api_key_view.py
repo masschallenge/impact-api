@@ -20,18 +20,15 @@ class AlgoliaApiKeyView(APIView):
     actions = ["GET"]
 
     def get(self, request, format=None):
-
         client = algoliasearch.Client(
             settings.ALGOLIA_APPLICATION_ID,
             settings.ALGOLIA_API_KEY)
         params = {
             'hitsPerPage': 20,
             'filters': '',
-            'validUntil': time.time() + 3600,
+            'validUntil': int(time.time()) + 3600,
             'restrictIndices': ",".join(settings.ALGOLIA_INDEXES),
-            'userToken': request.user.id,
-            'restrictSources': urlparse(
-                settings.REST_PROXY.get('HOST')).hostname
+            'userToken': request.user.id
         }
         public_key = client.generateSecuredApiKey(
             settings.ALGOLIA_SEARCH_ONLY_API_KEY,
