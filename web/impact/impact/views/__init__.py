@@ -4,3 +4,4 @@
 from impact.views.api_registration_view import APIRegistrationView
 from impact.views.general_view_set import GeneralViewSet
 from impact.views.index_view import IndexView
+from impact.views.algolia_api_key_view import AlgoliaApiKeyView
