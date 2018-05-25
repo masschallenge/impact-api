@@ -100,7 +100,6 @@ class UserListView(BaseListView):
                     self.user_type,
                     user_data,
                     ProfileHelper.ENTREPRENEUR_OPTIONAL_KEYS)
-        results["privacy_policy_accepted"] = False
         results["newsletter_sender"] = False
         self._validate_args(results, ProfileHelper.VALIDATORS)
         return results
