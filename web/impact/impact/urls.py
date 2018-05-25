@@ -7,6 +7,7 @@ from django.conf.urls import (
     include,
     url,
 )
+from impact.views import AlgoliaApiKeyView
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.views.generic import TemplateView
@@ -46,6 +47,8 @@ account_urlpatterns = [
 ]
 
 urls = [
+    url(r'^api/algolia/api_key/$', AlgoliaApiKeyView.as_view(),
+        name=AlgoliaApiKeyView.view_name),
     url(r'^api/v0/', include(v0_urlpatterns)),
     url(r'^api/v1/', include(v1_urlpatterns)),
     url(r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/'
@@ -79,6 +82,7 @@ urls = [
     url(r'^sso/', include(sso_urlpatterns, namespace="sso")),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include(account_urlpatterns)),
+
     url(r'^oauth/',
         include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^schema/$', schema_view, name='schema'),
