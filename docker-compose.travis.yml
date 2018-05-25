@@ -11,6 +11,10 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mc_dev
+  mentor_directory:
+    build: ../New-Mentor-Directory
+    volumes:
+      - ../New-Mentor-Directory/dist:/usr/src/app/dist
   # Redis
   redis:
     build:
