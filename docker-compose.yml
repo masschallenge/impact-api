@@ -30,7 +30,7 @@ services:
       - ./web/impact/static/css:/gulp/css
       - ./web/impact/static/js:/gulp/js
   mentor_directory:
-    build: ../New-Mentor-Directory
+    build: ../directory
     volumes:
       - ../New-Mentor-Directory/dist:/usr/src/app/dist
   # Web python
