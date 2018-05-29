@@ -54,6 +54,7 @@ services:
     depends_on:
       - mysql
       - assets
+      - mentor_directory
     links:
       - mysql
       - redis
