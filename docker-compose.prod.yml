@@ -1,5 +1,9 @@
 version: '2.3'
 services:
+  mentor_directory:
+    image: 997386117669.dkr.ecr.us-east-1.amazonaws.com/mentor_directory
+    volumes:
+      - ../directory/dist:/usr/src/app/dist
   web:
     image: 997386117669.dkr.ecr.us-east-1.amazonaws.com/impact-api
     env_file: .prod.env
@@ -12,6 +16,8 @@ services:
     expose:
       - "443:443"
       - "80:80"
+    volumes:
+      - ../directory/dist:/wwwroot/static/dist
   redis:
     image: 997386117669.dkr.ecr.us-east-1.amazonaws.com/redis
     volumes:
