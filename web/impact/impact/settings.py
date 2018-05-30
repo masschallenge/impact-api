@@ -148,10 +148,23 @@ class Base(Configuration):
             },
         },
     ]
-
+    ALGOLIA_INDEX_PREFIX = os.environ.get('ALGOLIA_INDEX_PREFIX', 'dev')
+    ALGOLIA_INDEXES = [
+        '{algolia_prefix}_mentor'.format(algolia_prefix=ALGOLIA_INDEX_PREFIX)
+    ]
     NEW_RELIC_CONFIG_FILE = os.path.join(PROJECT_DIR, 'newrelic.ini')
     NEW_RELIC_ENVIRONMENT = os.environ.get('NEW_RELIC_ENVIRONMENT',
                                            'development')
+
+    ALGOLIA_APPLICATION_ID = os.environ.get('ALGOLIA_APPLICATION_ID', '')
+
+    ALGOLIA_API_KEY = os.environ.get('ALGOLIA_API_KEY', '')
+
+    ALGOLIA_STAFF_SEARCH_ONLY_API_KEY = os.environ.get(
+        'ALGOLIA_STAFF_SEARCH_ONLY_API_KEY', '')
+
+    ALGOLIA_SEARCH_ONLY_API_KEY = os.environ.get(
+        'ALGOLIA_SEARCH_ONLY_API_KEY', '')
 
     V0_SECURITY_KEY = bytes(
         os.environ.get('IMPACT_API_V0_SECURITY_KEY', 'XXX'),
