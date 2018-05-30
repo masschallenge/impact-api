@@ -436,8 +436,6 @@ endif
 	@docker push $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG)
 	@docker tag impactapi_redis:latest $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
 	@docker push $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
-	@docker tag impactapi_mentor_directory:latest $(DOCKER_REGISTRY)/mentor_directory:$(IMAGE_TAG)
-	@docker push $(DOCKER_REGISTRY)/impactapi_mentor_directory:$(IMAGE_TAG)
 	@ecs-cli compose -f docker-compose.prod.yml down
 	@ecs-cli compose -f docker-compose.prod.yml up
 
