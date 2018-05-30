@@ -432,7 +432,6 @@ endif
 	echo $$DOCKER_PASSWORD | docker login -u $$DOCKER_USER --password-stdin $$ECR_HOST;
 	@ecs-cli configure profile travis --access-key $(AWS_ACCESS_KEY_ID) --secret-key $(AWS_SECRET_ACCESS_KEY);
 	@ecs-cli configure --region us-east-1 --cluster $(ENVIRONMENT);
-	@docker images
 	@docker tag impactapi_web:latest $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG)
 	@docker push $(DOCKER_REGISTRY)/impact-api:$(IMAGE_TAG)
 	@docker tag impactapi_redis:latest $(DOCKER_REGISTRY)/redis:$(IMAGE_TAG)
