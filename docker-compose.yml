@@ -29,6 +29,10 @@ services:
       - ./web/impact/sass:/gulp/sass
       - ./web/impact/static/css:/gulp/css
       - ./web/impact/static/js:/gulp/js
+  mentor_directory:
+    build: ../directory
+    volumes:
+      - ../directory/dist:/usr/src/app/dist
   # Web python
   web:
     build: ./web
@@ -42,12 +46,13 @@ services:
     volumes:
       - ./web/impact:/wwwroot
       - ../django-accelerator:/packages/src/django-accelerator
-      - ../New-Mentor-Directory/dist:/wwwroot/static/dist
+      - ../directory/dist:/wwwroot/static/dist
       - ./db_cache:/db_cache
       - ./web/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./web/impact/media:/media:ro
     depends_on:
       - mysql
+      - mentor_directory
       - assets
     links:
       - mysql
