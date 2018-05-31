@@ -8,6 +8,11 @@ if [ "${DJANGO_CONFIGURATION}" == "Dev" ]; then
   done
 fi
 
+if [ -e "/wwwroot/static/dist/index.html" ]
+then
+	cp /wwwroot/static/dist/index.html templates/directory.html
+fi
+
 python3 manage.py migrate --noinput
 python3 manage.py collectstatic --noinput
 

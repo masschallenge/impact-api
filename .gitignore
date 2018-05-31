@@ -191,5 +191,6 @@ db_cache/
 *.orig
 web/impact/categories.json
 web/impact/confusables.json
+web/impact/templates/directory.html
 /mysql_entrypoint/000*
 !/mysql_entrypoint/0001*
