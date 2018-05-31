@@ -86,6 +86,9 @@ urls = [
     url(r'^oauth/',
         include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^schema/$', schema_view, name='schema'),
+    url(r'^directory/(?P<app>\w+)/$', login_required(
+        TemplateView.as_view(template_name='directory.html')),
+        name="directory"),
     url(r'^directory/$', login_required(
         TemplateView.as_view(template_name='directory.html')),
         name="directory"),
