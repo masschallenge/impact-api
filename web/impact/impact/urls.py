@@ -18,7 +18,7 @@ from rest_framework_jwt.views import (
     refresh_jwt_token,
     verify_jwt_token,
 )
-
+from django.contrib.auth.decorators import login_required
 from impact.model_utils import model_name_to_snake
 from impact.schema import schema_view
 from impact.v0.urls import v0_urlpatterns
@@ -86,7 +86,8 @@ urls = [
     url(r'^oauth/',
         include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^schema/$', schema_view, name='schema'),
-    url(r'^directory/$', TemplateView.as_view(template_name='directory.html'),
+    url(r'^directory/$', login_required(
+        TemplateView.as_view(template_name='directory.html')),
         name="directory"),
     url(r'^$', IndexView.as_view()),
 ]
