@@ -19,18 +19,20 @@ class AlgoliaApiKeyView(APIView):
     actions = ["GET"]
 
     def get(self, request, format=None):
+        index_prefix = settings.ALGOLIA_INDEX_PREFIX
         client = algoliasearch.Client(
             settings.ALGOLIA_APPLICATION_ID,
             settings.ALGOLIA_API_KEY)
         params = {
             'hitsPerPage': 24,
-            'filters': '',
+            'filters': 'is_confirmed_mentor:true',
             'validUntil': int(time.time()) + 3600,
             'userToken': request.user.id
         }
         search_key = settings.ALGOLIA_SEARCH_ONLY_API_KEY
         if request.user.is_staff:
             search_key = settings.ALGOLIA_STAFF_SEARCH_ONLY_API_KEY
+            params['filters'] = 'is_confirmed_mentor:false'
 
         public_key = client.generateSecuredApiKey(
             search_key,
@@ -38,4 +40,4 @@ class AlgoliaApiKeyView(APIView):
 
         return Response({
             'token': public_key,
-            'index_prefix': settings.ALGOLIA_INDEX_PREFIX})
+            'index_prefix': index_prefix})
