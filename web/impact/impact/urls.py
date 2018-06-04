@@ -10,6 +10,7 @@ from django.conf.urls import (
 from impact.views import AlgoliaApiKeyView
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.views.generic import TemplateView
 from drf_auto_endpoint.router import router as schema_router
 from rest_framework import routers
 from rest_framework_jwt.views import (
@@ -17,7 +18,7 @@ from rest_framework_jwt.views import (
     refresh_jwt_token,
     verify_jwt_token,
 )
-
+from django.contrib.auth.decorators import login_required
 from impact.model_utils import model_name_to_snake
 from impact.schema import schema_view
 from impact.v0.urls import v0_urlpatterns
@@ -85,6 +86,12 @@ urls = [
     url(r'^oauth/',
         include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^schema/$', schema_view, name='schema'),
+    url(r'^directory/(?P<app>\w+)/$', login_required(
+        TemplateView.as_view(template_name='directory.html')),
+        name="directory"),
+    url(r'^directory/$', login_required(
+        TemplateView.as_view(template_name='directory.html')),
+        name="directory"),
     url(r'^$', IndexView.as_view()),
 ]
 

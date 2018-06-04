@@ -23,7 +23,7 @@ class AlgoliaApiKeyView(APIView):
             settings.ALGOLIA_APPLICATION_ID,
             settings.ALGOLIA_API_KEY)
         params = {
-            'hitsPerPage': 20,
+            'hitsPerPage': 24,
             'filters': '',
             'validUntil': int(time.time()) + 3600,
             'userToken': request.user.id
@@ -36,4 +36,6 @@ class AlgoliaApiKeyView(APIView):
             search_key,
             params)
 
-        return Response({'token': public_key})
+        return Response({
+            'token': public_key,
+            'index_prefix': settings.ALGOLIA_INDEX_PREFIX})
