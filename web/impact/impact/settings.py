@@ -195,7 +195,6 @@ class Base(Configuration):
         }
     }
 
-    CORS_ORIGIN_ALLOW_ALL = True
     # settings.py
     REST_PROXY = {
         'HOST': os.environ.get('ACCELERATE_SITE_URL',
@@ -272,8 +271,8 @@ class Dev(Base):
     ]
 
     MIDDLEWARE_CLASSES = [
-                             'debug_toolbar.middleware.DebugToolbarMiddleware',
-                         ] + Base.MIDDLEWARE_CLASSES
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    ] + Base.MIDDLEWARE_CLASSES
 
     INSTALLED_APPS = Base.INSTALLED_APPS + [
         'debug_toolbar',
@@ -282,6 +281,12 @@ class Dev(Base):
     DEBUG_TOOLBAR_CONFIG = {
         'SHOW_TOOLBAR_CALLBACK': lambda x: True
     }
+
+    CORS_ORIGIN_WHITELIST = (
+        'localhost:1234',
+        )
+
+    CORS_ALLOW_CREDENTIALS = True
 
 
 class Test(Base):

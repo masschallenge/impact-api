@@ -3,3 +3,4 @@
 
 -r test.txt
 
+django-cors-headers
