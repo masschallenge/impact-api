@@ -148,6 +148,7 @@ class Base(Configuration):
             },
         },
     ]
+    CORS_ALLOW_CREDENTIALS = True
     ALGOLIA_INDEX_PREFIX = os.environ.get('ALGOLIA_INDEX_PREFIX', 'dev')
     ALGOLIA_INDEXES = [
         '{algolia_prefix}_mentor'.format(algolia_prefix=ALGOLIA_INDEX_PREFIX)
@@ -285,8 +286,6 @@ class Dev(Base):
     CORS_ORIGIN_WHITELIST = (
         'localhost:1234',
         )
-
-    CORS_ALLOW_CREDENTIALS = True
 
 
 class Test(Base):
