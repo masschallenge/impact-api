@@ -41,6 +41,7 @@ before_script:
 - docker run -v $(pwd)/../directory/dist:/usr/src/app/dist -t masschallenge/mentor-directory
 - cp -r ../directory/dist web/impact/static/dist
 - cp ../directory/dist/index.html web/impact/templates/directory.html
+- touch .env
 - docker-compose -f docker-compose.travis.yml build --no-cache --build-arg DJANGO_ACCELERATOR_REVISION=$DJANGO_ACCELERATOR_REVISION
 - docker-compose -f docker-compose.travis.yml up -d
 
