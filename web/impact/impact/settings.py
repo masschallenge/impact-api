@@ -149,6 +149,9 @@ class Base(Configuration):
         },
     ]
     CORS_ALLOW_CREDENTIALS = True
+    CORS_ORIGIN_WHITELIST = (
+        'localhost:1234',
+        )
     ALGOLIA_INDEX_PREFIX = os.environ.get('ALGOLIA_INDEX_PREFIX', 'dev')
     ALGOLIA_INDEXES = [
         '{algolia_prefix}_mentor'.format(algolia_prefix=ALGOLIA_INDEX_PREFIX)
@@ -282,10 +285,6 @@ class Dev(Base):
     DEBUG_TOOLBAR_CONFIG = {
         'SHOW_TOOLBAR_CALLBACK': lambda x: True
     }
-
-    CORS_ORIGIN_WHITELIST = (
-        'localhost:1234',
-        )
 
 
 class Test(Base):
