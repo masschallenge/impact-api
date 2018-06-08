@@ -1,13 +1,13 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-import re
 from accelerator.models import JudgingRound
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     INTEGER_FIELD,
     ModelHelper,
     PK_FIELD,
+    READ_ONLY_STRING_FIELD,
     REQUIRED_STRING_FIELD,
     STRING_FIELD,
 )
@@ -15,31 +15,12 @@ from impact.v1.helpers.model_helper import (
 JUDGING_ROUND_FIELDS = {
     "id": PK_FIELD,
     "name": REQUIRED_STRING_FIELD,
+    "is_active": BOOLEAN_FIELD,
+    "full_name": READ_ONLY_STRING_FIELD,
+    "round_type": STRING_FIELD,
+    "cycle_based_round": BOOLEAN_FIELD,
     "program_id": INTEGER_FIELD,
     "cycle_id": INTEGER_FIELD,
-    "cycle_based_round": BOOLEAN_FIELD,
-    "round_type": STRING_FIELD,  # ENUM
-
-    # "start_date_time": STRING_FIELD,
-    # "end_date_time": STRING_FIELD,
-    # "application_type_id": INTEGER_FIELD,
-    # "is_active": BOOLEAN_FIELD,
-    # "buffer_before_event": INTEGER_FIELD,
-    # "recruit_judges": STRING_FIELD,  # ENUM
-    # "capture_capacity": BOOLEAN_FIELD,
-    # "capacity_options": STRING_FIELD,  # '10|20|30|...'
-    # "capture_availability": STRING_FIELD,
-    # "feedback_display": STRING_FIELD,  # ENUM
-    # "feedback_merge_with": INTEGER_FIELD,
-    # "feedback_display_items": STRING_FIELD,  # ENUM
-    # # In Person timing options
-    # "presentation_mins": INTEGER_FIELD,
-    # "buffer_mins": INTEGER_FIELD,
-    # "break_mins": INTEGER_FIELD,
-    # "num_breaks": INTEGER_FIELD,
-    # "startup_label_id": INTEGER_FIELD,
-    # "desired_judge_label_id": INTEGER_FIELD,
-    # "confirmed_judge_label_id": INTEGER_FIELD,
 }
 
 
@@ -52,3 +33,15 @@ class JudgingRoundHelper(ModelHelper):
     @classmethod
     def fields(cls):
         return JUDGING_ROUND_FIELDS
+
+    @property
+    def full_name(self):
+        # JudgingRounds in django-accelerator currently have both a
+        # short_name and a display_name.  However, the display_name
+        # appears to be simpler and not well justified.  Specifically
+        # it does not list all of the program abbreviations for
+        # cycle-base rounds.  For example, for judging round 48, the
+        # display_name is currently "2017-04 BOS Round 1", but the
+        # short_name is "2017-04 BOS CH IL Round 1".  See ticket
+        # AC-5694 for proposed cleanup.
+        return self.subject.short_name()

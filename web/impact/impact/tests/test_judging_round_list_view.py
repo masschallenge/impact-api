@@ -44,3 +44,16 @@ class TestJudgingRoundListView(APITestCase):
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)
             assert validator.is_valid(json.loads(get_response.content))
+
+    def test_get_is_active(self):
+        is_active = JudgingRoundFactory.create(is_active=True)
+        is_not_active = JudgingRoundFactory.create(is_active=False)
+        with self.login(email=self.basic_user().email):
+            all_response = self.client.get(self.url)
+            all_results = all_response.data["results"]
+            active_response = self.client.get(self.url + "?is_active=True")
+            active_results = active_response.data["results"]
+            assert len(active_results) < len(all_results)
+            active_ids = [item["id"] for item in active_results]
+            assert is_active.id in active_ids
+            assert is_not_active.id not in active_ids

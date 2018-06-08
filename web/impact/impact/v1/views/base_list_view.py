@@ -106,6 +106,8 @@ class BaseListView(ImpactView):
 
     def filter(self, qs):
         qs = self._filter_by_date(qs)
+        if model_has_field(self.model(), "is_active"):
+            qs = self._filter_by_is_active(qs)
         if model_has_field(self.model(), "name"):
             qs = self._filter_by_name(qs)
         return qs
@@ -134,6 +136,12 @@ class BaseListView(ImpactView):
         name_filter = self.request.query_params.get("name", None)
         if name_filter:
             return qs.filter(name__icontains=name_filter)
+        return qs
+
+    def _filter_by_is_active(self, qs):
+        active_filter = self.request.query_params.get("is_active", None)
+        if active_filter is not None:
+            return qs.filter(is_active=active_filter)
         return qs
 
 
