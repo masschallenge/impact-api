@@ -57,7 +57,9 @@ services:
     links:
       - mysql
       - redis
-    env_file: .dev.env
+    env_file:
+      - .env
+      - .dev.env
     user: root
   start_dependencies:
     image: "python:3.6"
