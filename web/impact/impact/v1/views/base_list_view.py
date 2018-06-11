@@ -28,8 +28,19 @@ KWARG_VALUE_IS_NON_POSITIVE_ERROR = ("value of '{}' should be greater than "
                                      "zero.")
 KWARG_VALUE_IS_NEGATIVE_ERROR = ("value of '{}' should be greater than or "
                                  "equal to zero.")
+INVALID_IS_ACTIVE_ERROR = ("Invalid value '{}' for is_active. "
+                           "Use True or False.")
 
 DEFAULT_MAX_LIMIT = 200
+
+IS_ACTIVE_TRANSLATIONS = {
+    "False": False,
+    "false": False,
+    "0": False,
+    "True": True,
+    "true": True,
+    "1": True,
+}
 
 
 class BaseListView(ImpactView):
@@ -48,6 +59,7 @@ class BaseListView(ImpactView):
     def get(self, request):
         limit = self._get_limit(request)
         offset = self._get_offset(request)
+        self._get_is_active(request)
         if self.errors:
             return Response(status=401, data=self.errors)
         base_url = _base_url(request)
@@ -67,6 +79,13 @@ class BaseListView(ImpactView):
     def _get_limit(self, request):
         limit_input = request.GET.get("limit", str(self.DEFAULT_LIMIT))
         return self._validate_limit(limit_input)
+
+    def _get_is_active(self, request):
+        is_active = request.GET.get("is_active", None)
+        if is_active is not None:
+            is_active = IS_ACTIVE_TRANSLATIONS.get(is_active, is_active)
+            if is_active not in [True, False]:
+                self.errors.append(INVALID_IS_ACTIVE_ERROR.format(is_active))
 
     def _validate_limit(self, val):
         val = self._validate_integer(val, key="limit")
@@ -139,9 +158,10 @@ class BaseListView(ImpactView):
         return qs
 
     def _filter_by_is_active(self, qs):
-        active_filter = self.request.query_params.get("is_active", None)
-        if active_filter is not None:
-            return qs.filter(is_active=active_filter)
+        is_active = self.request.query_params.get("is_active", None)
+        is_active = IS_ACTIVE_TRANSLATIONS.get(is_active, is_active)
+        if is_active is not None:
+            return qs.filter(is_active=is_active)
         return qs
 
 

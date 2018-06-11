@@ -3,6 +3,7 @@
 
 from impact.v1.views.impact_view import ImpactView
 
+from impact.v1.views.base_list_view import INVALID_IS_ACTIVE_ERROR
 from impact.v1.views.credit_code_detail_view import CreditCodeDetailView
 from impact.v1.views.credit_code_list_view import CreditCodeListView
 from impact.v1.views.functional_expertise_detail_view import (

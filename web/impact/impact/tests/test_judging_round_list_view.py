@@ -11,7 +11,10 @@ from impact.tests.test_judging_round_detail_view import (
     JUDGING_ROUND_GET_FIELDS,
 )
 from impact.tests.utils import assert_fields
-from impact.v1.views import JudgingRoundListView
+from impact.v1.views import (
+    INVALID_IS_ACTIVE_ERROR,
+    JudgingRoundListView,
+)
 
 
 class TestJudgingRoundListView(APITestCase):
@@ -57,3 +60,14 @@ class TestJudgingRoundListView(APITestCase):
             active_ids = [item["id"] for item in active_results]
             assert is_active.id in active_ids
             assert is_not_active.id not in active_ids
+
+    def test_get_is_active_can_be_lower_case(self):
+        with self.login(email=self.basic_user().email):
+            response = self.client.get(self.url + "?is_active=false")
+            assert response.status_code == 200
+
+    def test_get_is_active_cannot_be_bogus(self):
+        with self.login(email=self.basic_user().email):
+            response = self.client.get(self.url + "?is_active=bogus")
+            assert response.status_code == 401
+            assert response.data == [INVALID_IS_ACTIVE_ERROR.format("bogus")]
