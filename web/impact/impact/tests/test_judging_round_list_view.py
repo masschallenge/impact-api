@@ -5,6 +5,12 @@ import json
 from jsonschema import Draft4Validator
 
 from django.urls import reverse
+
+from accelerator.models import (
+    IN_PERSON_JUDGING_ROUND_TYPE,
+    ONLINE_JUDGING_ROUND_TYPE,
+)
+
 from impact.tests.factories import JudgingRoundFactory
 from impact.tests.api_test_case import APITestCase
 from impact.tests.test_judging_round_detail_view import (
@@ -13,6 +19,7 @@ from impact.tests.test_judging_round_detail_view import (
 from impact.tests.utils import assert_fields
 from impact.v1.views import (
     INVALID_IS_ACTIVE_ERROR,
+    INVALID_ROUND_TYPE_ERROR,
     JudgingRoundListView,
 )
 
@@ -71,3 +78,25 @@ class TestJudgingRoundListView(APITestCase):
             response = self.client.get(self.url + "?is_active=bogus")
             assert response.status_code == 401
             assert response.data == [INVALID_IS_ACTIVE_ERROR.format("bogus")]
+
+    def test_get_by_round_type(self):
+        online = JudgingRoundFactory.create(
+            round_type=ONLINE_JUDGING_ROUND_TYPE)
+        in_person = JudgingRoundFactory.create(
+            round_type=IN_PERSON_JUDGING_ROUND_TYPE)
+        with self.login(email=self.basic_user().email):
+            all_response = self.client.get(self.url)
+            all_results = all_response.data["results"]
+            online_response = self.client.get(
+                self.url + "?round_type={}".format(ONLINE_JUDGING_ROUND_TYPE))
+            online_results = online_response.data["results"]
+            assert len(online_results) < len(all_results)
+            online_ids = [item["id"] for item in online_results]
+            assert online.id in online_ids
+            assert in_person.id not in online_ids
+
+    def test_get_round_type_cannot_be_bogus(self):
+        with self.login(email=self.basic_user().email):
+            response = self.client.get(self.url + "?round_type=bogus")
+            assert response.status_code == 401
+            assert response.data == [INVALID_ROUND_TYPE_ERROR.format("bogus")]

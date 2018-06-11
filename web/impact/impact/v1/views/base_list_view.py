@@ -59,7 +59,7 @@ class BaseListView(ImpactView):
     def get(self, request):
         limit = self._get_limit(request)
         offset = self._get_offset(request)
-        self._get_is_active(request)
+        self._validate_is_active(request)
         if self.errors:
             return Response(status=401, data=self.errors)
         base_url = _base_url(request)
@@ -80,8 +80,8 @@ class BaseListView(ImpactView):
         limit_input = request.GET.get("limit", str(self.DEFAULT_LIMIT))
         return self._validate_limit(limit_input)
 
-    def _get_is_active(self, request):
-        is_active = request.GET.get("is_active", None)
+    def _validate_is_active(self, request):
+        is_active = request.GET.get("is_active")
         if is_active is not None:
             is_active = IS_ACTIVE_TRANSLATIONS.get(is_active, is_active)
             if is_active not in [True, False]:
