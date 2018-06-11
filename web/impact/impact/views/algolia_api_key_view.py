@@ -11,6 +11,23 @@ from accelerator.models import UserRole
 import time
 
 
+def _get_user_filters(request):
+        active_roles = UserRole.FINALIST_USER_ROLES
+        active_roles.append(UserRole.MENTOR)
+        facet_filters = []
+        for grant in request.user.programrolegrant_set.filter(
+                program_role__program__program_status__in=CURRENT_STATUSES,
+                program_role__user_role__name__in=active_roles
+        ):
+            facet_filters.append(
+                'confirmed_mentor_programs:"{active_program}"'.format(
+                    active_program=grant.program_role.program.name))
+        if len(facet_filters) > 0:
+            return " OR ".join(facet_filters)
+        else:
+            return "is_confirmed_mentor:true"
+
+
 class AlgoliaApiKeyView(APIView):
     view_name = 'algolia_api_key_view'
 
@@ -34,20 +51,7 @@ class AlgoliaApiKeyView(APIView):
         if request.user.is_staff:
             search_key = settings.ALGOLIA_STAFF_SEARCH_ONLY_API_KEY
         else:
-            active_roles = UserRole.FINALIST_USER_ROLES
-            active_roles.append(UserRole.MENTOR)
-            facet_filters = []
-            for grant in request.user.programrolegrant_set.filter(
-                    program_role__program__program_status__in=CURRENT_STATUSES,
-                    program_role__user_role__name__in=active_roles
-            ):
-                facet_filters.append(
-                    'confirmed_mentor_programs:"{active_program}"'.format(
-                        active_program=grant.program_role.program.name))
-            if len(facet_filters) > 0:
-                params['filters'] = " OR ".join(facet_filters)
-            else:
-                params['filters'] = "is_confirmed_mentor:true"
+            params['filters'] = _get_user_filters(request)
         public_key = client.generateSecuredApiKey(
             search_key,
             params)
