@@ -233,7 +233,7 @@ class Base(Configuration):
         'django.contrib.auth.backends.ModelBackend',
     )
     JWT_AUTH = {
-        'JWT_ALLOW_REFRESH': True,
+        'JWT_ALLOW_REFRESH': False,
         'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
         # after timedelta has passed, token is no longer valid, and cannot
         # be refreshed any longer
