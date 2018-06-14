@@ -73,6 +73,11 @@ from impact.v1.helpers.credit_code_helper import (
     CREDIT_CODE_FIELDS,
     CreditCodeHelper,
 )
+from impact.v1.helpers.criterion_helper import (
+    CRITERION_FIELDS,
+    CriterionHelper,
+)
+
 from impact.v1.helpers.user_helper import (
     USER_FIELDS,
     UserHelper,
