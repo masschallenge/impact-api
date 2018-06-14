@@ -71,7 +71,14 @@ def _get_filters(request):
     program_families = ProgramFamily.objects.filter(
         programs__mentor_program_group__in=program_groups).prefetch_related(
         'programs').distinct()
+    facet_filters = _facet_filters(program_families)
+    if len(facet_filters) > 0:
+        return " OR ".join(facet_filters)
+    else:
+        return IS_CONFIRMED_MENTOR_FILTER
 
+
+def _facet_filters(program_families):
     facet_filters = []
     for program_family in program_families:
         past_or_present_programs = program_family.programs.filter(
@@ -80,10 +87,7 @@ def _get_filters(request):
         if past_or_present_programs:
             facet_filters.append(CONFIRMED_MENTOR_IN_PROGRAM_FILTER.format(
                 program=past_or_present_programs.first().name))
-    if len(facet_filters) > 0:
-        return " OR ".join(facet_filters)
-    else:
-        return IS_CONFIRMED_MENTOR_FILTER
+    return facet_filters
 
 
 def _get_public_key(params, search_key):
