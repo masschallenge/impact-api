@@ -40,8 +40,9 @@ class AlgoliaApiKeyView(APIView):
             'hitsPerPage': 24,
             'validUntil': int(time.time()) + 3600,
             'userToken': request.user.id,
-            'filters': filters
         }
+        if filters:
+            params['filters'] = filters
         public_key = _get_public_key(params, search_key)
         return Response({
             'token': public_key,
