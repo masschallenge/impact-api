@@ -151,6 +151,7 @@ class Base(Configuration):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = (
         'localhost:1234',
+        'localhost:8000',
         )
     ALGOLIA_INDEX_PREFIX = os.environ.get('ALGOLIA_INDEX_PREFIX', 'dev')
     ALGOLIA_INDEXES = [
