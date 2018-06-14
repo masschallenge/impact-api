@@ -8,6 +8,13 @@ from impact.v1.views.credit_code_detail_view import CreditCodeDetailView
 from impact.v1.views.credit_code_list_view import CreditCodeListView
 from impact.v1.views.criterion_detail_view import CriterionDetailView
 from impact.v1.views.criterion_list_view import CriterionListView
+from impact.v1.views.criterion_option_spec_list_view import (
+    CriterionOptionSpecListView,
+)
+from impact.v1.views.criterion_option_spec_detail_view import (
+    CriterionOptionSpecDetailView,
+)
+
 from impact.v1.views.functional_expertise_detail_view import (
     FunctionalExpertiseDetailView
 )

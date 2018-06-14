@@ -77,7 +77,10 @@ from impact.v1.helpers.criterion_helper import (
     CRITERION_FIELDS,
     CriterionHelper,
 )
-
+from impact.v1.helpers.criterion_option_spec_helper import (
+    CRITERION_OPTION_SPEC_FIELDS,
+    CriterionOptionSpecHelper,
+)
 from impact.v1.helpers.user_helper import (
     USER_FIELDS,
     UserHelper,
