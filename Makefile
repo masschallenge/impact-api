@@ -162,13 +162,16 @@ no_release_error_msg = RELEASE must be set.  E.g., 'make deploy RELEASE=1.2.3.4'
 .PHONY: $(targets) $(deprecated_targets)
 
 
+.env:
+	@touch .env
+
 help:
 	@echo "Valid targets are:\n"
 	@for t in $(target_help) ; do \
 	    echo $$t; done
 	@echo
 
-setup:
+setup: .env
 	@cp git-hooks/pre-commit .git/hooks/pre-commit
 	@cp git-hooks/prepare-commit-msg .git/hooks/prepare-commit-msg
 	@mkdir -p ./mysql/data
@@ -224,7 +227,7 @@ REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(IMPACT_API)
 
 # Database migration related targets
 
-data-migration migrations:
+data-migration migrations: .env
 	@cd $(DJANGO_ACCELERATOR) && $(MAKE) $@ \
 	  migration_name=$(migration_name) | \
 	  sed "s|accelerator/|$(DJANGO_ACCELERATOR)/accelerator/|" | \
@@ -234,7 +237,7 @@ data-migration migrations:
 application ?= accelerator
 
 MIGRATE_CMD = docker-compose run --rm web ./manage.py migrate $(application) $(migration)
-migrate:
+migrate: .env
 	@$(MIGRATE_CMD)
 
 update-schema: migrations
