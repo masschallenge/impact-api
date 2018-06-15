@@ -8,5 +8,3 @@ from impact.v1.helpers import CriterionHelper
 class CriterionListView(BaseListView):
     view_name = "criterion"
     helper_class = CriterionHelper
-
-    

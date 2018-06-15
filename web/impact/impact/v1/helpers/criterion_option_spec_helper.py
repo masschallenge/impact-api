@@ -15,7 +15,7 @@ CRITERION_OPTION_SPEC_FIELDS = {
     "id": PK_FIELD,
     "option": REQUIRED_STRING_FIELD,
     "count": STRING_FIELD,
-    "weight": STRING_FIELD,    
+    "weight": STRING_FIELD,
     "criterion_id": INTEGER_FIELD,
 }
 
@@ -26,5 +26,3 @@ class CriterionOptionSpecHelper(ModelHelper):
     @classmethod
     def fields(cls):
         return CRITERION_OPTION_SPEC_FIELDS
-    
-    

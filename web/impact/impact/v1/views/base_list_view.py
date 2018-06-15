@@ -163,7 +163,7 @@ class BaseListView(ImpactView):
         if is_active is not None:
             return qs.filter(is_active=is_active)
         return qs
-        
+
 
 def _previous_url(base_url, limit, offset, count):
     if offset == 0:

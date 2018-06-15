@@ -4,13 +4,10 @@
 from accelerator.models import Criterion
 
 from impact.v1.helpers.model_helper import (
-    BOOLEAN_FIELD,
     INTEGER_FIELD,
     ModelHelper,
     PK_FIELD,
-    READ_ONLY_STRING_FIELD,
     REQUIRED_STRING_FIELD,
-    STRING_FIELD,
 )
 
 CRITERION_FIELDS = {
@@ -27,5 +24,3 @@ class CriterionHelper(ModelHelper):
     @classmethod
     def fields(cls):
         return CRITERION_FIELDS
-    
-    

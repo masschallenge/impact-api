@@ -8,5 +8,3 @@ from impact.v1.helpers import CriterionOptionSpecHelper
 class CriterionOptionSpecListView(BaseListView):
     view_name = "criterion_option_spec"
     helper_class = CriterionOptionSpecHelper
-
-    

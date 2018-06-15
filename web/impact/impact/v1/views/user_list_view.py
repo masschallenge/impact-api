@@ -3,7 +3,7 @@
 
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from rest_framework.response import Response
+
 
 from accelerator.models import (
     BaseProfile,
@@ -24,7 +24,7 @@ from impact.v1.helpers import (
     validate_choices,
 )
 from impact.v1.views.base_list_view import BaseListView
-
+from impact.v1.views.post_mixin import PostMixin
 
 EMAIL_EXISTS_ERROR = "User with email {} already exists"
 INVALID_KEY_ERROR = "'{}' is not a valid key."
@@ -34,7 +34,8 @@ UNSUPPORTED_KEY_ERROR = "'{key}' is not supported for {type}"
 User = get_user_model()
 
 
-class UserListView(BaseListView):
+class UserListView(BaseListView,
+                   PostMixin):
     view_name = "user"
     helper_class = UserHelper
     actions = ["GET", "POST"]
@@ -46,26 +47,15 @@ class UserListView(BaseListView):
             return True
         return check_name
 
-    def post(self, request):
-        user_args = self._user_args(request.POST)
-        profile_args = self._profile_args(request.POST)
-        self._invalid_keys(request.POST)
-        if self.errors:
-            note = valid_keys_note(profile_args.get("user_type"), post=True)
-            self.errors.append(note)
-            return Response(status=403, data=self.errors)
-        user = _construct_user(user_args, profile_args)
-        return Response({"id": user.id})
-
     def _user_args(self, dict):
-        self._check_required_keys(dict, UserHelper.REQUIRED_KEYS)
-        results = self._copy_keys(dict, UserHelper.USER_INPUT_KEYS)
+        self._check_required_keys(dict, self.helper_class.REQUIRED_KEYS)
+        results = self._copy_keys(dict, self.helper_class.USER_INPUT_KEYS)
         email = results.get("email")
         if email and User.objects.filter(email=email).exists():
             self.errors.append(EMAIL_EXISTS_ERROR.format(email))
         if "is_active" not in results:
             results["is_active"] = False
-        self._validate_args(results, UserHelper.VALIDATORS)
+        self._validate_args(results, self.helper_class.VALIDATORS)
         return results
 
     def _check_required_keys(self, user_keys, required_keys):
@@ -130,6 +120,16 @@ class UserListView(BaseListView):
                 Q(entrepreneurprofile__updated_at__gt=updated_at_before) |
                 Q(memberprofile__updated_at__gt=updated_at_before))
         return qs
+
+    def create_object(self, post):
+        user_args = self._user_args(post)
+        profile_args = self._profile_args(post)
+        self._invalid_keys(post)
+        if self.errors:
+            note = valid_keys_note(profile_args.get("user_type"), post=True)
+            self.errors.append(note)
+            return None
+        return _construct_user(user_args, profile_args)
 
 
 def _construct_user(user_args, profile_args):
