@@ -264,7 +264,7 @@ checkout:
 # Server and Virtual Machine related targets
 debug ?= 1
 
-run-server: run-server-$(debug)
+run-server: .env run-server-$(debug)
 
 run-server-0: initial-db-setup
 	@docker-compose up
