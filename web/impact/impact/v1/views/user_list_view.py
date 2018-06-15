@@ -38,7 +38,6 @@ class UserListView(BaseListView,
                    PostMixin):
     view_name = "user"
     helper_class = UserHelper
-    actions = ["GET", "POST"]
 
     def description_check(self, check_name):
         if check_name in [IS_EXPERT_CHECK, IS_NON_MEMBER_CHECK]:
