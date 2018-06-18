@@ -152,7 +152,8 @@ class Base(Configuration):
     CORS_ORIGIN_WHITELIST = (
         'localhost:1234',
         'localhost:8000',
-        )
+    )
+    CORS_ORIGIN_REGEX_WHITELIST = (r'^(https?://)?(\w+\.)?masschallenge\.org$', )
     ALGOLIA_INDEX_PREFIX = os.environ.get('ALGOLIA_INDEX_PREFIX', 'dev')
     ALGOLIA_INDEXES = [
         '{algolia_prefix}_mentor'.format(algolia_prefix=ALGOLIA_INDEX_PREFIX)
