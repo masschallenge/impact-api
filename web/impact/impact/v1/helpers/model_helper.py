@@ -160,6 +160,10 @@ class ModelHelper(object):
         if not self.subject:
             self.errors.append(MISSING_SUBJECT_ERROR)
 
+    @classmethod
+    def construct_object(cls, object_data):
+        return cls.model.objects.create(**object_data)
+
     def serialize(self, fields):
         result = {}
         for field in fields:

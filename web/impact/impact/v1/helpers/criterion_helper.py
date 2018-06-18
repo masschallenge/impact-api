@@ -28,6 +28,8 @@ class CriterionHelper(ModelHelper):
         ]
     OPTIONAL_BOOLEAN_KEYS = [
         ]
+    ALL_KEYS = REQUIRED_KEYS
+    INPUT_KEYS = ALL_KEYS
 
     @classmethod
     def fields(cls):

@@ -14,10 +14,9 @@ class PostMixin(object):
 
     def create_object(self, post_data):
         object_data = self.data_from_post(post_data)
-        profile_args = self._profile_args(post_data)
         self._invalid_keys(post_data)
         if self.errors:
-            note = valid_keys_note(profile_args.get("user_type"), post=True)
+            note = valid_keys_note(self.helper_class.ALL_KEYS)
             self.errors.append(note)
             return None
         return self.helper_class.construct_object(object_data)
