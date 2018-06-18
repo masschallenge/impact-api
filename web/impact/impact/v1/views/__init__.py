@@ -32,6 +32,7 @@ from impact.v1.views.organization_detail_view import OrganizationDetailView
 from impact.v1.views.organization_history_view import OrganizationHistoryView
 from impact.v1.views.organization_list_view import OrganizationListView
 from impact.v1.views.organization_users_view import OrganizationUsersView
+from impact.v1.views.post_mixin import PostMixin
 from impact.v1.views.program_cycle_detail_view import ProgramCycleDetailView
 from impact.v1.views.program_cycle_list_view import ProgramCycleListView
 from impact.v1.views.program_detail_view import ProgramDetailView

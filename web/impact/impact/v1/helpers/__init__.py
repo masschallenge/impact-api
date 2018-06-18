@@ -74,7 +74,6 @@ from impact.v1.helpers.credit_code_helper import (
     CreditCodeHelper,
 )
 from impact.v1.helpers.criterion_helper import (
-    CRITERION_FIELDS,
     CriterionHelper,
 )
 from impact.v1.helpers.criterion_option_spec_helper import (
@@ -84,8 +83,6 @@ from impact.v1.helpers.criterion_option_spec_helper import (
 from impact.v1.helpers.user_helper import (
     USER_FIELDS,
     UserHelper,
-    VALID_KEYS_NOTE,
-    valid_keys_note,
 )
 from impact.v1.helpers.judging_round_helper import (
     JUDGING_ROUND_FIELDS,

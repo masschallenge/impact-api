@@ -40,8 +40,6 @@ from impact.v1.helpers.profile_helper import (
 
 User = get_user_model()
 
-VALID_KEYS_NOTE = "Valid keys are: {}"
-
 USER_FIELDS = {
     "id": PK_FIELD,
     "updated_at": READ_ONLY_STRING_FIELD,
@@ -97,8 +95,8 @@ class UserHelper(ModelHelper):
         "is_active",
         ]
     OPTIONAL_KEYS = OPTIONAL_BOOLEAN_KEYS
-    USER_INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
-    INPUT_KEYS = USER_INPUT_KEYS + ProfileHelper.INPUT_KEYS
+    ALL_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
+    INPUT_KEYS = ALL_KEYS + ProfileHelper.INPUT_KEYS
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -133,15 +131,15 @@ class UserHelper(ModelHelper):
     def fields(cls):
         return USER_FIELDS
 
-
-def valid_keys_note(user_type, post=False):
-    keys = UserHelper.USER_INPUT_KEYS.copy()
-    if post:
-        keys += ProfileHelper.CORE_KEYS
-    else:
-        keys += ProfileHelper.CORE_PATCH_KEYS
-    if not user_type or user_type == ExpertProfile.user_type:
-        keys += ProfileHelper.EXPERT_KEYS
-    if not user_type or user_type == EntrepreneurProfile.user_type:
-        keys += ProfileHelper.ENTREPRENEUR_KEYS
-    return VALID_KEYS_NOTE.format(keys)
+    @classmethod
+    def valid_keys(cls, user_type, post=False):
+        keys = UserHelper.ALL_KEYS.copy()
+        if post:
+            keys += ProfileHelper.CORE_KEYS
+        else:
+            keys += ProfileHelper.CORE_PATCH_KEYS
+        if not user_type or user_type == ExpertProfile.user_type:
+            keys += ProfileHelper.EXPERT_KEYS
+        if not user_type or user_type == EntrepreneurProfile.user_type:
+            keys += ProfileHelper.ENTREPRENEUR_KEYS
+        return keys

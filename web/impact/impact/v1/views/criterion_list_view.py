@@ -10,5 +10,4 @@ class CriterionListView(BaseListView,
                         PostMixin):
     view_name = "criterion"
     helper_class = CriterionHelper
-
-        
+    actions = ['GET', 'POST']  # Should get this from PostMixin

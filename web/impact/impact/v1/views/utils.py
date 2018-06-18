@@ -1,5 +1,10 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
+VALID_KEYS_NOTE = "Valid keys are: {}"
+
+
+def valid_keys_note(keys):
+    return VALID_KEYS_NOTE.format(keys)
 
 
 def coalesce_dictionaries(data, merge_field="id"):

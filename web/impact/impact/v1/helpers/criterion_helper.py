@@ -10,7 +10,7 @@ from impact.v1.helpers.model_helper import (
     REQUIRED_STRING_FIELD,
 )
 
-CRITERION_FIELDS = {
+ALL_FIELDS = {
     "id": PK_FIELD,
     "name": REQUIRED_STRING_FIELD,
     "type": REQUIRED_STRING_FIELD,
@@ -21,6 +21,14 @@ CRITERION_FIELDS = {
 class CriterionHelper(ModelHelper):
     model = Criterion
 
+    REQUIRED_KEYS = [
+        "name",
+        "type",
+        "judging_round_id",
+        ]
+    OPTIONAL_BOOLEAN_KEYS = [
+        ]
+
     @classmethod
     def fields(cls):
-        return CRITERION_FIELDS
+        return ALL_FIELDS
