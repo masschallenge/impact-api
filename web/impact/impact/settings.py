@@ -1,9 +1,9 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-import datetime
 import os
 
+import datetime
 from configurations import (
     Configuration,
     values,
@@ -151,7 +151,9 @@ class Base(Configuration):
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = (
         'localhost:1234',
-        )
+        'localhost:8000',
+    )
+    CORS_ORIGIN_REGEX_WHITELIST = (r'^(https?://)?(\w+\.)?masschallenge\.org$', )
     ALGOLIA_INDEX_PREFIX = os.environ.get('ALGOLIA_INDEX_PREFIX', 'dev')
     ALGOLIA_INDEXES = [
         '{algolia_prefix}_mentor'.format(algolia_prefix=ALGOLIA_INDEX_PREFIX)
@@ -232,12 +234,15 @@ class Base(Configuration):
         'simpleuser.email_model_backend.EmailModelBackend',
         'django.contrib.auth.backends.ModelBackend',
     )
+    SESSION_COOKIE_AGE = 3600 * 24 * 7 * 2  # default
     JWT_AUTH = {
-        'JWT_ALLOW_REFRESH': True,
-        'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),
+        'JWT_ALLOW_REFRESH': False,
+        'JWT_EXPIRATION_DELTA': datetime.timedelta(
+            seconds=(SESSION_COOKIE_AGE * 2)),
         # after timedelta has passed, token is no longer valid, and cannot
         # be refreshed any longer
-        'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+        'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(
+            seconds=(SESSION_COOKIE_AGE * 2)),
         # after timedelta has passed since first obtaining the token,
         # it is no longer possible to refresh the token, even if the token
         # did not expire
@@ -275,8 +280,8 @@ class Dev(Base):
     ]
 
     MIDDLEWARE_CLASSES = [
-        'debug_toolbar.middleware.DebugToolbarMiddleware',
-    ] + Base.MIDDLEWARE_CLASSES
+                             'debug_toolbar.middleware.DebugToolbarMiddleware',
+                         ] + Base.MIDDLEWARE_CLASSES
 
     INSTALLED_APPS = Base.INSTALLED_APPS + [
         'debug_toolbar',
