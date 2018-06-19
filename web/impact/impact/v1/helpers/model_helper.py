@@ -141,6 +141,11 @@ TWITTER_FIELD = merge_fields(STRING_FIELD,
 
 INVALID_BOOLEAN_ERROR = ("Invalid {field}: "
                          "Expected 'true' or 'false' not {value}")
+INVALID_INTEGER_ERROR = ("Invalid {field}: "
+                         "Expected integer not {value}")
+INVALID_FLOAT_ERROR = ("Invalid {field}: "
+                       "Expected floating-point number not {value}")
+
 INVALID_CHOICE_ERROR = ("Invalid {field}: "
                         "Expected {choices} not {value}")
 INVALID_EMAIL_ERROR = ("Invalid {field}: "
@@ -244,6 +249,25 @@ def validate_string(helper, field, value):
         helper.errors.append(INVALID_STRING_ERROR.format(field=field,
                                                          value=value))
     return value
+
+
+def validate_integer(helper, field, value):
+
+    try:
+        result = int(value)
+    except ValueError:
+        helper.errors.append(INVALID_INTEGER_ERROR.format(field=field,
+                                                          value=value))
+    return result
+
+
+def validate_float(helper, field, value):
+    try:
+        result = float(value)
+    except ValueError:
+        helper.errors.append(INVALID_INTEGER_ERROR.format(field=field,
+                                                          value=value))
+    return result
 
 
 def validate_choices(helper, field, value, choices):
