@@ -162,13 +162,16 @@ no_release_error_msg = RELEASE must be set.  E.g., 'make deploy RELEASE=1.2.3.4'
 .PHONY: $(targets) $(deprecated_targets)
 
 
+.env:
+	@touch .env
+
 help:
 	@echo "Valid targets are:\n"
 	@for t in $(target_help) ; do \
 	    echo $$t; done
 	@echo
 
-setup:
+setup: .env
 	@cp git-hooks/pre-commit .git/hooks/pre-commit
 	@cp git-hooks/prepare-commit-msg .git/hooks/prepare-commit-msg
 	@mkdir -p ./mysql/data
@@ -188,16 +191,16 @@ test: setup
 
 coverage: coverage-run coverage-report coverage-html-report
 
-coverage-run:
+coverage-run: .env
 	@docker-compose run --rm web coverage run --omit="*/tests/*" --source='.' manage.py test --configuration=Test
 
 coverage-report: diff_files:=$(shell git diff --name-only $(branch))
 coverage-report: diff_sed:=$(shell echo $(diff_files)| sed s:web/impact/::g)
 coverage-report: diff_grep:=$(shell echo $(diff_sed) | tr ' ' '\n' | grep \.py | grep -v /tests/ | grep -v /django_migrations/ | tr '\n' ' ' )
-coverage-report:
+coverage-report: .env
 	@docker-compose run --rm web coverage report -i --skip-covered $(diff_grep) | grep -v "NoSource:"
 
-coverage-html-report:
+coverage-html-report: .env
 	@docker-compose run --rm web coverage html --omit="*/tests/*"
 
 coverage-html: coverage
@@ -224,7 +227,7 @@ REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(IMPACT_API)
 
 # Database migration related targets
 
-data-migration migrations:
+data-migration migrations: .env
 	@cd $(DJANGO_ACCELERATOR) && $(MAKE) $@ \
 	  migration_name=$(migration_name) | \
 	  sed "s|accelerator/|$(DJANGO_ACCELERATOR)/accelerator/|" | \
@@ -234,7 +237,7 @@ data-migration migrations:
 application ?= accelerator
 
 MIGRATE_CMD = docker-compose run --rm web ./manage.py migrate $(application) $(migration)
-migrate:
+migrate: .env
 	@$(MIGRATE_CMD)
 
 update-schema: migrations
@@ -263,10 +266,10 @@ debug ?= 1
 
 run-server: run-server-$(debug)
 
-run-server-0: initial-db-setup
+run-server-0: .env initial-db-setup
 	@docker-compose up
 
-run-detached-server: initial-db-setup
+run-detached-server: .env initial-db-setup
 	@docker-compose up -d
 	@docker-compose run --rm web /usr/bin/mysqlwait.sh
 
@@ -284,11 +287,11 @@ initial-db-setup:
 		cp $(gz_file) ./mysql_entrypoint/0002_$(notdir $(gz_file)); \
 	fi;
 
-stop-server:
+stop-server: .env
 	@docker-compose stop
 	-@killall -9 docker-compose || true
 
-shutdown-vms:
+shutdown-vms: .env
 	@docker-compose down
 	@rm -rf ./mysql/data
 	@rm -rf ./redis
@@ -296,7 +299,7 @@ shutdown-vms:
 REMOVE_IMAGES = no
 remove_images ?= $(REMOVE_IMAGES)
 delete-vms: CONTAINERS?=$(shell docker ps -a -q --filter network=impactapi_default)
-delete-vms:
+delete-vms: .env
 	@echo $(shell if [ ! -z "$(CONTAINERS)" ]; then docker rm -f $(CONTAINERS); fi;)
 	@echo $(shell if [ -z "$(remove_images)" ]; then docker image prune -a -f; fi;)
 
@@ -319,13 +322,13 @@ build-all: build
 
 # Interactive shell Targets
 
-bash-shell:
+bash-shell: .env
 	@docker-compose exec web /bin/bash || docker-compose run --rm web /bin/bash
 
-db-shell:
+db-shell: .env
 	@docker-compose run --rm web ./manage.py dbshell
 
-django-shell:
+django-shell: .env
 	@docker-compose run --rm web ./manage.py shell
 
 
@@ -335,7 +338,7 @@ DB_CACHE_DIR = db_cache/
 s3_key = $(db_name).sql.gz
 gz_file ?= $(DB_CACHE_DIR)$(s3_key)
 
-load-db: $(DB_CACHE_DIR) $(gz_file)
+load-db: $(DB_CACHE_DIR) $(gz_file) .env
 	@echo "Loading $(gz_file)"
 	@echo "drop database mc_dev; create database mc_dev;" | docker-compose run --rm web ./manage.py dbshell
 	@gzcat $(gz_file) | docker-compose run --rm web ./manage.py dbshell
@@ -456,11 +459,11 @@ dbshell:
 	@echo ERROR: dbshell has been replaced by db-shell
 
 
-comp-messages:
+comp-messages: .env
 	@docker-compose exec web python manage.py compilemessages
 
-messages:
+messages: .env
 	@docker-compose exec web python manage.py makemessages -a
 
-lint:
+lint: .env
 	@docker-compose run --rm web pylint impact
