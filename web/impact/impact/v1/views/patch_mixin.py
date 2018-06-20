@@ -13,7 +13,7 @@ class PatchMixin(object):
             return Response(status=404, data=NO_OBJECT_ERROR.format(pk))
         helper = self.helper_class(object)
         keys = set(request.data.keys())
-        self._invalid_keys(keys)
+        self._invalid_keys(keys, helper)
         valid_data = self.validate_keys(keys, request.data, helper)
         if helper.errors:
             return self.error_response(keys, helper)
@@ -36,6 +36,6 @@ class PatchMixin(object):
             result[key] = helper.validate(key, data[key])
         return result
 
-    def _invalid_keys(self, keys):
+    def _invalid_keys(self, keys, helper):
         for key in set(keys) - set(self.helper_class.INPUT_KEYS):
-            self.errors.append(INVALID_KEY_ERROR.format(key))
+            helper.errors.append(INVALID_KEY_ERROR.format(key))

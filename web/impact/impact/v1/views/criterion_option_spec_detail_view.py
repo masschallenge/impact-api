@@ -7,6 +7,6 @@ from impact.v1.helpers import CriterionOptionSpecHelper
 
 
 class CriterionOptionSpecDetailView(BaseDetailView, PatchMixin):
-    actions = ["GET", "PATCH"]    
+    actions = ["GET", "PATCH"]
     view_name = "criterion_option_spec"
     helper_class = CriterionOptionSpecHelper

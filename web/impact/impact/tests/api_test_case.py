@@ -32,8 +32,8 @@ class APITestCase(TestCase):
     def basic_user(self):
         user = self.make_user('basic_user@test.com',
                               perms=["mc.view_startup"])
-        [user.groups.add(group)
-         for group in Group.objects.filter(name__in=API_GROUPS)]
+        for group in Group.objects.filter(name__in=API_GROUPS):
+            user.groups.add(group)
         user.set_password('password')
         user.save()
         return user

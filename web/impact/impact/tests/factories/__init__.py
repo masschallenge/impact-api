@@ -19,6 +19,10 @@ from accelerator.tests.factories.bucket_state_factory import BucketStateFactory
 from accelerator.tests.factories.content_type_factory import ContentTypeFactory
 from accelerator.tests.factories.clearance_factory import ClearanceFactory
 from accelerator.tests.factories.core_profile_factory import CoreProfileFactory
+from accelerator.tests.factories.criterion_factory import CriterionFactory
+from accelerator.tests.factories.criterion_option_spec_factory import (
+    CriterionOptionSpecFactory,
+)
 from accelerator.tests.factories.entrepreneur_factory import (
     EntrepreneurFactory
 )

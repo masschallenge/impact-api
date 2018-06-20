@@ -4,7 +4,7 @@ VALID_KEYS_NOTE = "Valid keys are: {}"
 
 
 def valid_keys_note(keys):
-    return VALID_KEYS_NOTE.format(keys)
+    return VALID_KEYS_NOTE.format(", ".join(sorted(keys)))
 
 
 def coalesce_dictionaries(data, merge_field="id"):
