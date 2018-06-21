@@ -197,9 +197,6 @@ class ModelHelper(object):
         field_property = getattr(self.subject, field, None)
         return getattr(field_property, attribute, None)
 
-    def valid_keys(self):
-        return self.ALL_KEYS
-
 
 def serialize_list_field(object, field, helper_class):
     if hasattr(object, field):

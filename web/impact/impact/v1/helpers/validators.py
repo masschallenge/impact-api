@@ -47,11 +47,11 @@ def validate_string(helper, field, value):
 def _make_validator(cls, error_msg):
     def validate_cls(helper, field, value):
         try:
-            result = cls(value)
+            return cls(value)
         except ValueError:
             _add_error_to_helper(helper, error_msg.format(field=field,
                                                           value=value))
-        return result
+    return validate_cls
 
 
 validate_float = _make_validator(float, INVALID_FLOAT_ERROR)
