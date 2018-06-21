@@ -40,6 +40,5 @@ class PostMixin(object):
 
     def _validate_args(self, args, validators):
         for key, validator in validators.items():
-            if key in args:
-                if validator:
-                    args[key] = validator(self, key, args[key])
+            if validator and key in args:
+                args[key] = validator(self, key, args[key])
