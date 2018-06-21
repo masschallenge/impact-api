@@ -102,7 +102,7 @@ class UserListView(BaseListView,
     def create_object(self, posted_data):
         user_args = self._user_args(posted_data)
         profile_args = self._profile_args(posted_data)
-        self._invalid_keys(posted_data)
+        self.invalid_keys(posted_data)
         if self.errors:
             valid_keys = self.helper_class.valid_keys(
                 profile_args.get("user_type"),

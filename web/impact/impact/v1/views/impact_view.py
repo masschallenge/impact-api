@@ -10,6 +10,8 @@ from impact.v1.helpers import (
 )
 from impact.v1.metadata import ImpactMetadata
 
+INVALID_KEY_ERROR = "'{}' is not a valid key."
+
 
 class ImpactView(APIView):
     __metaclass__ = ABCMeta
@@ -81,3 +83,7 @@ class ImpactView(APIView):
         if description:
             result["description"] = description
         return result
+
+    def invalid_keys(self, keys):
+        for key in set(keys) - set(self.helper_class.INPUT_KEYS):
+            self.errors.append(INVALID_KEY_ERROR.format(key))

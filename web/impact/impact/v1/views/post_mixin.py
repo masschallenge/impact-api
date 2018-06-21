@@ -2,7 +2,6 @@ from rest_framework.response import Response
 from impact.v1.views.utils import valid_keys_note
 
 REQUIRED_KEY_ERROR = "'{}' is required"
-INVALID_KEY_ERROR = "'{}' is not a valid key."
 
 
 class PostMixin(object):
@@ -14,7 +13,7 @@ class PostMixin(object):
 
     def create_object(self, post_data):
         object_data = self.data_from_post(post_data)
-        self._invalid_keys(post_data)
+        self.invalid_keys(post_data.keys())
         if self.errors:
             note = valid_keys_note(self.helper_class.ALL_KEYS)
             self.errors.append(note)
@@ -44,7 +43,3 @@ class PostMixin(object):
             if key in args:
                 if validator:
                     args[key] = validator(self, key, args[key])
-
-    def _invalid_keys(self, keys):
-        for key in set(keys) - set(self.helper_class.INPUT_KEYS):
-            self.errors.append(INVALID_KEY_ERROR.format(key))

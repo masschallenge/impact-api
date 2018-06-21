@@ -1,8 +1,6 @@
 from rest_framework.response import Response
 from impact.v1.views.utils import valid_keys_note
 
-REQUIRED_KEY_ERROR = "'{}' is required"
-INVALID_KEY_ERROR = "'{}' is not a valid key."
 NO_OBJECT_ERROR = "Unable to find object for id {}"
 
 
@@ -13,16 +11,16 @@ class PatchMixin(object):
             return Response(status=404, data=NO_OBJECT_ERROR.format(pk))
         helper = self.helper_class(object)
         keys = set(request.data.keys())
-        self._invalid_keys(keys, helper)
+        self.invalid_keys(keys)
         valid_data = self.validate_keys(keys, request.data, helper)
-        if helper.errors:
-            return self.error_response(keys, helper)
+        if self.errors:
+            return self.error_response(keys)
         self.set_fields(valid_data, helper)
         return Response(status=204)
 
-    def error_response(self, keys, helper):
+    def error_response(self, keys):
         note = valid_keys_note(self.helper_class.INPUT_KEYS)
-        return Response(status=403, data=helper.errors + [note])
+        return Response(status=403, data=self.errors + [note])
 
     def set_fields(self, data, helper):
         for key, value in data.items():
@@ -34,7 +32,3 @@ class PatchMixin(object):
         for key in keys.intersection(self.helper_class.INPUT_KEYS):
             result[key] = helper.validate(key, data[key])
         return result
-
-    def _invalid_keys(self, keys, helper):
-        for key in set(keys) - set(self.helper_class.INPUT_KEYS):
-            helper.errors.append(INVALID_KEY_ERROR.format(key))
