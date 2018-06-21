@@ -7,8 +7,11 @@ from impact.tests.factories import CriterionFactory
 from impact.v1.views import CriterionListView
 from django.urls import reverse
 
+
 class TestCriterionListView(APITestCase):
+
     def test_get(self):
+        Criterion.objects.all().delete()
         criteria = CriterionFactory.create_batch(5)
         with self.login(email=self.basic_user().email):
             url = reverse(CriterionListView.view_name)
@@ -28,9 +31,8 @@ class TestCriterionListView(APITestCase):
             criterion_id = json.loads(response.content)['id']
             criterion = Criterion.objects.get(id=criterion_id)
             assert_data_is_consistent_with_instance(data, criterion)
- 
+
     def test_post_bad_key_in_data(self):
-        criterion = CriterionFactory()
         data = {'name': 'Posted Criterion',
                 'type': 'sans serif',
                 'judging_round_id': 1,

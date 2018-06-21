@@ -5,7 +5,9 @@ from impact.v1.views import CriterionDetailView
 from impact.v1.views.utils import valid_keys_note
 from django.urls import reverse
 
+
 class TestCriterionDetailView(APITestCase):
+
     def test_get(self):
         criterion = CriterionFactory()
         with self.login(email=self.basic_user().email):
@@ -34,8 +36,8 @@ class TestCriterionDetailView(APITestCase):
         with self.login(email=self.basic_user().email):
             url = reverse(CriterionDetailView.view_name, args=[criterion_id])
             response = self.client.patch(url, data)
-            self.assertEqual(response.status_code, 404)           
- 
+            self.assertEqual(response.status_code, 404)
+
     def test_patch_bad_key_in_data(self):
         criterion = CriterionFactory()
         data = {'name': 'Patched Criterion',
@@ -47,5 +49,3 @@ class TestCriterionDetailView(APITestCase):
             response = self.client.patch(url, data)
             note = valid_keys_note(CriterionDetailView.helper_class.INPUT_KEYS)
             assert note in str(response.content)
-        
-
