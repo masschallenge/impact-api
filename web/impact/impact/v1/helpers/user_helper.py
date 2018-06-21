@@ -17,6 +17,8 @@ from impact.v1.helpers.model_helper import (
     REQUIRED_STRING_FIELD,
     TWITTER_FIELD,
     URL_FIELD,
+)
+from impact.v1.helpers.validators import (
     validate_boolean,
     validate_email_address,
     validate_string,

@@ -9,7 +9,6 @@ from impact.v1.helpers.model_helper import (
     PK_FIELD,
     REQUIRED_STRING_FIELD,
 )
-
 ALL_FIELDS = {
     "id": PK_FIELD,
     "name": REQUIRED_STRING_FIELD,

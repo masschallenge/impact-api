@@ -1,7 +1,5 @@
 import json
-from accelerator.models import (
-    Criterion,
-    CriterionOptionSpec,)
+from accelerator.models import CriterionOptionSpec
 
 from impact.v1.views.utils import valid_keys_note
 from impact.tests.api_test_case import APITestCase
@@ -13,12 +11,15 @@ from impact.tests.factories import (
 from impact.v1.views import CriterionOptionSpecListView
 from django.urls import reverse
 
+
 class TestCriterionOptionSpecListView(APITestCase):
+    view = CriterionOptionSpecListView
+
     def test_get(self):
         CriterionOptionSpec.objects.all().delete()
         option_specs = CriterionOptionSpecFactory.create_batch(5)
         with self.login(email=self.basic_user().email):
-            url = reverse(CriterionOptionSpecListView.view_name)
+            url = reverse(self.view.view_name)
             response = self.client.get(url)
             data = json.loads(response.content)
             results = {result['id']: result for result in data['results']}
@@ -32,7 +33,7 @@ class TestCriterionOptionSpecListView(APITestCase):
                 'count': 1,
                 'criterion_id': criterion.id}
         with self.login(email=self.basic_user().email):
-            url = reverse(CriterionOptionSpecListView.view_name)
+            url = reverse(self.view.view_name)
             response = self.client.post(url, data)
             option_spec_id = json.loads(response.content)['id']
             option_spec = CriterionOptionSpec.objects.get(id=option_spec_id)
@@ -44,7 +45,7 @@ class TestCriterionOptionSpecListView(APITestCase):
                 'count': 1,
                 'bad_key': 'B flat minor'}
         with self.login(email=self.basic_user().email):
-            url = reverse(CriterionOptionSpecListView.view_name)
+            url = reverse(self.view.view_name)
             response = self.client.post(url, data)
-            note = valid_keys_note(CriterionOptionSpecListView.helper_class.INPUT_KEYS)
+            note = valid_keys_note(self.view.helper_class.INPUT_KEYS)
             assert note in str(response.content)

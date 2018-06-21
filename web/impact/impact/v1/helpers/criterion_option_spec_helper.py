@@ -9,11 +9,12 @@ from impact.v1.helpers.model_helper import (
     PK_FIELD,
     REQUIRED_STRING_FIELD,
     FLOAT_FIELD,
+)
+from impact.v1.helpers.validators import (
     validate_string,
     validate_integer,
     validate_float,
 )
-
 CRITERION_OPTION_SPEC_FIELDS = {
     "id": PK_FIELD,
     "option": REQUIRED_STRING_FIELD,
