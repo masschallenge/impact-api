@@ -251,23 +251,18 @@ def validate_string(helper, field, value):
     return value
 
 
-def validate_integer(helper, field, value):
+def _make_validator(cls, error_msg):
+    def validate_cls(helper, field, value):
+        try:
+            result = cls(value)
+        except ValueError:
+            helper.errors.append(error_msg.format(field=field,
+                                                  value=value))
+        return result
 
-    try:
-        result = int(value)
-    except ValueError:
-        helper.errors.append(INVALID_INTEGER_ERROR.format(field=field,
-                                                          value=value))
-    return result
 
-
-def validate_float(helper, field, value):
-    try:
-        result = float(value)
-    except ValueError:
-        helper.errors.append(INVALID_INTEGER_ERROR.format(field=field,
-                                                          value=value))
-    return result
+validate_float = _make_validator(float, INVALID_FLOAT_ERROR)
+validate_integer = _make_validator(int, INVALID_INTEGER_ERROR)
 
 
 def validate_choices(helper, field, value, choices):
