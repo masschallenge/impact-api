@@ -21,8 +21,7 @@ class PatchMixin(object):
         return Response(status=204)
 
     def error_response(self, keys, helper):
-        note = valid_keys_note(keys.intersection(
-            set(self.helper_class.INPUT_KEYS)))
+        note = valid_keys_note(self.helper_class.INPUT_KEYS)
         return Response(status=403, data=helper.errors + [note])
 
     def set_fields(self, data, helper):
