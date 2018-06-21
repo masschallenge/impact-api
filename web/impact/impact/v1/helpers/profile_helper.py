@@ -21,7 +21,6 @@ from impact.v1.helpers.functional_expertise_helper import (
 from impact.v1.helpers.industry_helper import IndustryHelper
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
-    INVALID_URL_ERROR,
     ModelHelper,
     PHONE_FIELD,
     PHONE_REGEX,
@@ -32,6 +31,7 @@ from impact.v1.helpers.model_helper import (
     serialize_list_field,
 )
 from impact.v1.helpers.validators import (
+    INVALID_URL_ERROR,
     validate_boolean,
     validate_choices,
     validate_regex,

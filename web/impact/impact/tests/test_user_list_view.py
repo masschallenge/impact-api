@@ -39,11 +39,13 @@ from impact.utils import (
     get_profile,
     override_updated_at,
 )
-from impact.v1.helpers.model_helper import (
+
+from impact.v1.helpers.validators import (
+    format_choices,
     INVALID_CHOICE_ERROR,
     INVALID_URL_ERROR,
 )
-from impact.v1.helpers.validators import format_choices
+
 from impact.v1.views.base_list_view import (
     DEFAULT_MAX_LIMIT,
     GREATER_THAN_MAX_LIMIT_ERROR,

@@ -19,6 +19,10 @@ INVALID_STRING_ERROR = "Invalid {field}: Expected a String not {value}"
 INVALID_URL_ERROR = "Invalid {field}: Expected '{value}' to be a valid URL"
 
 
+def _add_error_to_helper(helper, error):
+    helper.errors.append(error)
+
+
 def validate_boolean(helper, field, value):
     result = value
     if isinstance(result, str):
@@ -28,15 +32,15 @@ def validate_boolean(helper, field, value):
         elif result == 'false':
             result = False
     if not isinstance(result, bool):
-        helper.errors.append(INVALID_BOOLEAN_ERROR.format(field=field,
-                                                          value=value))
+        _add_error_to_helper(helper, INVALID_BOOLEAN_ERROR.format(field=field,
+                                                                  value=value))
     return result
 
 
 def validate_string(helper, field, value):
     if not isinstance(value, str):
-        helper.errors.append(INVALID_STRING_ERROR.format(field=field,
-                                                         value=value))
+        _add_error_to_helper(helper, INVALID_STRING_ERROR.format(field=field,
+                                                                 value=value))
     return value
 
 
@@ -45,8 +49,8 @@ def _make_validator(cls, error_msg):
         try:
             result = cls(value)
         except ValueError:
-            helper.errors.append(error_msg.format(field=field,
-                                                  value=value))
+            _add_error_to_helper(helper, error_msg.format(field=field,
+                                                          value=value))
         return result
 
 
@@ -57,7 +61,7 @@ validate_integer = _make_validator(int, INVALID_INTEGER_ERROR)
 def validate_choices(helper, field, value, choices):
     validate_string(helper, field, value)
     if value not in choices:
-        helper.errors.append(INVALID_CHOICE_ERROR.format(
+        _add_error_to_helper(helper, INVALID_CHOICE_ERROR.format(
             field=field, value=value, choices=format_choices(choices)))
     return value
 
@@ -74,7 +78,8 @@ def format_choices(choices):
 
 def validate_regex(helper, field, value, regex):
     if not regex.match(value):
-        helper.errors.append(INVALID_REGEX_ERROR.format(field=field,
+        _add_error_to_helper(helper,
+                             INVALID_REGEX_ERROR.format(field=field,
                                                         value=value,
                                                         regex=regex.pattern))
     return value
@@ -84,8 +89,8 @@ def validate_email_address(helper, field, value):
     try:
         validate_email(value)
     except ValidationError:
-        helper.errors.append(INVALID_EMAIL_ERROR.format(field=field,
-                                                        value=value))
+        _add_error_to_helper(helper, INVALID_EMAIL_ERROR.format(field=field,
+                                                                value=value))
     return value
 
 
@@ -94,6 +99,6 @@ def validate_url(helper, field, value):
         try:
             URLValidator(schemes=["http", "https"])(value)
         except ValidationError:
-            helper.errors.append(INVALID_URL_ERROR.format(field=field,
-                                                          value=value))
+            _add_error_to_helper(helper, INVALID_URL_ERROR.format(field=field,
+                                                                  value=value))
     return value
