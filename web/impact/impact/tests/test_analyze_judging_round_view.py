@@ -12,12 +12,6 @@ from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
 from impact.v1.views import AnalyzeJudgingRoundView
 
-ANALYZE_JUDGING_ROUND_FIELDS = [
-    "criterion_option_spec_id",
-    "criterion_name",
-    "option",
-]
-
 
 class TestAnalyzeJudgingRoundView(APITestCase):
     def test_get(self):

@@ -68,9 +68,18 @@ FLOAT_FIELD = {
     },
 }
 
-READ_ONLY_ID_FIELD = {
+READ_ONLY_INTEGER_FIELD = {
     "json-schema": {
         "type": "integer",
+        "readOnly": True,
+    },
+}
+
+READ_ONLY_ID_FIELD = READ_ONLY_INTEGER_FIELD
+
+READ_ONLY_OBJECT_FIELD = {
+    "json-schema": {
+        "type": "object",
         "readOnly": True,
     },
 }
