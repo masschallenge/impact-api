@@ -1,7 +1,9 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+from itertools import chain
 from accelerator.models import (
+    Application,
     CriterionOptionSpec,
     JudgingRound,
 )
@@ -42,5 +44,9 @@ class AnalyzeJudgingRoundView(ImpactView):
         self.instance = self.model.objects.get(pk=pk)
         options = CriterionOptionSpec.objects.filter(
             criterion__judging_round=self.instance)
-        results = [OptionAnalysis(option).analysis() for option in options]
-        return Response({"results": results})
+        self.apps = Application.objects.filter(
+            application_status="submitted",
+            application_type=self.instance.application_type)
+        analyses = [OptionAnalysis(option, self.apps).analyses()
+                    for option in options]
+        return Response({"results": list(chain.from_iterable(analyses))})
