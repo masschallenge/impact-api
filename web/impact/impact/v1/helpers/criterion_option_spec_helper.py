@@ -5,10 +5,11 @@ from accelerator.models import CriterionOptionSpec
 
 from impact.v1.helpers.model_helper import (
     INTEGER_FIELD,
+    REQUIRED_INTEGER_FIELD,
     ModelHelper,
     PK_FIELD,
-    REQUIRED_STRING_FIELD,
     FLOAT_FIELD,
+    REQUIRED_STRING_FIELD,
 )
 from impact.v1.helpers.validators import (
     validate_string,
@@ -20,7 +21,7 @@ CRITERION_OPTION_SPEC_FIELDS = {
     "option": REQUIRED_STRING_FIELD,
     "count": INTEGER_FIELD,
     "weight": FLOAT_FIELD,
-    "criterion_id": INTEGER_FIELD,
+    "criterion_id": REQUIRED_INTEGER_FIELD,
 }
 
 
@@ -35,13 +36,14 @@ class CriterionOptionSpecHelper(ModelHelper):
 
     REQUIRED_KEYS = [
         "option",
-        "count",
-        "weight",
         "criterion_id",
         ]
     OPTIONAL_BOOLEAN_KEYS = [
         ]
-    ALL_KEYS = REQUIRED_KEYS
+    ALL_KEYS = REQUIRED_KEYS + [
+        "count",
+        "weight",
+    ]
     INPUT_KEYS = ALL_KEYS
 
     @classmethod

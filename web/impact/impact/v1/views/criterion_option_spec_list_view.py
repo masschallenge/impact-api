@@ -8,6 +8,6 @@ from impact.v1.helpers import CriterionOptionSpecHelper
 
 class CriterionOptionSpecListView(BaseListView,
                                   PostMixin):
-    helper_class = CriterionOptionSpecHelper    
+    helper_class = CriterionOptionSpecHelper
     view_name = "criterion_option_spec"
     actions = ['GET', 'POST']  # Should get this from PostMixin

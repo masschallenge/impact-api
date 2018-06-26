@@ -54,14 +54,33 @@ INTEGER_FIELD = {
     "json-schema": {
         "type": "integer"
     },
+    "POST": {"required": False},
+    "PATCH": {"required": False}
+}
+
+REQUIRED_INTEGER_FIELD = {
+    "json-schema": {
+        "type": "integer"
+    },
+    "POST": {"required": True},
+    "PATCH": {"required": False}
 }
 
 FLOAT_FIELD = {
     "json-schema": {
         "type": "number"
     },
+    "POST": {"required": False},
+    "PATCH": {"required": False}
 }
 
+REQUIRED_FLOAT_FIELD = {
+    "json-schema": {
+        "type": "number"
+    },
+    "POST": {"required": True},
+    "PATCH": {"required": False}
+}
 READ_ONLY_ID_FIELD = {
     "json-schema": {
         "type": "integer",

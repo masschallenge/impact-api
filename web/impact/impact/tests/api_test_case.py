@@ -8,6 +8,7 @@ from test_plus.test import TestCase
 
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.urls import reverse
 
 from impact.tests.factories import UserFactory
 
@@ -58,3 +59,18 @@ class APITestCase(TestCase):
         )
         response_json = json.loads(response.content)
         return response_json['access_token']
+
+    def assert_options_include(self, method, expected_options, object_id=None):
+        if object_id:
+            args = [object_id]
+        else:
+            args = []
+        url = reverse(self.view.view_name, args=args)
+        with self.login(email=self.basic_user().email):
+            response = self.client.options(url)
+            result = json.loads(response.content)
+            assert method in result['actions']
+            options = result['actions'][method]['properties']
+            for key, params in expected_options.items():
+                self.assertIn(key, options)
+                self.assertEqual(options[key], params)

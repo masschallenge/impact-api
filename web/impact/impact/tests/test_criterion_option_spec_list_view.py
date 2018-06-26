@@ -63,3 +63,12 @@ class TestCriterionOptionSpecListView(APITestCase):
             error = INVALID_INTEGER_ERROR.format(field='count',
                                                  value='one')
             assert error in str(response.content)
+
+    def test_post_options(self):
+        post_options = {"option": {"type": "string",
+                                   "required": True},
+                        "weight": {"type": "number"},
+                        "count": {"type": "integer"},
+                        "criterion_id": {"type": "integer",
+                                         "required": True}}
+        self.assert_options_include("POST", post_options)

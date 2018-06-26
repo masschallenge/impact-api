@@ -9,7 +9,7 @@ from impact.v1.views.utils import valid_keys_note
 from django.urls import reverse
 
 
-class TestCriterionDetailView(APITestCase):
+class TestCriterionOptionSpecDetailView(APITestCase):
     view = CriterionOptionSpecDetailView
 
     def test_get(self):
@@ -56,3 +56,15 @@ class TestCriterionDetailView(APITestCase):
             note = valid_keys_note(
                 self.view.helper_class.INPUT_KEYS)
             assert note in str(response.content)
+
+    def test_patch_options(self):
+        option_spec = CriterionOptionSpecFactory()
+        patch_options = {"id": {"type": "integer",
+                                "readOnly": True,
+                                "required": True},
+                         "option": {"type": "string"},
+                         "weight": {"type": "number"},
+                         "count": {"type": "integer"},
+                         "criterion_id": {"type": "integer"}}
+        self.assert_options_include("PATCH", patch_options,
+                                    object_id=option_spec.id)
