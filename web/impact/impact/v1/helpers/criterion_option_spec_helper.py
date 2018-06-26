@@ -38,8 +38,6 @@ class CriterionOptionSpecHelper(ModelHelper):
         "option",
         "criterion_id",
         ]
-    OPTIONAL_BOOLEAN_KEYS = [
-        ]
     ALL_KEYS = REQUIRED_KEYS + [
         "count",
         "weight",
