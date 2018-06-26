@@ -133,15 +133,15 @@ class UserHelper(ModelHelper):
     def fields(cls):
         return USER_FIELDS
 
-    @classmethod
-    def valid_keys(cls, user_type, post=False):
-        keys = UserHelper.ALL_KEYS.copy()
-        if post:
-            keys += ProfileHelper.CORE_KEYS
-        else:
-            keys += ProfileHelper.CORE_PATCH_KEYS
-        if not user_type or user_type == ExpertProfile.user_type:
-            keys += ProfileHelper.EXPERT_KEYS
-        if not user_type or user_type == EntrepreneurProfile.user_type:
-            keys += ProfileHelper.ENTREPRENEUR_KEYS
-        return keys
+
+def valid_keys(user_type, post=False):
+    keys = UserHelper.ALL_KEYS.copy()
+    if post:
+        keys += ProfileHelper.CORE_KEYS
+    else:
+        keys += ProfileHelper.CORE_PATCH_KEYS
+    if not user_type or user_type == ExpertProfile.user_type:
+        keys += ProfileHelper.EXPERT_KEYS
+    if not user_type or user_type == EntrepreneurProfile.user_type:
+        keys += ProfileHelper.ENTREPRENEUR_KEYS
+    return keys

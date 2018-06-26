@@ -21,6 +21,7 @@ from impact.v1.helpers import (
     UserHelper,
     VALID_USER_TYPES,
     validate_choices,
+    valid_keys,
 )
 from impact.v1.views.utils import valid_keys_note
 from impact.v1.views.base_list_view import BaseListView
@@ -104,10 +105,10 @@ class UserListView(BaseListView,
         profile_args = self._profile_args(posted_data)
         self.invalid_keys(posted_data)
         if self.errors:
-            valid_keys = self.helper_class.valid_keys(
+            _valid_keys = valid_keys(
                 profile_args.get("user_type"),
                 post=True)
-            self.errors.append(valid_keys_note(valid_keys))
+            self.errors.append(valid_keys_note(_valid_keys))
             return None
         return _construct_user(user_args, profile_args)
 

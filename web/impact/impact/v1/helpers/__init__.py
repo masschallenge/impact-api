@@ -85,6 +85,7 @@ from impact.v1.helpers.criterion_option_spec_helper import (
 from impact.v1.helpers.user_helper import (
     USER_FIELDS,
     UserHelper,
+    valid_keys,
 )
 from impact.v1.helpers.judging_round_helper import (
     JUDGING_ROUND_FIELDS,
