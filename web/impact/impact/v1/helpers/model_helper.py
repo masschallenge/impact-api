@@ -3,12 +3,6 @@
 
 import re
 
-from django.core.exceptions import ValidationError
-from django.core.validators import (
-    URLValidator,
-    validate_email,
-)
-
 from accelerator.models import (
     PHONE_MAX_LENGTH,
     TWITTER_HANDLE_MAX_LENGTH,
@@ -56,22 +50,44 @@ INTEGER_ARRAY_FIELD = {
     },
 }
 
-INTEGER_FIELD = {
+POST_OPTIONAL = {
+    "PATCH": {"required": False},
+    "POST": {"required": False},
+}
+
+POST_REQUIRED = {
+    "PATCH": {"required": False},
+    "POST": {"required": True},
+}
+
+RAW_INTEGER_FIELD = {
     "json-schema": {
         "type": "integer"
     },
 }
 
-FLOAT_FIELD = {
+OPTIONAL_INTEGER_FIELD = merge_fields(POST_OPTIONAL, RAW_INTEGER_FIELD)
+REQUIRED_INTEGER_FIELD = merge_fields(POST_REQUIRED, RAW_INTEGER_FIELD)
+
+RAW_FLOAT_FIELD = {
     "json-schema": {
         "type": "number"
     },
 }
 
+OPTIONAL_FLOAT_FIELD = merge_fields(POST_OPTIONAL, RAW_FLOAT_FIELD)
+REQUIRED_FLOAT_FIELD = merge_fields(POST_REQUIRED, RAW_FLOAT_FIELD)
+
 READ_ONLY_ID_FIELD = {
     "json-schema": {
         "type": "integer",
         "readOnly": True,
+    },
+}
+
+RAW_STRING_FIELD = {
+    "json-schema": {
+        "type": "string",
     },
 }
 
@@ -82,16 +98,8 @@ READ_ONLY_STRING_FIELD = {
     },
 }
 
-POST_REQUIRED = {"POST": {"required": True}}
-
-STRING_FIELD = {
-    "json-schema": {
-        "type": "string",
-    },
-    "PATCH": {"required": False},
-    "POST": {"required": False},
-}
-REQUIRED_STRING_FIELD = merge_fields(POST_REQUIRED, STRING_FIELD)
+OPTIONAL_STRING_FIELD = merge_fields(POST_OPTIONAL, RAW_STRING_FIELD)
+REQUIRED_STRING_FIELD = merge_fields(POST_REQUIRED, RAW_STRING_FIELD)
 
 STRING_ARRAY_FIELD = {
     "json-schema": {
@@ -123,31 +131,29 @@ PHONE_FIELD = {
     "POST": {"required": False},
 }
 
-URL_FIELD = merge_fields(
-    STRING_FIELD,
+RAW_URL_FIELD = merge_fields(
+    RAW_STRING_FIELD,
     {
         "json-schema": {
             "description": "Must be valid URL per the Django URLValidator",
         },
     })
+OPTIONAL_URL_FIELD = merge_fields(POST_OPTIONAL, RAW_URL_FIELD)
 
-URL_SLUG_FIELD = merge_fields(STRING_FIELD,
-                              {"json-schema": {"pattern": "^[a-zA-Z0-9_-]+$"}})
+URL_SLUG_FIELD = merge_fields(
+    OPTIONAL_STRING_FIELD,
+    {
+        "json-schema": {"pattern": "^[a-zA-Z0-9_-]+$"},
+    })
 
 TWITTER_PATTERN = '^\S{{0,{}}}$'.format(TWITTER_HANDLE_MAX_LENGTH)
 TWITTER_REGEX = re.compile(TWITTER_PATTERN)
-TWITTER_FIELD = merge_fields(STRING_FIELD,
-                             {"json-schema": {"pattern": TWITTER_PATTERN}})
+TWITTER_FIELD = merge_fields(
+    OPTIONAL_STRING_FIELD,
+    {
+        "json-schema": {"pattern": TWITTER_PATTERN},
+    })
 
-INVALID_BOOLEAN_ERROR = ("Invalid {field}: "
-                         "Expected 'true' or 'false' not {value}")
-INVALID_CHOICE_ERROR = ("Invalid {field}: "
-                        "Expected {choices} not {value}")
-INVALID_EMAIL_ERROR = ("Invalid {field}: "
-                       "Expected '{value}' to be valid email address")
-INVALID_REGEX_ERROR = "Invalid {field}: Expected '{value}' to match '{regex}'"
-INVALID_STRING_ERROR = "Invalid {field}: Expected a String not {value}"
-INVALID_URL_ERROR = "Invalid {field}: Expected '{value}' to be a valid URL"
 MISSING_SUBJECT_ERROR = "Database error: missing object"
 
 
@@ -159,6 +165,10 @@ class ModelHelper(object):
         self.errors = []
         if not self.subject:
             self.errors.append(MISSING_SUBJECT_ERROR)
+
+    @classmethod
+    def construct_object(cls, object_data):
+        return cls.model.objects.create(**object_data)
 
     def serialize(self, fields):
         result = {}
@@ -218,72 +228,6 @@ def serialize_list_field(object, field, helper_class):
         return result
 
 
-def validate_boolean(helper, field, value):
-    result = value
-    if isinstance(result, str):
-        result = result.lower()
-        if result == 'true':
-            result = True
-        elif result == 'false':
-            result = False
-    if not isinstance(result, bool):
-        helper.errors.append(INVALID_BOOLEAN_ERROR.format(field=field,
-                                                          value=value))
-    return result
-
-
-def validate_string(helper, field, value):
-    if not isinstance(value, str):
-        helper.errors.append(INVALID_STRING_ERROR.format(field=field,
-                                                         value=value))
-    return value
-
-
-def validate_choices(helper, field, value, choices):
-    validate_string(helper, field, value)
-    if value not in choices:
-        helper.errors.append(INVALID_CHOICE_ERROR.format(
-            field=field, value=value, choices=format_choices(choices)))
-    return value
-
-
-def format_choices(choices):
-    choice_list = list(choices)
-    if choice_list:
-        result = "', '".join(choice_list[:-1])
-        if result:
-            result += "' or '"
-        result += "%s'" % choice_list[-1]
-        return "'" + result
-
-
-def validate_regex(helper, field, value, regex):
-    if not regex.match(value):
-        helper.errors.append(INVALID_REGEX_ERROR.format(field=field,
-                                                        value=value,
-                                                        regex=regex.pattern))
-    return value
-
-
-def validate_email_address(helper, field, value):
-    try:
-        validate_email(value)
-    except ValidationError:
-        helper.errors.append(INVALID_EMAIL_ERROR.format(field=field,
-                                                        value=value))
-    return value
-
-
-def validate_url(helper, field, value):
-    if value:
-        try:
-            URLValidator(schemes=["http", "https"])(value)
-        except ValidationError:
-            helper.errors.append(INVALID_URL_ERROR.format(field=field,
-                                                          value=value))
-    return value
-
-
 def json_object(properties):
     return {
         "type": "object",
@@ -307,9 +251,9 @@ def json_array(item):
 
 def json_list_wrapper(item):
     return json_object({
-        "count": INTEGER_FIELD,
-        "next": URL_FIELD,
-        "previous": URL_FIELD,
+        "count": RAW_INTEGER_FIELD,
+        "next": RAW_URL_FIELD,
+        "previous": RAW_URL_FIELD,
         "results": json_array(item)})
 
 

@@ -6,10 +6,10 @@ from accelerator.models import ProgramFamily
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     ModelHelper,
+    OPTIONAL_STRING_FIELD,
     PHONE_FIELD,
     PK_FIELD,
     REQUIRED_STRING_FIELD,
-    STRING_FIELD,
     URL_SLUG_FIELD,
 )
 
@@ -29,7 +29,7 @@ PROGRAM_FAMILY_FIELDS = {
     "name": REQUIRED_STRING_FIELD,
     "email_domain": EMAIL_DOMAIN_FIELD,
     "phone_number": PHONE_FIELD,
-    "short_description": STRING_FIELD,
+    "short_description": OPTIONAL_STRING_FIELD,
     "url_slug": URL_SLUG_FIELD,
     "is_open": BOOLEAN_FIELD,
 }

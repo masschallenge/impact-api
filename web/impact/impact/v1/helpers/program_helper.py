@@ -1,29 +1,29 @@
 from accelerator.models import Program
 from impact.v1.helpers.model_helper import (
-    FLOAT_FIELD,
-    INTEGER_FIELD,
     ModelHelper,
+    OPTIONAL_FLOAT_FIELD,
+    OPTIONAL_INTEGER_FIELD,
+    OPTIONAL_STRING_FIELD,
     PK_FIELD,
-    STRING_FIELD,
 )
 
 PROGRAM_FIELDS = {
     "id": PK_FIELD,
-    "name": STRING_FIELD,
-    "program_family_id": INTEGER_FIELD,
-    "program_family_name": STRING_FIELD,
-    "cycle_id": INTEGER_FIELD,
-    "cycle_name": STRING_FIELD,
-    "description": STRING_FIELD,
-    "start_date": STRING_FIELD,
-    "end_date": STRING_FIELD,
-    "location": STRING_FIELD,
-    "program_status": STRING_FIELD,
-    "currency_code": STRING_FIELD,
-    "regular_application_fee": FLOAT_FIELD,
-    "url_slug": STRING_FIELD,
-    "overview_start_date": STRING_FIELD,
-    "overview_deadline_date": STRING_FIELD,
+    "name": OPTIONAL_STRING_FIELD,
+    "program_family_id": OPTIONAL_INTEGER_FIELD,
+    "program_family_name": OPTIONAL_STRING_FIELD,
+    "cycle_id": OPTIONAL_INTEGER_FIELD,
+    "cycle_name": OPTIONAL_STRING_FIELD,
+    "description": OPTIONAL_STRING_FIELD,
+    "start_date": OPTIONAL_STRING_FIELD,
+    "end_date": OPTIONAL_STRING_FIELD,
+    "location": OPTIONAL_STRING_FIELD,
+    "program_status": OPTIONAL_STRING_FIELD,
+    "currency_code": OPTIONAL_STRING_FIELD,
+    "regular_application_fee": OPTIONAL_FLOAT_FIELD,
+    "url_slug": OPTIONAL_STRING_FIELD,
+    "overview_start_date": OPTIONAL_STRING_FIELD,
+    "overview_deadline_date": OPTIONAL_STRING_FIELD,
 }
 
 

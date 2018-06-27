@@ -14,18 +14,20 @@ from impact.v1.helpers.mptt_model_helper import (
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     EMAIL_FIELD,
-    FLOAT_FIELD,
     INTEGER_ARRAY_FIELD,
-    INTEGER_FIELD,
     MISSING_SUBJECT_ERROR,
+    OPTIONAL_FLOAT_FIELD,
+    OPTIONAL_INTEGER_FIELD,
+    OPTIONAL_STRING_FIELD,
+    OPTIONAL_URL_FIELD,
     PK_FIELD,
     REQUIRED_STRING_FIELD,
-    STRING_FIELD,
-    URL_FIELD,
     json_array,
     json_list_wrapper,
     json_object,
     json_simple_list,
+)
+from impact.v1.helpers.validators import (
     validate_boolean,
     validate_choices,
     validate_regex,
@@ -73,11 +75,17 @@ from impact.v1.helpers.credit_code_helper import (
     CREDIT_CODE_FIELDS,
     CreditCodeHelper,
 )
+from impact.v1.helpers.criterion_helper import (
+    CriterionHelper,
+)
+from impact.v1.helpers.criterion_option_spec_helper import (
+    CRITERION_OPTION_SPEC_FIELDS,
+    CriterionOptionSpecHelper,
+)
 from impact.v1.helpers.user_helper import (
     USER_FIELDS,
     UserHelper,
-    VALID_KEYS_NOTE,
-    valid_keys_note,
+    valid_keys,
 )
 from impact.v1.helpers.judging_round_helper import (
     JUDGING_ROUND_FIELDS,
