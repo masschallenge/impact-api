@@ -14,8 +14,8 @@ from impact.utils import (
 )
 from impact.v1.events.base_history_event import BaseHistoryEvent
 from impact.v1.helpers import (
-    INTEGER_FIELD,
-    STRING_FIELD,
+    OPTIONAL_INTEGER_FIELD,
+    OPTIONAL_STRING_FIELD,
 )
 
 
@@ -23,10 +23,10 @@ class BaseUserRoleGrantEvent(BaseHistoryEvent):
     __metaclass__ = ABCMeta
 
     CLASS_FIELDS = {
-        "cycle_id": INTEGER_FIELD,
-        "cycle": STRING_FIELD,
-        "program_id": INTEGER_FIELD,
-        "program": STRING_FIELD,
+        "cycle_id": OPTIONAL_INTEGER_FIELD,
+        "cycle": OPTIONAL_STRING_FIELD,
+        "program_id": OPTIONAL_INTEGER_FIELD,
+        "program": OPTIONAL_STRING_FIELD,
        }
 
     @classmethod

@@ -4,12 +4,12 @@
 from accelerator.models import JudgingRound
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
-    INTEGER_FIELD,
+    OPTIONAL_INTEGER_FIELD,
     ModelHelper,
+    OPTIONAL_STRING_FIELD,
     PK_FIELD,
     READ_ONLY_STRING_FIELD,
     REQUIRED_STRING_FIELD,
-    STRING_FIELD,
 )
 
 JUDGING_ROUND_FIELDS = {
@@ -17,10 +17,10 @@ JUDGING_ROUND_FIELDS = {
     "name": REQUIRED_STRING_FIELD,
     "is_active": BOOLEAN_FIELD,
     "full_name": READ_ONLY_STRING_FIELD,
-    "round_type": STRING_FIELD,
+    "round_type": OPTIONAL_STRING_FIELD,
     "cycle_based_round": BOOLEAN_FIELD,
-    "program_id": INTEGER_FIELD,
-    "cycle_id": INTEGER_FIELD,
+    "program_id": OPTIONAL_INTEGER_FIELD,
+    "cycle_id": OPTIONAL_INTEGER_FIELD,
 }
 
 

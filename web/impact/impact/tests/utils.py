@@ -52,3 +52,10 @@ def assert_fields_not_required(fields, data):
     for field in fields:
         error_msg = "Expected %s to not be required" % field
         assert "required" not in data[field], error_msg
+
+
+def assert_data_is_consistent_with_instance(data, instance):
+    for key, val in data.items():
+        if val != getattr(instance, key):
+            raise AssertionError("%s did not equal %s. (Key: %s)" %
+                                 (str(val), str(getattr(instance, key)), key))

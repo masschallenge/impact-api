@@ -6,14 +6,14 @@ from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     EMAIL_FIELD,
     INTEGER_ARRAY_FIELD,
-    INTEGER_FIELD,
+    OPTIONAL_INTEGER_FIELD,
     ModelHelper,
     PK_FIELD,
     READ_ONLY_STRING_FIELD,
     REQUIRED_STRING_FIELD,
-    STRING_FIELD,
+    OPTIONAL_STRING_FIELD,
     TWITTER_FIELD,
-    URL_FIELD,
+    OPTIONAL_URL_FIELD,
     json_array,
     json_schema,
     merge_fields,
@@ -36,15 +36,15 @@ STARTUP_FIELD = {
 }
 STARTUP_BOOLEAN_FIELD = merge_fields(STARTUP_FIELD, BOOLEAN_FIELD)
 STARTUP_INTEGER_ARRAY_FIELD = merge_fields(STARTUP_FIELD, INTEGER_ARRAY_FIELD)
-STARTUP_INTEGER_FIELD = merge_fields(STARTUP_FIELD, INTEGER_FIELD)
-STARTUP_STRING_FIELD = merge_fields(STARTUP_FIELD, STRING_FIELD)
-STARTUP_URL_FIELD = merge_fields(STARTUP_FIELD, URL_FIELD)
+STARTUP_INTEGER_FIELD = merge_fields(STARTUP_FIELD, OPTIONAL_INTEGER_FIELD)
+STARTUP_STRING_FIELD = merge_fields(STARTUP_FIELD, OPTIONAL_STRING_FIELD)
+STARTUP_URL_FIELD = merge_fields(STARTUP_FIELD, OPTIONAL_URL_FIELD)
 STARTUP_INDUSTRY_FIELD = merge_fields(STARTUP_FIELD,
                                       json_schema(MPTT_TYPE))
 STARTUP_INDUSTRY_ARRAY_FIELD = merge_fields(
     STARTUP_FIELD, json_schema(json_array(MPTT_TYPE)))
 ORGANIZATION_URL_SLUG_FIELD = merge_fields(
-    STRING_FIELD, {"json-schema": {"pattern": "^[\w-]+$"}})
+    OPTIONAL_STRING_FIELD, {"json-schema": {"pattern": "^[\w-]+$"}})
 
 ORGANIZATION_FIELDS = {
     "id": PK_FIELD,
@@ -55,7 +55,7 @@ ORGANIZATION_FIELDS = {
     "twitter_handle": TWITTER_FIELD,
     "updated_at": READ_ONLY_STRING_FIELD,
     "url_slug": ORGANIZATION_URL_SLUG_FIELD,
-    "website_url": URL_FIELD,
+    "website_url": OPTIONAL_URL_FIELD,
     "startup_id": PK_FIELD,
     "partner_id": PK_FIELD,
     # Startup specific fields

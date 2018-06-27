@@ -21,15 +21,17 @@ from impact.v1.helpers.functional_expertise_helper import (
 from impact.v1.helpers.industry_helper import IndustryHelper
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
-    INVALID_URL_ERROR,
     ModelHelper,
     PHONE_FIELD,
     PHONE_REGEX,
-    STRING_FIELD,
+    OPTIONAL_STRING_FIELD,
     TWITTER_REGEX,
     json_array,
     merge_fields,
     serialize_list_field,
+)
+from impact.v1.helpers.validators import (
+    INVALID_URL_ERROR,
     validate_boolean,
     validate_choices,
     validate_regex,
@@ -58,7 +60,7 @@ EXPERT_BOOLEAN_FIELD = merge_fields(OPTIONAL_EXPERT_FIELD,
                                     BOOLEAN_FIELD)
 
 EXPERT_STRING_FIELD = merge_fields(OPTIONAL_EXPERT_FIELD,
-                                   STRING_FIELD)
+                                   OPTIONAL_STRING_FIELD)
 
 NON_MEMBER_STRING_FIELD = {
     "json-schema": {

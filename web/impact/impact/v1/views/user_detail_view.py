@@ -10,10 +10,10 @@ from impact.v1.helpers import (
     IS_EXPERT_CHECK,
     IS_NON_MEMBER_CHECK,
     UserHelper,
-    valid_keys_note,
+    valid_keys,
 )
 from impact.v1.views.base_detail_view import BaseDetailView
-
+from impact.v1.views.utils import valid_keys_note
 
 INVALID_KEYS_ERROR = "Recevied invalid key(s): {invalid_keys}."
 MISSING_PROFILE_ERROR = "User ({}) has no profile"
@@ -74,7 +74,8 @@ class UserDetailView(BaseDetailView):
 def _error_response(helper):
     subject = helper.profile_helper.subject
     if subject:
-        note = valid_keys_note(subject.user_type)
+        _valid_keys = valid_keys(subject.user_type)
+        note = valid_keys_note(_valid_keys)
     else:
         note = MISSING_PROFILE_ERROR.format(helper.subject.id)
     return Response(status=403, data=helper.errors + [note])

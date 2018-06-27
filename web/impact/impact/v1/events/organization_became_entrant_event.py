@@ -17,17 +17,17 @@ from impact.utils import (
 )
 from impact.v1.events.base_history_event import BaseHistoryEvent
 from impact.v1.helpers import (
-    INTEGER_FIELD,
-    STRING_FIELD,
+    OPTIONAL_INTEGER_FIELD,
+    OPTIONAL_STRING_FIELD,
 )
 
 PROGRAM_FIELD = {
     "json-schema": {
         "type": "object",
         "properties": {
-            "id": INTEGER_FIELD,
-            "name": STRING_FIELD,
-            "preference": INTEGER_FIELD,
+            "id": OPTIONAL_INTEGER_FIELD,
+            "name": OPTIONAL_STRING_FIELD,
+            "preference": OPTIONAL_INTEGER_FIELD,
         },
     },
 }
@@ -38,11 +38,11 @@ class OrganizationBecameEntrantEvent(BaseHistoryEvent):
     EVENT_TYPE = "became entrant"
 
     CLASS_FIELDS = {
-        "cycle_id": INTEGER_FIELD,
-        "cycle": STRING_FIELD,
-        "program_id": INTEGER_FIELD,
-        "program": STRING_FIELD,
-        "program_preference": INTEGER_FIELD,
+        "cycle_id": OPTIONAL_INTEGER_FIELD,
+        "cycle": OPTIONAL_STRING_FIELD,
+        "program_id": OPTIONAL_INTEGER_FIELD,
+        "program": OPTIONAL_STRING_FIELD,
+        "program_preference": OPTIONAL_INTEGER_FIELD,
        }
 
     def __init__(self, application, program_data):

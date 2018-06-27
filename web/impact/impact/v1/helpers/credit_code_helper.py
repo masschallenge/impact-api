@@ -5,10 +5,10 @@ from accelerator.models import RefundCode
 from impact.v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     INTEGER_ARRAY_FIELD,
-    INTEGER_FIELD,
+    OPTIONAL_INTEGER_FIELD,
     ModelHelper,
     PK_FIELD,
-    STRING_FIELD,
+    OPTIONAL_STRING_FIELD,
 )
 
 
@@ -23,13 +23,13 @@ PROGRAMS_FIELD = {
 
 CREDIT_CODE_FIELDS = {
     "id": PK_FIELD,
-    "issued_to": INTEGER_FIELD,
-    "created_at": STRING_FIELD,
-    "unique_code": STRING_FIELD,
-    "discount": INTEGER_FIELD,
-    "maximum_uses": INTEGER_FIELD,
+    "issued_to": OPTIONAL_INTEGER_FIELD,
+    "created_at": OPTIONAL_STRING_FIELD,
+    "unique_code": OPTIONAL_STRING_FIELD,
+    "discount": OPTIONAL_INTEGER_FIELD,
+    "maximum_uses": OPTIONAL_INTEGER_FIELD,
     "programs": INTEGER_ARRAY_FIELD,
-    "notes": STRING_FIELD,
+    "notes": OPTIONAL_STRING_FIELD,
     "internal": BOOLEAN_FIELD,
 }
 

@@ -9,8 +9,8 @@ from impact.v1.events.base_user_role_grant_event import (
     BaseUserRoleGrantEvent,
 )
 from impact.v1.helpers import (
-    INTEGER_FIELD,
-    STRING_FIELD,
+    OPTIONAL_INTEGER_FIELD,
+    OPTIONAL_STRING_FIELD,
 )
 
 
@@ -21,8 +21,8 @@ class BaseUserBecameJudgeEvent(BaseUserRoleGrantEvent):
     JUDGING_ROUND_FORMAT = "{role_name} for Judging Round {name} ({id})"
 
     CLASS_FIELDS = {
-        "judging_round_id": INTEGER_FIELD,
-        "judging_round_name": STRING_FIELD,
+        "judging_round_id": OPTIONAL_INTEGER_FIELD,
+        "judging_round_name": OPTIONAL_STRING_FIELD,
         }
 
     def __init__(self, program_role_grant):
