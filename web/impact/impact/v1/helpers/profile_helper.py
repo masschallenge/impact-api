@@ -24,7 +24,7 @@ from impact.v1.helpers.model_helper import (
     ModelHelper,
     PHONE_FIELD,
     PHONE_REGEX,
-    STRING_FIELD,
+    OPTIONAL_STRING_FIELD,
     TWITTER_REGEX,
     json_array,
     merge_fields,
@@ -60,7 +60,7 @@ EXPERT_BOOLEAN_FIELD = merge_fields(OPTIONAL_EXPERT_FIELD,
                                     BOOLEAN_FIELD)
 
 EXPERT_STRING_FIELD = merge_fields(OPTIONAL_EXPERT_FIELD,
-                                   STRING_FIELD)
+                                   OPTIONAL_STRING_FIELD)
 
 NON_MEMBER_STRING_FIELD = {
     "json-schema": {

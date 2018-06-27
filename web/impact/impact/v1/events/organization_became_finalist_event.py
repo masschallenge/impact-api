@@ -5,8 +5,8 @@ from accelerator.models import StartupRole
 from impact.utils import compose_filter
 from impact.v1.events.base_history_event import BaseHistoryEvent
 from impact.v1.helpers import (
-    INTEGER_FIELD,
-    STRING_FIELD,
+    OPTIONAL_INTEGER_FIELD,
+    OPTIONAL_STRING_FIELD,
 )
 
 
@@ -15,10 +15,10 @@ class OrganizationBecameFinalistEvent(BaseHistoryEvent):
     EVENT_TYPE = "became finalist"
 
     CLASS_FIELDS = {
-        "cycle": STRING_FIELD,
-        "cycle_id": INTEGER_FIELD,
-        "program": STRING_FIELD,
-        "program_id": INTEGER_FIELD,
+        "cycle": OPTIONAL_STRING_FIELD,
+        "cycle_id": OPTIONAL_INTEGER_FIELD,
+        "program": OPTIONAL_STRING_FIELD,
+        "program_id": OPTIONAL_INTEGER_FIELD,
     }
 
     def __init__(self, startup_status):

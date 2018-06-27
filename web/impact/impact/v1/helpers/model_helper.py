@@ -50,41 +50,44 @@ INTEGER_ARRAY_FIELD = {
     },
 }
 
-INTEGER_FIELD = {
+POST_OPTIONAL = {
+    "PATCH": {"required": False},
+    "POST": {"required": False},
+}
+
+POST_REQUIRED = {
+    "PATCH": {"required": False},
+    "POST": {"required": True},
+}
+
+RAW_INTEGER_FIELD = {
     "json-schema": {
         "type": "integer"
     },
-    "POST": {"required": False},
-    "PATCH": {"required": False}
 }
 
-REQUIRED_INTEGER_FIELD = {
-    "json-schema": {
-        "type": "integer"
-    },
-    "POST": {"required": True},
-    "PATCH": {"required": False}
-}
+OPTIONAL_INTEGER_FIELD = merge_fields(POST_OPTIONAL, RAW_INTEGER_FIELD)
+REQUIRED_INTEGER_FIELD = merge_fields(POST_REQUIRED, RAW_INTEGER_FIELD)
 
-FLOAT_FIELD = {
+RAW_FLOAT_FIELD = {
     "json-schema": {
         "type": "number"
     },
-    "POST": {"required": False},
-    "PATCH": {"required": False}
 }
 
-REQUIRED_FLOAT_FIELD = {
-    "json-schema": {
-        "type": "number"
-    },
-    "POST": {"required": True},
-    "PATCH": {"required": False}
-}
+OPTIONAL_FLOAT_FIELD = merge_fields(POST_OPTIONAL, RAW_FLOAT_FIELD)
+REQUIRED_FLOAT_FIELD = merge_fields(POST_REQUIRED, RAW_FLOAT_FIELD)
+
 READ_ONLY_ID_FIELD = {
     "json-schema": {
         "type": "integer",
         "readOnly": True,
+    },
+}
+
+RAW_STRING_FIELD = {
+    "json-schema": {
+        "type": "string",
     },
 }
 
@@ -95,16 +98,8 @@ READ_ONLY_STRING_FIELD = {
     },
 }
 
-POST_REQUIRED = {"POST": {"required": True}}
-
-STRING_FIELD = {
-    "json-schema": {
-        "type": "string",
-    },
-    "PATCH": {"required": False},
-    "POST": {"required": False},
-}
-REQUIRED_STRING_FIELD = merge_fields(POST_REQUIRED, STRING_FIELD)
+OPTIONAL_STRING_FIELD = merge_fields(POST_OPTIONAL, RAW_STRING_FIELD)
+REQUIRED_STRING_FIELD = merge_fields(POST_REQUIRED, RAW_STRING_FIELD)
 
 STRING_ARRAY_FIELD = {
     "json-schema": {
@@ -136,21 +131,29 @@ PHONE_FIELD = {
     "POST": {"required": False},
 }
 
-URL_FIELD = merge_fields(
-    STRING_FIELD,
+RAW_URL_FIELD = merge_fields(
+    RAW_STRING_FIELD,
     {
         "json-schema": {
             "description": "Must be valid URL per the Django URLValidator",
         },
     })
+OPTIONAL_URL_FIELD = merge_fields(POST_OPTIONAL, RAW_URL_FIELD)
 
-URL_SLUG_FIELD = merge_fields(STRING_FIELD,
-                              {"json-schema": {"pattern": "^[a-zA-Z0-9_-]+$"}})
+URL_SLUG_FIELD = merge_fields(
+    OPTIONAL_STRING_FIELD,
+    {
+        "json-schema": {"pattern": "^[a-zA-Z0-9_-]+$"},
+    })
 
 TWITTER_PATTERN = '^\S{{0,{}}}$'.format(TWITTER_HANDLE_MAX_LENGTH)
 TWITTER_REGEX = re.compile(TWITTER_PATTERN)
-TWITTER_FIELD = merge_fields(STRING_FIELD,
-                             {"json-schema": {"pattern": TWITTER_PATTERN}})
+TWITTER_FIELD = merge_fields(
+    OPTIONAL_STRING_FIELD,
+    {
+        "json-schema": {"pattern": TWITTER_PATTERN},
+    })
+
 MISSING_SUBJECT_ERROR = "Database error: missing object"
 
 
@@ -248,9 +251,9 @@ def json_array(item):
 
 def json_list_wrapper(item):
     return json_object({
-        "count": INTEGER_FIELD,
-        "next": URL_FIELD,
-        "previous": URL_FIELD,
+        "count": RAW_INTEGER_FIELD,
+        "next": RAW_URL_FIELD,
+        "previous": RAW_URL_FIELD,
         "results": json_array(item)})
 
 

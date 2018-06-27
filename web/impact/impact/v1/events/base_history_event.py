@@ -6,7 +6,7 @@ from abc import (
     abstractmethod,
 )
 from impact.v1.helpers import (
-    STRING_FIELD,
+    OPTIONAL_STRING_FIELD,
 )
 
 
@@ -14,10 +14,10 @@ class BaseHistoryEvent(object):
     __metaclass__ = ABCMeta
 
     CLASS_FIELDS = {
-        "event_type": STRING_FIELD,
-        "datetime": STRING_FIELD,
-        "latest_datetime": STRING_FIELD,
-        "description": STRING_FIELD,
+        "event_type": OPTIONAL_STRING_FIELD,
+        "datetime": OPTIONAL_STRING_FIELD,
+        "latest_datetime": OPTIONAL_STRING_FIELD,
+        "description": OPTIONAL_STRING_FIELD,
     }
 
     def __init__(self):

@@ -16,7 +16,7 @@ from impact.v1.helpers.model_helper import (
     READ_ONLY_STRING_FIELD,
     REQUIRED_STRING_FIELD,
     TWITTER_FIELD,
-    URL_FIELD,
+    OPTIONAL_URL_FIELD,
 )
 from impact.v1.helpers.validators import (
     validate_boolean,
@@ -71,8 +71,8 @@ USER_FIELDS = {
     "mentoring_specialties": MENTORING_SPECIALTIES_FIELD,
     "email": REQUIRED_EMAIL_FIELD,
     "twitter_handle": TWITTER_FIELD,
-    "facebook_url": URL_FIELD,
-    "linked_in_url": URL_FIELD,
+    "facebook_url": OPTIONAL_URL_FIELD,
+    "linked_in_url": OPTIONAL_URL_FIELD,
     "personal_website_url": PERSONAL_WEBSITE_URL_FIELD,
     "functional_expertise": MPTT_ARRAY_FIELD,
 }
