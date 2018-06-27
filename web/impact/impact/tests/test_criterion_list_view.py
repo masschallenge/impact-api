@@ -54,3 +54,16 @@ class TestCriterionListView(APITestCase):
                         "judging_round_id": {"type": "integer",
                                              "required": True}}
         self.assert_options_include("POST", post_options)
+
+    def test_filter_by_judging_round(self):
+        good_criterion = CriterionFactory()
+        bad_criterion = CriterionFactory()
+        judging_round_id = good_criterion.judging_round_id
+        with self.login(email=self.basic_user().email):
+            url = reverse(self.view.view_name)
+            url += "?judging_round_id={}".format(judging_round_id)
+            response = self.client.get(url)
+            results = json.loads(response.content)['results']
+            self.assertEqual(len(results), 1)
+            for key, val in results[0].items():
+                self.assertEqual(val, getattr(good_criterion, key))
