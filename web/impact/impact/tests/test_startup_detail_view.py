@@ -21,6 +21,7 @@ EMPTY_RESPONSE = {'startups': []}
 VIMEO_EXAMPLE = "https://vimeo.com/149212783"
 BAD_YOUTUBE_EXAMPLE = "https://www.youtube.com/x/y/z"
 UNKNOWN_VIDEO_EXAMPLE = "http://blahblahblah.com/149212783"
+STARTUP_DETAIL_URL = reverse("startup_detail")
 
 
 class TestStartupDetailView(APITestCase):
@@ -42,8 +43,7 @@ class TestStartupDetailView(APITestCase):
             program_startup_status__startup_list_include=True,
             startup=startup).program_startup_status.startup_status
         with self.login(email=self.basic_user().email):
-            url = reverse("startup_detail")
-            response = self.client.post(url,
+            response = self.client.post(STARTUP_DETAIL_URL,
                                         {"ProgramKey": program.id,
                                          "StartupKey": startup.id})
             assert startup.name == response.data["name"]
@@ -65,8 +65,7 @@ class TestStartupDetailView(APITestCase):
             program_startup_status__startup_list_include=True,
             startup=startup).program_startup_status.startup_status
         with self.login(email=self.basic_user().email):
-            url = reverse("startup_detail")
-            response = self.client.post(url,
+            response = self.client.post(STARTUP_DETAIL_URL,
                                         {"StartupKey": startup.id})
             assert startup.name == response.data["name"]
             statuses = [status["status_name"]
@@ -81,8 +80,7 @@ class TestStartupDetailView(APITestCase):
         startup = member.startup
         program = ProgramFactory()
         with self.login(email=self.basic_user().email):
-            url = reverse("startup_detail")
-            response = self.client.post(url,
+            response = self.client.post(STARTUP_DETAIL_URL,
                                         {"ProgramKey": program.id,
                                          "StartupKey": startup.id})
             assert EMPTY_DETAIL_RESULT == response.data
@@ -93,9 +91,8 @@ class TestStartupDetailView(APITestCase):
         startup = member.startup
         program = ProgramFactory()
         with self.login(email=self.basic_user().email):
-            url = reverse("startup_detail")
             response = self.client.post(
-                url,
+                STARTUP_DETAIL_URL,
                 {"ProgramKey": program.id,
                  "StartupKey": startup.organization.url_slug})
             assert startup.name == response.data["name"]
@@ -107,8 +104,7 @@ class TestStartupDetailView(APITestCase):
         startup = member.startup
         program = ProgramFactory()
         with self.login(email=self.basic_user().email):
-            url = reverse("startup_detail")
-            response = self.client.post(url,
+            response = self.client.post(STARTUP_DETAIL_URL,
                                         {"ProgramKey": program.id,
                                          "StartupKey": startup.id})
             assert startup.name == response.data["name"]
@@ -122,8 +118,7 @@ class TestStartupDetailView(APITestCase):
         startup = member.startup
         program = ProgramFactory()
         with self.login(email=self.basic_user().email):
-            url = reverse("startup_detail")
-            response = self.client.post(url,
+            response = self.client.post(STARTUP_DETAIL_URL,
                                         {"ProgramKey": program.id,
                                          "StartupKey": startup.id})
             assert "iframe" in response.data["video_elevator_pitch_url"]
@@ -137,8 +132,7 @@ class TestStartupDetailView(APITestCase):
         startup = member.startup
         program = ProgramFactory()
         with self.login(email=self.basic_user().email):
-            url = reverse("startup_detail")
-            response = self.client.post(url,
+            response = self.client.post(STARTUP_DETAIL_URL,
                                         {"ProgramKey": program.id,
                                          "StartupKey": startup.id})
             assert "" == response.data["video_elevator_pitch_url"]
@@ -152,8 +146,7 @@ class TestStartupDetailView(APITestCase):
         startup = member.startup
         program = ProgramFactory()
         with self.login(email=self.basic_user().email):
-            url = reverse("startup_detail")
-            response = self.client.post(url,
+            response = self.client.post(STARTUP_DETAIL_URL,
                                         {"ProgramKey": program.id,
                                          "StartupKey": startup.id})
             assert "" == response.data["video_elevator_pitch_url"]
@@ -164,8 +157,7 @@ class TestStartupDetailView(APITestCase):
         startup.delete()
         program = ProgramFactory()
         with self.login(email=self.basic_user().email):
-            url = reverse("startup_detail")
-            response = self.client.post(url,
+            response = self.client.post(STARTUP_DETAIL_URL,
                                         {"ProgramKey": program.id,
                                          "StartupKey": startup_id})
             assert response.status_code == 404
@@ -175,8 +167,7 @@ class TestStartupDetailView(APITestCase):
     def test_missing_startup(self):
         program = ProgramFactory()
         with self.login(email=self.basic_user().email):
-            url = reverse("startup_detail")
-            response = self.client.post(url,
+            response = self.client.post(STARTUP_DETAIL_URL,
                                         {"ProgramKey": program.id})
             assert response.status_code == 404
             assert match_errors({"StartupKey": "'None'"},
