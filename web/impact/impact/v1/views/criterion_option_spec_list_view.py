@@ -22,14 +22,8 @@ class CriterionOptionSpecListView(BaseListView,
         return self._filter_by_judging_round_id(qs)
 
     def _filter_by_judging_round_id(self, qs):
-        judging_round_id = self.request.query_params.get("judging_round_id",
-                                                         None)
-        if judging_round_id is not None:
-            return qs.filter(criterion__judging_round_id=judging_round_id)
-        return qs
+        lookup = "criterion__judging_round_id"
+        return self.filter_by_field("judging_round_id", qs, lookup)
 
     def _filter_by_criterion_id(self, qs):
-        criterion_id = self.request.query_params.get("criterion_id", None)
-        if criterion_id is not None:
-            return qs.filter(criterion_id=criterion_id)
-        return qs
+        return self.filter_by_field("criterion_id", qs)

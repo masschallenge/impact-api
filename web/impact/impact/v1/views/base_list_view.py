@@ -175,6 +175,13 @@ class BaseListView(ImpactView):
                     field=field_name,
                     value=id_from_query))
 
+    def filter_by_field(self, field_name, queryset, lookup=None):
+        field_value = self.request.query_params.get(field_name)
+        lookup = lookup or field_name
+        if field_value is not None:
+            return queryset.filter(**{lookup: field_value})
+        return queryset
+
 
 def _previous_url(base_url, limit, offset, count):
     if offset == 0:
