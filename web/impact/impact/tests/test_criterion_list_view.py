@@ -8,6 +8,7 @@ from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_data_is_consistent_with_instance
 from impact.tests.factories import CriterionFactory
 from impact.v1.views import CriterionListView
+from impact.v1.helpers import INVALID_INTEGER_ERROR
 
 
 class TestCriterionListView(APITestCase):
@@ -56,9 +57,8 @@ class TestCriterionListView(APITestCase):
         self.assert_options_include("POST", post_options)
 
     def test_filter_by_judging_round(self):
-        good_criterion = CriterionFactory()
-        bad_criterion = CriterionFactory()
-        judging_round_id = good_criterion.judging_round_id
+        criterion = CriterionFactory()
+        judging_round_id = criterion.judging_round_id
         with self.login(email=self.basic_user().email):
             url = reverse(self.view.view_name)
             url += "?judging_round_id={}".format(judging_round_id)
@@ -66,4 +66,14 @@ class TestCriterionListView(APITestCase):
             results = json.loads(response.content)['results']
             self.assertEqual(len(results), 1)
             for key, val in results[0].items():
-                self.assertEqual(val, getattr(good_criterion, key))
+                self.assertEqual(val, getattr(criterion, key))
+
+    def test_filter_id_by_non_int_value(self):
+        judging_round_id = "seventeen"
+        with self.login(email=self.basic_user().email):
+            url = reverse(self.view.view_name)
+            url += "?judging_round_id={}".format(judging_round_id)
+            response = self.client.get(url)
+            error = INVALID_INTEGER_ERROR.format(field='judging_round_id',
+                                                 value=judging_round_id)
+            self.assertIn(error, str(response.content))
