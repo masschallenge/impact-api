@@ -222,7 +222,8 @@ code-check:
 ACCELERATE = ../accelerate
 DJANGO_ACCELERATOR = ../django-accelerator
 IMPACT_API = ../impact-api
-REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(IMPACT_API)
+DIRECTORY = ../directory
+REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(DIRECTORY) $(IMPACT_API)
 
 
 # Database migration related targets
