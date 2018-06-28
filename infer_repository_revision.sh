@@ -5,13 +5,13 @@ REVISION_ARG=$1
 REPO_URL=$2
 
 # allow for an override, if DJANGO_ACCELERATOR_REVISION is already set in env.
-if [[  (! -z $DIRECTORY_REVISION) && $REPO_URL == *"django-accelerator"* ]];then
+if [[  (! -z $DJANGO_ACCELERATOR_REVISION) && $REPO_URL == *"django-accelerator"* ]];then
   echo $DJANGO_ACCELERATOR_REVISION
   exit
 fi
 # allow for an override, if DIRECTORY_REVISION is already set in env.
 if ! [[ (! -z $DIRECTORY_REVISION) && $REPO_URL == *"directory"* ]];then
-  echo DIRECTORY_REVISION
+  echo $DIRECTORY_REVISION
   exit
 fi
 
