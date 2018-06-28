@@ -10,7 +10,7 @@ if [[  (! -z $DJANGO_ACCELERATOR_REVISION) && $REPO_URL == *"django-accelerator"
   exit
 fi
 # allow for an override, if DIRECTORY_REVISION is already set in env.
-if ! [[ (! -z $DIRECTORY_REVISION) && $REPO_URL == *"directory"* ]];then
+if [[ (! -z $DIRECTORY_REVISION) && $REPO_URL == *"directory"* ]];then
   echo $DIRECTORY_REVISION
   exit
 fi
@@ -21,7 +21,6 @@ if [[ -z $REVISION_ARG ]]; then
 else
   REQUESTED_REVISION=$REVISION_ARG
 fi
-
 # check if the requested revision exists in remote
 PARSED_REVISION=`git ls-remote $REPO_URL $REQUESTED_REVISION | xargs echo | tr -s ' ' | cut -d ' ' -f 2 | cut -d'/' -f 3`
 
