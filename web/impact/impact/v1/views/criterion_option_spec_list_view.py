@@ -18,6 +18,7 @@ class CriterionOptionSpecListView(BaseListView,
         return super().get(request)
 
     def filter(self, qs):
+        qs = super().filter(qs)
         qs = self._filter_by_criterion_id(qs)
         return self._filter_by_judging_round_id(qs)
 

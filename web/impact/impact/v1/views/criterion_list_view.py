@@ -17,7 +17,7 @@ class CriterionListView(BaseListView,
         return super().get(request)
 
     def filter(self, qs):
-        return self._filter_by_judging_round_id(qs)
+        return self._filter_by_judging_round_id(super().filter(qs))
 
     def _filter_by_judging_round_id(self, qs):
         return self.filter_by_field("judging_round_id", qs)
