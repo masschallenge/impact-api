@@ -11,6 +11,7 @@ from impact.graphql.functional_expertise_type import FunctionalExpertiseType
 
 class ExpertProfileType(DjangoObjectType):
     mentees = graphene.List(StartupType)
+    image_url = graphene.String()
 
     class Meta:
         model = ExpertProfile
@@ -23,10 +24,12 @@ class ExpertProfileType(DjangoObjectType):
             'personal_website_url',
             'bio',
             'expert_category',
-            'image',
             'primary_industry',
             'additional_industries',
             'home_program_family',
             'user',
             'functional_expertise',
         )
+
+    def resolve_image_url(self, info, **kwargs):
+        return self.image and self.image.url
