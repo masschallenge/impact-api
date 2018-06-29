@@ -45,9 +45,20 @@ def _pad(text):
 
 
 def logo_url(startup):
-    if not startup.high_resolution_logo:
+    """
+    Turns the stored *.s3.amazonaws.com URL into one that uses our
+    CloudFormation image resizer; returns empty string for None
+    """
+    logo_field = startup.high_resolution_logo
+    if not logo_field:
         return ""
-    return startup.high_resolution_logo.url
+    elif "startup_pics/" not in logo_field.url:
+        return logo_field.url
+    else:
+        url_template = "https://dl4fx6jt7wkin.cloudfront.net/fit-in/500x500/{}"
+        # Get just the filename and drop any S3 auth params
+        filename = logo_field.url.split("startup_pics/")[1].split("?")[0]
+        return url_template.format(filename)
 
 
 def status_description(status):

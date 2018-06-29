@@ -172,3 +172,18 @@ class TestStartupDetailView(APITestCase):
             assert response.status_code == 404
             assert match_errors({"StartupKey": "'None'"},
                                 response.data)
+
+    def test_logos_are_resized(self):
+        path = "startup_pics/yuge.png"
+        context = UserContext()
+        member = StartupTeamMemberFactory(user=context.user)
+        startup = member.startup
+        startup.high_resolution_logo = path
+        startup.save()
+        program = ProgramFactory()
+        with self.login(email=self.basic_user().email):
+            response = self.client.post(STARTUP_DETAIL_URL,
+                                        {"ProgramKey": program.id,
+                                         "StartupKey": startup.id})
+            self.assertTrue("dl4fx6jt7wkin.cloudfront.net"
+                            in response.data["logo_url"])
