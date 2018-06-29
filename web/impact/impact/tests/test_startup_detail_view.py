@@ -1,6 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+from django.conf import settings
 from django.urls import reverse
 
 from impact.tests.factories import (
@@ -185,5 +186,5 @@ class TestStartupDetailView(APITestCase):
             response = self.client.post(STARTUP_DETAIL_URL,
                                         {"ProgramKey": program.id,
                                          "StartupKey": startup.id})
-            self.assertTrue("dl4fx6jt7wkin.cloudfront.net"
+            self.assertTrue(settings.IMAGE_RESIZE_HOST
                             in response.data["logo_url"])

@@ -55,10 +55,10 @@ def logo_url(startup):
     elif "startup_pics/" not in logo_field.url:
         return logo_field.url
     else:
-        url_template = "https://dl4fx6jt7wkin.cloudfront.net/fit-in/500x500/{}"
         # Get just the filename and drop any S3 auth params
         filename = logo_field.url.split("startup_pics/")[1].split("?")[0]
-        return url_template.format(filename)
+        template = settings.IMAGE_RESIZE_HOST + settings.IMAGE_RESIZE_TEMPLATE
+        return template.format(filename)
 
 
 def status_description(status):
