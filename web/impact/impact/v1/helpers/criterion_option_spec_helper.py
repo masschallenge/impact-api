@@ -11,6 +11,7 @@ from impact.v1.helpers.model_helper import (
     PK_FIELD,
     REQUIRED_STRING_FIELD,
 )
+from impact.v1.helpers.criterion_helper import CriterionHelper
 from impact.v1.helpers.validators import (
     validate_string,
     validate_integer,
@@ -43,6 +44,18 @@ class CriterionOptionSpecHelper(ModelHelper):
         "weight",
     ]
     INPUT_KEYS = ALL_KEYS
+
+    def __init__(self, subject):
+        super().__init__(subject)
+        criterion = self.subject.criterion
+        self.criterion_helper = CriterionHelper.find_helper(criterion.type,
+                                                            criterion.name)
+
+    def app_ids_for_feedback(self, option_name, apps):
+        return self.criterion_helper.app_ids_for_feedback(option_name, apps)
+
+    def options(self, apps):
+        return self.criterion_helper.options(self.subject, apps)
 
     @classmethod
     def fields(cls):
