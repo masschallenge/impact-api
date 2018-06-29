@@ -46,7 +46,7 @@ services:
     volumes:
       - ./web/impact:/wwwroot
       - ../django-accelerator:/packages/src/django-accelerator
-      - ../directory/dist:/wwwroot/static/dist
+      - ../directory/dist:/wwwroot/static/directory-dist
       - ./db_cache:/db_cache
       - ./web/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./web/impact/media:/media:ro
