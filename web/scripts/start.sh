@@ -15,7 +15,7 @@ fi
 
 python3 manage.py migrate --noinput
 python3 manage.py collectstatic --noinput
-python3 manage.py graphql_schema --schema impact.graphql.schema.schema
+python3 manage.py graphql_schema --schema impact.graphql.schema.schema --indent=2
 
 if [ "${DJANGO_CONFIGURATION}" == "Prod" ]
 then
