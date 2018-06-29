@@ -100,7 +100,9 @@ class Base(Configuration):
         'rest_framework_swagger',
         'fluent_pages',
         'impact',
+        'graphene_django',
     ]
+
     ACCELERATOR_MODELS_ARE_MANAGED = True
 
     AUTH_USER_MODEL = 'simpleuser.User'
@@ -112,6 +114,7 @@ class Base(Configuration):
         'corsheaders.middleware.CorsMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+        'impact.graphql.auth.middleware.CookieJSONWebTokenMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django.middleware.security.SecurityMiddleware',
@@ -153,7 +156,8 @@ class Base(Configuration):
         'localhost:1234',
         'localhost:8000',
     )
-    CORS_ORIGIN_REGEX_WHITELIST = (r'^(https?://)?(\w+\.)?masschallenge\.org$', )
+    CORS_ORIGIN_REGEX_WHITELIST = (
+        r'^(https?://)?(\w+\.)?masschallenge\.org$', )
     ALGOLIA_INDEX_PREFIX = os.environ.get('ALGOLIA_INDEX_PREFIX', 'dev')
     ALGOLIA_INDEXES = [
         '{algolia_prefix}_mentor'.format(algolia_prefix=ALGOLIA_INDEX_PREFIX)
@@ -231,6 +235,7 @@ class Base(Configuration):
 
     AUTHENTICATION_BACKENDS = (
         'oauth2_provider.backends.OAuth2Backend',
+        'impact.graphql.auth.authentication_backend.JWTokenCookieBackend',
         'simpleuser.email_model_backend.EmailModelBackend',
         'django.contrib.auth.backends.ModelBackend',
     )
