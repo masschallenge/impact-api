@@ -3,13 +3,14 @@
 
 from collections import Counter
 from accelerator.models import JudgeApplicationFeedback
-from impact.v1.helper.criterion_option_spec_helper import (
+from impact.v1.helpers.criterion_option_spec_helper import (
     CriterionOptionSpecHelper,
 )
 
 
 class OptionAnalysis(object):
     def __init__(self, option_spec, apps):
+        self.option_spec = option_spec
         self.helper = CriterionOptionSpecHelper(option_spec)
         self.apps = apps
 
@@ -30,7 +31,7 @@ class OptionAnalysis(object):
         spec = self.option_spec
         if spec.option:
             return [spec.option]
-        return self.helper.options(self.apps)
+        return self.helper.optionsXYZ(self.apps)
 
     def calc_needs(self, option_name):
         needs_dist = self.calc_needs_distribution(option_name)
@@ -58,10 +59,10 @@ class OptionAnalysis(object):
         expected_count = self.option_spec.count
         return {expected_count - k: v for (k, v) in counts.items()}
 
-    def all_feedbacks(self, applications):
+    def all_feedbacks(self):
         return JudgeApplicationFeedback.objects.filter(
             application__in=self.apps,
-            feedback_statue='COMPLETE')
+            feedback_status='COMPLETE')
 
     def calc_commitments(self):
         # self.total_commitments = 0
