@@ -9,8 +9,10 @@ from django.conf.urls import (
 )
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from drf_auto_endpoint.router import router as schema_router
+from graphene_django.views import GraphQLView
 from rest_framework import routers
 from rest_framework_jwt.views import (
     obtain_jwt_token,
@@ -18,6 +20,11 @@ from rest_framework_jwt.views import (
     verify_jwt_token,
 )
 
+from impact.graphql.middleware import IsAuthenticatedMiddleware
+from impact.graphql.schema import (
+    auth_schema,
+    schema,
+)
 from impact.model_utils import model_name_to_snake
 from impact.schema import schema_view
 from impact.v0.urls import v0_urlpatterns
@@ -82,7 +89,17 @@ urls = [
     url(r'^sso/', include(sso_urlpatterns, namespace="sso")),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include(account_urlpatterns)),
-
+    url(r'^graphql/$',
+        csrf_exempt(GraphQLView.as_view(graphiql=settings.DEBUG,
+                                        schema=schema,
+                                        middleware=[
+                                            IsAuthenticatedMiddleware]
+                                        )),
+        name="graphql"),
+    url(r'^graphql/auth/$',
+        csrf_exempt(GraphQLView.as_view(graphiql=settings.DEBUG,
+                                        schema=auth_schema)),
+        name="graphql-auth"),
     url(r'^oauth/',
         include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^schema/$', schema_view, name='schema'),
@@ -103,7 +120,8 @@ if settings.DEBUG:
     import debug_toolbar  # pragma: no cover
 
     urls += [  # pragma: no cover
-        url(r"^__debug__/", include(debug_toolbar.urls)),  # pragma: no cover
-    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+                url(r"^__debug__/", include(debug_toolbar.urls)),
+                # pragma: no cover
+            ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns = urls

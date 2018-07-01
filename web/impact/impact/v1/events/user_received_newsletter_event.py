@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from impact.v1.events.base_history_event import BaseHistoryEvent
 from impact.v1.helpers import (
     EMAIL_FIELD,
-    STRING_FIELD,
+    OPTIONAL_STRING_FIELD,
 )
 
 User = get_user_model()
@@ -16,7 +16,7 @@ class UserReceivedNewsletterEvent(BaseHistoryEvent):
     RECEIVED_NEWSLETTER_FORMAT = "Received {name} newsletter"
 
     CLASS_FIELDS = {
-        "newsletter_name": STRING_FIELD,
+        "newsletter_name": OPTIONAL_STRING_FIELD,
         "newsletter_from_address": EMAIL_FIELD,
     }
 

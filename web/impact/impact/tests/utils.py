@@ -1,11 +1,14 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
-
-from pytz import utc
+import sys
+from contextlib import contextmanager
 from datetime import (
     datetime,
     timedelta,
 )
+from io import StringIO
+
+from pytz import utc
 
 
 def days_from_now(days):
@@ -52,3 +55,20 @@ def assert_fields_not_required(fields, data):
     for field in fields:
         error_msg = "Expected %s to not be required" % field
         assert "required" not in data[field], error_msg
+
+
+def assert_data_is_consistent_with_instance(data, instance):
+    for key, val in data.items():
+        if val != getattr(instance, key):
+            raise AssertionError("%s did not equal %s. (Key: %s)" %
+                                 (str(val), str(getattr(instance, key)), key))
+
+
+@contextmanager
+def capture_stderr(command, *args, **kwargs):
+    err, sys.stderr = sys.stderr, StringIO()
+    try:
+        result = command(*args, **kwargs)
+        yield result, sys.stderr.read()
+    finally:
+        sys.stderr = err

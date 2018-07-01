@@ -16,7 +16,9 @@ from impact.v1.helpers.model_helper import (
     READ_ONLY_STRING_FIELD,
     REQUIRED_STRING_FIELD,
     TWITTER_FIELD,
-    URL_FIELD,
+    OPTIONAL_URL_FIELD,
+)
+from impact.v1.helpers.validators import (
     validate_boolean,
     validate_email_address,
     validate_string,
@@ -39,8 +41,6 @@ from impact.v1.helpers.profile_helper import (
 )
 
 User = get_user_model()
-
-VALID_KEYS_NOTE = "Valid keys are: {}"
 
 USER_FIELDS = {
     "id": PK_FIELD,
@@ -71,8 +71,8 @@ USER_FIELDS = {
     "mentoring_specialties": MENTORING_SPECIALTIES_FIELD,
     "email": REQUIRED_EMAIL_FIELD,
     "twitter_handle": TWITTER_FIELD,
-    "facebook_url": URL_FIELD,
-    "linked_in_url": URL_FIELD,
+    "facebook_url": OPTIONAL_URL_FIELD,
+    "linked_in_url": OPTIONAL_URL_FIELD,
     "personal_website_url": PERSONAL_WEBSITE_URL_FIELD,
     "functional_expertise": MPTT_ARRAY_FIELD,
 }
@@ -97,8 +97,8 @@ class UserHelper(ModelHelper):
         "is_active",
         ]
     OPTIONAL_KEYS = OPTIONAL_BOOLEAN_KEYS
-    USER_INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
-    INPUT_KEYS = USER_INPUT_KEYS + ProfileHelper.INPUT_KEYS
+    ALL_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
+    INPUT_KEYS = ALL_KEYS + ProfileHelper.INPUT_KEYS
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -134,8 +134,8 @@ class UserHelper(ModelHelper):
         return USER_FIELDS
 
 
-def valid_keys_note(user_type, post=False):
-    keys = UserHelper.USER_INPUT_KEYS.copy()
+def valid_keys(user_type, post=False):
+    keys = UserHelper.ALL_KEYS.copy()
     if post:
         keys += ProfileHelper.CORE_KEYS
     else:
@@ -144,4 +144,4 @@ def valid_keys_note(user_type, post=False):
         keys += ProfileHelper.EXPERT_KEYS
     if not user_type or user_type == EntrepreneurProfile.user_type:
         keys += ProfileHelper.ENTREPRENEUR_KEYS
-    return VALID_KEYS_NOTE.format(keys)
+    return keys

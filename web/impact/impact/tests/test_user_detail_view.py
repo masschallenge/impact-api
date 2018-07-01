@@ -27,8 +27,8 @@ from impact.v1.helpers import (
     INVALID_ID_ERROR,
     MISSING_SUBJECT_ERROR,
     UserHelper,
-    VALID_KEYS_NOTE,
 )
+from impact.v1.views.utils import VALID_KEYS_NOTE
 from accelerator_abstract.models.base_base_profile import (
     ENTREPRENEUR_USER_TYPE,
     EXPERT_USER_TYPE,

@@ -1,0 +1,2 @@
+# This requirements file will be executed with `--no-dependencies` flag.
+django-graphql-jwt==0.1.10
