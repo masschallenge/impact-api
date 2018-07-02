@@ -2,7 +2,10 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from collections import Counter
-from accelerator.models import JudgeApplicationFeedback
+from accelerator.models import (
+    JudgeApplicationFeedback,
+    Scenario,
+)
 from impact.v1.helpers.criterion_option_spec_helper import (
     CriterionOptionSpecHelper,
 )
@@ -32,8 +35,9 @@ CriterionHelper.register_helper(MatchingProgramCriterionHelper,
 
 
 class OptionAnalysis(object):
-    def __init__(self, option_spec, apps):
+    def __init__(self, option_spec, apps, judging_round):
         self.option_spec = option_spec
+        self.judging_round = judging_round
         self.helper = CriterionOptionSpecHelper(option_spec)
         self.apps = apps
 
@@ -84,9 +88,12 @@ class OptionAnalysis(object):
         return {expected_count - k: v for (k, v) in counts.items()}
 
     def all_feedbacks(self):
+        scenarios = Scenario.objects.filter(
+            judging_round=self.judging_round, is_active=True)
         return JudgeApplicationFeedback.objects.filter(
             application__in=self.apps,
-            feedback_status='COMPLETE')
+            feedback_status='COMPLETE',
+            panel__judgepanelassignment__scenario__in=scenarios)
 
     def calc_commitments(self):
         # self.total_commitments = 0

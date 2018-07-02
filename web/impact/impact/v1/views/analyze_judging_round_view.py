@@ -47,6 +47,6 @@ class AnalyzeJudgingRoundView(ImpactView):
         self.apps = Application.objects.filter(
             application_status="submitted",
             application_type=self.instance.application_type)
-        analyses = [OptionAnalysis(option, self.apps).analyses()
+        analyses = [OptionAnalysis(option, self.apps, self.instance).analyses()
                     for option in options]
         return Response({"results": list(chain.from_iterable(analyses))})
