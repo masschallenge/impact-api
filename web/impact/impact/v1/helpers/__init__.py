@@ -28,6 +28,7 @@ from impact.v1.helpers.model_helper import (
     json_simple_list,
 )
 from impact.v1.helpers.validators import (
+    INVALID_INTEGER_ERROR,
     validate_boolean,
     validate_choices,
     validate_regex,
