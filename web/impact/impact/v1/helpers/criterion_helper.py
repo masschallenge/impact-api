@@ -42,6 +42,9 @@ class CriterionHelper(ModelHelper):
     def app_ids_for_feedback(self, feedbacks, **kwargs):
         return feedbacks.values_list("application_id", flat=True)
 
+    def app_count(self, apps, option_name):
+        return apps.count()
+
     @classmethod
     def fields(cls):
         return ALL_FIELDS

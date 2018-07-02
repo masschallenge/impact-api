@@ -6,6 +6,29 @@ from accelerator.models import JudgeApplicationFeedback
 from impact.v1.helpers.criterion_option_spec_helper import (
     CriterionOptionSpecHelper,
 )
+from impact.v1.helpers.criterion_helper import CriterionHelper
+from impact.v1.helpers.judge_gender_criterion_helper import (
+    JudgeGenderCriterionHelper,
+)
+from impact.v1.helpers.judge_role_criterion_helper import (
+    JudgeRoleCriterionHelper,
+)
+from impact.v1.helpers.matching_industry_criterion_helper import (
+    MatchingIndustryCriterionHelper,
+)
+from impact.v1.helpers.matching_program_criterion_helper import (
+    MatchingProgramCriterionHelper,
+)
+
+
+CriterionHelper.register_helper(JudgeGenderCriterionHelper,
+                                "judge", "gender")
+CriterionHelper.register_helper(JudgeRoleCriterionHelper,
+                                "judge", "role")
+CriterionHelper.register_helper(MatchingIndustryCriterionHelper,
+                                "matching", "industry")
+CriterionHelper.register_helper(MatchingProgramCriterionHelper,
+                                "matching", "program")
 
 
 class OptionAnalysis(object):
@@ -31,7 +54,7 @@ class OptionAnalysis(object):
         spec = self.option_spec
         if spec.option:
             return [spec.option]
-        return self.helper.optionsXYZ(self.apps)
+        return self.helper.options(self.apps)
 
     def calc_needs(self, option_name):
         needs_dist = self.calc_needs_distribution(option_name)
@@ -53,7 +76,8 @@ class OptionAnalysis(object):
                                                    applications=self.apps)
         app_counts = Counter(app_ids)
         counts = Counter(app_counts.values())
-        unread_count = self.apps.count() - len(app_counts)
+        unread_count = (self.helper.app_count(self.apps, option_name) -
+                        len(app_counts))
         if unread_count != 0:
             counts[0] = unread_count
         expected_count = self.option_spec.count
