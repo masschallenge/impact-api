@@ -40,7 +40,7 @@ before_script:
 - cp .prod.env .env
 - docker build --no-cache -t masschallenge/mentor-directory ../directory
 - docker run -v $(pwd)/../directory/dist:/usr/src/app/dist -t masschallenge/mentor-directory
-- cp -r ../directory/dist web/impact/static/dist
+- cp -r ../directory/dist web/impact/static/directory-dist
 - cp ../directory/dist/index.html web/impact/templates/directory.html
 - docker-compose -f docker-compose.travis.yml build --no-cache --build-arg DJANGO_ACCELERATOR_REVISION=$DJANGO_ACCELERATOR_REVISION
 - docker-compose -f docker-compose.travis.yml up -d
