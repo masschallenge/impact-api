@@ -4,11 +4,11 @@
 from accelerator.models import CriterionOptionSpec
 
 from impact.v1.helpers.model_helper import (
-    REQUIRED_INTEGER_FIELD,
     ModelHelper,
     OPTIONAL_FLOAT_FIELD,
     OPTIONAL_INTEGER_FIELD,
     PK_FIELD,
+    REQUIRED_INTEGER_FIELD,
     REQUIRED_STRING_FIELD,
 )
 from impact.v1.helpers.criterion_helper import CriterionHelper

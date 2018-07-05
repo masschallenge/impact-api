@@ -72,3 +72,27 @@ class TestCriterionOptionSpecListView(APITestCase):
                         "criterion_id": {"type": "integer",
                                          "required": True}}
         self.assert_options_include("POST", post_options)
+
+    def test_filter_by_judging_round_id(self):
+        option_spec = CriterionOptionSpecFactory()
+        judging_round_id = option_spec.criterion.judging_round_id
+        with self.login(email=self.basic_user().email):
+            url = reverse(self.view.view_name)
+            url += "?judging_round_id={}".format(judging_round_id)
+            response = self.client.get(url)
+            results = json.loads(response.content)['results']
+            self.assertEqual(len(results), 1)
+            for key, val in results[0].items():
+                self.assertEqual(val, getattr(option_spec, key))
+
+    def test_filter_by_criterion_id(self):
+        option_spec = CriterionOptionSpecFactory()
+        criterion_id = option_spec.criterion.id
+        with self.login(email=self.basic_user().email):
+            url = reverse(self.view.view_name)
+            url += "?criterion_id={}".format(criterion_id)
+            response = self.client.get(url)
+            results = json.loads(response.content)['results']
+            self.assertEqual(len(results), 1)
+            for key, val in results[0].items():
+                self.assertEqual(val, getattr(option_spec, key))
