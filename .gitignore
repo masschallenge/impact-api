@@ -189,6 +189,7 @@ web/impact/htmlcov/
 db_cache/
 *~
 *.orig
+web/impact/schema.json
 web/impact/categories.json
 web/impact/confusables.json
 web/impact/templates/directory.html

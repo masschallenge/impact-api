@@ -12,6 +12,7 @@ from urllib.parse import (
 from rest_framework.response import Response
 
 from impact.v1.helpers import (
+    INVALID_INTEGER_ERROR,
     json_list_wrapper,
     json_object,
 )
@@ -163,6 +164,23 @@ class BaseListView(ImpactView):
         if is_active is not None:
             return qs.filter(is_active=is_active)
         return qs
+
+    def validate_id(self, request, field_name):
+        id_from_query = request.query_params.get(field_name)
+        if id_from_query is not None:
+            try:
+                int(id_from_query)
+            except ValueError:
+                self.errors.append(INVALID_INTEGER_ERROR.format(
+                    field=field_name,
+                    value=id_from_query))
+
+    def filter_by_field(self, field_name, queryset, lookup=None):
+        field_value = self.request.query_params.get(field_name)
+        lookup = lookup or field_name
+        if field_value is not None:
+            return queryset.filter(**{lookup: field_value})
+        return queryset
 
 
 def _previous_url(base_url, limit, offset, count):
