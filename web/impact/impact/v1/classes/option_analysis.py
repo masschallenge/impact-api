@@ -4,6 +4,8 @@
 from collections import Counter
 from accelerator.models import (
     JudgeApplicationFeedback,
+    JudgePanelAssignment,
+    JudgeRoundCommitment,
     Scenario,
 )
 from impact.v1.helpers.criterion_option_spec_helper import (
@@ -51,7 +53,7 @@ class OptionAnalysis(object):
             "option": option_name,
         }
         result.update(self.calc_needs(option_name))
-        result.update(self.calc_commitments())
+        result.update(self.calc_commitments(option_name))
         return result
 
     def find_options(self):
@@ -95,7 +97,19 @@ class OptionAnalysis(object):
             feedback_status='COMPLETE',
             panel__judgepanelassignment__scenario__in=scenarios)
 
-    def calc_commitments(self):
-        # self.total_commitments = 0
-        # self.remaining_commitments = 0
-        return {}
+    def calc_commitments(self, option_name):
+        commitments = JudgeRoundCommitment.objects.filter(
+            judging_round=self.judging_round)
+        total_commitments = self.helper.total_commitments(
+            commitments=commitments,
+            option_name=option_name)
+        assignments = JudgePanelAssignment.objects.filter(
+            scenario__judging_round=self.judging_round)
+        remaining_commitments = self.helper.remaining_commitments(
+            assignments=assignments,
+            commitments=commitments,
+            option_name=option_name)
+        return {
+            "total_commitments": total_commitments,
+            "remaining_commitments": remaining_commitments,
+        }

@@ -15,10 +15,7 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
     def app_ids_for_feedback(self, feedbacks, option_name, applications):
         target = ProgramFamily.objects.filter(name=option_name).first()
         return self.find_app_ids(
-            self.refine_feedbacks(
-                feedbacks,
-                target,
-                "judge__expertprofile__home_program_family"),
+            self.feedbacks_for_option(feedbacks, option_name),
             self.app_ids_to_targets(applications),
             target)
 
@@ -44,3 +41,7 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
         pfs = ProgramFamily.objects.filter(
             programs__cycle=spec.criterion.judging_round.program.cycle)
         return pfs.values_list("name", flat=True)
+
+    def query_for_option(self, query, option_name):
+        return query.filter(
+            judge__expertprofile__home_program_family__name=option_name)

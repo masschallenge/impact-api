@@ -61,6 +61,17 @@ class CriterionOptionSpecHelper(ModelHelper):
     def app_count(self, apps, option_name):
         return self.criterion_helper.app_count(apps, option_name)
 
+    def total_commitments(self, commitments, option_name):
+        return self.criterion_helper.total_commitments(
+            commitments=commitments,
+            option_name=option_name)
+
+    def remaining_commitments(self, commitments, assignments, option_name):
+        return self.criterion_helper.remaining_commitments(
+            assignments=assignments,
+            commitments=commitments,
+            option_name=option_name)
+
     @classmethod
     def fields(cls):
         return CRITERION_OPTION_SPEC_FIELDS
