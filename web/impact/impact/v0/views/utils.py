@@ -55,8 +55,7 @@ def logo_url(startup):
     elif "startup_pics/" not in logo_field.url:
         return logo_field.url
     else:
-        # Get just the filename and drop any S3 auth params
-        filename = logo_field.url.split("startup_pics/")[1].split("?")[0]
+        filename = logo_field.name
         template = settings.IMAGE_RESIZE_HOST + settings.IMAGE_RESIZE_TEMPLATE
         return template.format(filename)
 

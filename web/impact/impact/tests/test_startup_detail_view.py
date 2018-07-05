@@ -186,5 +186,6 @@ class TestStartupDetailView(APITestCase):
             response = self.client.post(STARTUP_DETAIL_URL,
                                         {"ProgramKey": program.id,
                                          "StartupKey": startup.id})
-            self.assertTrue(settings.IMAGE_RESIZE_HOST
-                            in response.data["logo_url"])
+            url_base = (settings.IMAGE_RESIZE_HOST +
+                        settings.IMAGE_RESIZE_TEMPLATE).format("")
+            self.assertTrue(url_base in response.data["logo_url"])

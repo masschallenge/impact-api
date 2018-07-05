@@ -271,7 +271,7 @@ class Base(Configuration):
     CMS_FILE_ROOT = '/var/www/cms-files'
 
     IMAGE_RESIZE_HOST = "https://dl4fx6jt7wkin.cloudfront.net"
-    IMAGE_RESIZE_TEMPLATE = "/fit-in/500x500/{}"
+    IMAGE_RESIZE_TEMPLATE = "/fit-in/500x500/media/startup_pics/{}"
 
 
 class Dev(Base):
