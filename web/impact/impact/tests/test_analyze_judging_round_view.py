@@ -51,3 +51,14 @@ class TestAnalyzeJudgingRoundView(APITestCase):
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)
             assert validator.is_valid(json.loads(get_response.content))
+
+    def test_get_with_implicit_option(self):
+        option = CriterionOptionSpecFactory(option="")
+        judging_round_id = option.criterion.judging_round_id
+        with self.login(email=self.basic_user().email):
+            url = reverse(AnalyzeJudgingRoundView.view_name,
+                          args=[judging_round_id])
+            response = self.client.get(url)
+            assert len(response.data) == 1
+            first_result = response.data["results"][0]
+            assert first_result["criterion_option_spec_id"] == option.id
