@@ -46,18 +46,14 @@ def _pad(text):
 
 def logo_url(startup):
     """
-    Turns the stored *.s3.amazonaws.com URL into one that uses our
-    CloudFormation image resizer; returns empty string for None
+    Use the stored filename to generate a ServerlessImageHandler URL
     """
     logo_field = startup.high_resolution_logo
     if not logo_field:
         return ""
-    elif "startup_pics/" not in logo_field.url:
-        return logo_field.url
     else:
-        filename = logo_field.name
         template = settings.IMAGE_RESIZE_HOST + settings.IMAGE_RESIZE_TEMPLATE
-        return template.format(filename)
+        return template.format(logo_field.name)
 
 
 def status_description(status):
