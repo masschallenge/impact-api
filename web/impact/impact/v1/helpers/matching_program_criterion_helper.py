@@ -16,7 +16,7 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
         target = ProgramFamily.objects.filter(name=option_name).first()
         return self.find_app_ids(
             self.feedbacks_for_option(feedbacks, option_name),
-            self.app_ids_to_targets(applications),
+            applications,
             target)
 
     def calc_app_ids_to_targets(self, applications):
