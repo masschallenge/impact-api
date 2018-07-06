@@ -21,13 +21,13 @@ class MatchingCriterionHelper(CriterionHelper):
         return feedbacks.filter(query)
 
     def find_app_ids(self, feedbacks, apps, target):
+        if not feedbacks:
+            return []
         result = []
-        if feedbacks:
-            app_map = self.app_ids_to_targets(apps)
-            for app_id in feedbacks.values_list("application_id", flat=True):
-                if app_id in app_map and app_map[app_id] == target.id:
-                    result.append(app_id)
-        return result
+        app_map = self.app_ids_to_targets(apps)
+        return [app_id for app_id in
+                feedbacks.values_list("application_id", flat=True)
+                if app_id in app_map and app_map[app_id] == target.id]
 
     def app_ids_to_targets(self, apps):
         if not self._app_ids_to_targets:
