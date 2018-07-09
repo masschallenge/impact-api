@@ -7,14 +7,10 @@ from jsonschema import Draft4Validator
 from django.urls import reverse
 
 from accelerator.tests.factories import (
-    CriterionFactory,
     CriterionOptionSpecFactory,
     JudgeRoundCommitmentFactory,
 )
-from accelerator.tests.contexts import JudgeFeedbackContext
-from accelerator.models import (
-    JUDGING_FEEDBACK_STATUS_COMPLETE,
-)
+from accelerator.tests.contexts import AnalyzeJudgingContext
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
 from impact.v1.views import AnalyzeJudgingRoundView
@@ -71,21 +67,13 @@ class TestAnalyzeJudgingRoundView(APITestCase):
             assert first_result["criterion_option_spec_id"] == option.id
 
     def test_get_with_unread_application(self):
-        context = JudgeFeedbackContext()
-        context.add_application()
-        feedback = context.feedback
-        feedback.feedback_status = JUDGING_FEEDBACK_STATUS_COMPLETE
-        feedback.save()
-        criterion = CriterionFactory(type="reads",
-                                     name="reads",
-                                     judging_round=context.judging_round)
-        option = CriterionOptionSpecFactory(criterion=criterion,
-                                            count=2,
-                                            option="")
-        judging_round_id = option.criterion.judging_round_id
+        context = AnalyzeJudgingContext(type="reads",
+                                        name="reads",
+                                        read_count=2,
+                                        options=[""])
         with self.login(email=self.basic_user().email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
-                          args=[judging_round_id])
+                          args=[context.judging_round.id])
             response = self.client.get(url)
             assert len(response.data) == 1
             first_result = response.data["results"][0]
@@ -192,20 +180,3 @@ def _calc_industry_dists(options, judge_key):
     if judge_key in results:
         results[judge_key] = {0: 1}
     return results
-
-
-class AnalyzeJudgingContext(JudgeFeedbackContext):
-    def __init__(self, type, name, read_count, options):
-        super().__init__()
-        self.read_count = read_count
-        self.options = options
-        self.feedback.feedback_status = JUDGING_FEEDBACK_STATUS_COMPLETE
-        self.feedback.save()
-        self.add_application()  # Add unread app
-        self.criterion = CriterionFactory(type=type,
-                                          name=name,
-                                          judging_round=self.judging_round)
-        self.option_specs = [CriterionOptionSpecFactory(
-            criterion=self.criterion,
-            count=1,
-            option=option) for option in options]
