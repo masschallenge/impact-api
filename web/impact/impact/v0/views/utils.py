@@ -45,9 +45,15 @@ def _pad(text):
 
 
 def logo_url(startup):
-    if not startup.high_resolution_logo:
+    """
+    Use the stored filename to generate a ServerlessImageHandler URL
+    """
+    logo_field = startup.high_resolution_logo
+    if not logo_field:
         return ""
-    return startup.high_resolution_logo.url
+    else:
+        template = settings.IMAGE_RESIZE_HOST + settings.IMAGE_RESIZE_TEMPLATE
+        return template.format(logo_field.name)
 
 
 def status_description(status):
