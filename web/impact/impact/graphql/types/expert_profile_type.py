@@ -55,12 +55,12 @@ class ExpertProfileType(DjangoObjectType):
             'start_time__gte': timezone.now().time()
         }
         if not user.is_staff:
-            filter_kwargs['program__in'] = get_user_programs(user)
+            filter_kwargs['program__in'] = _get_user_programs(user)
         return self.user.mentor_officehours.filter(
             **filter_kwargs).exists()
 
 
-def get_user_programs(user):
+def _get_user_programs(user):
     # todo: refactor this and move it to a sensible place
     # todo: test this
     participant_roles = UserRole.FINALIST_USER_ROLES
