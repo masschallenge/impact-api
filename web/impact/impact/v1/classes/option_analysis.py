@@ -64,10 +64,13 @@ class OptionAnalysis(object):
 
     def calc_needs(self, option_name):
         needs_dist = self.calc_needs_distribution(option_name)
+        read_count = self.option_spec.count
         return {
             "needs_distribution": needs_dist,
-            "total_required_reads": self.option_spec.count * sum(
-                needs_dist.values()),
+            "total_required_reads": read_count * sum(needs_dist.values()),
+            "completed_required_reads": sum(
+                [min(read_count, read_count - k) * v
+                 for (k, v) in needs_dist.items()]),
             "satisfied_apps": sum(
                 [v for (k, v) in needs_dist.items() if k <= 0]),
             "needy_apps": sum(
