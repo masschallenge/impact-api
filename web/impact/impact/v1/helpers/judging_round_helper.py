@@ -21,6 +21,8 @@ JUDGING_ROUND_FIELDS = {
     "cycle_based_round": BOOLEAN_FIELD,
     "program_id": OPTIONAL_INTEGER_FIELD,
     "cycle_id": OPTIONAL_INTEGER_FIELD,
+    "start_date_time": OPTIONAL_STRING_FIELD,  # Need date validator
+    "end_date_time": OPTIONAL_STRING_FIELD,
 }
 
 
