@@ -35,6 +35,9 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
 
     def options(self, spec, apps):
         startups = Startup.objects.filter(application__in=apps)
+        # Get the top level industry for all applications including
+        # those whose industries are direct children of top level
+        # industries.
         top_q = Q(startups__in=startups, parent_id__isnull=True)
         child_q = Q(children__startups__in=startups, parent_id__isnull=True)
         industries = Industry.objects.filter(top_q | child_q).distinct()
