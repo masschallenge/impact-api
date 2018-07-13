@@ -10,10 +10,10 @@ from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
 
 
 class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
-    def app_ids_for_feedback(self, feedbacks, option_name, applications):
+    def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
         target = Industry.objects.filter(name=option_name).first()
         return self.find_app_ids(
-            self.feedbacks_for_option(feedbacks, option_name),
+            self.filter_by_judge_option(feedbacks, option_name),
             self.app_ids_to_targets(applications),
             target)
 
@@ -35,11 +35,14 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
 
     def options(self, spec, apps):
         startups = Startup.objects.filter(application__in=apps)
+        # Get the top level industry for all applications including
+        # those whose industries are direct children of top level
+        # industries.
         top_q = Q(startups__in=startups, parent_id__isnull=True)
         child_q = Q(children__startups__in=startups, parent_id__isnull=True)
         industries = Industry.objects.filter(top_q | child_q).distinct()
         return industries.values_list("name", flat=True)
 
-    def query_for_option(self, query, option_name):
+    def filter_by_judge_option(self, query, option_name):
         return query.filter(
             judge__expertprofile__primary_industry__name=option_name)

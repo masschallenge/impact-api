@@ -44,7 +44,7 @@ class OptionAnalysis(object):
         self.apps = apps
 
     def analyses(self):
-        return [self.analysis(name) for name in self.find_options()]
+        return [self.analysis(option) for option in self.find_options()]
 
     def analysis(self, option_name):
         result = {
@@ -53,7 +53,7 @@ class OptionAnalysis(object):
             "option": option_name,
         }
         result.update(self.calc_needs(option_name))
-        result.update(self.calc_commitments(option_name))
+        result.update(self.calc_capacity(option_name))
         return result
 
     def find_options(self):
@@ -80,9 +80,9 @@ class OptionAnalysis(object):
         }
 
     def calc_needs_distribution(self, option_name):
-        app_ids = self.helper.app_ids_for_feedback(self.all_feedbacks(),
-                                                   option_name=option_name,
-                                                   applications=self.apps)
+        app_ids = self.helper.app_ids_for_feedbacks(self.all_feedbacks(),
+                                                    option_name=option_name,
+                                                    applications=self.apps)
         app_counts = Counter(app_ids)
         counts = Counter(app_counts.values())
         unread_count = (self.helper.app_count(self.apps, option_name) -
@@ -100,19 +100,19 @@ class OptionAnalysis(object):
             feedback_status='COMPLETE',
             panel__judgepanelassignment__scenario__in=scenarios)
 
-    def calc_commitments(self, option_name):
+    def calc_capacity(self, option_name):
         commitments = JudgeRoundCommitment.objects.filter(
             judging_round=self.judging_round)
-        total_commitments = self.helper.total_commitments(
+        total_capacity = self.helper.total_capacity(
             commitments=commitments,
             option_name=option_name)
         assignments = JudgePanelAssignment.objects.filter(
             scenario__judging_round=self.judging_round)
-        remaining_commitments = self.helper.remaining_commitments(
+        remaining_capacity = self.helper.remaining_capacity(
             assignments=assignments,
             commitments=commitments,
             option_name=option_name)
         return {
-            "total_commitments": total_commitments,
-            "remaining_commitments": remaining_commitments,
+            "total_capacity": total_capacity,
+            "remaining_capacity": remaining_capacity,
         }

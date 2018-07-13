@@ -28,8 +28,8 @@ ANALYZE_JUDGING_ROUND_FIELDS = {
     "satisfied_apps": READ_ONLY_INTEGER_FIELD,
     "needy_apps": READ_ONLY_INTEGER_FIELD,
     "remaining_needed_reads": READ_ONLY_INTEGER_FIELD,
-    "total_commitments": READ_ONLY_INTEGER_FIELD,
-    "remaining_commitments": READ_ONLY_INTEGER_FIELD,
+    "total_capacity": READ_ONLY_INTEGER_FIELD,
+    "remaining_capacity": READ_ONLY_INTEGER_FIELD,
 }
 
 

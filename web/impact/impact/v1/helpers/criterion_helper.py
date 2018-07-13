@@ -43,19 +43,19 @@ class CriterionHelper(ModelHelper):
     def options(self, spec, apps):
         return [spec.option]
 
-    def app_ids_for_feedback(self, feedbacks, option_name, **kwargs):
-        return self.feedbacks_for_option(feedbacks, option_name).values_list(
+    def app_ids_for_feedbacks(self, feedbacks, option_name, **kwargs):
+        return self.filter_by_judge_option(feedbacks, option_name).values_list(
             "application_id", flat=True)
 
     def app_count(self, apps, option_name):
         return apps.count()
 
-    def total_commitments(self, commitments, option_name):
-        return self.commitments_for_option(commitments, option_name).aggregate(
+    def total_capacity(self, commitments, option_name):
+        return self.filter_by_judge_option(commitments, option_name).aggregate(
             total=Sum("capacity"))["total"]
 
-    def remaining_commitments(self, commitments, assignments, option_name):
-        judge_to_capacity = self.commitments_for_option(
+    def remaining_capacity(self, commitments, assignments, option_name):
+        judge_to_capacity = self.filter_by_judge_option(
             commitments, option_name).values_list("judge_id", "capacity")
         judge_to_count = self.count_assignments(assignments)
         result = 0
@@ -63,13 +63,7 @@ class CriterionHelper(ModelHelper):
             result += max(0, capacity - judge_to_count.get(judge_id, 0))
         return result
 
-    def feedbacks_for_option(self, query, option_name):
-        return self.query_for_option(query, option_name)
-
-    def commitments_for_option(self, query, option_name):
-        return self.query_for_option(query, option_name)
-
-    def query_for_option(self, query, option_name):
+    def filter_by_judge_option(self, query, option_name):
         return query
 
     def count_assignments(self, assignments):
