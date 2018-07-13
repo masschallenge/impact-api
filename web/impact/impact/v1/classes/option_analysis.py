@@ -44,7 +44,7 @@ class OptionAnalysis(object):
         self.apps = apps
 
     def analyses(self):
-        return [self.analysis(name) for name in self.find_options()]
+        return [self.analysis(option) for option in self.find_options()]
 
     def analysis(self, option_name):
         result = {
