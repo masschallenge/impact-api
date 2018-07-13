@@ -50,11 +50,11 @@ class CriterionHelper(ModelHelper):
     def app_count(self, apps, option_name):
         return apps.count()
 
-    def total_commitments(self, commitments, option_name):
+    def total_capacity(self, commitments, option_name):
         return self.commitments_for_option(commitments, option_name).aggregate(
             total=Sum("capacity"))["total"]
 
-    def remaining_commitments(self, commitments, assignments, option_name):
+    def remaining_capacity(self, commitments, assignments, option_name):
         judge_to_capacity = self.commitments_for_option(
             commitments, option_name).values_list("judge_id", "capacity")
         judge_to_count = self.count_assignments(assignments)

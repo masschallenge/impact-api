@@ -142,8 +142,8 @@ class TestAnalyzeJudgingRoundView(APITestCase):
                           args=[judging_round_id])
             response = self.client.get(url)
             result = response.data["results"][0]
-            assert commitment.capacity == result['total_commitments']
-            assert commitment.capacity - 1 == result['remaining_commitments']
+            assert commitment.capacity == result['total_capacity']
+            assert commitment.capacity - 1 == result['remaining_capacity']
 
 
 def _industry_options(context):

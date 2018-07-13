@@ -61,13 +61,13 @@ class CriterionOptionSpecHelper(ModelHelper):
     def app_count(self, apps, option_name):
         return self.criterion_helper.app_count(apps, option_name)
 
-    def total_commitments(self, commitments, option_name):
-        return self.criterion_helper.total_commitments(
+    def total_capacity(self, commitments, option_name):
+        return self.criterion_helper.total_capacity(
             commitments=commitments,
             option_name=option_name)
 
-    def remaining_commitments(self, commitments, assignments, option_name):
-        return self.criterion_helper.remaining_commitments(
+    def remaining_capacity(self, commitments, assignments, option_name):
+        return self.criterion_helper.remaining_capacity(
             assignments=assignments,
             commitments=commitments,
             option_name=option_name)
