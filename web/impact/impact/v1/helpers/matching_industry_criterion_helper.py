@@ -10,7 +10,7 @@ from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
 
 
 class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
-    def app_ids_for_feedback(self, feedbacks, option_name, applications):
+    def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
         target = Industry.objects.filter(name=option_name).first()
         return self.find_app_ids(
             self.feedbacks_for_option(feedbacks, option_name),

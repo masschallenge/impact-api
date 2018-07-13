@@ -77,9 +77,9 @@ class OptionAnalysis(object):
         }
 
     def calc_needs_distribution(self, option_name):
-        app_ids = self.helper.app_ids_for_feedback(self.all_feedbacks(),
-                                                   option_name=option_name,
-                                                   applications=self.apps)
+        app_ids = self.helper.app_ids_for_feedbacks(self.all_feedbacks(),
+                                                    option_name=option_name,
+                                                    applications=self.apps)
         app_counts = Counter(app_ids)
         counts = Counter(app_counts.values())
         unread_count = (self.helper.app_count(self.apps, option_name) -

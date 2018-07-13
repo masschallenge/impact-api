@@ -43,7 +43,7 @@ class CriterionHelper(ModelHelper):
     def options(self, spec, apps):
         return [spec.option]
 
-    def app_ids_for_feedback(self, feedbacks, option_name, **kwargs):
+    def app_ids_for_feedbacks(self, feedbacks, option_name, **kwargs):
         return self.feedbacks_for_option(feedbacks, option_name).values_list(
             "application_id", flat=True)
 

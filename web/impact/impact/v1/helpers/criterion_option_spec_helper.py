@@ -51,8 +51,8 @@ class CriterionOptionSpecHelper(ModelHelper):
         self.criterion_helper = CriterionHelper.find_helper(
             criterion.type, criterion.name)(subject)
 
-    def app_ids_for_feedback(self, feedbacks, option_name, applications):
-        return self.criterion_helper.app_ids_for_feedback(
+    def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
+        return self.criterion_helper.app_ids_for_feedbacks(
             feedbacks, option_name=option_name, applications=applications)
 
     def options(self, apps):
