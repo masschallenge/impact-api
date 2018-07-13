@@ -12,7 +12,7 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
     def __init__(self, subject):
         super().__init__(subject)
 
-    def app_ids_for_feedback(self, feedbacks, option_name, applications):
+    def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
         target = ProgramFamily.objects.filter(name=option_name).first()
         return self.find_app_ids(
             self.feedbacks_for_option(feedbacks, option_name),
