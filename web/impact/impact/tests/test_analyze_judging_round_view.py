@@ -36,7 +36,6 @@ class TestAnalyzeJudgingRoundView(APITestCase):
                           args=[judging_round_id])
             response = self.client.options(url)
             assert response.status_code == 200
-            get_options = response.data["actions"]["GET"]["properties"]
             results = response.data["actions"]["GET"]["properties"]["results"]
             get_options = results["item"]["properties"]
             assert_fields(AnalyzeJudgingRoundView.fields().keys(), get_options)
@@ -50,7 +49,6 @@ class TestAnalyzeJudgingRoundView(APITestCase):
 
             options_response = self.client.options(url)
             get_response = self.client.get(url)
-
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)
             assert validator.is_valid(json.loads(get_response.content))
@@ -77,7 +75,8 @@ class TestAnalyzeJudgingRoundView(APITestCase):
             response = self.client.get(url)
             assert len(response.data) == 1
             first_result = response.data["results"][0]
-            assert first_result["remaining_needed_reads"] == 3
+            assert (first_result["remaining_needed_reads"] ==
+                    context.needed_reads())
 
     def test_get_with_gender_criterion(self):
         genders = ["f", "m"]
