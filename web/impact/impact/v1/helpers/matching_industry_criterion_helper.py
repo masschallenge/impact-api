@@ -13,7 +13,7 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
     def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
         target = Industry.objects.filter(name=option_name).first()
         return self.find_app_ids(
-            self.feedbacks_for_option(feedbacks, option_name),
+            self.filter_by_judge_option(feedbacks, option_name),
             self.app_ids_to_targets(applications),
             target)
 
@@ -43,6 +43,6 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
         industries = Industry.objects.filter(top_q | child_q).distinct()
         return industries.values_list("name", flat=True)
 
-    def query_for_option(self, query, option_name):
+    def filter_by_judge_option(self, query, option_name):
         return query.filter(
             judge__expertprofile__primary_industry__name=option_name)
