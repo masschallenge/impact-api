@@ -11,6 +11,7 @@ from impact.v1.helpers.model_helper import (
     REQUIRED_INTEGER_FIELD,
     REQUIRED_STRING_FIELD,
 )
+from impact.v1.helpers.criterion_helper import CriterionHelper
 from impact.v1.helpers.validators import (
     validate_string,
     validate_integer,
@@ -43,6 +44,33 @@ class CriterionOptionSpecHelper(ModelHelper):
         "weight",
     ]
     INPUT_KEYS = ALL_KEYS
+
+    def __init__(self, subject):
+        super().__init__(subject)
+        criterion = self.subject.criterion
+        self.criterion_helper = CriterionHelper.find_helper(
+            criterion.type, criterion.name)(subject)
+
+    def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
+        return self.criterion_helper.app_ids_for_feedbacks(
+            feedbacks, option_name=option_name, applications=applications)
+
+    def options(self, apps):
+        return self.criterion_helper.options(self.subject, apps)
+
+    def app_count(self, apps, option_name):
+        return self.criterion_helper.app_count(apps, option_name)
+
+    def total_capacity(self, commitments, option_name):
+        return self.criterion_helper.total_capacity(
+            commitments=commitments,
+            option_name=option_name)
+
+    def remaining_capacity(self, commitments, assignments, option_name):
+        return self.criterion_helper.remaining_capacity(
+            assignments=assignments,
+            commitments=commitments,
+            option_name=option_name)
 
     @classmethod
     def fields(cls):
