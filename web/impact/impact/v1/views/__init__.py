@@ -3,7 +3,12 @@
 
 from impact.v1.views.impact_view import ImpactView
 
-from impact.v1.views.allocate_applications_view import AllocateApplicationsView
+from impact.v1.views.allocate_applications_view import (
+    ALREADY_ASSIGNED_ERROR,
+    AllocateApplicationsView,
+    JUDGING_ROUND_INACTIVE_ERROR,
+    NO_APP_LEFT_FOR_JUDGE,
+)
 from impact.v1.views.analyze_judging_round_view import AnalyzeJudgingRoundView
 from impact.v1.views.base_list_view import INVALID_IS_ACTIVE_ERROR
 from impact.v1.views.credit_code_detail_view import CreditCodeDetailView
