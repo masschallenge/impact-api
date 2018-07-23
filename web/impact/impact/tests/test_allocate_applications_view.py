@@ -30,10 +30,8 @@ class TestAllocateApplicationsView(APITestCase):
             assert response.status_code == 200
 
     def test_get_judging_round_inactive(self):
-        context = JudgeFeedbackContext()
+        context = JudgeFeedbackContext(is_active=False)
         judging_round = context.judging_round
-        judging_round.is_active = False
-        judging_round.save()
         judge_id = ExpertFactory().id
         with self.login(email=self.basic_user().email):
             url = reverse(AllocateApplicationsView.view_name,
