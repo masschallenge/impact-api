@@ -93,6 +93,12 @@ class TestAllocateApplicationsView(APITestCase):
         context = JudgeFeedbackContext()
         judging_round = context.judging_round
         judge = ExpertFactory()  # Tried password="password", no luck
+        # There is code for this in UserFactory (which ExpertFactory inherits
+        # from), but UserFactory._prepare never gets called.  Looking
+        # the Factory Boy Docs it recommends using _generate for version
+        # < 2.9, but does not clearly document that approach and this then
+        # gets into verifying what accelerate tests are still working etc.
+        # #rabbithole.
         judge.set_password("password")
         judge.save()
         with self.login(email=judge.email):
