@@ -51,6 +51,8 @@ class OptionAnalysis(object):
             "criterion_option_spec_id": self.option_spec.id,
             "criterion_name": self.option_spec.criterion.name,
             "option": option_name,
+            "weight": self.option_spec.weight,
+            "count": self.option_spec.count,
         }
         result.update(self.calc_needs(option_name))
         result.update(self.calc_capacity(option_name))
