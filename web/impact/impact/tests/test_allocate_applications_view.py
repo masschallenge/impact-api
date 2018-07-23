@@ -92,7 +92,7 @@ class TestAllocateApplicationsView(APITestCase):
     def test_get_by_judge_succeeds(self):
         context = JudgeFeedbackContext()
         judging_round = context.judging_round
-        judge = ExpertFactory()
+        judge = ExpertFactory()  # Tried password="password", no luck
         judge.set_password("password")
         judge.save()
         with self.login(email=judge.email):
