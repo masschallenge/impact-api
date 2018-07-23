@@ -108,28 +108,25 @@ class AllocateApplicationsView(ImpactView):
 
     def _make_panel(self, choices):
         self._enable_additional_assignments(len(choices))
-        panel = Panel(status=ACTIVE_PANEL_STATUS)
-        panel.save()
-        jpa = JudgePanelAssignment(
+        panel = Panel.objects.create(status=ACTIVE_PANEL_STATUS)
+        JudgePanelAssignment.objects.create(
             judge=self.judge,
             panel=panel,
             scenario=self.scenario,
             assignment_status=ASSIGNED_PANEL_ASSIGNMENT_STATUS)
-        jpa.save()
         for choice in choices:
-            ApplicationPanelAssignment(
+            ApplicationPanelAssignment.objects.create(
                 application_id=choice,
                 panel=panel,
-                scenario=self.scenario).save()
+                scenario=self.scenario)
 
     def _find_scenario(self):
         judging_round = self.judging_round
         if not hasattr(judging_round, "allocator"):
-            scenario = Scenario(judging_round=judging_round,
-                                is_active=True)
-            scenario.save()
-            Allocator(judging_round=judging_round,
-                      scenario=scenario).save()
+            scenario = Scenario.objects.create(
+                judging_round=judging_round, is_active=True)
+            Allocator.objects.create(judging_round=judging_round,
+                                     scenario=scenario)
         return judging_round.allocator.scenario
 
     def _failure(self):
