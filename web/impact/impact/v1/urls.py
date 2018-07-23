@@ -1,6 +1,7 @@
 from django.conf.urls import url
 
 from impact.v1.views import (
+    AllocateApplicationsView,
     AnalyzeJudgingRoundView,
     CreditCodeDetailView,
     CreditCodeListView,
@@ -32,6 +33,9 @@ from impact.v1.views import (
 )
 
 v1_urlpatterns = [
+    url(r"^allocate_applications/(?P<round_id>[0-9]+)/(?P<judge_id>[0-9]+)/$",
+        AllocateApplicationsView.as_view(),
+        name=AllocateApplicationsView.view_name),
     url(r"^analyze_judging_round/(?P<pk>[0-9]+)/$",
         AnalyzeJudgingRoundView.as_view(),
         name=AnalyzeJudgingRoundView.view_name),
