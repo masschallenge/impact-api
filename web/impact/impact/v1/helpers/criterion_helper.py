@@ -75,6 +75,7 @@ class CriterionHelper(ModelHelper):
 
     @classmethod
     def clone_criteria(cls, source_judging_round_id, target_judging_round_id):
+
         cls.delete_existing_criteria(target_judging_round_id)
         criteria = cls.model.objects.filter(
             judging_round_id=source_judging_round_id)

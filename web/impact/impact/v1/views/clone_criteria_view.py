@@ -31,6 +31,8 @@ ANALYZE_JUDGING_ROUND_FIELDS = {
     "remaining_capacity": READ_ONLY_INTEGER_FIELD,
 }
 
+ROUND_DOES_NOT_EXIST_ERROR = "Judging Round {} does not exist"
+
 
 class CloneCriteriaView(ImpactView):
     view_name = "clone_criteria"
@@ -41,6 +43,14 @@ class CloneCriteriaView(ImpactView):
         return ANALYZE_JUDGING_ROUND_FIELDS
 
     def get(self, request, source_pk, target_pk):
+        self._validate_judging_round_exists(source_pk)
+        self._validate_judging_round_exists(target_pk)
+        if self.errors:
+            return Response(status=401, data=self.errors)
         clones = CriterionHelper.clone_criteria(source_pk, target_pk)
         CriterionOptionSpecHelper.clone_option_specs(clones)
         return Response(status=204)
+
+    def _validate_judging_round_exists(self, id):
+        if not JudgingRound.objects.filter(pk=id).exists():
+            self.errors.append(ROUND_DOES_NOT_EXIST_ERROR.format(id))
