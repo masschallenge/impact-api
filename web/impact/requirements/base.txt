@@ -35,7 +35,7 @@ django-registration
 django-rest-framework-proxy
 django-rest-swagger
 django-paypal
-Django==1.11.14
+Django==1.10.8
 django-multidb-router
 djangorestframework
 djangorestframework-jwt
