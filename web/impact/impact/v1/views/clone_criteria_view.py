@@ -43,4 +43,4 @@ class CloneCriteriaView(ImpactView):
     def get(self, request, source_pk, target_pk):
         clones = CriterionHelper.clone_criteria(source_pk, target_pk)
         CriterionOptionSpecHelper.clone_option_specs(clones)
-        return Response({"results": "Success"})
+        return Response(status=204)
