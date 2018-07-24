@@ -61,7 +61,7 @@ class TestCriterionListView(APITestCase):
         judging_round_id = criterion.judging_round_id
         with self.login(email=self.basic_user().email):
             url = reverse(self.view.view_name)
-            url += "?judging_round_id={}".format(judging_round_id)
+            url += "?judging_round={}".format(judging_round_id)
             response = self.client.get(url)
             results = json.loads(response.content)['results']
             self.assertEqual(len(results), 1)

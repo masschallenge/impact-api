@@ -14,6 +14,7 @@ from accelerator.tests.factories import (
     JudgingRoundFactory,
 )
 
+
 class TestCloneCriteriaView(APITestCase):
     def test_successful_clone(self):
         option_spec = CriterionOptionSpecFactory()
@@ -22,7 +23,7 @@ class TestCloneCriteriaView(APITestCase):
         url = reverse(CloneCriteriaView.view_name,
                       args=[old_round.pk, new_round.pk])
         with self.login(email=self.basic_user().email):
-            response=self.client.get(url)
+            self.client.get(url)
         assert CriterionOptionSpec.objects.filter(
             option=option_spec.option,
             weight=option_spec.weight,
@@ -34,8 +35,7 @@ class TestCloneCriteriaView(APITestCase):
         JudgingRound.objects.filter(pk__in=round_ids).delete()
         url = reverse(CloneCriteriaView.view_name,
                       args=round_ids)
-        
+
         with self.login(email=self.basic_user().email):
-            response=self.client.get(url)
+            response = self.client.get(url)
         self.assertEqual(response.status_code, 401)
-    
