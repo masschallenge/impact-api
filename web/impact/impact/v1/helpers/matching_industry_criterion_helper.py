@@ -46,3 +46,6 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
     def filter_by_judge_option(self, query, option_name):
         return query.filter(
             judge__expertprofile__primary_industry__name=option_name)
+
+    def judge_field(self):
+        return "expertprofile__primary_industry__name"

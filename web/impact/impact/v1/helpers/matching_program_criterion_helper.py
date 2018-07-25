@@ -45,3 +45,6 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
     def filter_by_judge_option(self, query, option_name):
         return query.filter(
             judge__expertprofile__home_program_family__name=option_name)
+
+    def judge_field(self):
+        return "expertprofile__home_program_family__name"

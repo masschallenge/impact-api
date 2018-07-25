@@ -3,6 +3,7 @@
 
 from collections import Counter
 from accelerator.models import (
+    JUDGING_FEEDBACK_STATUS_COMPLETE,
     JudgeApplicationFeedback,
     JudgePanelAssignment,
     JudgeRoundCommitment,
@@ -82,7 +83,7 @@ class OptionAnalysis(object):
         }
 
     def calc_needs_distribution(self, option_name):
-        app_ids = self.helper.app_ids_for_feedbacks(self.all_feedbacks(),
+        app_ids = self.helper.app_ids_for_feedbacks(self.completed_feedbacks(),
                                                     option_name=option_name,
                                                     applications=self.apps)
         app_counts = Counter(app_ids)
@@ -94,13 +95,10 @@ class OptionAnalysis(object):
         expected_count = self.option_spec.count
         return {expected_count - k: v for (k, v) in counts.items()}
 
-    def all_feedbacks(self):
-        scenarios = Scenario.objects.filter(
-            judging_round=self.judging_round, is_active=True)
-        return JudgeApplicationFeedback.objects.filter(
-            application__in=self.apps,
-            feedback_status='COMPLETE',
-            panel__judgepanelassignment__scenario__in=scenarios)
+    def completed_feedbacks(self):
+        return feedbacks_for_judging_round(
+            self.judging_round, self.apps).filter(
+                feedback_status=JUDGING_FEEDBACK_STATUS_COMPLETE)
 
     def calc_capacity(self, option_name):
         commitments = JudgeRoundCommitment.objects.filter(
@@ -118,3 +116,11 @@ class OptionAnalysis(object):
             "total_capacity": total_capacity,
             "remaining_capacity": remaining_capacity,
         }
+
+
+def feedbacks_for_judging_round(judging_round, apps):
+    scenarios = Scenario.objects.filter(
+        judging_round=judging_round, is_active=True)
+    return JudgeApplicationFeedback.objects.filter(
+        application__in=apps,
+        panel__judgepanelassignment__scenario__in=scenarios)
