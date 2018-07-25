@@ -15,22 +15,6 @@ from impact.v1.helpers import (
     CriterionOptionSpecHelper,
 )
 
-ANALYZE_JUDGING_ROUND_FIELDS = {
-    "criterion_option_spec_id": READ_ONLY_ID_FIELD,
-    "weight": READ_ONLY_INTEGER_FIELD,
-    "count": READ_ONLY_INTEGER_FIELD,
-    "criterion_name": READ_ONLY_STRING_FIELD,
-    "option": READ_ONLY_STRING_FIELD,
-    "total_required_reads": READ_ONLY_INTEGER_FIELD,
-    "completed_required_reads": READ_ONLY_INTEGER_FIELD,
-    "needs_distribution": READ_ONLY_OBJECT_FIELD,
-    "satisfied_apps": READ_ONLY_INTEGER_FIELD,
-    "needy_apps": READ_ONLY_INTEGER_FIELD,
-    "remaining_needed_reads": READ_ONLY_INTEGER_FIELD,
-    "total_capacity": READ_ONLY_INTEGER_FIELD,
-    "remaining_capacity": READ_ONLY_INTEGER_FIELD,
-}
-
 ROUND_DOES_NOT_EXIST_ERROR = "Judging Round {} does not exist"
 
 
@@ -40,7 +24,7 @@ class CloneCriteriaView(ImpactView):
 
     @classmethod
     def fields(cls):
-        return ANALYZE_JUDGING_ROUND_FIELDS
+        return {}
 
     def get(self, request, source_pk, target_pk):
         self._validate_judging_round_exists(source_pk)
