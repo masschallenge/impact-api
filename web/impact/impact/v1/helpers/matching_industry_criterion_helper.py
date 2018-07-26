@@ -10,6 +10,10 @@ from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
 
 
 class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
+    def __init__(self, subject):
+        super().__init__(subject)
+        self._top_level_id_cache = None
+
     def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
         target = Industry.objects.filter(name=option_name).first()
         return self.find_app_ids(
@@ -49,3 +53,22 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
 
     def judge_field(self):
         return "expertprofile__primary_industry__name"
+
+    def application_field(self):
+        return "startup__primary_industry__id"
+
+    def option_for_field(self, field):
+        return field
+
+    def field_matches_option(self, field, option):
+        return self._top_level_id(field) == option
+
+    def _top_level_id(self, field):
+        if self._top_level_id_cache is None:
+            self._top_level_id_cache = dict(
+                list(Industry.objects.filter(
+                    parent_id__isnull=True).values_list("id", "name")) +
+                list(Industry.objects.filter(
+                    parent_id__isnull=False).values_list(
+                        "id", "parent__name")))
+        return self._top_level_id_cache[field]

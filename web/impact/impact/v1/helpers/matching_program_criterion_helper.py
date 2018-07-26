@@ -3,6 +3,7 @@
 
 from accelerator.models import (
     ProgramFamily,
+    Startup,
     StartupProgramInterest,
 )
 from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
@@ -11,6 +12,7 @@ from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
 class MatchingProgramCriterionHelper(MatchingCriterionHelper):
     def __init__(self, subject):
         super().__init__(subject)
+        self._startup_program_family_cache = None
 
     def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
         target = ProgramFamily.objects.filter(name=option_name).first()
@@ -48,3 +50,28 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
 
     def judge_field(self):
         return "expertprofile__home_program_family__name"
+
+    def application_field(self):
+        return "startup_id"
+
+    def option_for_field(self, field):
+        return field
+
+    def field_matches_option(self, field, option):
+        return self._startup_program_family(field) == option
+
+    def _startup_program_family(self, field):
+        if self._startup_program_family_cache is None:
+            cache = {}
+            judging_round = self.subject.judging_round
+            startups = Startup.objects.filter(
+                application__application_type=judging_round.application_type,
+                application__application_status="submitted")
+            spis = StartupProgramInterest.objects.filter(
+                applying=True,
+                startup__in=startups).order_by('order')
+            for spi in spis:
+                if spi.startup_id not in cache:
+                    cache[spi.startup_id] = spi.program.program_family.name
+            self._startup_program_family_cache = cache
+        return self._startup_program_family_cache[field]
