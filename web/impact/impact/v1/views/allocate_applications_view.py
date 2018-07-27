@@ -60,7 +60,8 @@ class AllocateApplicationsView(ImpactView):
         self.judging_round = JudgingRound.objects.get(pk=round_id)
         self.judge = User.objects.get(pk=judge_id)
         self.scenario = self._find_scenario()
-        self._validate()
+        self._check_judging_round()
+        self._check_assignments()
         if self.errors:
             return
         self.apps = Application.objects.filter(
@@ -78,10 +79,6 @@ class AllocateApplicationsView(ImpactView):
             self.errors.append(NO_DATA_FOR_JUDGE.format(
                 judging_round=self.judging_round,
                 judge=self.judge.email))
-
-    def _validate(self):
-        self._check_judging_round()
-        self._check_assignments()
 
     def _check_judging_round(self):
         if not self.judging_round.is_active:
