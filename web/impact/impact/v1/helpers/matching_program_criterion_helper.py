@@ -12,7 +12,7 @@ from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
 class MatchingProgramCriterionHelper(MatchingCriterionHelper):
     def __init__(self, subject):
         super().__init__(subject)
-        self._startup_program_family_cache = None
+        self._program_name_cache = None
 
     def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
         target = ProgramFamily.objects.filter(name=option_name).first()
@@ -58,20 +58,23 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
         return field
 
     def field_matches_option(self, field, option):
-        return self._startup_program_family(field) == option
+        return self._program_name(field) == option
 
-    def _startup_program_family(self, field):
-        if self._startup_program_family_cache is None:
-            cache = {}
-            judging_round = self.subject.judging_round
-            startups = Startup.objects.filter(
-                application__application_type=judging_round.application_type,
-                application__application_status="submitted")
-            spis = StartupProgramInterest.objects.filter(
-                applying=True,
-                startup__in=startups).order_by('order')
-            for spi in spis:
-                if spi.startup_id not in cache:
-                    cache[spi.startup_id] = spi.program.program_family.name
-            self._startup_program_family_cache = cache
-        return self._startup_program_family_cache[field]
+    def _program_name(self, field):
+        if self._program_name_cache is None:
+            self._program_name_cache = self._calc_program_name_cache()
+        return self._program_name_cache[field]
+
+    def _calc_program_name_cache(self):
+        cache = {}
+        judging_round = self.subject.judging_round
+        startups = Startup.objects.filter(
+            application__application_type=judging_round.application_type,
+            application__application_status="submitted")
+        spis = StartupProgramInterest.objects.filter(
+            applying=True,
+            startup__in=startups).order_by('order')
+        for spi in spis:
+            if spi.startup_id not in cache:
+                cache[spi.startup_id] = spi.program.program_family.name
+        return cache
