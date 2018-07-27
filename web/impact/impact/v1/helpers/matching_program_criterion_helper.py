@@ -66,7 +66,8 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
             application__application_status="submitted")
         spis = StartupProgramInterest.objects.filter(
             applying=True,
-            startup__in=startups).order_by('order')
+            startup__in=startups).order_by('order').prefetch_related(
+                "program__program_family")
         for spi in spis:
             if spi.startup_id not in cache:
                 cache[spi.startup_id] = spi.program.program_family.name
