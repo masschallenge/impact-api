@@ -222,14 +222,16 @@ class AllocateApplicationsView(ImpactView):
 
     def _option_counts(self, key):
         if self._option_counts_cache is None:
-            cache = {}
+            self._option_counts_cache = {}
             for criterion in self.judging_round.criterion_set.all():
-                helper = CriterionHelper.find_helper(criterion)
-                for spec in criterion.criterionoptionspec_set.all():
-                    for option in helper.options(spec, self.apps):
-                        cache[(criterion, option)] = spec.count
-            self._option_counts_cache = cache
+                self._add_criterion_options_to_cache(criterion)
         return self._option_counts_cache[key]
+
+    def _add_criterion_options_to_cache(self, criterion):
+        helper = CriterionHelper.find_helper(criterion)
+        for spec in criterion.criterionoptionspec_set.all():
+            for option in helper.options(spec, self.apps):
+                self._option_counts_cache[(criterion, option)] = spec.count
 
     def _sum_judge_data(self, key, judge_ids):
         result = 0
