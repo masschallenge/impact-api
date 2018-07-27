@@ -6,6 +6,7 @@ from accelerator.models import (
     JUDGING_FEEDBACK_STATUS_INCOMPLETE,
 )
 
+
 class ApplicationDataCache(object):
     def __init__(self):
         self._data = None

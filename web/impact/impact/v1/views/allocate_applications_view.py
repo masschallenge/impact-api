@@ -6,9 +6,8 @@ from numpy import (
     array,
     matrix,
 )
-from impact.v1.classes.application_data_cache import (
-    ApplicationDataCache,
-)
+from impact.v1.classes.application_data_cache import ApplicationDataCache
+from impact.v1.classes.criteria_data_cache import CriteriaDataCache
 from accelerator.models import (
     ACTIVE_PANEL_STATUS,
     Allocator,
@@ -44,8 +43,7 @@ class AllocateApplicationsView(ImpactView):
 
     def __init__(self):
         self._app_data_cache = ApplicationDataCache()
-        self._criteria_cache = None
-        self._criteria_weights_cache = None
+        self._criteria_cache = CriteriaDataCache()
         self._judge_app_id_cache = None
         self._judge_data_cache = None
         self._option_counts_cache = None
@@ -89,7 +87,8 @@ class AllocateApplicationsView(ImpactView):
         if self.errors:
             return []
         needs = self._application_needs()
-        weights = array(list(self._criteria_weights().values()))
+        weights = array(list(self._criteria_cache.weights(self.judging_round,
+                                                          self.apps).values()))
         needs_matrix = matrix(needs * weights)
         preferences = judge_features * needs_matrix.transpose()
         choices = self._choose_app_ids(preferences)
@@ -103,9 +102,10 @@ class AllocateApplicationsView(ImpactView):
         datum = self._data_for_judge(self.judge)
         if not datum:
             return matrix([])
-        keys = self._criteria_weights().keys()
+        keys = self._criteria_cache.weights(self.judging_round,
+                                            self.apps).keys()
         row = OrderedDict([(key, 0) for key in keys])
-        for criterion in self._criteria():
+        for criterion in self._criteria_cache.criteria(self.judging_round):
             helper = CriterionHelper.find_helper(criterion)
             option = helper.option_for_field(
                 datum[helper.judge_field])
@@ -126,7 +126,7 @@ class AllocateApplicationsView(ImpactView):
         if self._judge_data_cache is None:
             fields = set(["id"])
             result = {}
-            for criterion in self._criteria():
+            for criterion in self._criteria_cache.criteria(self.judging_round):
                 helper = CriterionHelper.find_helper(criterion)
                 fields.add(helper.judge_field)
             for datum in self.judges.values(*list(fields)):
@@ -134,30 +134,11 @@ class AllocateApplicationsView(ImpactView):
             self._judge_data_cache = result
         return self._judge_data_cache
 
-    def _criteria_weights(self):
-        if self._criteria_weights_cache is None:
-            self._criteria_weights_cache = OrderedDict()
-            for criterion in self._criteria():
-                helper = CriterionHelper.find_helper(criterion)
-                self._add_specs(helper)
-        return self._criteria_weights_cache
-
-    def _criteria(self):
-        if self._criteria_cache is None:
-            self._criteria_cache = self.judging_round.criterion_set.all()
-        return self._criteria_cache
-
-    def _add_specs(self, helper):
-        criterion = helper.subject
-        for spec in criterion.criterionoptionspec_set.all():
-            for option in helper.options(spec, self.apps):
-                key = (criterion, option)
-                self._criteria_weights_cache[key] = float(spec.weight)
-
     def _application_data(self):
-        return self._app_data_cache.data(self._criteria(),
-                                         self.apps,
-                                         self.feedback)
+        return self._app_data_cache.data(
+            self._criteria_cache.criteria(self.judging_round),
+            self.apps,
+            self.feedback)
 
     def _application_needs(self):
         rows = []
@@ -169,7 +150,8 @@ class AllocateApplicationsView(ImpactView):
         needs = OrderedDict()
         app_data = self._application_data()[app_id]
         fields = app_data["fields"]
-        keys = self._criteria_weights().keys()
+        keys = self._criteria_cache.weights(self.judging_round,
+                                            self.apps).keys()
         for key in keys:
             criterion, option = key
             helper = CriterionHelper.find_helper(criterion)
