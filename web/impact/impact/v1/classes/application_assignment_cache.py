@@ -19,5 +19,5 @@ class ApplicationAssignmentCache(object):
                 feedback_status=JUDGING_FEEDBACK_STATUS_INCOMPLETE
             ).values_list("application_id", "judge_id")
             self._data = collect_pairs(set(assignments) -
-                                      set(finished_assignments))
+                                       set(finished_assignments))
         return self._data

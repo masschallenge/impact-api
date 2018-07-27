@@ -6,17 +6,15 @@ from numpy import (
     array,
     matrix,
 )
-from impact.v1.classes.application_assignment_cache import (
-    ApplicationAssignmentCache,
+from impact.v1.classes.application_data_cache import (
+    ApplicationDataCache,
 )
-from impact.v1.classes.utils import collect_pairs
 from accelerator.models import (
     ACTIVE_PANEL_STATUS,
     Allocator,
     Application,
     ApplicationPanelAssignment,
     ASSIGNED_PANEL_ASSIGNMENT_STATUS,
-    JUDGING_FEEDBACK_STATUS_COMPLETE,
     JudgePanelAssignment,
     JudgingRound,
     Panel,
@@ -45,9 +43,7 @@ class AllocateApplicationsView(ImpactView):
     view_name = "allocate_applications"
 
     def __init__(self):
-        self._app_assignments_cache = ApplicationAssignmentCache()
-        self._app_data_cache = None
-        self._app_reads_cache = None
+        self._app_data_cache = ApplicationDataCache()
         self._criteria_cache = None
         self._criteria_weights_cache = None
         self._judge_app_id_cache = None
@@ -159,32 +155,9 @@ class AllocateApplicationsView(ImpactView):
                 self._criteria_weights_cache[key] = float(spec.weight)
 
     def _application_data(self):
-        if self._app_data_cache is None:
-            fields = set(["id"])
-            result = {}
-            for criterion in self._criteria():
-                helper = CriterionHelper.find_helper(criterion)
-                fields.add(helper.application_field)
-            for field_data in self.apps.values(*list(fields)):
-                app_id = field_data["id"]
-                result[app_id] = {
-                    "fields": field_data,
-                    "feedbacks": self._app_reads().get(app_id, []),
-                    "assignments": self._app_assignments().get(app_id, [])
-                }
-            self._app_data_cache = result
-        return self._app_data_cache
-
-    def _app_reads(self):
-        if self._app_reads_cache is None:
-            app_to_judge = self.feedback.filter(
-                feedback_status=JUDGING_FEEDBACK_STATUS_COMPLETE).values_list(
-                "application_id", "judge_id")
-            self._app_reads_cache = collect_pairs(app_to_judge)
-        return self._app_reads_cache
-
-    def _app_assignments(self):
-        return self._app_assignments_cache.data(self.apps, self.feedback)
+        return self._app_data_cache.data(self._criteria(),
+                                         self.apps,
+                                         self.feedback)
 
     def _application_needs(self):
         rows = []

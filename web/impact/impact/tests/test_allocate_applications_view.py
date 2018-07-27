@@ -1,11 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-# TODO: Coverage, tests that make reasonable selections
-# Need to account for completed feedback
-# Need to account for existing assignments
-# Need to instrument other CriterionHelpers
-
 from collections import namedtuple
 from django.urls import reverse
 
