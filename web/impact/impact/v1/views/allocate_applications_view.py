@@ -109,7 +109,7 @@ class AllocateApplicationsView(ImpactView):
         for criterion in self._criteria():
             helper = CriterionHelper.find_helper(criterion)
             option = helper.option_for_field(
-                datum[helper.judge_field()])
+                datum[helper.judge_field])
             key = (criterion, option)
             if key in keys:
                 row[key] = 1
@@ -129,7 +129,7 @@ class AllocateApplicationsView(ImpactView):
             result = {}
             for criterion in self._criteria():
                 helper = CriterionHelper.find_helper(criterion)
-                fields.add(helper.judge_field())
+                fields.add(helper.judge_field)
             for datum in self.judges.values(*list(fields)):
                 result[datum["id"]] = datum
             self._judge_data_cache = result
@@ -236,7 +236,7 @@ class AllocateApplicationsView(ImpactView):
         criterion, option = key
         for judge_id in judge_ids:
             judge_data = self._judge_data().get(judge_id, {})
-            field = CriterionHelper.find_helper(criterion).judge_field()
+            field = CriterionHelper.find_helper(criterion).judge_field
             if option == judge_data.get(field):
                 result += 1
         return result

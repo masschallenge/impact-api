@@ -10,6 +10,8 @@ from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
 
 
 class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
+    judge_field = "expertprofile__primary_industry__name"
+
     def __init__(self, subject):
         super().__init__(subject)
         self._top_level_id_cache = None
@@ -50,9 +52,6 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
     def filter_by_judge_option(self, query, option_name):
         return query.filter(
             judge__expertprofile__primary_industry__name=option_name)
-
-    def judge_field(self):
-        return "expertprofile__primary_industry__name"
 
     def application_field(self):
         return "startup__primary_industry__id"

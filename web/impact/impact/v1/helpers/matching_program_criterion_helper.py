@@ -10,6 +10,8 @@ from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
 
 
 class MatchingProgramCriterionHelper(MatchingCriterionHelper):
+    judge_field = "expertprofile__home_program_family__name"
+
     def __init__(self, subject):
         super().__init__(subject)
         self._program_name_cache = None
@@ -43,13 +45,6 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
         pfs = ProgramFamily.objects.filter(
             programs__cycle=spec.criterion.judging_round.program.cycle)
         return pfs.values_list("name", flat=True)
-
-    def filter_by_judge_option(self, query, option_name):
-        return query.filter(
-            judge__expertprofile__home_program_family__name=option_name)
-
-    def judge_field(self):
-        return "expertprofile__home_program_family__name"
 
     def application_field(self):
         return "startup_id"
