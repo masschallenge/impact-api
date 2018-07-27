@@ -6,6 +6,10 @@ from numpy import (
     array,
     matrix,
 )
+from impact.v1.classes.application_assignment_cache import (
+    ApplicationAssignmentCache,
+)
+from impact.v1.classes.utils import collect_pairs
 from accelerator.models import (
     ACTIVE_PANEL_STATUS,
     Allocator,
@@ -13,7 +17,6 @@ from accelerator.models import (
     ApplicationPanelAssignment,
     ASSIGNED_PANEL_ASSIGNMENT_STATUS,
     JUDGING_FEEDBACK_STATUS_COMPLETE,
-    JUDGING_FEEDBACK_STATUS_INCOMPLETE,
     JudgePanelAssignment,
     JudgingRound,
     Panel,
@@ -42,7 +45,7 @@ class AllocateApplicationsView(ImpactView):
     view_name = "allocate_applications"
 
     def __init__(self):
-        self._app_assignments_cache = None
+        self._app_assignments_cache = ApplicationAssignmentCache()
         self._app_data_cache = None
         self._app_reads_cache = None
         self._criteria_cache = None
@@ -177,21 +180,11 @@ class AllocateApplicationsView(ImpactView):
             app_to_judge = self.feedback.filter(
                 feedback_status=JUDGING_FEEDBACK_STATUS_COMPLETE).values_list(
                 "application_id", "judge_id")
-            self._app_reads_cache = _collect_pairs(app_to_judge)
+            self._app_reads_cache = collect_pairs(app_to_judge)
         return self._app_reads_cache
 
     def _app_assignments(self):
-        if self._app_assignments_cache is None:
-            assignments = ApplicationPanelAssignment.objects.filter(
-                application__in=self.apps).values_list(
-                    "application_id",
-                    "panel__judgepanelassignment__judge_id")
-            finished_assignments = self.feedback.exclude(
-                feedback_status=JUDGING_FEEDBACK_STATUS_INCOMPLETE
-            ).values_list("application_id", "judge_id")
-            self._app_assignments_cache = _collect_pairs(
-                set(assignments) - set(finished_assignments))
-        return self._app_assignments_cache
+        return self._app_assignments_cache.data(self.apps, self.feedback)
 
     def _application_needs(self):
         rows = []
@@ -319,14 +312,3 @@ class AllocateApplicationsView(ImpactView):
     def _failure(self):
         return Response(status=403,
                         data=self.errors)
-
-
-def _collect_pairs(pairs):
-    result = {}
-    for first, second in pairs:
-        value = result.get(first)
-        if value:
-            value.append(second)
-        else:
-            result[first] = [second]
-    return result
