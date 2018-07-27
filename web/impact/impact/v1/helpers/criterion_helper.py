@@ -22,6 +22,7 @@ ALL_FIELDS = {
 
 
 class CriterionHelper(ModelHelper):
+    application_field = "id"
     judge_field = "id"
 
     model = Criterion
@@ -81,9 +82,6 @@ class CriterionHelper(ModelHelper):
     @classmethod
     def fields(cls):
         return ALL_FIELDS
-
-    def application_field(self):
-        return "id"
 
     def option_for_field(self, field):
         return ""

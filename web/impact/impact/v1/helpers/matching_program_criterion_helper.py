@@ -10,6 +10,7 @@ from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
 
 
 class MatchingProgramCriterionHelper(MatchingCriterionHelper):
+    application_field = "startup_id"
     judge_field = "expertprofile__home_program_family__name"
 
     def __init__(self, subject):
@@ -45,9 +46,6 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
         pfs = ProgramFamily.objects.filter(
             programs__cycle=spec.criterion.judging_round.program.cycle)
         return pfs.values_list("name", flat=True)
-
-    def application_field(self):
-        return "startup_id"
 
     def option_for_field(self, field):
         return field

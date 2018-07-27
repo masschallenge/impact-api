@@ -10,6 +10,7 @@ from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
 
 
 class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
+    application_field = "startup__primary_industry__id"
     judge_field = "expertprofile__primary_industry__name"
 
     def __init__(self, subject):
@@ -52,9 +53,6 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
     def filter_by_judge_option(self, query, option_name):
         return query.filter(
             judge__expertprofile__primary_industry__name=option_name)
-
-    def application_field(self):
-        return "startup__primary_industry__id"
 
     def option_for_field(self, field):
         return field

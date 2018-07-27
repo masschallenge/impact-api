@@ -161,7 +161,7 @@ class AllocateApplicationsView(ImpactView):
             result = {}
             for criterion in self._criteria():
                 helper = CriterionHelper.find_helper(criterion)
-                fields.add(helper.application_field())
+                fields.add(helper.application_field)
             for field_data in self.apps.values(*list(fields)):
                 app_id = field_data["id"]
                 result[app_id] = {
@@ -207,7 +207,7 @@ class AllocateApplicationsView(ImpactView):
         for key in keys:
             criterion, option = key
             helper = CriterionHelper.find_helper(criterion)
-            if helper.field_matches_option(fields[helper.application_field()],
+            if helper.field_matches_option(fields[helper.application_field],
                                            option):
                 needs[key] = (
                     self._option_counts(key) -
