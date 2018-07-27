@@ -8,6 +8,7 @@ from numpy import (
 )
 from impact.v1.classes.application_data_cache import ApplicationDataCache
 from impact.v1.classes.criteria_data_cache import CriteriaDataCache
+from impact.v1.classes.judge_data_cache import JudgeDataCache
 from accelerator.models import (
     ACTIVE_PANEL_STATUS,
     Allocator,
@@ -42,24 +43,41 @@ class AllocateApplicationsView(ImpactView):
     view_name = "allocate_applications"
 
     def __init__(self):
-        self._app_data_cache = ApplicationDataCache()
-        self._criteria_cache = CriteriaDataCache()
-        self._judge_app_id_cache = None
-        self._judge_data_cache = None
+        self._app_id_cache = None
         self._option_counts_cache = None
         self.errors = []
 
     def get(self, request, round_id, judge_id):
-        self.judging_round = JudgingRound.objects.get(pk=round_id)
-        self.judge = User.objects.get(pk=judge_id)
-        self.scenario = self._find_scenario()
-        self._validate()
+        self._initialize(round_id, judge_id)
         if self.errors:
             return self._failure()
         applications = self._allocate()
         if self.errors:
             return self._failure()
         return Response(applications)
+
+    def _initialize(self, round_id, judge_id):
+        self.judging_round = JudgingRound.objects.get(pk=round_id)
+        self.judge = User.objects.get(pk=judge_id)
+        self.scenario = self._find_scenario()
+        self._validate()
+        if self.errors:
+            return
+        self.apps = Application.objects.filter(
+            application_type=self.judging_round.application_type,
+            application_status="submitted").order_by("id")
+        self.judges = self.judging_round.confirmed_judge_label.users
+        self.feedback = feedbacks_for_judging_round(
+            self.judging_round, self.apps).order_by("application_id")
+        self._criteria_cache = CriteriaDataCache(self.apps, self.judging_round)
+        self._application_cache = ApplicationDataCache(
+            self.apps, self._criteria_cache.criteria, self.feedback)
+        self._judge_cache = JudgeDataCache(self.judges,
+                                           self._criteria_cache.criteria)
+        if not self._judge_cache.data.get(self.judge.id, {}):
+            self.errors.append(NO_DATA_FOR_JUDGE.format(
+                judging_round=self.judging_round,
+                judge=self.judge.email))
 
     def _validate(self):
         self._check_judging_round()
@@ -77,19 +95,10 @@ class AllocateApplicationsView(ImpactView):
                 judge=self.judge.email, count=count))
 
     def _allocate(self):
-        self.apps = Application.objects.filter(
-            application_type=self.judging_round.application_type,
-            application_status="submitted").order_by("id")
-        self.feedback = feedbacks_for_judging_round(
-            self.judging_round, self.apps).order_by("application_id")
-        self.judges = self.judging_round.confirmed_judge_label.users
-        judge_features = self._judge_features()
-        if self.errors:
-            return []
+        weights = self._criteria_cache.weights
+        judge_features = self._judge_cache.features(self.judge, weights)
         needs = self._application_needs()
-        weights = array(list(self._criteria_cache.weights(self.judging_round,
-                                                          self.apps).values()))
-        needs_matrix = matrix(needs * weights)
+        needs_matrix = matrix(needs * array(list(weights.values())))
         preferences = judge_features * needs_matrix.transpose()
         choices = self._choose_app_ids(preferences)
         if not choices:
@@ -97,48 +106,6 @@ class AllocateApplicationsView(ImpactView):
         else:
             self._make_panel(choices)
         return choices
-
-    def _judge_features(self):
-        datum = self._data_for_judge(self.judge)
-        if not datum:
-            return matrix([])
-        keys = self._criteria_cache.weights(self.judging_round,
-                                            self.apps).keys()
-        row = OrderedDict([(key, 0) for key in keys])
-        for criterion in self._criteria_cache.criteria(self.judging_round):
-            helper = CriterionHelper.find_helper(criterion)
-            option = helper.option_for_field(
-                datum[helper.judge_field])
-            key = (criterion, option)
-            if key in keys:
-                row[key] = 1
-        return matrix(list(row.values()))
-
-    def _data_for_judge(self, judge):
-        result = self._judge_data().get(judge.id, None)
-        if not result:
-            self.errors.append(NO_DATA_FOR_JUDGE.format(
-                judging_round=self.judging_round,
-                judge=self.judge.email))
-        return result
-
-    def _judge_data(self):
-        if self._judge_data_cache is None:
-            fields = set(["id"])
-            result = {}
-            for criterion in self._criteria_cache.criteria(self.judging_round):
-                helper = CriterionHelper.find_helper(criterion)
-                fields.add(helper.judge_field)
-            for datum in self.judges.values(*list(fields)):
-                result[datum["id"]] = datum
-            self._judge_data_cache = result
-        return self._judge_data_cache
-
-    def _application_data(self):
-        return self._app_data_cache.data(
-            self._criteria_cache.criteria(self.judging_round),
-            self.apps,
-            self.feedback)
 
     def _application_needs(self):
         rows = []
@@ -148,10 +115,9 @@ class AllocateApplicationsView(ImpactView):
 
     def _application_need(self, app_id):
         needs = OrderedDict()
-        app_data = self._application_data()[app_id]
+        app_data = self._application_cache.data[app_id]
         fields = app_data["fields"]
-        keys = self._criteria_cache.weights(self.judging_round,
-                                            self.apps).keys()
+        keys = self._criteria_cache.weights.keys()
         for key in keys:
             criterion, option = key
             helper = CriterionHelper.find_helper(criterion)
@@ -160,13 +126,11 @@ class AllocateApplicationsView(ImpactView):
                 needs[key] = (
                     self._option_counts(key) -
                     self._sum_judge_data(key, app_data["feedbacks"]) -
-                    self._assignment_weight(key, app_data["assignments"]))
+                    (ASSIGNMENT_DISCOUNT *
+                     self._sum_judge_data(key, app_data["assignments"])))
             else:
                 needs[key] = 0
         return array(list(needs.values()))
-
-    def _assignment_weight(self, key, data):
-        return ASSIGNMENT_DISCOUNT * self._sum_judge_data(key, data)
 
     def _option_counts(self, key):
         if self._option_counts_cache is None:
@@ -185,7 +149,7 @@ class AllocateApplicationsView(ImpactView):
         result = 0
         criterion, option = key
         for judge_id in judge_ids:
-            judge_data = self._judge_data().get(judge_id, {})
+            judge_data = self._judge_cache.data.get(judge_id, {})
             field = CriterionHelper.find_helper(criterion).judge_field
             if option == judge_data.get(field):
                 result += 1
@@ -197,15 +161,19 @@ class AllocateApplicationsView(ImpactView):
         result = []
         count = 0
         for app in apps:
-            if self._can_assign(app.id):
+            if app.id not in self.app_ids():
                 result.append(app.id)
                 count += 1
             if count >= panel_size:
                 break
         return result
 
-    def _can_assign(self, app_id):
-        return app_id not in self._judge_app_ids()
+    def app_ids(self):
+        if self._app_id_cache is None:
+            self._app_id_cache = self._assignments().values_list(
+                "panel__applicationpanelassignment__application_id",
+                flat=True)
+        return self._app_id_cache
 
     def _assignments(self):
         return self.judge.judgepanelassignment_set.filter(
@@ -214,13 +182,6 @@ class AllocateApplicationsView(ImpactView):
     def _incomplete_assignments(self):
         return self._assignments().filter(
             assignment_status=ASSIGNED_PANEL_ASSIGNMENT_STATUS)
-
-    def _judge_app_ids(self):
-        if self._judge_app_id_cache is None:
-            self._judge_app_id_cache = self._assignments().values_list(
-                "panel__applicationpanelassignment__application_id",
-                flat=True)
-        return self._judge_app_id_cache
 
     def _make_panel(self, choices):
         self._enable_additional_assignments(len(choices))
