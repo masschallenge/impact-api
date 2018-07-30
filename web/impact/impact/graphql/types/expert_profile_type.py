@@ -13,11 +13,13 @@ from impact.graphql.types.program_family_type import ProgramFamilyType  # noqa: 
 from impact.graphql.types.user_type import UserType  # noqa: F401
 from impact.graphql.types.functional_expertise_type import FunctionalExpertiseType  # noqa: F401, E501
 from impact.graphql.types.interest_category_type import InterestCategoryType  # noqa: F401, E501
+from django.core.urlresolvers import reverse
 
 
 class ExpertProfileType(DjangoObjectType):
     mentees = graphene.List(StartupType)
     image_url = graphene.String()
+    office_hours_url = graphene.String()
     program_interests = graphene.List(graphene.String)
     available_office_hours = graphene.Boolean()
 
@@ -50,7 +52,6 @@ class ExpertProfileType(DjangoObjectType):
     def resolve_available_office_hours(self, info, **kwargs):
         user = info.context.user
         filter_kwargs = {
-            'finalist__isnull': True,
             'date__gte': timezone.now(),
             'start_time__gte': timezone.now().time()
         }
@@ -58,6 +59,21 @@ class ExpertProfileType(DjangoObjectType):
             filter_kwargs['program__in'] = _get_user_programs(user)
         return self.user.mentor_officehours.filter(
             **filter_kwargs).exists()
+
+    def resolve_office_hours_url(self, info, **kwargs):
+        user = info.context.user
+        if user.programrolegrant_set.filter(
+                program_role__user_role__name=UserRole.MENTOR
+        ).exists():
+            latest_grant = user.programrolegrant_set.filter(
+                program_role__user_role__name=UserRole.MENTOR
+            ).latest('created_at')
+            latest_mentor_program = latest_grant.program_role.program
+            return "/officehours/list/{family_slug}/{program_slug}/".format(
+                family_slug=latest_mentor_program.program_family.url_slug,
+                program_slug=latest_mentor_program.url_slug) + (
+                '?mentor_id={mentor_id}'.format(
+                    mentor_id=user.id))
 
 
 def _get_user_programs(user):
