@@ -63,7 +63,6 @@ class ExpertProfileType(DjangoObjectType):
                 date__gt=now)).exists()
 
     def resolve_office_hours_url(self, info, **kwargs):
-        user = info.context.user
         if self.user.programrolegrant_set.filter(
                 program_role__user_role__name=UserRole.MENTOR
         ).exists():
@@ -71,7 +70,7 @@ class ExpertProfileType(DjangoObjectType):
                 program_role__user_role__name=UserRole.MENTOR
             ).latest('created_at')
             latest_mentor_program = latest_grant.program_role.program
-            return "/officehours/list/{family_slug}/{program_slug}/".format(
+            return "/officehours/{family_slug}/{program_slug}/".format(
                 family_slug=latest_mentor_program.program_family.url_slug,
                 program_slug=latest_mentor_program.url_slug) + (
                 '?mentor_id={mentor_id}'.format(
