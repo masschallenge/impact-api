@@ -3,14 +3,19 @@
 
 from accelerator.models import (
     ProgramFamily,
+    Startup,
     StartupProgramInterest,
 )
 from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
 
 
 class MatchingProgramCriterionHelper(MatchingCriterionHelper):
+    application_field = "startup_id"
+    judge_field = "expertprofile__home_program_family__name"
+
     def __init__(self, subject):
         super().__init__(subject)
+        self._program_name_cache = None
 
     def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
         target = ProgramFamily.objects.filter(name=option_name).first()
@@ -42,6 +47,28 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
             programs__cycle=spec.criterion.judging_round.program.cycle)
         return pfs.values_list("name", flat=True)
 
-    def filter_by_judge_option(self, query, option_name):
-        return query.filter(
-            judge__expertprofile__home_program_family__name=option_name)
+    def option_for_field(self, field):
+        return field
+
+    def field_matches_option(self, field, option):
+        return self._program_name(field) == option
+
+    def _program_name(self, field):
+        if self._program_name_cache is None:
+            self._program_name_cache = self._calc_program_name_cache()
+        return self._program_name_cache[field]
+
+    def _calc_program_name_cache(self):
+        cache = {}
+        judging_round = self.subject.judging_round
+        startups = Startup.objects.filter(
+            application__application_type=judging_round.application_type,
+            application__application_status="submitted")
+        spis = StartupProgramInterest.objects.filter(
+            applying=True,
+            startup__in=startups).order_by('order').prefetch_related(
+                "program__program_family")
+        for spi in spis:
+            if spi.startup_id not in cache:
+                cache[spi.startup_id] = spi.program.program_family.name
+        return cache
