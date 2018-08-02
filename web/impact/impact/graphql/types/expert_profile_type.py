@@ -55,12 +55,13 @@ class ExpertProfileType(DjangoObjectType):
             'finalist__isnull': True,
         }
         now = timezone.now()
-        if not user.is_staff:
+        if not user.is_staff and user != self.user and not user.is_superuser:
             filter_kwargs['program__in'] = _get_user_programs(user)
+        future_datetime_filter = Q(
+            date=now,
+            start_time__gte=now.time()) | Q(date__gt=now)
         return self.user.mentor_officehours.filter(**filter_kwargs).filter(
-            Q(date=now,
-              start_time__gte=now.time()) | Q(
-                date__gt=now)).exists()
+            future_datetime_filter).exists()
 
     def resolve_office_hours_url(self, info, **kwargs):
         if self.user.programrolegrant_set.filter(
