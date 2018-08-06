@@ -26,7 +26,7 @@ class CloneCriteriaView(ImpactView):
     def fields(cls):
         return {}
 
-    def get(self, request, source_pk, target_pk):
+    def post(self, request, source_pk, target_pk):
         self._validate_judging_round_exists(source_pk)
         self._validate_judging_round_exists(target_pk)
         if self.errors:

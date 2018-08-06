@@ -23,7 +23,7 @@ class TestCloneCriteriaView(APITestCase):
         url = reverse(CloneCriteriaView.view_name,
                       args=[old_round.pk, new_round.pk])
         with self.login(email=self.basic_user().email):
-            self.client.get(url)
+            self.client.post(url)
         assert CriterionOptionSpec.objects.filter(
             option=option_spec.option,
             weight=option_spec.weight,
@@ -37,5 +37,5 @@ class TestCloneCriteriaView(APITestCase):
                       args=round_ids)
 
         with self.login(email=self.basic_user().email):
-            response = self.client.get(url)
+            response = self.client.post(url)
         self.assertEqual(response.status_code, 401)
