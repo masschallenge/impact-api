@@ -21,6 +21,7 @@ mock
 pycrypto
 python-magic
 gunicorn
+numpy
 
 # Django
 dj-database-url

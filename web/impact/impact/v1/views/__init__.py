@@ -8,6 +8,7 @@ from impact.v1.views.allocate_applications_view import (
     AllocateApplicationsView,
     JUDGING_ROUND_INACTIVE_ERROR,
     NO_APP_LEFT_FOR_JUDGE,
+    NO_DATA_FOR_JUDGE,
 )
 from impact.v1.views.analyze_judging_round_view import AnalyzeJudgingRoundView
 from impact.v1.views.base_list_view import INVALID_IS_ACTIVE_ERROR

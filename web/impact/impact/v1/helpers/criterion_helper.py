@@ -21,11 +21,15 @@ ALL_FIELDS = {
 
 
 class CriterionHelper(ModelHelper):
+    application_field = "id"
+    judge_field = "id"
+
     model = Criterion
 
     REQUIRED_KEYS = ["name",
                      "type",
                      "judging_round_id"]
+    CLASS_TO_FIELD = {}
     ALL_KEYS = REQUIRED_KEYS
     INPUT_KEYS = ALL_KEYS
 
@@ -36,8 +40,9 @@ class CriterionHelper(ModelHelper):
         cls.specific_helpers[(type, name)] = klass
 
     @classmethod
-    def find_helper(cls, type, name):
-        return cls.specific_helpers.get((type, name), cls)
+    def find_helper(cls, criterion):
+        return cls.specific_helpers.get((criterion.type, criterion.name),
+                                        cls)(criterion)
 
     def options(self, spec, apps):
         return [spec.option]
@@ -100,3 +105,10 @@ class CriterionHelper(ModelHelper):
             type=criterion.type,
             name=criterion.name)
         return criterion.pk, clone.pk
+
+    def option_for_field(self, field):
+        return ""
+
+    def field_matches_option(self, field, option):
+        return True
+

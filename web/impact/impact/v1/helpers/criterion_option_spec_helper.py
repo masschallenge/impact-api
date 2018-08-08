@@ -46,9 +46,8 @@ class CriterionOptionSpecHelper(ModelHelper):
 
     def __init__(self, subject):
         super().__init__(subject)
-        criterion = self.subject.criterion
-        self.criterion_helper = CriterionHelper.find_helper(
-            criterion.type, criterion.name)(subject)
+        criterion = subject.criterion
+        self.criterion_helper = CriterionHelper.find_helper(criterion)
 
     def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
         return self.criterion_helper.app_ids_for_feedbacks(
