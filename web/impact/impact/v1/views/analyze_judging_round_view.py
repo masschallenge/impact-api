@@ -23,6 +23,7 @@ ANALYZE_JUDGING_ROUND_FIELDS = {
     "weight": READ_ONLY_INTEGER_FIELD,
     "count": READ_ONLY_INTEGER_FIELD,
     "criterion_name": READ_ONLY_STRING_FIELD,
+    "criterion_type": READ_ONLY_STRING_FIELD,    
     "option": READ_ONLY_STRING_FIELD,
     "total_required_reads": READ_ONLY_INTEGER_FIELD,
     "completed_required_reads": READ_ONLY_INTEGER_FIELD,
