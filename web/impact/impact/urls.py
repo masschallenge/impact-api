@@ -33,6 +33,7 @@ from impact.views import (
     AlgoliaApiKeyView,
     GeneralViewSet,
     IndexView,
+    JWTCookieNameView,
 )
 
 accelerator_router = routers.DefaultRouter()
@@ -54,6 +55,8 @@ account_urlpatterns = [
 ]
 
 urls = [
+    url(r'^api/sso/token_name/', JWTCookieNameView.as_view(),
+        name=JWTCookieNameView.view_name),
     url(r'^api/algolia/api_key/$', AlgoliaApiKeyView.as_view(),
         name=AlgoliaApiKeyView.view_name),
     url(r'^api/v0/', include(v0_urlpatterns)),
