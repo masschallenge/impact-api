@@ -1,6 +1,5 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
-
 from accelerator.models import CriterionOptionSpec
 
 from impact.v1.helpers.model_helper import (
@@ -74,3 +73,18 @@ class CriterionOptionSpecHelper(ModelHelper):
     @classmethod
     def fields(cls):
         return CRITERION_OPTION_SPEC_FIELDS
+
+    @classmethod
+    def clone_option_specs(cls, clones):
+        for original_id, copy_id in clones:
+            cls.clone_options(original_id, copy_id)
+
+    @classmethod
+    def clone_options(cls, original_id, copy_id):
+        option_specs = cls.model.objects.filter(criterion_id=original_id)
+        cls.model.objects.bulk_create([
+            cls.model(option=spec.option,
+                      count=spec.count,
+                      weight=spec.weight,
+                      criterion_id=copy_id)
+            for spec in option_specs])
