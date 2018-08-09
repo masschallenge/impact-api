@@ -43,6 +43,8 @@ class TestGraphQL(APITestCase):
                     expertProfile(id: {id}) {{
                         user {{ firstName }}
                         bio
+                        currentMentees {{ startupName }}
+                        previousMentees {{ startupName }}
                     }}
                 }}
             """.format(id=user.expertprofile.id)
@@ -56,6 +58,8 @@ class TestGraphQL(APITestCase):
                                 'firstName': user.first_name,
                             },
                             'bio': user.expertprofile.bio,
+                            'currentMentees': [],
+                            'previousMentees': [],
                         }
                     }
                 }
