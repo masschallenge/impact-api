@@ -405,6 +405,8 @@ release-list:
 
 
 release:
+	@git commit --allow-empty -m "generating a new release"
+	@git push
 	@bash create_release.sh
 
 
