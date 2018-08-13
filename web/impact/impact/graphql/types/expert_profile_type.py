@@ -13,7 +13,9 @@ from accelerator_abstract.models import (
     ENDED_PROGRAM_STATUS,
 )
 from impact.graphql.types.industry_type import IndustryType  # noqa: F401
-from impact.graphql.types.startup_mentor_relationship_type import StartupMentorRelationshipType  # noqa: E501
+from impact.graphql.types.startup_mentor_relationship_type import (
+    StartupMentorRelationshipType,
+)
 from impact.graphql.types.program_family_type import ProgramFamilyType  # noqa: F401, E501
 from impact.graphql.types.user_type import UserType  # noqa: F401
 from impact.graphql.types.functional_expertise_type import FunctionalExpertiseType  # noqa: F401, E501
@@ -86,26 +88,10 @@ class ExpertProfileType(DjangoObjectType):
                     mentor_id=self.user.id))
 
     def resolve_current_mentees(self, info, **kwargs):
-        mentee_filter = compose_filter([
-            'startup_mentor_tracking',
-            'program',
-            'program_status'
-        ], ACTIVE_PROGRAM_STATUS)
-        return self.user.startup_mentor_relationships.filter(
-            status=CONFIRMED_RELATIONSHIP,
-            **mentee_filter
-            )
+        return _get_mentees(self.user, ACTIVE_PROGRAM_STATUS)
 
     def resolve_previous_mentees(self, info, **kwargs):
-        mentee_filter = compose_filter([
-            'startup_mentor_tracking',
-            'program',
-            'program_status'
-        ], ENDED_PROGRAM_STATUS)
-        return self.user.startup_mentor_relationships.filter(
-            status=CONFIRMED_RELATIONSHIP,
-            **mentee_filter
-            )
+        return _get_mentees(self.user, ENDED_PROGRAM_STATUS)
 
 
 def _get_user_programs(user):
@@ -118,3 +104,15 @@ def _get_user_programs(user):
     )
     return Program.objects.filter(
         programrole__in=user_program_roles_as_participant).distinct()
+
+
+def _get_mentees(user, program_status):
+    mentee_filter = compose_filter([
+        'startup_mentor_tracking',
+        'program',
+        'program_status'
+    ], program_status)
+    return user.startup_mentor_relationships.filter(
+        status=CONFIRMED_RELATIONSHIP,
+        **mentee_filter
+    )
