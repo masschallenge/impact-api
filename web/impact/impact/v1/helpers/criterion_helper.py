@@ -6,7 +6,6 @@ from django.db.models import (
     Sum,
 )
 from accelerator.models import Criterion
-
 from impact.v1.helpers.model_helper import (
     REQUIRED_INTEGER_FIELD,
     ModelHelper,
@@ -80,11 +79,36 @@ class CriterionHelper(ModelHelper):
         return results
 
     @classmethod
+    def clone_criteria(cls, source_judging_round_id, target_judging_round_id):
+
+        cls.delete_existing_criteria(target_judging_round_id)
+        criteria = cls.model.objects.filter(
+            judging_round_id=source_judging_round_id)
+        return [cls.clone_criterion(criterion, target_judging_round_id)
+                for criterion in criteria]
+
+    @classmethod
+    def delete_existing_criteria(cls, judging_round_id):
+        criteria = cls.model.objects.filter(judging_round_id=judging_round_id)
+        for criterion in criteria:
+            criterion.criterionoptionspec_set.all().delete()
+        criteria.delete()
+
+    @classmethod
     def fields(cls):
         return ALL_FIELDS
+
+    @classmethod
+    def clone_criterion(cls, criterion, target_judging_round_id):
+        clone = cls.model.objects.create(
+            judging_round_id=target_judging_round_id,
+            type=criterion.type,
+            name=criterion.name)
+        return criterion.pk, clone.pk
 
     def option_for_field(self, field):
         return ""
 
     def field_matches_option(self, field, option):
         return True
+
