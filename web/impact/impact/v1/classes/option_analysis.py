@@ -52,7 +52,7 @@ class OptionAnalysis(object):
             "criterion_option_spec_id": self.option_spec.id,
             "criterion_name": self.option_spec.criterion.name,
             "criterion_type": self.option_spec.criterion.type,
-            "criterion_id": self.option_spec.criterion.id,            
+            "criterion_id": self.option_spec.criterion.id,
             "option": option_name,
             "weight": self.option_spec.weight,
             "count": self.option_spec.count,
