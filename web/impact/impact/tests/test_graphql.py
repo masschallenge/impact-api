@@ -5,8 +5,21 @@ from django.urls import reverse
 
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
 from impact.tests.api_test_case import APITestCase
-from impact.tests.factories import ExpertFactory, StartupMentorRelationshipFactory  # noqa: E501
+from impact.tests.factories import (
+    ExpertFactory,
+    StartupMentorRelationshipFactory,
+)
 from impact.tests.utils import capture_stderr
+
+MENTEE_FIELDS = """
+    startupId
+    startupName
+    startupHighResolutionLogo
+    startupShortPitch
+    programLocation
+    programYear
+    programStatus
+"""
 
 
 class TestGraphQL(APITestCase):
@@ -74,26 +87,15 @@ class TestGraphQL(APITestCase):
                 query {{
                     expertProfile(id: {id}) {{
                         currentMentees {{
-                            startupId
-                            startupName
-                            startupHighResolutionLogo
-                            startupShortPitch
-                            programLocation
-                            programYear
-                            programStatus
+                            {MENTEE_FIELDS}
                         }}
                         previousMentees {{
-                            startupId
-                            startupName
-                            startupHighResolutionLogo
-                            startupShortPitch
-                            programLocation
-                            programYear
-                            programStatus
+                            {MENTEE_FIELDS}
                         }}
                     }}
                 }}
-            """.format(id=obj.mentor.expertprofile.id)
+            """.format(id=obj.mentor.expertprofile.id,
+                       MENTEE_FIELDS=MENTEE_FIELDS)
             response = self.client.post(self.url, data={'query': query})
             self.assertJSONEqual(
                 str(response.content, encoding='utf8'),
