@@ -253,6 +253,7 @@ class Base(Configuration):
         # did not expire
         'JWT_AUTH_COOKIE': os.environ.get('JWT_AUTH_COOKIE', ''),
         'JWT_SECRET_KEY': os.environ.get('JWT_SECRET_KEY', ''),
+        'FIRST_NAME_KEY': 'first_name',
     }
 
     PAYPAL_WPP_USER = ''
