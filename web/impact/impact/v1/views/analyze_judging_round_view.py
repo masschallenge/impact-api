@@ -20,9 +20,11 @@ from impact.v1.helpers.model_helper import (
 
 ANALYZE_JUDGING_ROUND_FIELDS = {
     "criterion_option_spec_id": READ_ONLY_ID_FIELD,
+    "criterion_id": READ_ONLY_ID_FIELD,
     "weight": READ_ONLY_INTEGER_FIELD,
     "count": READ_ONLY_INTEGER_FIELD,
     "criterion_name": READ_ONLY_STRING_FIELD,
+    "criterion_type": READ_ONLY_STRING_FIELD,
     "option": READ_ONLY_STRING_FIELD,
     "total_required_reads": READ_ONLY_INTEGER_FIELD,
     "completed_required_reads": READ_ONLY_INTEGER_FIELD,
