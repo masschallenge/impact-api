@@ -6,6 +6,7 @@ from django.urls import reverse
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
 from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import (
+    EntrepreneurFactory,
     ExpertFactory,
     StartupMentorRelationshipFactory,
 )
@@ -91,7 +92,7 @@ class TestGraphQL(APITestCase):
                         }}
                     }}
                 }}
-            """.format(id=relationship.mentor.expertprofile.id,
+            """.format(id=relationship.mentor.id,
                        MENTEE_FIELDS=MENTEE_FIELDS)
             response = self.client.post(self.url, data={'query': query})
             self.assertJSONEqual(
@@ -112,6 +113,27 @@ class TestGraphQL(APITestCase):
                             }],
                             'previousMentees': []
                         }
+                    }
+                }
+            )
+
+    def test_query_with_non_expert_user_id(self):
+        with self.login(email=self.basic_user().email):
+            user = EntrepreneurFactory()
+            query = """
+                query {{
+                    expertProfile(id: {id}) {{
+                        user {{ firstName }}
+                        bio
+                    }}
+                }}
+            """.format(id=user.id)
+            response = self.client.post(self.url, data={'query': query})
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                {
+                    'data': {
+                        'expertProfile': None
                     }
                 }
             )
