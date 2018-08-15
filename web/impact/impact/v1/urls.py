@@ -40,7 +40,7 @@ v1_urlpatterns = [
     url(r"^analyze_judging_round/(?P<pk>[0-9]+)/$",
         AnalyzeJudgingRoundView.as_view(),
         name=AnalyzeJudgingRoundView.view_name),
-    url(r"^clone_criteria//$",
+    url(r"^clone_criteria/$",
         CloneCriteriaView.as_view(),
         name=CloneCriteriaView.view_name),
     url(r"^credit_code/(?P<pk>[0-9]+)/$",

@@ -23,8 +23,8 @@ class CloneCriteriaView(ImpactView):
         return {}
 
     def post(self, request):
-        source_pk = request.POST.get(SOURCE_JUDGING_ROUND_KEY)
-        target_pk = request.POST.get(TARGET_JUDGING_ROUND_KEY)
+        source_pk = request.data.get(SOURCE_JUDGING_ROUND_KEY)
+        target_pk = request.data.get(TARGET_JUDGING_ROUND_KEY)
         self._validate_judging_round_exists(source_pk)
         self._validate_judging_round_exists(target_pk)
         if self.errors:
