@@ -56,8 +56,6 @@ class TestGraphQL(APITestCase):
                     expertProfile(id: {id}) {{
                         user {{ firstName }}
                         bio
-                        currentMentees {{ startupName }}
-                        previousMentees {{ startupName }}
                     }}
                 }}
             """.format(id=user.expertprofile.id)
@@ -71,8 +69,6 @@ class TestGraphQL(APITestCase):
                                 'firstName': user.first_name,
                             },
                             'bio': user.expertprofile.bio,
-                            'currentMentees': [],
-                            'previousMentees': [],
                         }
                     }
                 }
@@ -80,9 +76,10 @@ class TestGraphQL(APITestCase):
 
     def test_requested_fields_for_startup_mentor_relationship_type(self):
         with self.login(email=self.basic_user().email):
-            obj = StartupMentorRelationshipFactory()
-            startup = obj.startup_mentor_tracking.startup
-            program = obj.startup_mentor_tracking.program
+            mentor = ExpertFactory()
+            relationship = StartupMentorRelationshipFactory(mentor=mentor)
+            startup = relationship.startup_mentor_tracking.startup
+            program = relationship.startup_mentor_tracking.program
             query = """
                 query {{
                     expertProfile(id: {id}) {{
@@ -94,7 +91,7 @@ class TestGraphQL(APITestCase):
                         }}
                     }}
                 }}
-            """.format(id=obj.mentor.expertprofile.id,
+            """.format(id=relationship.mentor.expertprofile.id,
                        MENTEE_FIELDS=MENTEE_FIELDS)
             response = self.client.post(self.url, data={'query': query})
             self.assertJSONEqual(

@@ -112,7 +112,7 @@ def _get_mentees(user, program_status):
         'program',
         'program_status'
     ], program_status)
-    return user.startup_mentor_relationships.filter(
+    return user.startupmentorrelationship_set.filter(
         status=CONFIRMED_RELATIONSHIP,
         **mentee_filter
     )
