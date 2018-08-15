@@ -6,18 +6,28 @@ from accelerator.models import (
     UserRole,
     ProgramRole,
     Program,
+    CONFIRMED_RELATIONSHIP,
+)
+from accelerator_abstract.models import (
+    ACTIVE_PROGRAM_STATUS,
+    ENDED_PROGRAM_STATUS,
 )
 from impact.graphql.types.industry_type import IndustryType  # noqa: F401
-from impact.graphql.types.startup_type import StartupType
+from impact.graphql.types.startup_mentor_relationship_type import (
+    StartupMentorRelationshipType,
+)
 from impact.graphql.types.program_family_type import ProgramFamilyType  # noqa: F401, E501
 from impact.graphql.types.user_type import UserType  # noqa: F401
 from impact.graphql.types.functional_expertise_type import FunctionalExpertiseType  # noqa: F401, E501
 from impact.graphql.types.interest_category_type import InterestCategoryType  # noqa: F401, E501
 from django.db.models import Q
 
+from impact.utils import compose_filter
+
 
 class ExpertProfileType(DjangoObjectType):
-    mentees = graphene.List(StartupType)
+    current_mentees = graphene.List(StartupMentorRelationshipType)
+    previous_mentees = graphene.List(StartupMentorRelationshipType)
     image_url = graphene.String()
     office_hours_url = graphene.String()
     program_interests = graphene.List(graphene.String)
@@ -77,6 +87,12 @@ class ExpertProfileType(DjangoObjectType):
                 '?mentor_id={mentor_id}'.format(
                     mentor_id=self.user.id))
 
+    def resolve_current_mentees(self, info, **kwargs):
+        return _get_mentees(self.user, ACTIVE_PROGRAM_STATUS)
+
+    def resolve_previous_mentees(self, info, **kwargs):
+        return _get_mentees(self.user, ENDED_PROGRAM_STATUS)
+
 
 def _get_user_programs(user):
     # todo: refactor this and move it to a sensible place
@@ -88,3 +104,15 @@ def _get_user_programs(user):
     )
     return Program.objects.filter(
         programrole__in=user_program_roles_as_participant).distinct()
+
+
+def _get_mentees(user, program_status):
+    mentee_filter = compose_filter([
+        'startup_mentor_tracking',
+        'program',
+        'program_status'
+    ], program_status)
+    return user.startupmentorrelationship_set.filter(
+        status=CONFIRMED_RELATIONSHIP,
+        **mentee_filter
+    )
