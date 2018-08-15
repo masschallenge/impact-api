@@ -8,9 +8,6 @@ class Query(graphene.ObjectType):
     expert_profile = graphene.Field(ExpertProfileType, id=graphene.Int())
 
     def resolve_expert_profile(self, info, **kwargs):
-        expert_profile_id = kwargs.get('id')
+        user_id = kwargs.get('id')
 
-        if expert_profile_id is not None:
-            return ExpertProfile.objects.get(pk=expert_profile_id)
-
-        return None
+        return ExpertProfile.objects.get(user_id=user_id) if user_id else None

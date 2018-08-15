@@ -16,7 +16,7 @@ class TestGraphQL(APITestCase):
     def test_anonymous_user_cannot_access_main_graphql_view(self):
         user = ExpertFactory()
         query = """query {{ expertProfile(id: {id}) {{ title }} }}
-            """.format(id=user.expertprofile.id)
+            """.format(id=user.id)
 
         with capture_stderr(self.client.post,
                             self.url,
@@ -45,7 +45,7 @@ class TestGraphQL(APITestCase):
                         bio
                     }}
                 }}
-            """.format(id=user.expertprofile.id)
+            """.format(id=user.id)
             response = self.client.post(self.url, data={'query': query})
             self.assertJSONEqual(
                 str(response.content, encoding='utf8'),
