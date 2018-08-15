@@ -14,7 +14,6 @@ class Query(graphene.ObjectType):
 
     def resolve_expert_profile(self, info, **kwargs):
         user_id = kwargs.get('id')
-
         User = get_user_model()
 
         try:

@@ -137,3 +137,22 @@ class TestGraphQL(APITestCase):
                     }
                 }
             )
+
+    def test_query_with_non_existant_user_id(self):
+        with self.login(email=self.basic_user().email):
+            query = """
+                query {{
+                    expertProfile(id: {id}) {{
+                        user {{ firstName }}
+                    }}
+                }}
+            """.format(id=0)
+            response = self.client.post(self.url, data={'query': query})
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                {
+                    'data': {
+                        'expertProfile': None
+                    }
+                }
+            )
