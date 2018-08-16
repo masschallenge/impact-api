@@ -141,7 +141,7 @@ class TestGraphQL(APITestCase):
                 None
             )
 
-    def test_query_with_non_existant_user_id(self):
+    def test_query_with_non_existent_user_id(self):
         with self.login(email=self.basic_user().email):
             query = """
                 query {{
