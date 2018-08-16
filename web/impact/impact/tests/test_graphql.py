@@ -1,11 +1,12 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
-
+import json
 from django.urls import reverse
 
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
 from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import (
+    EntrepreneurFactory,
     ExpertFactory,
     StartupMentorRelationshipFactory,
 )
@@ -21,6 +22,8 @@ MENTEE_FIELDS = """
     programStatus
 """
 
+EXPERT_NOT_FOUND_MESSAGE = 'ExpertProfile matching query does not exist.'
+
 
 class TestGraphQL(APITestCase):
     url = reverse('graphql')
@@ -29,7 +32,7 @@ class TestGraphQL(APITestCase):
     def test_anonymous_user_cannot_access_main_graphql_view(self):
         user = ExpertFactory()
         query = """query {{ expertProfile(id: {id}) {{ title }} }}
-            """.format(id=user.expertprofile.id)
+            """.format(id=user.id)
 
         with capture_stderr(self.client.post,
                             self.url,
@@ -58,7 +61,7 @@ class TestGraphQL(APITestCase):
                         bio
                     }}
                 }}
-            """.format(id=user.expertprofile.id)
+            """.format(id=user.id)
             response = self.client.post(self.url, data={'query': query})
             self.assertJSONEqual(
                 str(response.content, encoding='utf8'),
@@ -91,7 +94,7 @@ class TestGraphQL(APITestCase):
                         }}
                     }}
                 }}
-            """.format(id=relationship.mentor.expertprofile.id,
+            """.format(id=relationship.mentor.id,
                        MENTEE_FIELDS=MENTEE_FIELDS)
             response = self.client.post(self.url, data={'query': query})
             self.assertJSONEqual(
@@ -114,4 +117,46 @@ class TestGraphQL(APITestCase):
                         }
                     }
                 }
+            )
+
+    def test_query_with_non_expert_user_id(self):
+        with self.login(email=self.basic_user().email):
+            user = EntrepreneurFactory()
+            query = """
+                query {{
+                    expertProfile(id: {id}) {{
+                        user {{ firstName }}
+                        bio
+                    }}
+                }}
+            """.format(id=user.id)
+            response = self.client.post(self.url, data={'query': query})
+            response_payload = json.loads(response.content)
+            self.assertEqual(
+                response_payload['errors'][0]['message'],
+                EXPERT_NOT_FOUND_MESSAGE
+            )
+            self.assertEqual(
+                response_payload['data']['expertProfile'],
+                None
+            )
+
+    def test_query_with_non_existent_user_id(self):
+        with self.login(email=self.basic_user().email):
+            query = """
+                query {{
+                    expertProfile(id: {id}) {{
+                        user {{ firstName }}
+                    }}
+                }}
+            """.format(id=0)
+            response = self.client.post(self.url, data={'query': query})
+            response_payload = json.loads(response.content)
+            self.assertEqual(
+                response_payload['errors'][0]['message'],
+                EXPERT_NOT_FOUND_MESSAGE
+            )
+            self.assertEqual(
+                response_payload['data']['expertProfile'],
+                None
             )
