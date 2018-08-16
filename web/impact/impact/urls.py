@@ -12,7 +12,7 @@ from django.contrib import admin
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from drf_auto_endpoint.router import router as schema_router
-from graphene_django.views import GraphQLView
+from impact.graphql.utils.custom_error_view import SafeGraphQLView
 from rest_framework import routers
 from rest_framework_jwt.views import (
     obtain_jwt_token,
@@ -93,14 +93,14 @@ urls = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include(account_urlpatterns)),
     url(r'^graphql/$',
-        csrf_exempt(GraphQLView.as_view(graphiql=settings.DEBUG,
+        csrf_exempt(SafeGraphQLView.as_view(graphiql=settings.DEBUG,
                                         schema=schema,
                                         middleware=[
                                             IsAuthenticatedMiddleware]
                                         )),
         name="graphql"),
     url(r'^graphql/auth/$',
-        csrf_exempt(GraphQLView.as_view(graphiql=settings.DEBUG,
+        csrf_exempt(SafeGraphQLView.as_view(graphiql=settings.DEBUG,
                                         schema=auth_schema)),
         name="graphql-auth"),
     url(r'^oauth/',
