@@ -6,7 +6,8 @@ from graphql.error import GraphQLSyntaxError
 from graphql.error.located_error import GraphQLLocatedError
 from graphql.error import format_error as format_graphql_error
 from impact.graphql.utils.response_error import ResponseError
-from impact.graphql.utils.str_converters import to_kebab_case, dict_key_to_camel_case
+from impact.graphql.utils.str_converters import (
+    to_kebab_case, dict_key_to_camel_case)
 
 
 def encode_code(code):
@@ -30,13 +31,14 @@ def format_response_error(error: ResponseError):
 
 
 def format_internal_error(error: Exception):
-    message = 'Internal server errorr'
-    code = 'internal-server-error'
+    message = str(error)
+    code = type(error).__name__
     if settings.DEBUG:
         params = {
             'exception': type(error).__name__,
             'message': str(error),
-            'trace': traceback.format_list(traceback.extract_tb(error.__traceback__)),
+            'trace': traceback.format_list(traceback.extract_tb(
+                error.__traceback__)),
         }
         return {
             'code': code,
