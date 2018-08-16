@@ -151,6 +151,20 @@ class TestGraphQL(APITestCase):
             self.assertJSONEqual(
                 str(response.content, encoding='utf8'),
                 {
+                    'errors': [
+                        {
+                            'message': 'User not found',
+                            'locations': [
+                                {
+                                    'line': 3,
+                                    'column': 21
+                                }
+                            ],
+                            'path': [
+                                'expertProfile'
+                            ]
+                        }
+                    ],
                     'data': {
                         'expertProfile': None
                     }
