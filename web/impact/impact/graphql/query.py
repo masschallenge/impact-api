@@ -1,12 +1,7 @@
 import graphene
-from django.contrib.auth import get_user_model
-from django.core.exceptions import ObjectDoesNotExist
-from graphql import GraphQLError
 
 from impact.graphql.types.expert_profile_type import ExpertProfileType
-from accelerator_abstract.models.base_base_profile import (
-    EXPERT_USER_TYPE,
-)
+from accelerator.models.expert_profile import ExpertProfile
 
 
 class Query(graphene.ObjectType):
@@ -14,14 +9,8 @@ class Query(graphene.ObjectType):
 
     def resolve_expert_profile(self, info, **kwargs):
         user_id = kwargs.get('id')
-        User = get_user_model()
 
-        try:
-            user = User.objects.get(id=user_id)
-            profile = user.get_profile()
-            if profile.user_type.upper() == EXPERT_USER_TYPE:
-                return profile
-        except ObjectDoesNotExist:
-            raise GraphQLError('User not found')
+        if user_id is not None:
+            return ExpertProfile.objects.get(user_id=user_id)
 
         return None

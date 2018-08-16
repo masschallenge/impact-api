@@ -1,6 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
-
+import json
 from django.urls import reverse
 
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
@@ -21,6 +21,8 @@ MENTEE_FIELDS = """
     programYear
     programStatus
 """
+
+EXPERT_NOT_FOUND_MESSAGE = 'ExpertProfile matching query does not exist.'
 
 
 class TestGraphQL(APITestCase):
@@ -129,13 +131,14 @@ class TestGraphQL(APITestCase):
                 }}
             """.format(id=user.id)
             response = self.client.post(self.url, data={'query': query})
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                {
-                    'data': {
-                        'expertProfile': None
-                    }
-                }
+            response_payload = json.loads(response.content)
+            self.assertEqual(
+                response_payload['errors'][0]['message'],
+                EXPERT_NOT_FOUND_MESSAGE
+            )
+            self.assertEqual(
+                response_payload['data']['expertProfile'],
+                None
             )
 
     def test_query_with_non_existant_user_id(self):
@@ -148,25 +151,12 @@ class TestGraphQL(APITestCase):
                 }}
             """.format(id=0)
             response = self.client.post(self.url, data={'query': query})
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                {
-                    'errors': [
-                        {
-                            'message': 'User not found',
-                            'locations': [
-                                {
-                                    'line': 3,
-                                    'column': 21
-                                }
-                            ],
-                            'path': [
-                                'expertProfile'
-                            ]
-                        }
-                    ],
-                    'data': {
-                        'expertProfile': None
-                    }
-                }
+            response_payload = json.loads(response.content)
+            self.assertEqual(
+                response_payload['errors'][0]['message'],
+                EXPERT_NOT_FOUND_MESSAGE
+            )
+            self.assertEqual(
+                response_payload['data']['expertProfile'],
+                None
             )
