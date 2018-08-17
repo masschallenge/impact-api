@@ -142,7 +142,9 @@ target_help = \
   '\tRelease name defaults release-<version>.<number> where <version> is' \
   '\tthe first line of impact-api/VERSION and <number> is the next unused' \
   '\tnon-negative integer (0,1,2,...).' \
-  '\t$$(release_name) overrides the entire release name.' \
+  '\t$$(TAG) overrides the entire release name.' \
+  '\tThe TAG can be set by adding an optional TAG="custom-tag" to the command' \
+  '\te.g. make release TAG="XX-XXXX" ' \
   'deploy - Deploy $$(release_name) to a $$(target).' \
   '\tValid targets include "staging" (the default), "production",' \
   '\t "test-1", and "test-2"' \
