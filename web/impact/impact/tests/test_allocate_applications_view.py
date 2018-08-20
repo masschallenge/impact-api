@@ -79,7 +79,7 @@ class TestAllocateApplicationsView(APITestCase):
                     in response.data]
 
     def test_get_adds_capacity_and_quota(self):
-        context = AnalyzeJudgingContext(judge_capacity=0)
+        context = AnalyzeJudgingContext()
         judging_round = context.judging_round
         commitment = context.judges[0].judgeroundcommitment_set.first()
         with self.login(email=self.basic_user().email):
