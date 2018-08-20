@@ -93,15 +93,16 @@ urls = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/', include(account_urlpatterns)),
     url(r'^graphql/$',
-        csrf_exempt(SafeGraphQLView.as_view(graphiql=settings.DEBUG,
-                                        schema=schema,
-                                        middleware=[
-                                            IsAuthenticatedMiddleware]
-                                        )),
+        csrf_exempt(SafeGraphQLView.as_view(
+            graphiql=settings.DEBUG,
+            schema=schema,
+            middleware=[
+                IsAuthenticatedMiddleware])),
         name="graphql"),
     url(r'^graphql/auth/$',
-        csrf_exempt(SafeGraphQLView.as_view(graphiql=settings.DEBUG,
-                                        schema=auth_schema)),
+        csrf_exempt(SafeGraphQLView.as_view(
+            graphiql=settings.DEBUG,
+            schema=auth_schema)),
         name="graphql-auth"),
     url(r'^oauth/',
         include('oauth2_provider.urls', namespace='oauth2_provider')),
