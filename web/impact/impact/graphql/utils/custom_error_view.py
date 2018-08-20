@@ -6,27 +6,13 @@ from graphql.error import GraphQLSyntaxError
 from graphql.error.located_error import GraphQLLocatedError
 from graphql.error import format_error as format_graphql_error
 from impact.graphql.utils.response_error import ResponseError
-from impact.graphql.utils.str_converters import (
-    to_kebab_case, dict_key_to_camel_case)
-
-
-def encode_code(code):
-    if code is None:
-        return None
-    return to_kebab_case(code)
-
-
-def encode_params(params):
-    if params is None:
-        return None
-    return dict_key_to_camel_case(params)
 
 
 def format_response_error(error: ResponseError):
     return {
         'message': error.message,
-        'code': encode_code(error.code),
-        'params': encode_params(error.params),
+        'code': str(error.code),
+        'params': error.params,
     }
 
 
