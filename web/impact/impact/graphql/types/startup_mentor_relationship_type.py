@@ -38,7 +38,8 @@ class StartupMentorRelationshipType(DjangoObjectType):
 
     def resolve_startup_high_resolution_logo(self, info, **kwargs):
         startup = self.startup_mentor_tracking.startup
-        return startup and startup.high_resolution_logo
+        return (startup and startup.high_resolution_logo and
+                startup.high_resolution_logo.url)
 
     def resolve_startup_short_pitch(self, info, **kwargs):
         startup = self.startup_mentor_tracking.startup
