@@ -106,7 +106,9 @@ class TestGraphQL(APITestCase):
                                 'startupId': str(startup.id),
                                 'startupName': startup.name,
                                 'startupHighResolutionLogo':
-                                    str(startup.high_resolution_logo),
+                                    (startup.high_resolution_logo and
+                                     startup.high_resolution_logo.url or
+                                     ''),
                                 'startupShortPitch': startup.short_pitch,
                                 'programLocation':
                                     program.program_family.name,

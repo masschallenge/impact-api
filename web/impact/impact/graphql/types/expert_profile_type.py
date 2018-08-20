@@ -115,4 +115,4 @@ def _get_mentees(user, program_status):
     return user.startupmentorrelationship_set.filter(
         status=CONFIRMED_RELATIONSHIP,
         **mentee_filter
-    )
+    ).order_by('-startup_mentor_tracking__program__start_date')
