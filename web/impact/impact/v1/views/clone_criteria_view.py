@@ -8,6 +8,7 @@ from impact.v1.helpers import (
     CriterionHelper,
     CriterionOptionSpecHelper,
 )
+from impact.permissions import global_operations_manager_check
 
 ROUND_DOES_NOT_EXIST_ERROR = "Judging Round {} does not exist"
 SOURCE_JUDGING_ROUND_KEY = 'source_judging_round_id'
@@ -28,7 +29,12 @@ class CloneCriteriaView(ImpactView):
         self._validate_judging_round_exists(source_pk)
         self._validate_judging_round_exists(target_pk)
         if self.errors:
-            return Response(status=401, data=self.errors)
+            return Response(status=401, data=self.errors)        
+        target_round = JudgingRound.objects.get(pk=target_pk)
+        program_family = target_round.program.program_family
+        cleared = global_operations_manager_check(request.user, program_family)
+        if not cleared:
+            return Response(status=403)
         clones = CriterionHelper.clone_criteria(source_pk, target_pk)
         CriterionOptionSpecHelper.clone_option_specs(clones)
         return Response(status=204)
