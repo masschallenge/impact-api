@@ -315,7 +315,6 @@ class Test(Base):
     DATABASE_ROUTERS = []
     DEBUG = False
     LANGUAGE_CODE = 'en'
-    }
 
 class Prod(Base):
     ALLOWED_HOSTS = Base.ALLOWED_HOSTS + [
