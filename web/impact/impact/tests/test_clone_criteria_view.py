@@ -16,7 +16,7 @@ from accelerator.tests.factories import (
     CriterionOptionSpecFactory,
     JudgingRoundFactory,
 )
-
+from impact.tests.utils import assert_fields
 
 class TestCloneCriteriaView(APITestCase):
     def test_global_operations_manager_permission_required(self):
@@ -83,3 +83,13 @@ class TestCloneCriteriaView(APITestCase):
         with self.login(email=email):
             response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, 401)
+
+    def test_options(self):
+        program_family = JudgingRoundFactory().program.program_family
+        email = self.global_operations_manager(program_family).email
+        url = reverse(CloneCriteriaView.view_name)                    
+        with self.login(email=email):
+            response = self.client.options(url)
+        results = response.data["actions"]["GET"]["properties"]["results"]
+        get_options = results["item"]["properties"]
+        assert_fields(CloneCriteriaView.fields().keys(), get_options)
