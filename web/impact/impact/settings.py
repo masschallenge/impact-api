@@ -317,9 +317,22 @@ class Test(Base):
     LANGUAGE_CODE = 'en'
     LOGGING = {
         'version': 1,
-        'disable_existing_loggers': True
-    }
-
+        'disable_existing_loggers': False,
+        'handlers': {
+            'file': {
+                'level': 'INFO',
+                'class': 'logging.FileHandler',
+                'filename': './test.log',
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': 'INFO',
+                'propagate': True,
+            },
+    },        
+     }
 
 class Prod(Base):
     ALLOWED_HOSTS = Base.ALLOWED_HOSTS + [
