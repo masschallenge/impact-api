@@ -11,18 +11,30 @@ from accelerator.tests.factories import (
     JudgeRoundCommitmentFactory,
 )
 from accelerator.tests.contexts import AnalyzeJudgingContext
+
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
 from impact.v1.views import AnalyzeJudgingRoundView
 
 
 class TestAnalyzeJudgingRoundView(APITestCase):
-    def test_get(self):
+    def test_global_operations_permission_required(self):
         option = CriterionOptionSpecFactory()
-        judging_round_id = option.criterion.judging_round_id
+        judging_round = option.criterion.judging_round
+        program_family = judging_round.program.program_family
         with self.login(email=self.basic_user().email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
-                          args=[judging_round_id])
+                          args=[judging_round.id])
+            response = self.client.get(url)
+            assert response.status_code == 403
+        
+    def test_get(self):
+        option = CriterionOptionSpecFactory()
+        judging_round = option.criterion.judging_round
+        program_family = judging_round.program.program_family
+        with self.login(email=self.global_operations_manager(program_family).email):
+            url = reverse(AnalyzeJudgingRoundView.view_name,
+                          args=[judging_round.id])
             response = self.client.get(url)
             assert len(response.data) == 1
             first_result = response.data["results"][0]
@@ -30,10 +42,11 @@ class TestAnalyzeJudgingRoundView(APITestCase):
 
     def test_options(self):
         option = CriterionOptionSpecFactory()
-        judging_round_id = option.criterion.judging_round_id
-        with self.login(email=self.basic_user().email):
+        judging_round = option.criterion.judging_round
+        program_family = judging_round.program.program_family
+        with self.login(email=self.global_operations_manager(program_family).email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
-                          args=[judging_round_id])
+                          args=[judging_round.id])
             response = self.client.options(url)
             assert response.status_code == 200
             results = response.data["actions"]["GET"]["properties"]["results"]
@@ -42,10 +55,11 @@ class TestAnalyzeJudgingRoundView(APITestCase):
 
     def test_options_against_get(self):
         option = CriterionOptionSpecFactory()
-        judging_round_id = option.criterion.judging_round_id
-        with self.login(email=self.basic_user().email):
+        judging_round = option.criterion.judging_round
+        program_family = judging_round.program.program_family
+        with self.login(email=self.global_operations_manager(program_family).email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
-                          args=[judging_round_id])
+                          args=[judging_round.id])
 
             options_response = self.client.options(url)
             get_response = self.client.get(url)
@@ -55,10 +69,11 @@ class TestAnalyzeJudgingRoundView(APITestCase):
 
     def test_get_with_implicit_option(self):
         option = CriterionOptionSpecFactory(option="")
-        judging_round_id = option.criterion.judging_round_id
-        with self.login(email=self.basic_user().email):
+        judging_round = option.criterion.judging_round
+        program_family = judging_round.program.program_family
+        with self.login(email=self.global_operations_manager(program_family).email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
-                          args=[judging_round_id])
+                          args=[judging_round.id])
             response = self.client.get(url)
             assert len(response.data) == 1
             first_result = response.data["results"][0]
@@ -69,7 +84,9 @@ class TestAnalyzeJudgingRoundView(APITestCase):
                                         name="reads",
                                         read_count=2,
                                         options=[""])
-        with self.login(email=self.basic_user().email):
+        program_family = context.program.program_family
+        email = self.global_operations_manager(program_family).email
+        with self.login(email=email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
                           args=[context.judging_round.id])
             response = self.client.get(url)
@@ -119,7 +136,9 @@ class TestAnalyzeJudgingRoundView(APITestCase):
 
     def assert_option_distributions(self, context, dists):
         judging_round_id = context.criterion.judging_round.id
-        with self.login(email=self.basic_user().email):
+        program_family = context.program.program_family
+        email = self.global_operations_manager(program_family).email
+        with self.login(email=email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
                           args=[judging_round_id])
             response = self.client.get(url)
@@ -137,7 +156,9 @@ class TestAnalyzeJudgingRoundView(APITestCase):
             judge=context.judge,
             judging_round=context.judging_round)
         judging_round_id = context.criterion.judging_round.id
-        with self.login(email=self.basic_user().email):
+        program_family = context.program.program_family
+        email = self.global_operations_manager(program_family).email
+        with self.login(email=email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
                           args=[judging_round_id])
             response = self.client.get(url)

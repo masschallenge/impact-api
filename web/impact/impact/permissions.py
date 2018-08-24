@@ -2,6 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from ast import literal_eval
+import logging
 
 from accelerator.apps import AcceleratorConfig
 from django.conf import settings
@@ -14,6 +15,11 @@ from rest_framework.permissions import BasePermission
 
 from impact.utils import model_name_case
 
+from accelerator_abstract.models.base_clearance import (
+    CLEARANCE_LEVEL_GLOBAL_MANAGER,
+)
+
+logger = logging.getLogger(__file__)
 User = get_user_model()
 
 METHOD_TO_ACTION = {
@@ -26,6 +32,63 @@ METHOD_TO_ACTION = {
     "DELETE": "delete",
 }
 
+# NOTE: following definitions are duplicated from mc.ClearanceManager and
+# mc.permission_checks
+# TO DO: resolve this duplication
+CLEARANCE_LOGGER_FAILURE_BASE_MSG = (
+    "clearance_check failure: Failed attempted to access data protected by "
+    "a clearance level.\nAttempting user: {user}.\nAttempted Program Family: "
+    "{program_family}.\nRequired Level:{level}.\n"
+)
+
+CLEARANCE_LEVEL_DOES_NOT_EXIST_MSG = (
+    "Permission Level with name \"{}\" does not exist.")
+
+CLEARANCE_LOGGER_FAILED_INSUFFICIENT_CLEARANCE_MSG = (
+        CLEARANCE_LOGGER_FAILURE_BASE_MSG + "Reason: Insufficient privileges."
+)
+CLEARANCE_LOGGER_SUCCESS_MSG = (
+    "clearance_check success: {user} attempted to access "
+    "{program_family} related data that requires a clearance of "
+    "{level}, and was granted access.")
+
+CLEARANCE_LOGGER_FAILED_BAD_CLEARANCE_MSG = (
+        CLEARANCE_LOGGER_FAILURE_BASE_MSG + "Reason: Bad clearance level name."
+)
+
+NO_CLEARANCE_ERROR_MSG = ("User {user} does not have permission level "
+                          "\"{level}\" for {program_family}.")
+
+
+def _log_access_attempt(cleared, user, level, program_family):
+    if cleared:
+        _log_sufficient_clearance(level, program_family, user)
+    else:
+        _log_insufficient_clearance(level, program_family, user)
+
+
+def _log_sufficient_clearance(level, program_family, user):
+    logger.info(CLEARANCE_LOGGER_SUCCESS_MSG.format(
+        user=user, program_family=program_family, level=level))
+
+
+def _log_insufficient_clearance(level, program_family, user):
+    logger.warn(CLEARANCE_LOGGER_FAILED_INSUFFICIENT_CLEARANCE_MSG.format(
+        user=user, program_family=program_family, level=level))
+    
+# end duplicated definitions
+
+def global_operations_manager_check(user, program_family=None):
+    program_family_filter = {"level": CLEARANCE_LEVEL_GLOBAL_MANAGER}
+    if program_family is not None:
+        program_family_filter.update({'program_family': program_family})
+    cleared = user.clearances.filter(**program_family_filter).exists()
+    _log_access_attempt(cleared,
+                        user,
+                        CLEARANCE_LEVEL_GLOBAL_MANAGER,
+                        program_family)
+    return cleared
+    
 
 class V0APIPermissions(BasePermission):
     authenticated_users_only = True
