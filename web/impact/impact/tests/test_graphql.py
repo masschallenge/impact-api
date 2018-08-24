@@ -1,6 +1,5 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
-import json
 from django.urls import reverse
 
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
@@ -132,14 +131,16 @@ class TestGraphQL(APITestCase):
                     }}
                 }}
             """.format(id=user.id)
-            response = self.client.post(self.url, data={'query': query})
-            response_payload = json.loads(response.content)
+
+            with capture_stderr(self.client.post,
+                                self.url,
+                                data={'query': query}) as (response, _):
+                error_messages = [x['message'] for x in
+                                  response.json()['errors']]
+
+            self.assertIn(EXPERT_NOT_FOUND_MESSAGE, error_messages)
             self.assertEqual(
-                response_payload['errors'][0]['message'],
-                EXPERT_NOT_FOUND_MESSAGE
-            )
-            self.assertEqual(
-                response_payload['data']['expertProfile'],
+                response.json()['data']['expertProfile'],
                 None
             )
 
@@ -152,13 +153,15 @@ class TestGraphQL(APITestCase):
                     }}
                 }}
             """.format(id=0)
-            response = self.client.post(self.url, data={'query': query})
-            response_payload = json.loads(response.content)
+
+            with capture_stderr(self.client.post,
+                                self.url,
+                                data={'query': query}) as (response, _):
+                error_messages = [x['message'] for x in
+                                  response.json()['errors']]
+
+            self.assertIn(EXPERT_NOT_FOUND_MESSAGE, error_messages)
             self.assertEqual(
-                response_payload['errors'][0]['message'],
-                EXPERT_NOT_FOUND_MESSAGE
-            )
-            self.assertEqual(
-                response_payload['data']['expertProfile'],
+                response.json()['data']['expertProfile'],
                 None
             )
