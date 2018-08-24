@@ -73,7 +73,7 @@ def _log_sufficient_clearance(level, program_family, user):
 
 
 def _log_insufficient_clearance(level, program_family, user):
-    logger.warn(CLEARANCE_LOGGER_FAILED_INSUFFICIENT_CLEARANCE_MSG.format(
+    logger.info(CLEARANCE_LOGGER_FAILED_INSUFFICIENT_CLEARANCE_MSG.format(
         user=user, program_family=program_family, level=level))
 
 # end duplicated definitions
