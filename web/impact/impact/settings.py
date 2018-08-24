@@ -315,6 +315,10 @@ class Test(Base):
     DATABASE_ROUTERS = []
     DEBUG = False
     LANGUAGE_CODE = 'en'
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': True
+    }
 
 
 class Prod(Base):
