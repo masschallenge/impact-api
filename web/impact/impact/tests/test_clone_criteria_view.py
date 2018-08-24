@@ -11,7 +11,6 @@ from impact.v1.views import (
 )
 from accelerator.models import (
     CriterionOptionSpec,
-    JudgingRound,
 )
 from accelerator.tests.factories import (
     CriterionOptionSpecFactory,

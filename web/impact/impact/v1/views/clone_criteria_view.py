@@ -29,7 +29,7 @@ class CloneCriteriaView(ImpactView):
         self._validate_judging_round_exists(source_pk)
         self._validate_judging_round_exists(target_pk)
         if self.errors:
-            return Response(status=401, data=self.errors)        
+            return Response(status=401, data=self.errors)
         target_round = JudgingRound.objects.get(pk=target_pk)
         program_family = target_round.program.program_family
         cleared = global_operations_manager_check(request.user, program_family)

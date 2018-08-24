@@ -51,7 +51,7 @@ class APITestCase(TestCase):
                          level=CLEARANCE_LEVEL_GLOBAL_MANAGER,
                          program_family=program_family)
         return user
-    
+
     def get_access_token(self, user):
         app = OAuth_App.objects.create(
             user=user,

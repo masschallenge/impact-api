@@ -41,7 +41,7 @@ class AnalyzeJudgingRoundView(ImpactView):
     view_name = "analyze_judging_round"
     model = JudgingRound
     permission_classes = ()
-    
+
     @classmethod
     def fields(cls):
         return ANALYZE_JUDGING_ROUND_FIELDS

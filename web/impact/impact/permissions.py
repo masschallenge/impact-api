@@ -75,8 +75,9 @@ def _log_sufficient_clearance(level, program_family, user):
 def _log_insufficient_clearance(level, program_family, user):
     logger.warn(CLEARANCE_LOGGER_FAILED_INSUFFICIENT_CLEARANCE_MSG.format(
         user=user, program_family=program_family, level=level))
-    
+
 # end duplicated definitions
+
 
 def global_operations_manager_check(user, program_family=None):
     program_family_filter = {"level": CLEARANCE_LEVEL_GLOBAL_MANAGER}
@@ -88,7 +89,7 @@ def global_operations_manager_check(user, program_family=None):
                         CLEARANCE_LEVEL_GLOBAL_MANAGER,
                         program_family)
     return cleared
-    
+
 
 class V0APIPermissions(BasePermission):
     authenticated_users_only = True
@@ -162,7 +163,7 @@ class DynamicModelPermissions(BasePermission):
     def convert_string_to_bool(self, text_value):
         try:
             boolean_value = literal_eval(text_value.title())
-        except:  # pragma: no cover
+        except:  # noqa: E722 # pragma: no cover
             # Regarding coverage, see AC-4573
             raise PermissionDenied  # pragma: no cover
         return boolean_value

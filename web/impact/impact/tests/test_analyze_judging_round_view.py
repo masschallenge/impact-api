@@ -21,18 +21,18 @@ class TestAnalyzeJudgingRoundView(APITestCase):
     def test_global_operations_permission_required(self):
         option = CriterionOptionSpecFactory()
         judging_round = option.criterion.judging_round
-        program_family = judging_round.program.program_family
         with self.login(email=self.basic_user().email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
                           args=[judging_round.id])
             response = self.client.get(url)
             assert response.status_code == 403
-        
+
     def test_get(self):
         option = CriterionOptionSpecFactory()
         judging_round = option.criterion.judging_round
         program_family = judging_round.program.program_family
-        with self.login(email=self.global_operations_manager(program_family).email):
+        email = self.global_operations_manager(program_family).email
+        with self.login(email=email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
                           args=[judging_round.id])
             response = self.client.get(url)
@@ -44,7 +44,8 @@ class TestAnalyzeJudgingRoundView(APITestCase):
         option = CriterionOptionSpecFactory()
         judging_round = option.criterion.judging_round
         program_family = judging_round.program.program_family
-        with self.login(email=self.global_operations_manager(program_family).email):
+        email = self.global_operations_manager(program_family).email
+        with self.login(email=email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
                           args=[judging_round.id])
             response = self.client.options(url)
@@ -57,7 +58,8 @@ class TestAnalyzeJudgingRoundView(APITestCase):
         option = CriterionOptionSpecFactory()
         judging_round = option.criterion.judging_round
         program_family = judging_round.program.program_family
-        with self.login(email=self.global_operations_manager(program_family).email):
+        email = self.global_operations_manager(program_family).email
+        with self.login(email=email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
                           args=[judging_round.id])
 
@@ -71,7 +73,8 @@ class TestAnalyzeJudgingRoundView(APITestCase):
         option = CriterionOptionSpecFactory(option="")
         judging_round = option.criterion.judging_round
         program_family = judging_round.program.program_family
-        with self.login(email=self.global_operations_manager(program_family).email):
+        email = self.global_operations_manager(program_family).email
+        with self.login(email=email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
                           args=[judging_round.id])
             response = self.client.get(url)
