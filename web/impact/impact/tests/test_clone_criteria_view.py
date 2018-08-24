@@ -19,6 +19,20 @@ from accelerator.tests.factories import (
 
 
 class TestCloneCriteriaView(APITestCase):
+    def test_global_operations_manager_permission_required(self):
+        option_spec = CriterionOptionSpecFactory()
+        old_round = option_spec.criterion.judging_round
+        new_round = JudgingRoundFactory()
+        url = reverse(CloneCriteriaView.view_name)
+        data = {SOURCE_JUDGING_ROUND_KEY: old_round.pk,
+                TARGET_JUDGING_ROUND_KEY: new_round.pk}
+        program_family = new_round.program.program_family
+        email = self.basic_user().email
+        with self.login(email=email):
+            response = self.client.post(url, data=data)
+        assert response.status_code == 403
+
+    
     def test_successful_clone(self):
         option_spec = CriterionOptionSpecFactory()
         old_round = option_spec.criterion.judging_round
