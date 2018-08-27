@@ -7,7 +7,6 @@ from django.urls import reverse
 from accelerator.models import Application
 from accelerator.tests.factories import (
     ExpertFactory,
-    JudgeRoundCommitmentFactory,
     ProgramFactory,
 )
 from accelerator.tests.contexts import AnalyzeJudgingContext
@@ -82,10 +81,7 @@ class TestAllocateApplicationsView(APITestCase):
     def test_get_adds_capacity_and_quota(self):
         context = AnalyzeJudgingContext()
         judging_round = context.judging_round
-        commitment = JudgeRoundCommitmentFactory(judge=context.judge,
-                                                 judging_round=judging_round,
-                                                 capacity=0,
-                                                 current_quota=0)
+        commitment = context.judges[0].judgeroundcommitment_set.first()
         with self.login(email=self.basic_user().email):
             url = reverse(AllocateApplicationsView.view_name,
                           args=[judging_round.id, context.judge.id])

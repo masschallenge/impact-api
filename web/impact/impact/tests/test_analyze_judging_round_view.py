@@ -6,10 +6,7 @@ from jsonschema import Draft4Validator
 
 from django.urls import reverse
 
-from accelerator.tests.factories import (
-    CriterionOptionSpecFactory,
-    JudgeRoundCommitmentFactory,
-)
+from accelerator.tests.factories import CriterionOptionSpecFactory
 from accelerator.tests.contexts import AnalyzeJudgingContext
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
@@ -133,9 +130,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
                                         name="program",
                                         read_count=1,
                                         options=[""])
-        commitment = JudgeRoundCommitmentFactory(
-            judge=context.judge,
-            judging_round=context.judging_round)
+        commitment = context.judges[0].judgeroundcommitment_set.first()
         judging_round_id = context.criterion.judging_round.id
         with self.login(email=self.basic_user().email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
