@@ -7,6 +7,7 @@ from django.urls import reverse
 from accelerator.models import Application
 from accelerator.tests.factories import (
     ExpertFactory,
+    IndustryFactory,
     ProgramFactory,
 )
 from accelerator.tests.contexts import AnalyzeJudgingContext
@@ -199,7 +200,25 @@ class TestAllocateApplicationsView(APITestCase):
             **{field: judge_option}).values_list("id", flat=True)
         self.assert_matching_allocation(context.judging_round, judge, apps)
 
-    # TODO: Test that uses a child industry
+    def test_get_industry_filter_with_child_industry(self):
+        context = AnalyzeJudgingContext(type="matching",
+                                        name="industry",
+                                        read_count=1)
+        child_industry = IndustryFactory()
+        child_industry.parent = IndustryFactory()
+        child_industry.save()
+        field = "startup__primary_industry"
+        context.add_applications(context.scenario.panel_size,
+                                 field=field,
+                                 options=[child_industry])
+        parent_industry = child_industry.parent        
+        judge = ExpertFactory(profile__primary_industry=parent_industry)
+        context.add_judge(assigned=False,
+                          complete=False,
+                          judge=judge)
+        apps = Application.objects.filter(
+            **{field: child_industry}).values_list("id", flat=True)
+        self.assert_matching_allocation(context.judging_round, judge, apps)        
 
     def test_get_program_filter(self):
         context = AnalyzeJudgingContext(type="matching",
