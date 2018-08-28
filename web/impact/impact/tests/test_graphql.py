@@ -94,34 +94,35 @@ class TestGraphQL(APITestCase):
             )
 
     def test_office_url_field_returns_correct_value(self):
-        with self.login(email=self.basic_user().email):
-            program = ProgramFactory()
-            confirmed = ExpertFactory()
-            confirmed_role = UserRoleFactory(name=UserRole.MENTOR)
-            program_role = ProgramRoleFactory(program=program,
-                                              user_role=confirmed_role)
-            program_grant_role = ProgramRoleGrantFactory(
-                person=confirmed,
-                program_role=program_role)
-            mentor_profile = confirmed.get_profile()
-            mentor_program = program_grant_role.program_role.program
-            family_slug = mentor_program.program_family.url_slug
-            program_slug = mentor_program.url_slug
-            office_hours_url = ("/officehours/{family_slug}/{program_slug}/"
-                                .format(
-                                    family_slug=family_slug,
-                                    program_slug=program_slug) + (
-                                    '?mentor_id={mentor_id}'.format(
-                                        mentor_id=mentor_profile.user_id)))
+        program = ProgramFactory()
+        confirmed = ExpertFactory()
+        confirmed_role = UserRoleFactory(name=UserRole.MENTOR)
+        program_role = ProgramRoleFactory(program=program,
+                                          user_role=confirmed_role)
+        program_grant_role = ProgramRoleGrantFactory(
+            person=confirmed,
+            program_role=program_role)
+        mentor_profile = confirmed.get_profile()
+        mentor_program = program_grant_role.program_role.program
+        family_slug = mentor_program.program_family.url_slug
+        program_slug = mentor_program.url_slug
+        office_hours_url = ("/officehours/{family_slug}/{program_slug}/"
+                            .format(
+                                family_slug=family_slug,
+                                program_slug=program_slug) + (
+                                '?mentor_id={mentor_id}'.format(
+                                    mentor_id=mentor_profile.user_id)))
 
-            query = """
-                query {{
-                    expertProfile(id: {id}) {{
-                        user {{ firstName }}
-                        officeHoursUrl
-                    }}
+        query = """
+            query {{
+                expertProfile(id: {id}) {{
+                    user {{ firstName }}
+                    officeHoursUrl
                 }}
-            """.format(id=mentor_profile.user_id)
+            }}
+        """.format(id=mentor_profile.user_id)
+
+        with self.login(email=self.basic_user().email):
             response = self.client.post(self.url, data={'query': query})
             self.assertJSONEqual(
                 str(response.content, encoding='utf8'),
