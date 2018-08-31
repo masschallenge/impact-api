@@ -261,8 +261,8 @@ class TestAllocateApplicationsView(APITestCase):
         for app, program in zip(context.applications, programs):
             StartupProgramInterestFactory(startup=app.startup,
                                           program=program,
-                                          interest_level=2)
-        spis = StartupProgramInterest.objects.filter(interest_level=1,
+                                          order=2)
+        spis = StartupProgramInterest.objects.filter(order=1,
                                                      program__in=options)
         app_filter = {"startup__startupprograminterest__in": spis}
         apps = Application.objects.filter(**app_filter).values_list("id",
