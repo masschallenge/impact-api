@@ -111,4 +111,3 @@ class CriterionHelper(ModelHelper):
 
     def field_matches_option(self, field, option):
         return True
-

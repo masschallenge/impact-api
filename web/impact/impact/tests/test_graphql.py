@@ -54,7 +54,8 @@ class TestGraphQL(APITestCase):
                     }
                 }"""
         response = self.client.post(self.url, data={'query': query})
-        error_messages = [x['message'] for x in response.json()['errors']]
+        error_messages = [
+            x['message'] for x in response.json()['errors'] if x is not None]
         self.assertNotIn(NOT_LOGGED_IN_MSG, error_messages)
 
     def test_query_with_expert(self):
