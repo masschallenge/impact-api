@@ -2,12 +2,18 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from collections import namedtuple
+from itertools import chain
 from django.urls import reverse
 
-from accelerator.models import Application
+from accelerator.models import (
+    Application,
+    StartupProgramInterest,
+)
 from accelerator.tests.factories import (
     ExpertFactory,
+    IndustryFactory,
     ProgramFactory,
+    StartupProgramInterestFactory,
 )
 from accelerator.tests.contexts import AnalyzeJudgingContext
 from impact.tests.api_test_case import APITestCase
@@ -199,7 +205,25 @@ class TestAllocateApplicationsView(APITestCase):
             **{field: judge_option}).values_list("id", flat=True)
         self.assert_matching_allocation(context.judging_round, judge, apps)
 
-    # TODO: Test that uses a child industry
+    def test_get_industry_filter_with_child_industry(self):
+        context = AnalyzeJudgingContext(type="matching",
+                                        name="industry",
+                                        read_count=1)
+        child_industry = IndustryFactory()
+        child_industry.parent = IndustryFactory()
+        child_industry.save()
+        field = "startup__primary_industry"
+        context.add_applications(context.scenario.panel_size,
+                                 field=field,
+                                 options=[child_industry])
+        parent_industry = child_industry.parent
+        judge = ExpertFactory(profile__primary_industry=parent_industry)
+        context.add_judge(assigned=False,
+                          complete=False,
+                          judge=judge)
+        apps = Application.objects.filter(
+            **{field: child_industry}).values_list("id", flat=True)
+        self.assert_matching_allocation(context.judging_round, judge, apps)
 
     def test_get_program_filter(self):
         context = AnalyzeJudgingContext(type="matching",
@@ -219,7 +243,31 @@ class TestAllocateApplicationsView(APITestCase):
             **{field: judge_option}).values_list("id", flat=True)
         self.assert_matching_allocation(context.judging_round, judge, apps)
 
-    # TODO: Test that has a startup with interest in more than one program
+    def test_get_program_filter_multiple_startup_interests(self):
+        context = AnalyzeJudgingContext(type="matching",
+                                        name="program",
+                                        read_count=1)
+        count = 4
+        options = ProgramFactory.create_batch(count, cycle=context.cycle)
+        panel_size = context.scenario.panel_size
+        context.add_applications(panel_size * count,
+                                 programs=options)
+        judge_option = options[0].program_family
+        judge = ExpertFactory(profile__home_program_family=judge_option)
+        context.add_judge(assigned=False,
+                          complete=False,
+                          judge=judge)
+        programs = chain(options[1:], options * panel_size)
+        for app, program in zip(context.applications, programs):
+            StartupProgramInterestFactory(startup=app.startup,
+                                          program=program,
+                                          interest_level=2)
+        spis = StartupProgramInterest.objects.filter(interest_level=1,
+                                                     program__in=options)
+        app_filter = {"startup__startupprograminterest__in": spis}
+        apps = Application.objects.filter(**app_filter).values_list("id",
+                                                                    flat=True)
+        self.assert_matching_allocation(context.judging_round, judge, apps)
 
     def assert_matching_allocation(self, judging_round, judge, apps):
         with self.login(email=self.basic_user().email):
