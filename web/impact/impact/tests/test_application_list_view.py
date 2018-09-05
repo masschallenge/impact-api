@@ -7,15 +7,9 @@ from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
 from impact.v1.views import ApplicationListView
 
-APPLICATION_GET_FIELDS = [
-    "id",
-    "created_at",
-    "updated_at",
-    "application_status",
-    "cycle",
-    "startup",
-    "application_type",
-]
+from impact.tests.test_application_detail_view import (
+    APPLICATION_GET_FIELDS,
+)
 
 
 class TestApplicationListView(APITestCase):
