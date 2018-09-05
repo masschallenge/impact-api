@@ -1,6 +1,7 @@
 from django.conf.urls import url
 
 from impact.v1.views import (
+    ApplicationDetailView,
     AllocateApplicationsView,
     AnalyzeJudgingRoundView,
     ApplicationListView,
@@ -42,6 +43,9 @@ v1_urlpatterns = [
     url(r"^analyze_judging_round/(?P<pk>[0-9]+)/$",
         AnalyzeJudgingRoundView.as_view(),
         name=AnalyzeJudgingRoundView.view_name),
+    url(r"^application/(?P<pk>[0-9]+)/$",
+        ApplicationDetailView.as_view(),
+        name=ApplicationDetailView.view_name),
     url(r"^application/$",
         ApplicationListView.as_view(),
         name=ApplicationListView.view_name),
