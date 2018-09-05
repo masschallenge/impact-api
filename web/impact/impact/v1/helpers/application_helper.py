@@ -6,18 +6,19 @@ from impact.v1.helpers.model_helper import (
     ModelHelper,
     OPTIONAL_INTEGER_FIELD,
     OPTIONAL_STRING_FIELD,
+    READ_ONLY_STRING_FIELD,
     PK_FIELD,
 )
 
 APPLICATION_FIELDS = {
     "application_status": OPTIONAL_STRING_FIELD,
     "application_type": OPTIONAL_INTEGER_FIELD,
-    "created_at": OPTIONAL_STRING_FIELD,
+    "created_at": READ_ONLY_STRING_FIELD,
     "cycle": OPTIONAL_INTEGER_FIELD,
     "id": PK_FIELD,
     "startup": OPTIONAL_INTEGER_FIELD,
     "submission_datetime": OPTIONAL_STRING_FIELD,
-    "updated_at": OPTIONAL_STRING_FIELD,
+    "updated_at": READ_ONLY_STRING_FIELD,
 }
 
 
