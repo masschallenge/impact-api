@@ -17,6 +17,7 @@ from impact.v1.views.clone_criteria_view import (
     SOURCE_JUDGING_ROUND_KEY,
     TARGET_JUDGING_ROUND_KEY,
 )
+from impact.v1.views.application_list_view import ApplicationListView
 from impact.v1.views.credit_code_detail_view import CreditCodeDetailView
 from impact.v1.views.credit_code_list_view import CreditCodeListView
 from impact.v1.views.criterion_detail_view import CriterionDetailView
