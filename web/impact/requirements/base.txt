@@ -32,7 +32,7 @@ django-embed-video
 django-filter # Filtering support
 django-oauth-toolkit<1.1
 django-redis-cache
-django-registration
+django-registration==2.5.2
 django-rest-framework-proxy
 django-rest-swagger
 django-paypal
