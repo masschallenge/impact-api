@@ -1,6 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+from django.db.models import Count
 from collections import Counter
 from accelerator.models import (
     JUDGING_FEEDBACK_STATUS_COMPLETE,
@@ -43,6 +44,7 @@ class OptionAnalysis(object):
         self.judging_round = judging_round
         self.helper = CriterionOptionSpecHelper(option_spec)
         self.apps = apps
+        self._judge_to_count = None
 
     def analyses(self):
         return [self.analysis(option) for option in self.find_options()]
@@ -108,16 +110,30 @@ class OptionAnalysis(object):
         total_capacity = self.helper.total_capacity(
             commitments=commitments,
             option_name=option_name)
-        assignments = JudgePanelAssignment.objects.filter(
-            scenario__judging_round=self.judging_round)
         remaining_capacity = self.helper.remaining_capacity(
-            assignments=assignments,
-            commitments=commitments,
-            option_name=option_name)
+            commitments,
+            self.judge_to_count(),
+            option_name)
         return {
             "total_capacity": total_capacity,
             "remaining_capacity": remaining_capacity,
         }
+
+    def judge_to_count(self):
+        if self._judge_to_count is None:
+            assignments = JudgePanelAssignment.objects.filter(
+                scenario__judging_round=self.judging_round)
+            self._judge_to_count = self._count_assignments(assignments)
+        return self._judge_to_count
+
+    def _count_assignments(self, assignments):
+        results = {}
+        judge_assignment_counts = assignments.annotate(
+            assignment_count=Count("panel__applications")).values_list(
+                "judge_id", "assignment_count")
+        for judge_id, assignment_count in judge_assignment_counts:
+            results[judge_id] = results.get(judge_id, 0) + assignment_count
+        return results
 
 
 def feedbacks_for_judging_round(judging_round, apps):
