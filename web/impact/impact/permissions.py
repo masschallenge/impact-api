@@ -4,7 +4,6 @@
 from ast import literal_eval
 import logging
 
-from accelerator.apps import AcceleratorConfig
 from django.conf import settings
 from django.contrib.auth import get_user
 from django.contrib.auth import get_user_model
@@ -13,11 +12,12 @@ from django.contrib.auth.models import PermissionDenied
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.permissions import BasePermission
 
-from impact.utils import model_name_case
-
 from accelerator_abstract.models.base_clearance import (
     CLEARANCE_LEVEL_GLOBAL_MANAGER,
 )
+from accelerator.apps import AcceleratorConfig
+from impact.utils import model_name_case
+
 
 logger = logging.getLogger(__file__)
 User = get_user_model()

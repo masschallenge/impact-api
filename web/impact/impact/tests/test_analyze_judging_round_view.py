@@ -15,7 +15,7 @@ from impact.v1.views import AnalyzeJudgingRoundView
 
 
 class TestAnalyzeJudgingRoundView(APITestCase):
-    def test_global_operations_permission_required(self):
+    def test_basic_staff_permission_does_not_grant_access(self):
         option = CriterionOptionSpecFactory()
         judging_round = option.criterion.judging_round
         with self.login(email=self.basic_user().email):
