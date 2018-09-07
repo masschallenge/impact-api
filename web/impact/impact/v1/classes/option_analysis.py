@@ -39,11 +39,17 @@ CriterionHelper.register_helper(MatchingProgramCriterionHelper,
 class OptionAnalysis(object):
     _judge_to_count = None
 
-    def __init__(self, option_spec, apps, judging_round, application_counts):
+    def __init__(self,
+                 option_spec,
+                 apps,
+                 app_ids,
+                 judging_round,
+                 application_counts):
         self.option_spec = option_spec
         self.judging_round = judging_round
         self.helper = CriterionOptionSpecHelper(option_spec)
         self.apps = apps
+        self.app_ids = app_ids
         self.application_counts = application_counts
 
     def analyses(self):

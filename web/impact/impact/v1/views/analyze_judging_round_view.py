@@ -57,8 +57,10 @@ class AnalyzeJudgingRoundView(ImpactView):
             application_status="submitted",
             application_type=self.instance.application_type)
         application_counts = self.judge_to_count()
+        app_ids = self.apps.values_list('id', flat=True)
         analyses = [OptionAnalysis(option,
                                    self.apps,
+                                   app_ids,
                                    self.instance,
                                    application_counts).analyses()
                     for option in options]
