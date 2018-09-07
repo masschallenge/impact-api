@@ -51,7 +51,8 @@ class AnalyzeJudgingRoundView(ImpactView):
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
         options = CriterionOptionSpec.objects.filter(
-            criterion__judging_round=self.instance)
+            criterion__judging_round=self.instance).prefetch_related(
+                'criterion')
         self.apps = Application.objects.filter(
             application_status="submitted",
             application_type=self.instance.application_type)

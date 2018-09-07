@@ -11,6 +11,9 @@ from accelerator.tests.contexts import AnalyzeJudgingContext
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
 from impact.v1.views import AnalyzeJudgingRoundView
+from impact.v1.helpers.matching_program_criterion_helper import (
+    MatchingProgramCriterionHelper,
+)
 
 
 class TestAnalyzeJudgingRoundView(APITestCase):
@@ -112,6 +115,8 @@ class TestAnalyzeJudgingRoundView(APITestCase):
                                         options=[""])
         # This is where I gave up and just hard coded it!
         dists = {context.program.program_family.name: {0: 1, 1: 1}}
+        # clear cache since we added a new program family!
+        MatchingProgramCriterionHelper.program_families = None
         self.assert_option_distributions(context, dists)
 
     def assert_option_distributions(self, context, dists):

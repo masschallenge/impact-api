@@ -12,13 +12,21 @@ from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
 class MatchingProgramCriterionHelper(MatchingCriterionHelper):
     application_field = "startup_id"
     judge_field = "expertprofile__home_program_family__name"
+    program_families = None
 
     def __init__(self, subject):
         super().__init__(subject)
         self._program_name_cache = None
 
+    @classmethod
+    def _program_family_map(cls):
+        if cls.program_families is None:
+            cls.program_families = cls.cache_instances_by_name(ProgramFamily)
+        return cls.program_families
+
     def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
-        target = ProgramFamily.objects.filter(name=option_name).first()
+        target = self.__class__._program_family_map()[option_name]
+
         return self.find_app_ids(
             self.filter_by_judge_option(feedbacks, option_name),
             applications,

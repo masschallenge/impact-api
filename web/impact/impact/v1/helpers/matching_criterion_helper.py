@@ -32,3 +32,7 @@ class MatchingCriterionHelper(CriterionHelper):
     def _check_cache(self, apps):
         if not self._app_ids_to_targets:
             self.calc_app_ids_to_targets(apps)
+
+    @classmethod
+    def cache_instances_by_name(cls, model):
+        return {instance.name: instance for instance in model.objects.all()}
