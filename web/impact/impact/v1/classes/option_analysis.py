@@ -1,12 +1,10 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from django.db.models import Count
 from collections import Counter
 from accelerator.models import (
     JUDGING_FEEDBACK_STATUS_COMPLETE,
     JudgeApplicationFeedback,
-    JudgePanelAssignment,
     JudgeRoundCommitment,
     Scenario,
 )
@@ -39,12 +37,14 @@ CriterionHelper.register_helper(MatchingProgramCriterionHelper,
 
 
 class OptionAnalysis(object):
-    def __init__(self, option_spec, apps, judging_round):
+    _judge_to_count = None
+
+    def __init__(self, option_spec, apps, judging_round, application_counts):
         self.option_spec = option_spec
         self.judging_round = judging_round
         self.helper = CriterionOptionSpecHelper(option_spec)
         self.apps = apps
-        self._judge_to_count = None
+        self.application_counts = application_counts
 
     def analyses(self):
         return [self.analysis(option) for option in self.find_options()]
@@ -112,28 +112,12 @@ class OptionAnalysis(object):
             option_name=option_name)
         remaining_capacity = self.helper.remaining_capacity(
             commitments,
-            self.judge_to_count(),
+            self.application_counts,
             option_name)
         return {
             "total_capacity": total_capacity,
             "remaining_capacity": remaining_capacity,
         }
-
-    def judge_to_count(self):
-        if self._judge_to_count is None:
-            assignments = JudgePanelAssignment.objects.filter(
-                scenario__judging_round=self.judging_round)
-            self._judge_to_count = self._count_assignments(assignments)
-        return self._judge_to_count
-
-    def _count_assignments(self, assignments):
-        results = {}
-        judge_assignment_counts = assignments.annotate(
-            assignment_count=Count("panel__applications")).values_list(
-                "judge_id", "assignment_count")
-        for judge_id, assignment_count in judge_assignment_counts:
-            results[judge_id] = results.get(judge_id, 0) + assignment_count
-        return results
 
 
 def feedbacks_for_judging_round(judging_round, apps):
