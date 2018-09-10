@@ -16,7 +16,7 @@ from impact.v1.helpers.model_helper import (
     READ_ONLY_OBJECT_FIELD,
     READ_ONLY_STRING_FIELD,
 )
-
+from impact.permissions import global_operations_manager_check
 
 ANALYZE_JUDGING_ROUND_FIELDS = {
     "criterion_option_spec_id": READ_ONLY_ID_FIELD,
@@ -40,6 +40,7 @@ ANALYZE_JUDGING_ROUND_FIELDS = {
 class AnalyzeJudgingRoundView(ImpactView):
     view_name = "analyze_judging_round"
     model = JudgingRound
+    permission_classes = ()
 
     @classmethod
     def fields(cls):
@@ -47,6 +48,10 @@ class AnalyzeJudgingRoundView(ImpactView):
 
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
+        program_family = self.instance.program.program_family
+        cleared = global_operations_manager_check(request.user, program_family)
+        if not cleared:
+            return Response(status=403)
         options = CriterionOptionSpec.objects.filter(
             criterion__judging_round=self.instance)
         self.apps = Application.objects.filter(
