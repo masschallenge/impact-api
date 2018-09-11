@@ -1,9 +1,9 @@
 from django.conf.urls import url
 
 from impact.v1.views import (
-    ApplicationDetailView,
     AllocateApplicationsView,
     AnalyzeJudgingRoundView,
+    ApplicationDetailView,
     ApplicationListView,
     CloneCriteriaView,
     CreditCodeDetailView,
@@ -23,12 +23,12 @@ from impact.v1.views import (
     OrganizationHistoryView,
     OrganizationListView,
     OrganizationUsersView,
-    ProgramDetailView,
-    ProgramListView,
     ProgramCycleDetailView,
     ProgramCycleListView,
+    ProgramDetailView,
     ProgramFamilyDetailView,
     ProgramFamilyListView,
+    ProgramListView,
     UserConfidentialView,
     UserDetailView,
     UserHistoryView,
