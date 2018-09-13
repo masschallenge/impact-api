@@ -2,6 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
+from impact.v1.helpers.application_helper import ApplicationHelper
 from impact.v1.helpers.functional_expertise_helper import (
     FunctionalExpertiseHelper,
 )

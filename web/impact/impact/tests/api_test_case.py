@@ -10,7 +10,13 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.urls import reverse
 
-from impact.tests.factories import UserFactory
+from accelerator_abstract.models.base_clearance import (
+    CLEARANCE_LEVEL_GLOBAL_MANAGER,
+)
+from impact.tests.factories import (
+    ClearanceFactory,
+    UserFactory,
+)
 
 OAuth_App = get_application_model()
 API_GROUPS = [settings.V0_API_GROUP, settings.V1_API_GROUP]
@@ -37,6 +43,13 @@ class APITestCase(TestCase):
             user.groups.add(group)
         user.set_password('password')
         user.save()
+        return user
+
+    def global_operations_manager(self, program_family):
+        user = self.basic_user()
+        ClearanceFactory(user=user,
+                         level=CLEARANCE_LEVEL_GLOBAL_MANAGER,
+                         program_family=program_family)
         return user
 
     def get_access_token(self, user):

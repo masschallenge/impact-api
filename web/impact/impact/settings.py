@@ -316,7 +316,6 @@ class Test(Base):
     DEBUG = False
     LANGUAGE_CODE = 'en'
 
-
 class Prod(Base):
     ALLOWED_HOSTS = Base.ALLOWED_HOSTS + [
         os.environ.get('DJANGO_ALLOWED_HOST', '*'),
