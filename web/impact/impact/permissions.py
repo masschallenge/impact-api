@@ -13,7 +13,12 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework.permissions import BasePermission
 
 from accelerator_abstract.models.base_clearance import (
+    CLEARANCE_LEVEL_DOES_NOT_EXIST_MSG,
     CLEARANCE_LEVEL_GLOBAL_MANAGER,
+    CLEARANCE_LOGGER_FAILED_BAD_CLEARANCE_MSG,
+    CLEARANCE_LOGGER_FAILED_INSUFFICIENT_CLEARANCE_MSG,
+    CLEARANCE_LOGGER_FAILURE_BASE_MSG,
+    CLEARANCE_LOGGER_SUCCESS_MSG,
 )
 from accelerator.apps import AcceleratorConfig
 from impact.utils import model_name_case
@@ -31,33 +36,6 @@ METHOD_TO_ACTION = {
     "PATCH": "change",
     "DELETE": "delete",
 }
-
-# NOTE: following definitions are duplicated from mc.ClearanceManager and
-# mc.permission_checks
-# TO DO: resolve this duplication
-CLEARANCE_LOGGER_FAILURE_BASE_MSG = (
-    "clearance_check failure: Failed attempted to access data protected by "
-    "a clearance level.\nAttempting user: {user}.\nAttempted Program Family: "
-    "{program_family}.\nRequired Level:{level}.\n"
-)
-
-CLEARANCE_LEVEL_DOES_NOT_EXIST_MSG = (
-    "Permission Level with name \"{}\" does not exist.")
-
-CLEARANCE_LOGGER_FAILED_INSUFFICIENT_CLEARANCE_MSG = (
-        CLEARANCE_LOGGER_FAILURE_BASE_MSG + "Reason: Insufficient privileges."
-)
-CLEARANCE_LOGGER_SUCCESS_MSG = (
-    "clearance_check success: {user} attempted to access "
-    "{program_family} related data that requires a clearance of "
-    "{level}, and was granted access.")
-
-CLEARANCE_LOGGER_FAILED_BAD_CLEARANCE_MSG = (
-        CLEARANCE_LOGGER_FAILURE_BASE_MSG + "Reason: Bad clearance level name."
-)
-
-NO_CLEARANCE_ERROR_MSG = ("User {user} does not have permission level "
-                          "\"{level}\" for {program_family}.")
 
 
 def _log_access_attempt(cleared, user, level, program_family):
