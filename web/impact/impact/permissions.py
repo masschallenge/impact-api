@@ -13,11 +13,8 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework.permissions import BasePermission
 
 from accelerator_abstract.models.base_clearance import (
-    CLEARANCE_LEVEL_DOES_NOT_EXIST_MSG,
     CLEARANCE_LEVEL_GLOBAL_MANAGER,
-    CLEARANCE_LOGGER_FAILED_BAD_CLEARANCE_MSG,
     CLEARANCE_LOGGER_FAILED_INSUFFICIENT_CLEARANCE_MSG,
-    CLEARANCE_LOGGER_FAILURE_BASE_MSG,
     CLEARANCE_LOGGER_SUCCESS_MSG,
 )
 from accelerator.apps import AcceleratorConfig
