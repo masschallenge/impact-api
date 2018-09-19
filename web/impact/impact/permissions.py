@@ -35,6 +35,8 @@ METHOD_TO_ACTION = {
 }
 
 
+# FIXME: function definitions duplicated from mc.permission_checks
+
 def _log_access_attempt(cleared, user, level, program_family):
     if cleared:
         _log_sufficient_clearance(level, program_family, user)
