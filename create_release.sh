@@ -9,6 +9,7 @@ else
     # TR == test release
     echo "We're going to refactor the tag into 'TR-$TAG' to avoid any conflicts."
     TAG="TR-$TAG"
+    git tag "v${TAG}"
 fi
 
 echo $TAG
