@@ -21,7 +21,7 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
     @classmethod
     def _industry_map(cls):
         if cls.industries is None:
-            cls.industries = cls.cache_instances_by_name(Industry)
+            cls.industries = cls.instances_by_name(Industry)
         return cls.industries
 
     def app_ids_for_feedbacks(self, feedbacks, option_name, applications):

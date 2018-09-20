@@ -19,13 +19,18 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
         self._program_name_cache = None
 
     @classmethod
-    def _program_family_map(cls):
+    def _program_family(cls, family_name):
         if cls.program_families is None:
-            cls.program_families = cls.cache_instances_by_name(ProgramFamily)
-        return cls.program_families
+            cls.program_families = cls.instances_by_name(ProgramFamily)
+
+        program_family = cls.program_families.get(family_name)
+        if program_family is None:
+            program_family = ProgramFamily.objects.get(name=family_name)
+            cls.program_families[family_name] = program_family
+        return program_family
 
     def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
-        target = self.__class__._program_family_map()[option_name]
+        target = self._program_family(option_name)
 
         return self.find_app_ids(
             self.filter_by_judge_option(feedbacks, option_name),
