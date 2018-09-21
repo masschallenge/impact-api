@@ -64,11 +64,11 @@ class CriterionOptionSpecHelper(ModelHelper):
             commitments=commitments,
             option_name=option_name)
 
-    def remaining_capacity(self, commitments, assignments, option_name):
+    def remaining_capacity(self, commitments, assignment_counts, option_name):
         return self.criterion_helper.remaining_capacity(
-            assignments=assignments,
-            commitments=commitments,
-            option_name=option_name)
+            commitments,
+            assignment_counts,
+            option_name)
 
     @classmethod
     def fields(cls):

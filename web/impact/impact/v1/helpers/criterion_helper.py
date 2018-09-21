@@ -1,10 +1,8 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from django.db.models import (
-    Count,
-    Sum,
-)
+from django.db.models import Sum
+
 from accelerator.models import Criterion
 from impact.v1.helpers.model_helper import (
     REQUIRED_INTEGER_FIELD,
@@ -58,25 +56,16 @@ class CriterionHelper(ModelHelper):
         return self.filter_by_judge_option(commitments, option_name).aggregate(
             total=Sum("capacity"))["total"]
 
-    def remaining_capacity(self, commitments, assignments, option_name):
+    def remaining_capacity(self, commitments, assignment_counts, option_name):
         judge_to_capacity = self.filter_by_judge_option(
             commitments, option_name).values_list("judge_id", "capacity")
-        judge_to_count = self.count_assignments(assignments)
         result = 0
         for judge_id, capacity in judge_to_capacity:
-            result += max(0, capacity - judge_to_count.get(judge_id, 0))
+            result += max(0, capacity - assignment_counts.get(judge_id, 0))
         return result
 
     def filter_by_judge_option(self, query, option_name):
         return query
-
-    def count_assignments(self, assignments):
-        results = {}
-        for judge_id, assignment_count in assignments.annotate(
-                assignment_count=Count("panel__applications")).values_list(
-                    "judge_id", "assignment_count"):
-            results[judge_id] = results.get(judge_id, 0) + assignment_count
-        return results
 
     @classmethod
     def clone_criteria(cls, source_judging_round_id, target_judging_round_id):
