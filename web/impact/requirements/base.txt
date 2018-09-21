@@ -37,7 +37,7 @@ django-oauth-toolkit<1.1
 django-paypal
 django-polymorphic==1.3
 django-redis-cache
-django-registration==2.5.2
+django-registration==2.4.1
 django-rest-framework-proxy
 django-rest-swagger
 django-storages==1.6.5
@@ -46,7 +46,7 @@ djangorestframework
 djangorestframework-jwt
 drf-schema-adapter
 drf-tracking
-graphene-django>=2.0
+graphene-django==2.1
 sorl-thumbnail==12.4.1
 
 
