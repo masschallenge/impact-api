@@ -12,12 +12,13 @@ from django.contrib.auth.models import PermissionDenied
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.permissions import BasePermission
 
+from accelerator.apps import AcceleratorConfig
+from accelerator.models import Clearance
 from accelerator_abstract.models.base_clearance import (
     CLEARANCE_LEVEL_GLOBAL_MANAGER,
     CLEARANCE_LOGGER_FAILED_INSUFFICIENT_CLEARANCE_MSG,
     CLEARANCE_LOGGER_SUCCESS_MSG,
 )
-from accelerator.apps import AcceleratorConfig
 from impact.utils import model_name_case
 
 
@@ -57,14 +58,10 @@ def _log_insufficient_clearance(level, program_family, user):
 
 
 def global_operations_manager_check(user, program_family=None):
-    program_family_filter = {"level": CLEARANCE_LEVEL_GLOBAL_MANAGER}
-    if program_family is not None:
-        program_family_filter.update({'program_family': program_family})
-    cleared = user.clearances.filter(**program_family_filter).exists()
-    _log_access_attempt(cleared,
-                        user,
-                        CLEARANCE_LEVEL_GLOBAL_MANAGER,
-                        program_family)
+    cleared = Clearance.objects.check_clearance(
+        user, CLEARANCE_LEVEL_GLOBAL_MANAGER, program_family)
+    _log_access_attempt(cleared, user,
+                        CLEARANCE_LEVEL_GLOBAL_MANAGER, program_family)
     return cleared
 
 
