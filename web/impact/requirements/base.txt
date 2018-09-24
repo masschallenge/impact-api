@@ -5,7 +5,7 @@
 Unipath==1.1
 coreapi
 hiredis==0.2.0
-markdown # Markdown support for the browsable API.
+markdown==2.6.11
 mysqlclient
 oauthlib
 algoliasearch
