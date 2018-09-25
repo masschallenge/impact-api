@@ -8,6 +8,7 @@ services:
       - ./mysql/conf.d/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./mysql/data:/var/lib/mysql
       - ./mysql_entrypoint:/docker-entrypoint-initdb.d
+      - ./mysql/connection/:/var/run/mysqld/
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: mc_dev

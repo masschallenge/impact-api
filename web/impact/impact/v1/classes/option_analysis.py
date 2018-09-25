@@ -5,7 +5,6 @@ from collections import Counter
 from accelerator.models import (
     JUDGING_FEEDBACK_STATUS_COMPLETE,
     JudgeApplicationFeedback,
-    JudgePanelAssignment,
     JudgeRoundCommitment,
     Scenario,
 )
@@ -38,11 +37,20 @@ CriterionHelper.register_helper(MatchingProgramCriterionHelper,
 
 
 class OptionAnalysis(object):
-    def __init__(self, option_spec, apps, judging_round):
+    _judge_to_count = None
+
+    def __init__(self,
+                 option_spec,
+                 apps,
+                 app_ids,
+                 judging_round,
+                 application_counts):
         self.option_spec = option_spec
         self.judging_round = judging_round
         self.helper = CriterionOptionSpecHelper(option_spec)
         self.apps = apps
+        self.app_ids = app_ids
+        self.application_counts = application_counts
 
     def analyses(self):
         return [self.analysis(option) for option in self.find_options()]
@@ -108,12 +116,10 @@ class OptionAnalysis(object):
         total_capacity = self.helper.total_capacity(
             commitments=commitments,
             option_name=option_name)
-        assignments = JudgePanelAssignment.objects.filter(
-            scenario__judging_round=self.judging_round)
         remaining_capacity = self.helper.remaining_capacity(
-            assignments=assignments,
-            commitments=commitments,
-            option_name=option_name)
+            commitments,
+            self.application_counts,
+            option_name)
         return {
             "total_capacity": total_capacity,
             "remaining_capacity": remaining_capacity,
