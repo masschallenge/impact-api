@@ -62,6 +62,7 @@ def _get_filters(request):
         return []
     participant_roles = UserRole.FINALIST_USER_ROLES
     participant_roles.append(UserRole.MENTOR)
+    participant_roles.append(UserRole.ALUM)
     user_program_roles_as_participant = ProgramRole.objects.filter(
         programrolegrant__person=request.user,
         user_role__name__in=participant_roles
