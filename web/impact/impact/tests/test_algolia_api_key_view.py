@@ -13,7 +13,7 @@ from accelerator.tests.factories import (
     ProgramRoleFactory,
     ProgramRoleGrantFactory,
     UserRoleFactory,
-    BaseProfileFactory,
+    EntrepreneurFactory,
 )
 from accelerator_abstract.models import (
     ACTIVE_PROGRAM_STATUS,
@@ -38,7 +38,7 @@ class TestAlgoliaApiKeyView(APITestCase):
         with self.settings(
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
-            with self.login(email=self._create_user_with_base_profile().email):
+            with self.login(email=self._create_entrepreneur().email):
                 response = self.client.get(self.url)
                 response_data = json.loads(response.content)
                 self.assertTrue('token' in response_data.keys())
@@ -179,14 +179,11 @@ class TestAlgoliaApiKeyView(APITestCase):
                 self.assertIn(IS_CONFIRMED_MENTOR_FILTER,
                               response_data["filters"])
 
-    def _create_user_with_base_profile(self, user_type=ENTREPRENEUR_USER_TYPE):
-        user = self.basic_user()
-        profile = BaseProfileFactory()
-        profile.user = user
-        profile.user_type = user_type
-        profile.save()
-
-        return user
+    def _create_entrepreneur(self):
+        ent_user = EntrepreneurFactory()
+        ent_user.set_password("password")
+        ent_user.save()
+        return ent_user
 
     def _create_user_with_role_grant(
             self, program, user_role_name, user=False):
@@ -197,7 +194,7 @@ class TestAlgoliaApiKeyView(APITestCase):
         )
 
         if not user:
-            user = self._create_user_with_base_profile()
+            user = self._create_entrepreneur()
 
         ProgramRoleGrantFactory(person=user, program_role=program_role)
         return user
