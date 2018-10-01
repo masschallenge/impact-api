@@ -22,6 +22,10 @@ from accelerator_abstract.models import (
     ENTREPRENEUR_USER_TYPE,
 )
 
+from accelerator_abstract.models.base_user_utils import (
+    is_entrepreneur,
+)
+
 IS_CONFIRMED_MENTOR_FILTER = "is_confirmed_mentor:true"
 CONFIRMED_MENTOR_IN_PROGRAM_FILTER = 'confirmed_mentor_programs:"{program}"'
 
@@ -65,7 +69,7 @@ def _get_filters(request):
     participant_roles = UserRole.FINALIST_USER_ROLES + [
         UserRole.MENTOR, UserRole.ALUM]
 
-    participant_roles = _enterpreneur_specific_alumni_filter(
+    participant_roles = _entrepreneur_specific_alumni_filter(
         participant_roles, request)
 
     user_program_roles_as_participant = ProgramRole.objects.filter(
@@ -86,16 +90,16 @@ def _get_filters(request):
         return IS_CONFIRMED_MENTOR_FILTER
 
 
-def _enterpreneur_specific_alumni_filter(roles, request):
-    current_finalist_roles = ProgramRoleGrant.objects.filter(
-        program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
-        program_role__user_role__name=UserRole.FINALIST,
-        person=request.user
-    )
+def _entrepreneur_specific_alumni_filter(roles, request):
+    if is_entrepreneur(request.user):
+        has_current_finalist_roles = ProgramRoleGrant.objects.filter(
+            program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
+            program_role__user_role__name=UserRole.FINALIST,
+            person=request.user
+        ).exists()
 
-    if not current_finalist_roles and \
-            request.user.baseprofile.user_type == ENTREPRENEUR_USER_TYPE:
-        roles.remove(UserRole.FINALIST)
+        if not has_current_finalist_roles:
+            roles.remove(UserRole.FINALIST)
 
     return roles
 

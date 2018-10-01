@@ -67,11 +67,10 @@ class TestAlgoliaApiKeyView(APITestCase):
 
     def test_finalist_user_gets_all_programs_in_program_group(self):
         named_group = NamedGroupFactory()
-        programs = []
-        for _ in range(5):
-            programs.append(ProgramFactory(
-                mentor_program_group=named_group,
-                program_status=ACTIVE_PROGRAM_STATUS))
+        programs = ProgramFactory.create_batch(
+            5,
+            mentor_program_group=named_group,
+            program_status=ACTIVE_PROGRAM_STATUS)
         other_program = ProgramFactory(program_status=ACTIVE_PROGRAM_STATUS)
         program = programs[0]
         user = self._create_user_with_role_grant(program, UserRole.FINALIST)
@@ -88,11 +87,10 @@ class TestAlgoliaApiKeyView(APITestCase):
 
     def test_finalist_user_gets_all_programs_in_past_or_present(self):
         named_group = NamedGroupFactory()
-        programs = []
-        for _ in range(5):
-            programs.append(ProgramFactory(
-                mentor_program_group=named_group,
-                program_status=ACTIVE_PROGRAM_STATUS))
+        programs = ProgramFactory.create_batch(
+            5,
+            mentor_program_group=named_group,
+            program_status=ACTIVE_PROGRAM_STATUS)
         other_program = ProgramFactory(program_status=UPCOMING_PROGRAM_STATUS,
                                        mentor_program_group=named_group)
         program = programs[0]
@@ -111,11 +109,10 @@ class TestAlgoliaApiKeyView(APITestCase):
     def test_alumni_user_only_sees_mentors_of_alumni_programs(self):
         named_group = NamedGroupFactory()
         named_alumni_group = NamedGroupFactory()
-        programs = []
-        for _ in range(5):
-            programs.append(ProgramFactory(
-                mentor_program_group=named_group,
-                program_status=ACTIVE_PROGRAM_STATUS))
+        programs = ProgramFactory.create_batch(
+            5,
+            mentor_program_group=named_group,
+            program_status=ACTIVE_PROGRAM_STATUS)
         other_program = ProgramFactory(program_status=ENDED_PROGRAM_STATUS,
                                        mentor_program_group=named_alumni_group)
 
@@ -137,11 +134,10 @@ class TestAlgoliaApiKeyView(APITestCase):
             self):
         named_group = NamedGroupFactory()
         named_alumni_group = NamedGroupFactory()
-        programs = []
-        for _ in range(5):
-            programs.append(ProgramFactory(
-                mentor_program_group=named_group,
-                program_status=ACTIVE_PROGRAM_STATUS))
+        programs = ProgramFactory.create_batch(
+            5,
+            mentor_program_group=named_group,
+            program_status=ACTIVE_PROGRAM_STATUS)
         other_program = ProgramFactory(program_status=ENDED_PROGRAM_STATUS,
                                        mentor_program_group=named_alumni_group)
 
@@ -165,11 +161,11 @@ class TestAlgoliaApiKeyView(APITestCase):
 
     def test_non_participant_user_sees_all_confirmed_mentors(self):
         named_group = NamedGroupFactory()
-        programs = []
-        for _ in range(5):
-            programs.append(ProgramFactory(
-                mentor_program_group=named_group,
-                program_status=ACTIVE_PROGRAM_STATUS))
+        programs = ProgramFactory.create_batch(
+            5,
+            mentor_program_group=named_group,
+            program_status=ACTIVE_PROGRAM_STATUS)
+
         program = programs[0]
         user = self._create_user_with_role_grant(program,
                                                  UserRole.DESIRED_MENTOR)
