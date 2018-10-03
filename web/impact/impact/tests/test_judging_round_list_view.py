@@ -7,10 +7,11 @@ from jsonschema import Draft4Validator
 from django.urls import reverse
 
 from accelerator.models import (
+    CLEARANCE_LEVEL_GLOBAL_MANAGER,
     IN_PERSON_JUDGING_ROUND_TYPE,
     ONLINE_JUDGING_ROUND_TYPE,
 )
-
+from accelerator.tests.factories.clearance_factory import ClearanceFactory
 from impact.tests.factories import JudgingRoundFactory
 from impact.tests.api_test_case import APITestCase
 from impact.tests.test_judging_round_detail_view import (
@@ -100,3 +101,24 @@ class TestJudgingRoundListView(APITestCase):
             response = self.client.get(self.url + "?round_type=bogus")
             assert response.status_code == 401
             assert response.data == [INVALID_ROUND_TYPE_ERROR.format("bogus")]
+
+    def test_clearance_enforced(self):
+        the_round = JudgingRoundFactory.create(
+            round_type=ONLINE_JUDGING_ROUND_TYPE)
+        url = self.url + "?round_type={}".format(ONLINE_JUDGING_ROUND_TYPE)
+        user = self.basic_user()
+        # This user does not have a clearance for the ProgramFamily
+        with self.login(email=user.email):
+            response = self.client.get(url)
+            results = response.data["results"]
+            round_ids = [item["id"] for item in results]
+            self.assertFalse(the_round.id in round_ids)
+        # Give the user a clearance for the ProgramFamily and check again
+        ClearanceFactory(level=CLEARANCE_LEVEL_GLOBAL_MANAGER,
+                         user=user,
+                         program_family=the_round.program.program_family)
+        with self.login(email=user.email):
+            response = self.client.get(url)
+            results = response.data["results"]
+            round_ids = [item["id"] for item in results]
+            self.assertTrue(the_round.id in round_ids)
