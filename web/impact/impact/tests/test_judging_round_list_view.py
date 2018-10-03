@@ -30,13 +30,16 @@ class TestJudgingRoundListView(APITestCase):
 
     def test_get(self):
         count = 5
-        program_families = JudgingRoundFactory.create_batch(count)
-        with self.login(email=self.basic_user().email):
+        judging_rounds = JudgingRoundFactory.create_batch(count)
+        user = self.basic_user()
+        for judging_round in judging_rounds:
+            _add_clearance(user, judging_round)
+        with self.login(email=user.email):
             response = self.client.get(self.url)
             assert response.data["count"] == count
             assert all([JudgingRoundListView.serialize(judging_round)
                         in response.data["results"]
-                        for judging_round in program_families])
+                        for judging_round in judging_rounds])
 
     def test_options(self):
         with self.login(email=self.basic_user().email):
@@ -59,7 +62,10 @@ class TestJudgingRoundListView(APITestCase):
     def test_get_is_active(self):
         is_active = JudgingRoundFactory.create(is_active=True)
         is_not_active = JudgingRoundFactory.create(is_active=False)
-        with self.login(email=self.basic_user().email):
+        user = self.basic_user()
+        _add_clearance(user, is_active)
+        _add_clearance(user, is_not_active)
+        with self.login(email=user.email):
             all_response = self.client.get(self.url)
             all_results = all_response.data["results"]
             active_response = self.client.get(self.url + "?is_active=True")
@@ -85,7 +91,10 @@ class TestJudgingRoundListView(APITestCase):
             round_type=ONLINE_JUDGING_ROUND_TYPE)
         in_person = JudgingRoundFactory.create(
             round_type=IN_PERSON_JUDGING_ROUND_TYPE)
-        with self.login(email=self.basic_user().email):
+        user = self.basic_user()
+        _add_clearance(user, online)
+        _add_clearance(user, in_person)
+        with self.login(email=user.email):
             all_response = self.client.get(self.url)
             all_results = all_response.data["results"]
             online_response = self.client.get(
@@ -113,12 +122,16 @@ class TestJudgingRoundListView(APITestCase):
             results = response.data["results"]
             round_ids = [item["id"] for item in results]
             self.assertFalse(the_round.id in round_ids)
-        # Give the user a clearance for the ProgramFamily and check again
-        ClearanceFactory(level=CLEARANCE_LEVEL_GLOBAL_MANAGER,
-                         user=user,
-                         program_family=the_round.program.program_family)
+        # Give the user clearance for relevant ProgramFamily and check again
+        _add_clearance(user, the_round)
         with self.login(email=user.email):
             response = self.client.get(url)
             results = response.data["results"]
             round_ids = [item["id"] for item in results]
             self.assertTrue(the_round.id in round_ids)
+
+
+def _add_clearance(user, judging_round):
+    ClearanceFactory(level=CLEARANCE_LEVEL_GLOBAL_MANAGER,
+                     user=user,
+                     program_family=judging_round.program.program_family)
