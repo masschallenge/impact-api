@@ -97,6 +97,7 @@ class Base(Configuration):
         'oauth2_provider',
         'rest_framework',
         'rest_framework.authtoken',
+        'oidc_provider',
         'rest_framework_swagger',
         'fluent_pages',
         'impact',
@@ -151,6 +152,7 @@ class Base(Configuration):
             },
         },
     ]
+    OIDC_USERINFO = 'impact.oidc_provider_settings.userinfo'
     CORS_ALLOW_CREDENTIALS = True
     CORS_ORIGIN_WHITELIST = (
         'localhost:1234',
