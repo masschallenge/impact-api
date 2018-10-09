@@ -97,6 +97,7 @@ class Base(Configuration):
         'oauth2_provider',
         'rest_framework',
         'rest_framework.authtoken',
+        'oidc_provider',
         'rest_framework_swagger',
         'fluent_pages',
         'impact',
