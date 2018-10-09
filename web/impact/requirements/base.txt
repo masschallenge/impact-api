@@ -48,6 +48,7 @@ drf-schema-adapter
 drf-tracking
 graphene-django==2.1
 sorl-thumbnail==12.4.1
+django-oidc-provider
 
 
 # django-configurations from Git master (needed for Django 1.8 support)
