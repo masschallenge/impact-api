@@ -66,10 +66,12 @@ def _get_search_key(request):
 def _get_filters(request):
     if request.user.is_staff:
         return []
-    participant_roles = UserRole.FINALIST_USER_ROLES + [
-        UserRole.MENTOR, UserRole.ALUM]
+    participant_roles = [UserRole.AIR, UserRole.STAFF, UserRole.MENTOR]
 
     participant_roles = _entrepreneur_specific_alumni_filter(
+        participant_roles, request)
+
+    participant_roles = _entrepreneur_specific_finalist_filter(
         participant_roles, request)
 
     user_program_roles_as_participant = ProgramRole.objects.filter(
@@ -90,7 +92,7 @@ def _get_filters(request):
         return IS_CONFIRMED_MENTOR_FILTER
 
 
-def _entrepreneur_specific_alumni_filter(roles, request):
+def _entrepreneur_specific_finalist_filter(roles, request):
     if is_entrepreneur(request.user):
         has_current_finalist_roles = ProgramRoleGrant.objects.filter(
             program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
@@ -98,8 +100,22 @@ def _entrepreneur_specific_alumni_filter(roles, request):
             person=request.user
         ).exists()
 
-        if not has_current_finalist_roles:
-            roles.remove(UserRole.FINALIST)
+        if has_current_finalist_roles:
+            roles.append(UserRole.FINALIST)
+
+    return roles
+
+
+def _entrepreneur_specific_alumni_filter(roles, request):
+    if is_entrepreneur(request.user):
+        has_current_alum_roles = ProgramRoleGrant.objects.filter(
+            program_role__program__program_status=ENDED_PROGRAM_STATUS,
+            program_role__user_role__name=UserRole.ALUM,
+            person=request.user
+        ).exists()
+
+        if has_current_alum_roles:
+            roles.append(UserRole.ALUM)
 
     return roles
 
