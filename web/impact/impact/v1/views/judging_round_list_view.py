@@ -20,6 +20,7 @@ class JudgingRoundListView(BaseListView):
 
     def get(self, request):
         self._validate_round_type(request)
+        self.ignore_clearance = request.GET.get("ignore_clearance") is not None
         return super().get(request)
 
     def _validate_round_type(self, request):
@@ -32,11 +33,16 @@ class JudgingRoundListView(BaseListView):
 
     def filter(self, qs):
         by_round = self._filter_by_round_type(super().filter(qs))
-        user = self.request.user
-        clearances = Clearance.objects.filter(user=user)
-        program_families = [c.program_family for c in clearances]
-        by_pf = by_round.filter(program__program_family__in=program_families)
-        return by_pf
+        if self.ignore_clearance:
+            return by_round
+        else:
+            # Only show ProgramFamilies the user has clearance for
+            user = self.request.user
+            clearances = Clearance.objects.filter(user=user)
+            program_families = [c.program_family for c in clearances]
+            by_round_and_clearance = by_round.filter(
+                program__program_family__in=program_families)
+            return by_round_and_clearance
 
     def _filter_by_round_type(self, qs):
         round_type = self.request.query_params.get("round_type", None)

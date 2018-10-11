@@ -130,6 +130,19 @@ class TestJudgingRoundListView(APITestCase):
             round_ids = [item["id"] for item in results]
             self.assertTrue(the_round.id in round_ids)
 
+    def test_ignore_clearance_request_param_works(self):
+        the_round = JudgingRoundFactory.create(
+            round_type=ONLINE_JUDGING_ROUND_TYPE)
+        url = self.url + "?round_type={}&ignore_clearance=true".format(
+            ONLINE_JUDGING_ROUND_TYPE)
+        user = self.basic_user()
+        # The user doesn't have clearance, but PF should be displayed anyway
+        with self.login(email=user.email):
+            response = self.client.get(url)
+            results = response.data["results"]
+            round_ids = [item["id"] for item in results]
+            self.assertTrue(the_round.id in round_ids)
+
 
 def _add_clearance(user, judging_round):
     ClearanceFactory(level=CLEARANCE_LEVEL_GLOBAL_MANAGER,
