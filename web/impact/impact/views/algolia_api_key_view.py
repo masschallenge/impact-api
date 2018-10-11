@@ -109,7 +109,7 @@ def _entrepreneur_specific_finalist_filter(roles, request):
 def _entrepreneur_specific_alumni_filter(roles, request):
     if is_entrepreneur(request.user):
         has_current_alum_roles = ProgramRoleGrant.objects.filter(
-            program_role__program__program_status=ENDED_PROGRAM_STATUS,
+            program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
             program_role__user_role__name=UserRole.ALUM,
             person=request.user
         ).exists()

@@ -113,7 +113,7 @@ class TestAlgoliaApiKeyView(APITestCase):
             5,
             mentor_program_group=named_group,
             program_status=ACTIVE_PROGRAM_STATUS)
-        other_program = ProgramFactory(program_status=ENDED_PROGRAM_STATUS,
+        other_program = ProgramFactory(program_status=ACTIVE_PROGRAM_STATUS,
                                        mentor_program_group=named_alumni_group)
 
         user = self._create_user_with_role_grant(
@@ -138,7 +138,7 @@ class TestAlgoliaApiKeyView(APITestCase):
             5,
             mentor_program_group=named_group,
             program_status=ACTIVE_PROGRAM_STATUS)
-        other_program = ProgramFactory(program_status=ENDED_PROGRAM_STATUS,
+        other_program = ProgramFactory(program_status=ACTIVE_PROGRAM_STATUS,
                                        mentor_program_group=named_alumni_group)
 
         finalist_program = programs[1]
