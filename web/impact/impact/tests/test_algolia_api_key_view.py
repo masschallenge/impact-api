@@ -14,6 +14,7 @@ from accelerator.tests.factories import (
     ProgramRoleGrantFactory,
     UserRoleFactory,
     EntrepreneurFactory,
+    ExpertFactory,
 )
 from accelerator_abstract.models import (
     ACTIVE_PROGRAM_STATUS,
@@ -38,7 +39,7 @@ class TestAlgoliaApiKeyView(APITestCase):
         with self.settings(
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
-            with self.login(email=self._create_entrepreneur().email):
+            with self.login(email=self._create_expert().email):
                 response = self.client.get(self.url)
                 response_data = json.loads(response.content)
                 self.assertTrue('token' in response_data.keys())
@@ -52,6 +53,15 @@ class TestAlgoliaApiKeyView(APITestCase):
             self.assertTrue(
                 response_data['detail'] == 'Authentication credentials '
                                            'were not provided.')
+
+    def test_entrepreneur_that_never_had_a_finalist_role_gets_403(self):
+        user = self._create_entrepreneur()
+        with self.settings(
+                ALGOLIA_APPLICATION_ID='test',
+                ALGOLIA_API_KEY='test'):
+            with self.login(email=user.email):
+                response = self.client.get(self.url)
+                self.assertTrue(response.status_code, 403)
 
     def test_staff_user_gets_empty_filters(self):
         user = self.basic_user()
@@ -112,12 +122,16 @@ class TestAlgoliaApiKeyView(APITestCase):
         programs = ProgramFactory.create_batch(
             5,
             mentor_program_group=named_group,
-            program_status=ACTIVE_PROGRAM_STATUS)
-        other_program = ProgramFactory(program_status=ACTIVE_PROGRAM_STATUS,
-                                       mentor_program_group=named_alumni_group)
+            program_status=ENDED_PROGRAM_STATUS)
+        alumni_program = ProgramFactory(
+                                program_status=ACTIVE_PROGRAM_STATUS,
+                                mentor_program_group=named_alumni_group)
+        finalist_program = programs[0]
 
         user = self._create_user_with_role_grant(
-            other_program, UserRole.ALUM)
+            finalist_program, UserRole.FINALIST)
+        self._create_user_with_role_grant(
+            alumni_program, UserRole.ALUM, user)
 
         with self.settings(
                 ALGOLIA_APPLICATION_ID='test',
@@ -128,7 +142,7 @@ class TestAlgoliaApiKeyView(APITestCase):
 
                 for program in programs:
                     self.assertNotIn(program.name, response_data["filters"])
-                self.assertIn(other_program.name, response_data["filters"])
+                self.assertIn(alumni_program.name, response_data["filters"])
 
     def test_alumni_user_who_is_also_finalist_sees_mentors_of_both_programs(
             self):
@@ -167,8 +181,13 @@ class TestAlgoliaApiKeyView(APITestCase):
             program_status=ACTIVE_PROGRAM_STATUS)
 
         program = programs[0]
-        user = self._create_user_with_role_grant(program,
-                                                 UserRole.DESIRED_MENTOR)
+
+        user = self._create_expert()
+
+        self._create_user_with_role_grant(
+            program,
+            UserRole.DESIRED_MENTOR,
+            user)
         with self.settings(
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
@@ -184,6 +203,12 @@ class TestAlgoliaApiKeyView(APITestCase):
         ent_user.set_password("password")
         ent_user.save()
         return ent_user
+
+    def _create_expert(self):
+        expert_user = ExpertFactory()
+        expert_user.set_password("password")
+        expert_user.save()
+        return expert_user
 
     def _create_user_with_role_grant(
             self, program, user_role_name, user=False):

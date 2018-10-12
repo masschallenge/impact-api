@@ -26,6 +26,8 @@ from accelerator_abstract.models.base_user_utils import (
     is_entrepreneur,
 )
 
+from impact.permissions import DirectoryAccessPermissions
+
 IS_CONFIRMED_MENTOR_FILTER = "is_confirmed_mentor:true"
 CONFIRMED_MENTOR_IN_PROGRAM_FILTER = 'confirmed_mentor_programs:"{program}"'
 
@@ -35,6 +37,7 @@ class AlgoliaApiKeyView(APIView):
 
     permission_classes = (
         permissions.IsAuthenticated,
+        DirectoryAccessPermissions,
     )
 
     actions = ["GET"]
@@ -68,10 +71,10 @@ def _get_filters(request):
         return []
     participant_roles = [UserRole.AIR, UserRole.STAFF, UserRole.MENTOR]
 
-    participant_roles = _entrepreneur_specific_alumni_filter(
+    _entrepreneur_specific_alumni_filter(
         participant_roles, request)
 
-    participant_roles = _entrepreneur_specific_finalist_filter(
+    _entrepreneur_specific_finalist_filter(
         participant_roles, request)
 
     user_program_roles_as_participant = ProgramRole.objects.filter(
