@@ -22,8 +22,9 @@ from accelerator_abstract.models.base_clearance import (
 from impact.utils import model_name_case
 
 from accelerator_abstract.models.base_user_utils import is_entrepreneur
-
+from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
 from accelerator.models import UserRole
+from accelerator_abstract.models.base_user_utils import is_employee
 
 logger = logging.getLogger(__file__)
 User = get_user_model()
@@ -80,11 +81,13 @@ class DirectoryAccessPermissions(BasePermission):
     authenticated_users_only = True
 
     def has_permission(self, request, view):
-        return (
-            is_entrepreneur(request.user) and
-            request.user.programrolegrant_set.filter(
-                program_role__user_role__name__in=UserRole.FINALIST_USER_ROLES,
-            ).exists()) or not is_entrepreneur(request.user)
+        allowed_roles = UserRole.FINALIST_USER_ROLES + [
+            UserRole.MENTOR, UserRole.ALUM
+        ]
+        return request.user.programrolegrant_set.filter(
+            program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
+            program_role__user_role__name__in=allowed_roles,
+        ).exists() or is_employee(request.user)
 
 
 class V1APIPermissions(BasePermission):

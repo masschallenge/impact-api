@@ -35,11 +35,38 @@ class TestAlgoliaApiKeyView(APITestCase):
     user_factory = UserFactory
     url = reverse(AlgoliaApiKeyView.view_name)
 
-    def test_logged_in_user_generates_token(self):
+    def test_logged_in_user_with_no_role_grant_gets_403(self):
+        user = self._create_entrepreneur()
         with self.settings(
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
-            with self.login(email=self._create_expert().email):
+            with self.login(email=user.email):
+                response = self.client.get(self.url)
+                self.assertTrue(response.status_code, 403)
+
+    def test_logged_in_user_with_role_grants_in_ended_programs_gets_403(self):
+        named_group = NamedGroupFactory()
+        program = ProgramFactory(
+            mentor_program_group=named_group,
+            program_status=ENDED_PROGRAM_STATUS)
+        user = self._create_user_with_role_grant(program, UserRole.FINALIST)
+        with self.settings(
+                ALGOLIA_APPLICATION_ID='test',
+                ALGOLIA_API_KEY='test'):
+            with self.login(email=user.email):
+                response = self.client.get(self.url)
+                self.assertTrue(response.status_code, 403)
+
+    def test_logged_in_user_generates_token(self):
+        named_group = NamedGroupFactory()
+        program = ProgramFactory(
+            mentor_program_group=named_group,
+            program_status=ACTIVE_PROGRAM_STATUS)
+        user = self._create_user_with_role_grant(program, UserRole.FINALIST)
+        with self.settings(
+                ALGOLIA_APPLICATION_ID='test',
+                ALGOLIA_API_KEY='test'):
+            with self.login(email=user.email):
                 response = self.client.get(self.url)
                 response_data = json.loads(response.content)
                 self.assertTrue('token' in response_data.keys())
@@ -67,6 +94,13 @@ class TestAlgoliaApiKeyView(APITestCase):
         user = self.basic_user()
         user.is_staff = True
         user.save()
+
+        named_group = NamedGroupFactory()
+        program = ProgramFactory(
+            mentor_program_group=named_group,
+            program_status=ACTIVE_PROGRAM_STATUS)
+        self._create_user_with_role_grant(program, UserRole.STAFF, user)
+
         with self.settings(
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
@@ -174,20 +208,10 @@ class TestAlgoliaApiKeyView(APITestCase):
                 self.assertIn(other_program.name, response_data["filters"])
 
     def test_non_participant_user_sees_all_confirmed_mentors(self):
-        named_group = NamedGroupFactory()
-        programs = ProgramFactory.create_batch(
-            5,
-            mentor_program_group=named_group,
-            program_status=ACTIVE_PROGRAM_STATUS)
-
-        program = programs[0]
-
         user = self._create_expert()
+        user.is_superuser = True
+        user.save()
 
-        self._create_user_with_role_grant(
-            program,
-            UserRole.DESIRED_MENTOR,
-            user)
         with self.settings(
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
