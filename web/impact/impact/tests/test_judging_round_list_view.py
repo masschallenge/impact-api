@@ -60,11 +60,11 @@ class TestJudgingRoundListView(APITestCase):
             assert validator.is_valid(json.loads(get_response.content))
 
     def test_get_is_active(self):
-        is_active = JudgingRoundFactory.create(is_active=True)
-        is_not_active = JudgingRoundFactory.create(is_active=False)
+        active_judging_round = JudgingRoundFactory.create(is_active=True)
+        inactive_judging_round = JudgingRoundFactory.create(is_active=False)
         user = self.basic_user()
-        _add_clearance(user, is_active)
-        _add_clearance(user, is_not_active)
+        _add_clearance(user, active_judging_round)
+        _add_clearance(user, inactive_judging_round)
         with self.login(email=user.email):
             all_response = self.client.get(self.url)
             all_results = all_response.data["results"]
@@ -72,8 +72,8 @@ class TestJudgingRoundListView(APITestCase):
             active_results = active_response.data["results"]
             assert len(active_results) < len(all_results)
             active_ids = [item["id"] for item in active_results]
-            assert is_active.id in active_ids
-            assert is_not_active.id not in active_ids
+            assert active_judging_round.id in active_ids
+            assert inactive_judging_round.id not in active_ids
 
     def test_get_is_active_can_be_lower_case(self):
         with self.login(email=self.basic_user().email):
@@ -111,18 +111,24 @@ class TestJudgingRoundListView(APITestCase):
             assert response.status_code == 401
             assert response.data == [INVALID_ROUND_TYPE_ERROR.format("bogus")]
 
-    def test_clearance_enforced(self):
+    def test_dont_show_to_user_without_clearance(self):
         the_round = JudgingRoundFactory.create(
             round_type=ONLINE_JUDGING_ROUND_TYPE)
         url = self.url + "?round_type={}".format(ONLINE_JUDGING_ROUND_TYPE)
         user = self.basic_user()
-        # This user does not have a clearance for the ProgramFamily
+        # User doesn't have clearance for the JudgingRound's ProgramFamily
         with self.login(email=user.email):
             response = self.client.get(url)
             results = response.data["results"]
             round_ids = [item["id"] for item in results]
             self.assertFalse(the_round.id in round_ids)
-        # Give the user clearance for relevant ProgramFamily and check again
+
+    def test_do_show_to_user_with_clearance(self):
+        the_round = JudgingRoundFactory.create(
+            round_type=ONLINE_JUDGING_ROUND_TYPE)
+        url = self.url + "?round_type={}".format(ONLINE_JUDGING_ROUND_TYPE)
+        user = self.basic_user()
+        # Give user clearance for JudgingRound's ProgramFamily
         _add_clearance(user, the_round)
         with self.login(email=user.email):
             response = self.client.get(url)
