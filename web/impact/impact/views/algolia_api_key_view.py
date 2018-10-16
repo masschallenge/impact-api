@@ -74,10 +74,10 @@ def _get_filters(request):
         return []
     participant_roles = [UserRole.AIR, UserRole.STAFF, UserRole.MENTOR]
 
-    _entrepreneur_specific_alumni_filter(
+    participant_roles = _entrepreneur_specific_alumni_filter(
         participant_roles, request)
 
-    _entrepreneur_specific_finalist_filter(
+    participant_roles = _entrepreneur_specific_finalist_filter(
         participant_roles, request)
 
     user_program_roles_as_participant = ProgramRole.objects.filter(

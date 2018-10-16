@@ -30,19 +30,25 @@ from impact.views.algolia_api_key_view import IS_CONFIRMED_MENTOR_FILTER
 User = get_user_model()  # pylint: disable=invalid-name
 
 
+def _create_expert():
+    return _create_user(ExpertFactory)
+
+
+def _create_entrepreneur():
+    return _create_user(EntrepreneurFactory)
+
+
+def _create_user(factory):
+    user = factory()
+    user.set_password("password")
+    user.save()
+    return user
+
+
 class TestAlgoliaApiKeyView(APITestCase):
     client_class = APIClient
     user_factory = UserFactory
     url = reverse(AlgoliaApiKeyView.view_name)
-
-    def test_logged_in_user_with_no_role_grant_gets_403(self):
-        user = self._create_entrepreneur()
-        with self.settings(
-                ALGOLIA_APPLICATION_ID='test',
-                ALGOLIA_API_KEY='test'):
-            with self.login(email=user.email):
-                response = self.client.get(self.url)
-                self.assertTrue(response.status_code, 403)
 
     def test_logged_in_user_with_role_grants_in_ended_programs_gets_403(self):
         named_group = NamedGroupFactory()
@@ -82,7 +88,7 @@ class TestAlgoliaApiKeyView(APITestCase):
                                            'were not provided.')
 
     def test_entrepreneur_that_never_had_a_finalist_role_gets_403(self):
-        user = self._create_entrepreneur()
+        user = _create_entrepreneur()
         with self.settings(
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
@@ -206,7 +212,7 @@ class TestAlgoliaApiKeyView(APITestCase):
                 self.assertIn(other_program.name, response_data["filters"])
 
     def test_superuser_employee_sees_all_mentors(self):
-        user = self._create_expert()
+        user = _create_expert()
         user.is_superuser = True
         user.save()
 
@@ -219,18 +225,6 @@ class TestAlgoliaApiKeyView(APITestCase):
 
                 self.assertEqual(response_data["filters"], [])
 
-    def _create_entrepreneur(self):
-        ent_user = EntrepreneurFactory()
-        ent_user.set_password("password")
-        ent_user.save()
-        return ent_user
-
-    def _create_expert(self):
-        expert_user = ExpertFactory()
-        expert_user.set_password("password")
-        expert_user.save()
-        return expert_user
-
     def _create_user_with_role_grant(
             self, program, user_role_name, user=False):
         user_role = UserRoleFactory(name=user_role_name)
@@ -240,7 +234,7 @@ class TestAlgoliaApiKeyView(APITestCase):
         )
 
         if not user:
-            user = self._create_entrepreneur()
+            user = _create_entrepreneur()
 
         ProgramRoleGrantFactory(person=user, program_role=program_role)
         return user
