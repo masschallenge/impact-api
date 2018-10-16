@@ -147,8 +147,8 @@ class AllocateApplicationsView(ImpactView):
         criterion, option = key
         for judge_id in judge_ids:
             judge_data = self._judge_cache.data.get(judge_id, {})
-            field = CriterionHelper.find_helper(criterion).judge_field
-            if option == judge_data.get(field):
+            helper = CriterionHelper.find_helper(criterion)
+            if helper.judge_matches_option(judge_data, option):
                 result += 1
         return result
 

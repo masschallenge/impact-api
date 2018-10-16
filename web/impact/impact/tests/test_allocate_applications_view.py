@@ -10,6 +10,8 @@ from accelerator.models import (
     StartupProgramInterest,
 )
 from accelerator.tests.factories import (
+    AllocatorFactory,
+    ApplicationPanelAssignmentFactory, 
     ExpertFactory,
     IndustryFactory,
     ProgramFactory,
@@ -30,14 +32,18 @@ JudgeWithPanel = namedtuple('JudgeWithPanel', ['option', 'judge', 'panel'])
 
 
 class TestAllocateApplicationsView(APITestCase):
+    def _url(self, judging_round_id, judge_id):
+        return reverse(AllocateApplicationsView.view_name,
+                       args=[judging_round_id, judge_id])
+    
     def test_get(self):
         context = AnalyzeJudgingContext()
         judging_round = context.judging_round
         judge = context.add_judge()
         with self.login(email=self.basic_user().email):
-            url = reverse(AllocateApplicationsView.view_name,
-                          args=[judging_round.id, judge.id])
-            response = self.client.get(url)
+
+            response = self.client.get(self._url(judging_round.id,
+                                                 judge.id))
             assert response.status_code == 200
 
     def test_get_judging_round_inactive(self):
@@ -111,6 +117,33 @@ class TestAllocateApplicationsView(APITestCase):
                     judging_round=context.judging_round,
                     judge=context.judge.email) in response.data
             ]
+
+    def test_allocator_respects_completed_assignments(self):
+        context = AnalyzeJudgingContext()
+        AllocatorFactory(judging_round=context.judging_round,
+                         scenario=context.scenario)
+        context.add_applications(20)
+        panel = context.add_panel()
+        for app in context.applications[-10:]:
+            ApplicationPanelAssignmentFactory(
+                application=app,
+                panel=panel,
+                scenario=context.scenario)
+        context.add_judge(assigned=True,
+                          complete=True,
+                          panel=panel)
+        new_judge = context.add_judge(assigned=False,
+                                      complete=False)
+        new_judge.set_password("password")
+        new_judge.save()
+        view = AllocateApplicationsView
+        with self.login(email=new_judge.email):
+            response = self.client.get(self._url(context.judging_round.id,
+                                                 new_judge.id))
+        assignments = response.json()
+        assigned_ids = [app.id for app in context.applications[-10:]]
+        reassigned_apps = set(assignments).intersection(assigned_ids)
+        assert 0 == len(reassigned_apps)
 
     def test_get_by_judge_succeeds(self):
         context = AnalyzeJudgingContext()
@@ -280,6 +313,7 @@ class TestAllocateApplicationsView(APITestCase):
                     flat=True))
             matches = set(apps).intersection(judge_apps)
             assert matches == judge_apps
+
 
 
 def _judge_with_panel(context, field, option):
