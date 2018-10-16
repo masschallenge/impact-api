@@ -198,11 +198,11 @@ class AllocateApplicationsView(ImpactView):
         goal = self._judge_assignment_count() + desired
         commitment = self.judge.judgeroundcommitment_set.filter(
             judging_round=self.judging_round).first()
+        if commitment.current_quota is None:
+            commitment.current_quota = 0
         if commitment:
-            if commitment.capacity < goal:
-                commitment.capacity = goal
-            if commitment.current_quota < goal:
-                commitment.current_quota = goal
+            commitment.capacity = max(goal, commitment.capacity)
+            commitment.current_quota = max(goal, commitment.current_quota)
             commitment.save()
 
     def _judge_assignment_count(self):
