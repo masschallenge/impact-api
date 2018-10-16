@@ -155,7 +155,7 @@ class Base(Configuration):
     CORS_ORIGIN_WHITELIST = (
         'localhost:1234',
         'localhost:8000',
-        'localhost:8181',        
+        'localhost:8181',
     )
     CORS_ORIGIN_REGEX_WHITELIST = (
         r'^(https?://)?(\w+\.)?masschallenge\.org$', )
@@ -316,6 +316,7 @@ class Test(Base):
     DATABASE_ROUTERS = []
     DEBUG = False
     LANGUAGE_CODE = 'en'
+
 
 class Prod(Base):
     ALLOWED_HOSTS = Base.ALLOWED_HOSTS + [

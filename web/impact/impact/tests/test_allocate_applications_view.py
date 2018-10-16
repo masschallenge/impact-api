@@ -7,13 +7,16 @@ from django.urls import reverse
 
 from accelerator.models import (
     Application,
+    JUDGING_FEEDBACK_STATUS_CONFLICT,
+    JUDGING_STATUS_CONFLICT,
     StartupProgramInterest,
 )
 from accelerator.tests.factories import (
     AllocatorFactory,
-    ApplicationPanelAssignmentFactory, 
+    ApplicationPanelAssignmentFactory,
     ExpertFactory,
     IndustryFactory,
+    JudgeApplicationFeedbackFactory,
     ProgramFactory,
     StartupProgramInterestFactory,
 )
@@ -35,7 +38,7 @@ class TestAllocateApplicationsView(APITestCase):
     def _url(self, judging_round_id, judge_id):
         return reverse(AllocateApplicationsView.view_name,
                        args=[judging_round_id, judge_id])
-    
+
     def test_get(self):
         context = AnalyzeJudgingContext()
         judging_round = context.judging_round
@@ -136,10 +139,42 @@ class TestAllocateApplicationsView(APITestCase):
                                       complete=False)
         new_judge.set_password("password")
         new_judge.save()
-        view = AllocateApplicationsView
         with self.login(email=new_judge.email):
             response = self.client.get(self._url(context.judging_round.id,
                                                  new_judge.id))
+        assignments = response.json()
+        assigned_ids = [app.id for app in context.applications[-10:]]
+        reassigned_apps = set(assignments).intersection(assigned_ids)
+        assert 0 == len(reassigned_apps)
+
+    def test_allocator_does_not_reassign_conflicted_apps_to_same_judge(self):
+        context = AnalyzeJudgingContext()
+        AllocatorFactory(judging_round=context.judging_round,
+                         scenario=context.scenario)
+        context.add_applications(20)
+        panel = context.add_panel()
+        for app in context.applications[-10:]:
+            ApplicationPanelAssignmentFactory(
+                application=app,
+                panel=panel,
+                scenario=context.scenario)
+        judge = context.add_judge(assigned=True,
+                                  complete=True,
+                                  panel=panel)
+        for app in context.applications[-10:]:
+            JudgeApplicationFeedbackFactory(
+                application=app,
+                form_type=context.judging_round.judging_form,
+                judge=judge,
+                panel=panel,
+                judging_status=JUDGING_STATUS_CONFLICT,
+                feedback_status=JUDGING_FEEDBACK_STATUS_CONFLICT
+            )
+        judge.set_password("password")
+        judge.save()
+        with self.login(email=judge.email):
+            response = self.client.get(self._url(context.judging_round.id,
+                                                 judge.id))
         assignments = response.json()
         assigned_ids = [app.id for app in context.applications[-10:]]
         reassigned_apps = set(assignments).intersection(assigned_ids)
@@ -313,7 +348,6 @@ class TestAllocateApplicationsView(APITestCase):
                     flat=True))
             matches = set(apps).intersection(judge_apps)
             assert matches == judge_apps
-
 
 
 def _judge_with_panel(context, field, option):
