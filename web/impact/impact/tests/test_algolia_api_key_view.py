@@ -90,10 +90,8 @@ class TestAlgoliaApiKeyView(APITestCase):
                 response = self.client.get(self.url)
                 self.assertTrue(response.status_code, 403)
 
-    def test_staff_user_gets_empty_filters(self):
+    def test_user_with_staff_role_grant_sees_all_mentors(self):
         user = self.basic_user()
-        user.is_staff = True
-        user.save()
 
         named_group = NamedGroupFactory()
         program = ProgramFactory(
@@ -207,7 +205,7 @@ class TestAlgoliaApiKeyView(APITestCase):
                     self.assertIn(program.name, response_data["filters"])
                 self.assertIn(other_program.name, response_data["filters"])
 
-    def test_non_participant_user_sees_all_confirmed_mentors(self):
+    def test_superuser_employee_sees_all_mentors(self):
         user = self._create_expert()
         user.is_superuser = True
         user.save()
@@ -219,8 +217,7 @@ class TestAlgoliaApiKeyView(APITestCase):
                 response = self.client.get(self.url)
                 response_data = json.loads(response.content)
 
-                self.assertIn(IS_CONFIRMED_MENTOR_FILTER,
-                              response_data["filters"])
+                self.assertEqual(response_data["filters"], [])
 
     def _create_entrepreneur(self):
         ent_user = EntrepreneurFactory()

@@ -24,6 +24,7 @@ from accelerator_abstract.models import (
 
 from accelerator_abstract.models.base_user_utils import (
     is_entrepreneur,
+    is_employee,   
 )
 
 from impact.permissions import DirectoryAccessPermissions
@@ -61,13 +62,15 @@ class AlgoliaApiKeyView(APIView):
 
 
 def _get_search_key(request):
-    if request.user.is_staff:
+    if is_employee(request.user):
         return settings.ALGOLIA_STAFF_SEARCH_ONLY_API_KEY
     return settings.ALGOLIA_SEARCH_ONLY_API_KEY
 
 
 def _get_filters(request):
-    if request.user.is_staff:
+
+    # an empty filter i.e. [], means the user sees all mentors
+    if is_employee(request.user):
         return []
     participant_roles = [UserRole.AIR, UserRole.STAFF, UserRole.MENTOR]
 
