@@ -24,7 +24,7 @@ from accelerator.models import (
 from rest_framework.response import Response
 from impact.v1.helpers import CriterionHelper
 from impact.v1.views.impact_view import ImpactView
-from impact.v1.classes.allocate_applications_permissions import (
+from impact.permissions import (
     AllocateApplicationsPermissions,
 )
 from impact.v1.classes.option_analysis import feedbacks_for_judging_round
