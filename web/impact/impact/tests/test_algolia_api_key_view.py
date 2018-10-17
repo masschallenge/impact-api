@@ -45,17 +45,24 @@ def _create_user(factory):
     return user
 
 
+def _create_batch_program_and_named_group(status, batch_size):
+    named_group = NamedGroupFactory()
+    programs = ProgramFactory.create_batch(
+        batch_size,
+        mentor_program_group=named_group,
+        program_status=status)
+    return programs
+
+
 class TestAlgoliaApiKeyView(APITestCase):
     client_class = APIClient
     user_factory = UserFactory
     url = reverse(AlgoliaApiKeyView.view_name)
 
     def test_logged_in_user_with_role_grants_in_ended_programs_gets_403(self):
-        named_group = NamedGroupFactory()
-        program = ProgramFactory(
-            mentor_program_group=named_group,
-            program_status=ENDED_PROGRAM_STATUS)
-        user = self._create_user_with_role_grant(program, UserRole.FINALIST)
+        program = _create_batch_program_and_named_group(
+                        ENDED_PROGRAM_STATUS, 1)
+        user = self._create_user_with_role_grant(program[0], UserRole.FINALIST)
         with self.settings(
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
@@ -64,11 +71,9 @@ class TestAlgoliaApiKeyView(APITestCase):
                 self.assertTrue(response.status_code, 403)
 
     def test_logged_in_user_generates_token(self):
-        named_group = NamedGroupFactory()
-        program = ProgramFactory(
-            mentor_program_group=named_group,
-            program_status=ACTIVE_PROGRAM_STATUS)
-        user = self._create_user_with_role_grant(program, UserRole.FINALIST)
+        program = _create_batch_program_and_named_group(
+                        ACTIVE_PROGRAM_STATUS, 1)
+        user = self._create_user_with_role_grant(program[0], UserRole.FINALIST)
         with self.settings(
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
@@ -98,12 +103,10 @@ class TestAlgoliaApiKeyView(APITestCase):
 
     def test_user_with_staff_role_grant_sees_all_mentors(self):
         user = self.basic_user()
+        program = _create_batch_program_and_named_group(
+                        ACTIVE_PROGRAM_STATUS, 1)
 
-        named_group = NamedGroupFactory()
-        program = ProgramFactory(
-            mentor_program_group=named_group,
-            program_status=ACTIVE_PROGRAM_STATUS)
-        self._create_user_with_role_grant(program, UserRole.STAFF, user)
+        self._create_user_with_role_grant(program[0], UserRole.STAFF, user)
 
         with self.settings(
                 ALGOLIA_APPLICATION_ID='test',
@@ -113,12 +116,10 @@ class TestAlgoliaApiKeyView(APITestCase):
                 response_data = json.loads(response.content)
                 self.assertEqual(response_data["filters"], [])
 
-    def test_finalist_user_gets_all_programs_in_program_group(self):
-        named_group = NamedGroupFactory()
-        programs = ProgramFactory.create_batch(
-            5,
-            mentor_program_group=named_group,
-            program_status=ACTIVE_PROGRAM_STATUS)
+    def test_finalist_user_gets_all_programs_in_program_group(
+            self):
+        programs = _create_batch_program_and_named_group(
+                        ACTIVE_PROGRAM_STATUS, 5)
         other_program = ProgramFactory(program_status=ACTIVE_PROGRAM_STATUS)
         program = programs[0]
         user = self._create_user_with_role_grant(program, UserRole.FINALIST)
@@ -133,14 +134,13 @@ class TestAlgoliaApiKeyView(APITestCase):
                     self.assertIn(program.name, response_data["filters"])
                 self.assertNotIn(other_program.name, response_data["filters"])
 
-    def test_finalist_user_gets_all_programs_in_past_or_present(self):
-        named_group = NamedGroupFactory()
-        programs = ProgramFactory.create_batch(
-            5,
-            mentor_program_group=named_group,
-            program_status=ACTIVE_PROGRAM_STATUS)
-        other_program = ProgramFactory(program_status=UPCOMING_PROGRAM_STATUS,
-                                       mentor_program_group=named_group)
+    def test_finalist_user_gets_all_programs_in_past_or_present(
+            self):
+        programs = _create_batch_program_and_named_group(
+                        ACTIVE_PROGRAM_STATUS, 5)
+        other_program = ProgramFactory(
+                            program_status=UPCOMING_PROGRAM_STATUS,
+                            mentor_program_group=NamedGroupFactory())
         program = programs[0]
         user = self._create_user_with_role_grant(program, UserRole.FINALIST)
         with self.settings(
@@ -154,13 +154,11 @@ class TestAlgoliaApiKeyView(APITestCase):
                     self.assertIn(program.name, response_data["filters"])
                 self.assertNotIn(other_program.name, response_data["filters"])
 
-    def test_alumni_user_only_sees_mentors_of_alumni_programs(self):
-        named_group = NamedGroupFactory()
+    def test_alumni_user_only_sees_mentors_of_alumni_programs(
+            self):
+        programs = _create_batch_program_and_named_group(
+                        ENDED_PROGRAM_STATUS, 5)
         named_alumni_group = NamedGroupFactory()
-        programs = ProgramFactory.create_batch(
-            5,
-            mentor_program_group=named_group,
-            program_status=ENDED_PROGRAM_STATUS)
         alumni_program = ProgramFactory(
                                 program_status=ACTIVE_PROGRAM_STATUS,
                                 mentor_program_group=named_alumni_group)
@@ -184,12 +182,9 @@ class TestAlgoliaApiKeyView(APITestCase):
 
     def test_alumni_user_who_is_also_finalist_sees_mentors_of_both_programs(
             self):
-        named_group = NamedGroupFactory()
+        programs = _create_batch_program_and_named_group(
+                        ACTIVE_PROGRAM_STATUS, 5)
         named_alumni_group = NamedGroupFactory()
-        programs = ProgramFactory.create_batch(
-            5,
-            mentor_program_group=named_group,
-            program_status=ACTIVE_PROGRAM_STATUS)
         other_program = ProgramFactory(program_status=ACTIVE_PROGRAM_STATUS,
                                        mentor_program_group=named_alumni_group)
 
