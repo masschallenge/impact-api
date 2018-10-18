@@ -24,7 +24,10 @@ from accelerator_abstract.models import (
 
 from accelerator_abstract.models.base_user_utils import (
     is_entrepreneur,
+    is_employee,   
 )
+
+from impact.permissions import DirectoryAccessPermissions
 
 IS_CONFIRMED_MENTOR_FILTER = "is_confirmed_mentor:true"
 CONFIRMED_MENTOR_IN_PROGRAM_FILTER = 'confirmed_mentor_programs:"{program}"'
@@ -35,6 +38,7 @@ class AlgoliaApiKeyView(APIView):
 
     permission_classes = (
         permissions.IsAuthenticated,
+        DirectoryAccessPermissions,
     )
 
     actions = ["GET"]
@@ -58,13 +62,15 @@ class AlgoliaApiKeyView(APIView):
 
 
 def _get_search_key(request):
-    if request.user.is_staff:
+    if is_employee(request.user):
         return settings.ALGOLIA_STAFF_SEARCH_ONLY_API_KEY
     return settings.ALGOLIA_SEARCH_ONLY_API_KEY
 
 
 def _get_filters(request):
-    if request.user.is_staff:
+
+    # an empty filter i.e. [], means the user sees all mentors
+    if is_employee(request.user):
         return []
     participant_roles = [UserRole.AIR, UserRole.STAFF, UserRole.MENTOR]
 
@@ -109,7 +115,7 @@ def _entrepreneur_specific_finalist_filter(roles, request):
 def _entrepreneur_specific_alumni_filter(roles, request):
     if is_entrepreneur(request.user):
         has_current_alum_roles = ProgramRoleGrant.objects.filter(
-            program_role__program__program_status=ENDED_PROGRAM_STATUS,
+            program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
             program_role__user_role__name=UserRole.ALUM,
             person=request.user
         ).exists()

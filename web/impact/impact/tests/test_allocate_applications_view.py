@@ -1,5 +1,6 @@
 # MIT License
-# Copyright (c) 2017 MassChallenge, Inc.
+# Copyright (c) 2018 MassChallenge, Inc.
+
 
 from collections import namedtuple
 from itertools import chain
@@ -268,6 +269,18 @@ class TestAllocateApplicationsView(APITestCase):
         apps = Application.objects.filter(**app_filter).values_list("id",
                                                                     flat=True)
         self.assert_matching_allocation(context.judging_round, judge, apps)
+
+    def test_commitment_quota_none_is_tolerated(self):
+        context = AnalyzeJudgingContext()
+        judging_round = context.judging_round
+        commitment = context.judges[0].judgeroundcommitment_set.first()
+        commitment.current_quota = None
+        commitment.save()
+        with self.login(email=self.basic_user().email):
+            url = reverse(AllocateApplicationsView.view_name,
+                          args=[judging_round.id, context.judge.id])
+            # No error == success
+            self.client.get(url)
 
     def assert_matching_allocation(self, judging_round, judge, apps):
         with self.login(email=self.basic_user().email):
