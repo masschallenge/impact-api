@@ -24,7 +24,7 @@ from accelerator.models import (
 from rest_framework.response import Response
 from impact.v1.helpers import CriterionHelper
 from impact.v1.views.impact_view import ImpactView
-from impact.v1.classes.allocate_applications_permissions import (
+from impact.permissions import (
     AllocateApplicationsPermissions,
 )
 from impact.v1.classes.option_analysis import feedbacks_for_judging_round
@@ -198,11 +198,11 @@ class AllocateApplicationsView(ImpactView):
         goal = self._judge_assignment_count() + desired
         commitment = self.judge.judgeroundcommitment_set.filter(
             judging_round=self.judging_round).first()
+        if commitment.current_quota is None:
+            commitment.current_quota = 0
         if commitment:
-            if commitment.capacity < goal:
-                commitment.capacity = goal
-            if commitment.current_quota < goal:
-                commitment.current_quota = goal
+            commitment.capacity = max(goal, commitment.capacity)
+            commitment.current_quota = max(goal, commitment.current_quota)
             commitment.save()
 
     def _judge_assignment_count(self):

@@ -110,6 +110,7 @@ urls = [
     url(r'^directory/(?:.*)$', TemplateView.as_view(
         template_name='directory.html'),
         name="directory"),
+    url(r'^openid/', include('oidc_provider.urls', namespace='oidc_provider')),
     url(r'^$', IndexView.as_view()),
 ]
 
