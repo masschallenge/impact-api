@@ -42,13 +42,13 @@ django-rest-framework-proxy
 django-rest-swagger
 django-storages==1.6.5
 Django==1.10.8
-djangorestframework
+djangorestframework==3.8.2
 djangorestframework-jwt
 drf-schema-adapter
 drf-tracking
 graphene-django==2.1
 sorl-thumbnail==12.4.1
-django-oidc-provider
+django-oidc-provider==0.6.2
 
 
 # django-configurations from Git master (needed for Django 1.8 support)
