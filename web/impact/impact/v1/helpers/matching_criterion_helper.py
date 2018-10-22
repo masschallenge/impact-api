@@ -36,3 +36,6 @@ class MatchingCriterionHelper(CriterionHelper):
     @staticmethod
     def instances_by_name(model):
         return {instance.name: instance for instance in model.objects.all()}
+
+    def judge_matches_option(self, judge_data, option):
+        return option == judge_data.get(self.judge_field)
