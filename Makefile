@@ -340,7 +340,7 @@ django-shell: .env
 DB_CACHE_DIR = db_cache/
 s3_key = $(db_name).sql.gz
 gz_file ?= $(DB_CACHE_DIR)$(s3_key)
-intermediary_file = sql_dump.sql
+intermediary_file = /tmp/sql_dump.sql
 
 load-db: $(DB_CACHE_DIR) $(gz_file) .env
 	@echo "Loading $(gz_file)"
