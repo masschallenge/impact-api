@@ -340,12 +340,17 @@ django-shell: .env
 DB_CACHE_DIR = db_cache/
 s3_key = $(db_name).sql.gz
 gz_file ?= $(DB_CACHE_DIR)$(s3_key)
+intermediary_file = /tmp/sql_dump.sql
 
 load-db: $(DB_CACHE_DIR) $(gz_file) .env
 	@echo "Loading $(gz_file)"
-	@echo "drop database mc_dev; create database mc_dev;" | docker-compose run --rm web ./manage.py dbshell
-	@gzcat $(gz_file) | docker-compose run --rm web ./manage.py dbshell
-	@docker-compose run --rm web ./manage.py migrate
+	@echo "This will take a while, don't be alarmed if your console appears frozen."
+	@echo "drop database mc_dev; create database mc_dev; " > $(intermediary_file)
+	@gzcat $(gz_file) >> $(intermediary_file)
+	@sed -i "" "s|\`masschallenge\`|\`mc_dev\`|g" $(intermediary_file)
+	@cat $(intermediary_file) | docker-compose run --rm web ./manage.py dbshell
+	@rm -rf $(intermediary_file)
+	@docker-compose run --rm web ./manage.py migrate --noinput
 
 %.sql.gz:
 	@echo downloading db...
