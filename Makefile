@@ -301,9 +301,13 @@ shutdown-vms: .env
 
 REMOVE_IMAGES = no
 remove_images ?= $(REMOVE_IMAGES)
-delete-vms: CONTAINERS?=$(shell docker ps -a -q --filter network=impactapi_default)
+delete-vms: CONTAINERS?=$(shell docker ps -a -q --filter name=^/impact-api)
 delete-vms: .env
+	@echo "Removing impact-api images and containers"
+	@echo "This may take a while if you have a lot of unused images"
+	@echo "Containers....."
 	@echo $(shell if [ ! -z "$(CONTAINERS)" ]; then docker rm -f $(CONTAINERS); fi;)
+	@echo "Images....."
 	@echo $(shell if [ -z "$(remove_images)" ]; then docker image prune -a -f; fi;)
 
 ACCELERATE_MAKE = cd $(ACCELERATE) && $(MAKE)
@@ -345,7 +349,7 @@ intermediary_file = /tmp/sql_dump.sql
 load-db: $(DB_CACHE_DIR) $(gz_file) .env
 	@echo "Loading $(gz_file)"
 	@echo "This will take a while, don't be alarmed if your console appears frozen."
-	@echo "drop database mc_dev; create database mc_dev; " > $(intermediary_file)
+	@echo "drop database mc_dev; create database mc_dev; use mc_dev;" > $(intermediary_file)
 	@gzcat $(gz_file) >> $(intermediary_file)
 	@sed -i "" "s|\`masschallenge\`|\`mc_dev\`|g" $(intermediary_file)
 	@cat $(intermediary_file) | docker-compose run --rm web ./manage.py dbshell
