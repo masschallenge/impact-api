@@ -149,6 +149,13 @@ class TestJudgingRoundListView(APITestCase):
             round_ids = [item["id"] for item in results]
             self.assertTrue(the_round.id in round_ids)
 
+    def test_staff_user_can_view(self):
+        email = self.staff_user().email
+        with self.login(email=email):
+            url = reverse(JudgingRoundListView.view_name)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+
 
 def _add_clearance(user, judging_round):
     ClearanceFactory(level=CLEARANCE_LEVEL_GLOBAL_MANAGER,
