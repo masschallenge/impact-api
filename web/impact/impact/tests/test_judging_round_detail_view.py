@@ -54,3 +54,15 @@ class TestJudgingRoundDetailView(APITestCase):
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)
             assert validator.is_valid(json.loads(get_response.content))
+
+    def test_staff_user_can_view(self):
+        judging_round = JudgingRoundFactory()
+        email = self.staff_user().email
+        with self.login(email=email):
+            url = reverse(JudgingRoundDetailView.view_name,
+                          args=[judging_round.id])
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.data["name"], judging_round.name)
+            self.assertEqual(response.data["program_id"],
+                             judging_round.program_id)

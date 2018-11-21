@@ -149,6 +149,19 @@ class TestJudgingRoundListView(APITestCase):
             round_ids = [item["id"] for item in results]
             self.assertTrue(the_round.id in round_ids)
 
+    def test_global_operations_manager_can_view(self):
+        count = 5
+        judging_rounds = JudgingRoundFactory.create_batch(count)
+        user = self.staff_user()
+        for judging_round in judging_rounds:
+            _add_clearance(user, judging_round)
+        with self.login(email=user.email):
+            response = self.client.get(self.url)
+            assert response.data["count"] == count
+            assert all([JudgingRoundListView.serialize(judging_round)
+                        in response.data["results"]
+                        for judging_round in judging_rounds])
+
 
 def _add_clearance(user, judging_round):
     ClearanceFactory(level=CLEARANCE_LEVEL_GLOBAL_MANAGER,
