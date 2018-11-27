@@ -67,10 +67,12 @@ class BaseListView(ImpactView):
         count, results = self.results(limit, offset)
         result = {
             "count": count,
-            "next": _next_url(base_url, limit, offset, count),
-            "previous": _previous_url(base_url, limit, offset, count),
             "results": results,
         }
+        if limit != "all":
+            result["next"] = _next_url(base_url, limit, offset, count)
+            result["previous"] = _previous_url(base_url, limit, offset, count)
+
         return Response(result)
 
     def _get_offset(self, request):
@@ -79,7 +81,8 @@ class BaseListView(ImpactView):
 
     def _get_limit(self, request):
         limit_input = request.GET.get("limit", str(self.DEFAULT_LIMIT))
-        return self._validate_limit(limit_input)
+        return limit_input if limit_input == "all" else self._validate_limit(
+            limit_input)
 
     def _validate_is_active(self, request):
         is_active = request.GET.get("is_active")
@@ -120,6 +123,10 @@ class BaseListView(ImpactView):
         queryset = self.helper_class.all_objects()
         queryset = self.filter(queryset)
         count = queryset.count()
+
+        if limit == "all":
+            return (count, [self.serialize(obj) for obj in queryset])
+
         return (count,
                 [self.serialize(obj)
                  for obj in queryset[offset:offset + limit]])
