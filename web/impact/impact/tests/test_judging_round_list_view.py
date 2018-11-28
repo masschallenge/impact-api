@@ -6,6 +6,8 @@ from jsonschema import Draft4Validator
 
 from django.urls import reverse
 
+from django.conf import settings
+
 from accelerator.models import (
     CLEARANCE_LEVEL_GLOBAL_MANAGER,
     IN_PERSON_JUDGING_ROUND_TYPE,
@@ -36,6 +38,30 @@ class TestJudgingRoundListView(APITestCase):
             _add_clearance(user, judging_round)
         with self.login(email=user.email):
             response = self.client.get(self.url)
+            assert response.data["count"] == count
+            assert all([JudgingRoundListView.serialize(judging_round)
+                        in response.data["results"]
+                        for judging_round in judging_rounds])
+
+    def test_get_implicit_pagination(self):
+        count = 15
+        judging_rounds = JudgingRoundFactory.create_batch(count)
+        user = self.basic_user()
+        default_pagination_size = settings.REST_FRAMEWORK["PAGE_SIZE"]
+        for judging_round in judging_rounds:
+            _add_clearance(user, judging_round)
+        with self.login(email=user.email):
+            response = self.client.get(self.url)
+            assert len(response.data["results"]) == default_pagination_size
+
+    def test_get_limit_lifted(self):
+        count = 15
+        judging_rounds = JudgingRoundFactory.create_batch(count)
+        user = self.basic_user()
+        for judging_round in judging_rounds:
+            _add_clearance(user, judging_round)
+        with self.login(email=user.email):
+            response = self.client.get("%s?limit=all" % self.url)
             assert response.data["count"] == count
             assert all([JudgingRoundListView.serialize(judging_round)
                         in response.data["results"]
