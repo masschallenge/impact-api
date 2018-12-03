@@ -225,7 +225,8 @@ ACCELERATE = ../accelerate
 DJANGO_ACCELERATOR = ../django-accelerator
 IMPACT_API = ../impact-api
 DIRECTORY = ../directory
-REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(DIRECTORY) $(IMPACT_API)
+SEMANTIC = ../semantic-ui-theme
+REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(DIRECTORY) $(SEMANTIC) $(IMPACT_API) 
 
 
 # Database migration related targets
