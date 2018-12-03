@@ -225,4 +225,4 @@ you would invoke:
 
     docker-compose exec web /bin/bash
 
-This is equivalent to running `make bash-shell`.
+This is equivalent to running `make bash-shell`. 
