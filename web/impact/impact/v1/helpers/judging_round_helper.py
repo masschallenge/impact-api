@@ -19,6 +19,7 @@ JUDGING_ROUND_FIELDS = {
     "full_name": READ_ONLY_STRING_FIELD,
     "round_type": OPTIONAL_STRING_FIELD,
     "cycle_based_round": BOOLEAN_FIELD,
+    "has_criteria": BOOLEAN_FIELD,
     "program_id": OPTIONAL_INTEGER_FIELD,
     "cycle_id": OPTIONAL_INTEGER_FIELD,
     # The next two fields should have a date validator.  See AC-5806.
@@ -30,7 +31,7 @@ JUDGING_ROUND_FIELDS = {
 class JudgingRoundHelper(ModelHelper):
     model = JudgingRound
     REQUIRED_KEYS = ["name", "program_id", "round_type"]
-    OPTIONAL_KEYS = ["cycle_based_round"]
+    OPTIONAL_KEYS = ["cycle_based_round", "has_criteria"]
     INPUT_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
 
     @classmethod
@@ -48,3 +49,8 @@ class JudgingRoundHelper(ModelHelper):
         # short_name is "2017-04 BOS CH IL Round 1".  See ticket
         # AC-5694 for proposed cleanup.
         return self.subject.short_name()
+
+    @property
+    def has_criteria(self):
+        criteria = JudgingRound.objects.get(pk=self.subject.id).criterion_set.all()
+        return any(criteria)
