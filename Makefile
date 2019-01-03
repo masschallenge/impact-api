@@ -256,14 +256,18 @@ status:
 
 checkout:
 	@for r in $(REPOS) ; do \
-	  cd $$r; \
-	  ((git -c 'color.ui=always' checkout $(branch) 2>&1 | \
-	   sed "s|^|$$r: |") || \
-	  (git -c 'color.ui=always' checkout $(DEFAULT_BRANCH) 2>&1 | \
-	   sed "s|^|$$r: |")) && \
-	  git pull | sed "s|^|$$r: |"; \
-	  echo; \
-	  done
+		cd $$r; \
+		git show-ref --verify --quiet refs/heads/$(branch); \
+		if [ $$? -eq 0 ]; then \
+			git -c 'color.ui=always' checkout $(branch) 2>&1 | sed "s|^|$$r: |"; \
+			git pull | sed "s|^|$$r: |"; \
+		else \
+			echo "$(branch) doesn't exist, checking out $(DEFAULT_BRANCH)..."; \
+			git -c 'color.ui=always' checkout $(DEFAULT_BRANCH) 2>&1 | sed "s|^|$$r: |"; \
+			git pull | sed "s|^|$(DEFAULT_BRANCH): |"; \
+		fi; \
+		echo; \
+	done
 
 # Server and Virtual Machine related targets
 debug ?= 1
