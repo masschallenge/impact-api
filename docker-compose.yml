@@ -31,9 +31,14 @@ services:
       - ./web/impact/static/css:/gulp/css
       - ./web/impact/static/js:/gulp/js
   mentor_directory:
-    build: ../directory
+    build:
+      dockerfile: dev.Dockerfile
+      context: ../directory
     volumes:
       - ../directory/dist:/usr/src/app/dist
+      - ../directory/src:/usr/src/app/src
+    ports:
+      - "1234:1234"
   # Web python
   web:
     build: ./web
