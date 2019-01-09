@@ -32,6 +32,7 @@ class CriterionHelper(ModelHelper):
     INPUT_KEYS = ALL_KEYS
 
     specific_helpers = {}
+    helper_instances = {}
 
     @classmethod
     def register_helper(cls, klass, type, name):
@@ -39,8 +40,12 @@ class CriterionHelper(ModelHelper):
 
     @classmethod
     def find_helper(cls, criterion):
-        return cls.specific_helpers.get((criterion.type, criterion.name),
-                                        cls)(criterion)
+        helper = cls.helper_instances.get(criterion)
+        if helper is None:
+            helper = cls.specific_helpers.get((criterion.type, criterion.name),
+                                              cls)(criterion)
+            cls.helper_instances[criterion] = helper
+        return helper
 
     def options(self, spec, apps):
         return [spec.option]
