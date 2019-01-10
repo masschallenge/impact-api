@@ -33,6 +33,10 @@ class CriterionHelper(ModelHelper):
 
     specific_helpers = {}
 
+    def __init__(self, subject):
+        super().__init__(subject)
+        self.app_count_cache = 0
+
     @classmethod
     def register_helper(cls, klass, type, name):
         cls.specific_helpers[(type, name)] = klass
@@ -53,7 +57,9 @@ class CriterionHelper(ModelHelper):
             "application_id", flat=True)
 
     def app_count(self, apps, option_name):
-        return apps.count()
+        if self.app_count_cache == 0:
+            self.app_count_cache = apps.count()
+        return self.app_count_cache
 
     def total_capacity(self, commitments, option_name):
         return self.filter_by_judge_option(commitments, option_name).aggregate(
