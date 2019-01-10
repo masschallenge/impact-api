@@ -50,6 +50,10 @@ class CriterionHelper(ModelHelper):
         )(criterion)
         return helper
 
+    @classmethod
+    def clear_cache(cls):
+        cls.helper_instances = {}
+
     def options(self, spec, apps):
         return [spec.option]
 
