@@ -32,6 +32,7 @@ class CriterionHelper(ModelHelper):
     INPUT_KEYS = ALL_KEYS
 
     specific_helpers = {}
+    criterion_total_capacities = {}
 
     def __init__(self, subject):
         super().__init__(subject)
