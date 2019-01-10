@@ -40,11 +40,11 @@ class CriterionHelper(ModelHelper):
 
     @classmethod
     def find_helper(cls, criterion):
-        helper = cls.helper_instances.get(criterion)
+        helper = cls.helper_instances.get(criterion.name)
         if helper is None:
             helper = cls.specific_helpers.get((criterion.type, criterion.name),
                                               cls)(criterion)
-            cls.helper_instances[criterion] = helper
+            cls.helper_instances[criterion.name] = helper
         return helper
 
     def options(self, spec, apps):
