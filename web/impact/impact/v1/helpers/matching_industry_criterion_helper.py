@@ -34,7 +34,7 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
         top_level_industry_map = {
             industry.id: (industry.parent_id, industry.parent.name)
             for industry in Industry.objects.filter(
-                    parent_id__isnull=False).prefetch_related('parent')
+                parent_id__isnull=False).prefetch_related('parent')
         }
         top_level_industry_map.update({
             industry.id: (industry.id, industry.name)
@@ -44,8 +44,8 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
                 "id", "startup__primary_industry"):
             top_id, top_name = top_level_industry_map[industry_id]
             self._app_ids_to_targets[app_id] = top_id
-            self._target_counts[top_name] = self._target_counts.get(top_name,
-                                                                    0) + 1
+            self._target_counts[top_name] = self._target_counts.get(
+                top_name, 0) + 1
 
     def options(self, spec, apps):
         startups = Startup.objects.filter(application__in=apps)
@@ -58,8 +58,8 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
         return industries.values_list("name", flat=True)
 
     def filter_by_judge_option(self, query, option_name):
-        return query.filter(
-            judge__expertprofile__primary_industry__name=option_name)
+        key = "judge__" + self.judge_field
+        return query.filter(**{key: option_name})
 
     def option_for_field(self, field):
         return field

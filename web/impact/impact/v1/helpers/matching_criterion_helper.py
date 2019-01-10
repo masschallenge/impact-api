@@ -17,9 +17,10 @@ class MatchingCriterionHelper(CriterionHelper):
         if not feedbacks:
             return []
         app_map = self.app_ids_to_targets(apps)
-        return [app_id for app_id in
-                feedbacks.values_list("application_id", flat=True)
-                if app_id in app_map and app_map[app_id] == target.id]
+        return [
+            app_id for app_id in
+            feedbacks.values_list("application_id", flat=True)
+            if app_id in app_map and app_map[app_id] == target.id]
 
     def app_ids_to_targets(self, apps):
         self._check_cache(apps)

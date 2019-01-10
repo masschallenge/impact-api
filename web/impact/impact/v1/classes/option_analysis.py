@@ -26,14 +26,14 @@ from impact.v1.helpers.matching_program_criterion_helper import (
 )
 
 
-CriterionHelper.register_helper(JudgeGenderCriterionHelper,
-                                "judge", "gender")
-CriterionHelper.register_helper(JudgeRoleCriterionHelper,
-                                "judge", "role")
-CriterionHelper.register_helper(MatchingIndustryCriterionHelper,
-                                "matching", "industry")
-CriterionHelper.register_helper(MatchingProgramCriterionHelper,
-                                "matching", "program")
+CriterionHelper.register_helper(
+    JudgeGenderCriterionHelper, "judge", "gender")
+CriterionHelper.register_helper(
+    JudgeRoleCriterionHelper, "judge", "role")
+CriterionHelper.register_helper(
+    MatchingIndustryCriterionHelper, "matching", "industry")
+CriterionHelper.register_helper(
+    MatchingProgramCriterionHelper, "matching", "program")
 
 
 class OptionAnalysis(object):

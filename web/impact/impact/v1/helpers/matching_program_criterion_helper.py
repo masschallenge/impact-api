@@ -44,16 +44,17 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
             startup__application__in=applications,
             applying=True,
             program__cycle=cycle
-        ).order_by("order").values_list("startup_id",
-                                        "program__program_family_id",
-                                        "program__program_family__name")
+        ).order_by("order").values_list(
+            "startup_id",
+            "program__program_family_id",
+            "program__program_family__name")
         startup_to_app = dict(applications.values_list("startup_id", "id"))
         for startup_id, pf_id, pf_name in spi_data:
             app_id = startup_to_app[startup_id]
             if app_id not in self._app_ids_to_targets:
                 self._app_ids_to_targets[app_id] = pf_id
-                self._target_counts[pf_name] = self._target_counts.get(pf_name,
-                                                                       0) + 1
+                self._target_counts[pf_name] = (
+                    self._target_counts.get(pf_name, 0) + 1)
 
     def options(self, spec, apps):
         pfs = ProgramFamily.objects.filter(
