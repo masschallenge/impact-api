@@ -6,8 +6,10 @@ from jsonschema import Draft4Validator
 
 from django.urls import reverse
 
-from accelerator.tests.factories import CriterionOptionSpecFactory
-from accelerator.tests.contexts import AnalyzeJudgingContext
+from accelerator.tests.contexts import (
+    AnalyzeJudgingContext,
+    CriterionOptionSpecContext,
+)
 
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
@@ -16,7 +18,7 @@ from impact.v1.views import AnalyzeJudgingRoundView
 
 class TestAnalyzeJudgingRoundView(APITestCase):
     def test_basic_staff_permission_does_not_grant_access(self):
-        option = CriterionOptionSpecFactory()
+        option = CriterionOptionSpecContext().criterion_option_spec
         judging_round = option.criterion.judging_round
         with self.login(email=self.basic_user().email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
@@ -25,7 +27,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
             assert response.status_code == 403
 
     def test_get(self):
-        option = CriterionOptionSpecFactory()
+        option = CriterionOptionSpecContext().criterion_option_spec
         judging_round = option.criterion.judging_round
         program_family = judging_round.program.program_family
         email = self.global_operations_manager(program_family).email
@@ -38,7 +40,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
             assert first_result["criterion_option_spec_id"] == option.id
 
     def test_options(self):
-        option = CriterionOptionSpecFactory()
+        option = CriterionOptionSpecContext().criterion_option_spec
         judging_round = option.criterion.judging_round
         program_family = judging_round.program.program_family
         email = self.global_operations_manager(program_family).email
@@ -52,7 +54,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
             assert_fields(AnalyzeJudgingRoundView.fields().keys(), get_options)
 
     def test_options_against_get(self):
-        option = CriterionOptionSpecFactory()
+        option = CriterionOptionSpecContext().criterion_option_spec
         judging_round = option.criterion.judging_round
         program_family = judging_round.program.program_family
         email = self.global_operations_manager(program_family).email
@@ -67,7 +69,9 @@ class TestAnalyzeJudgingRoundView(APITestCase):
             assert validator.is_valid(json.loads(get_response.content))
 
     def test_get_with_implicit_option(self):
-        option = CriterionOptionSpecFactory(option="")
+        option = CriterionOptionSpecContext(
+            option=""
+        ).criterion_option_spec
         judging_round = option.criterion.judging_round
         program_family = judging_round.program.program_family
         email = self.global_operations_manager(program_family).email
@@ -96,7 +100,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
                     context.needed_reads())
 
     def test_get_with_gender_criterion(self):
-        genders = ["f", "m"]
+        genders = ["female", "male"]
         context = AnalyzeJudgingContext(type="judge",
                                         name="gender",
                                         read_count=1,
@@ -162,6 +166,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
                           args=[judging_round_id])
             response = self.client.get(url)
             results = response.data["results"]
+
             for result in results:
                 option = result["option"]
                 assert result["needs_distribution"] == dists[option]

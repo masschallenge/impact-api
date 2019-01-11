@@ -62,7 +62,7 @@ class OptionAnalysis(object):
         self.judge_to_capacity_cache = None
         self.criterion_total_functions = {
             ("judge", "gender"): {
-                'function': self.gender_criterion_total_capacity,
+                'function': self.general_criterion_total_capacity,
                 'filter_field': self.gender_judge_field,
             },
             ("reads", "reads"): {
@@ -182,8 +182,8 @@ class OptionAnalysis(object):
             (self.option_spec.criterion.type, option_name)
         ]['filter_field']
 
-        if option == "gender":
-            option = self.gender_match_dict[option_name]
+        if option_name == "gender":
+            option = self.gender_match_dict[option]
 
         if self.criterion_total_capacities.get(option_name) is None:
             capacities = JudgeRoundCommitment.objects.filter(
@@ -194,8 +194,10 @@ class OptionAnalysis(object):
                 cap[field]: cap["total"]
                 for cap in capacities}
             self.criterion_total_capacities[option_name] = result
-
-        return self.criterion_total_capacities[option_name][option]
+        
+        key_exists = self.criterion_total_capacities[option_name].get(option)
+        return 0 if not key_exists else self.criterion_total_capacities[
+            option_name][option]
 
     def remaining_capacity(self, assignment_counts, option_spec):
         if self.judge_to_capacity_cache is None:
