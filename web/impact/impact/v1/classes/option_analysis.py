@@ -1,7 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from collections import Counter
 from accelerator.models import (
     JUDGING_FEEDBACK_STATUS_COMPLETE,
     JudgeApplicationFeedback,
@@ -37,6 +36,7 @@ CriterionHelper.register_helper(
     MatchingIndustryCriterionHelper, "matching", "industry")
 CriterionHelper.register_helper(
     MatchingProgramCriterionHelper, "matching", "program")
+
 
 class OptionAnalysis(object):
     _judge_to_count = None
@@ -137,7 +137,8 @@ class OptionAnalysis(object):
         counts = {}
         for count in app_counts:
             total = count["total"]
-            counts[total] = 1 if counts.get(total) is None else counts[total] + 1
+            counts[total] = (
+                1 if counts.get(total) is None else counts[total] + 1)
 
         read_count = 0
         for count_number in counts:
@@ -194,7 +195,7 @@ class OptionAnalysis(object):
                 cap[field]: cap["total"]
                 for cap in capacities}
             self.criterion_total_capacities[option_name] = result
-        
+
         key_exists = self.criterion_total_capacities[option_name].get(option)
         return 0 if not key_exists else self.criterion_total_capacities[
             option_name][option]
@@ -245,6 +246,7 @@ class OptionAnalysis(object):
             (self.option_spec.criterion.type, self.option_spec.criterion.name)
         ]['filter_field']
         return query.filter(**{field: option_name})
+
 
 def feedbacks_for_judging_round(judging_round, apps):
     scenarios = Scenario.objects.filter(
