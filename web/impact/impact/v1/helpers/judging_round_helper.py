@@ -52,4 +52,4 @@ class JudgingRoundHelper(ModelHelper):
 
     @property
     def has_criteria(self):
-        return JudgingRound.objects.get(pk=self.subject.id).criterion_set.count() > 0
+        return self.subject.criterion_set.count() > 0
