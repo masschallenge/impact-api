@@ -180,13 +180,19 @@ class TestAnalyzeJudgingRoundView(APITestCase):
         judging_round_id = context.criterion.judging_round.id
         program_family = context.program.program_family
         email = self.global_operations_manager(program_family).email
+        program_family = context.program.program_family
         with self.login(email=email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
                           args=[judging_round_id])
             response = self.client.get(url)
-            result = response.data["results"][0]
-            assert commitment.capacity == result['total_capacity']
-            assert commitment.capacity - 1 == result['remaining_capacity']
+            results = response.data["results"]
+
+            for result in results:
+                if result["option"] == program_family:
+                    assert commitment.capacity == result[
+                        'total_capacity']
+                    assert commitment.capacity - 1 == result[
+                        'remaining_capacity']
 
 
 def _industry_options(context):

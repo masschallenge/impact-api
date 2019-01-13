@@ -171,7 +171,8 @@ class OptionAnalysis(object):
         )
         remaining_capacity = self.remaining_capacity(
             self.application_counts,
-            self.option_spec)
+            self.option_spec,
+            option_name)
         return {
             "total_capacity": total_capacity,
             "remaining_capacity": remaining_capacity,
@@ -200,7 +201,7 @@ class OptionAnalysis(object):
         return 0 if not key_exists else self.criterion_total_capacities[
             option_name][option]
 
-    def remaining_capacity(self, assignment_counts, option_spec):
+    def remaining_capacity(self, assignment_counts, option_spec, option):
         if self.judge_to_capacity_cache is None:
             self.judge_to_capacity_cache = JudgeRoundCommitment.objects.filter(
                 judging_round=self.judging_round).values(
@@ -219,8 +220,9 @@ class OptionAnalysis(object):
 
         result = 0
         option_name = option_spec.criterion.name
+
         for judge in self.judge_to_capacity_cache:
-            if option_name == "reads" or judge[option_name] == option_name:
+            if option_name == "reads" or judge[option_name] == option:
                 result += max(0, judge['capacity'] - assignment_counts.get(
                     judge['judge_id'], 0))
         return result
