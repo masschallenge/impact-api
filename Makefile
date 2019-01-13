@@ -265,13 +265,12 @@ checkout:
 	  echo; \
 	  done
 
-watch-frontend: process-exists=$(shell ps -ef | grep "yarn.js watch" | grep -v "grep" | awk '{print $$2}')
+watch-frontend stop-frontend: process-exists=$(shell ps -ef | grep "./watch_frontend.sh" | grep -v "grep" | awk '{print $$2}')
 watch-frontend:
 	@if [ -z "$(process-exists)" ]; then \
-		cd $(DIRECTORY) && nohup bash -c "yarn watch &" && cd $(IMPACT_API); \
+		cd $(DIRECTORY) && nohup bash -c "./watch_frontend.sh &" && cd $(IMPACT_API); \
 	fi;
 
-stop-frontend: process-exists=$(shell ps -ef | grep 'yarn.js watch' | grep -v 'grep' | awk '{print $$2}')
 stop-frontend:
 	@if [ -n "$(process-exists)" ]; then \
 		kill $(process-exists); \
