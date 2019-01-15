@@ -222,16 +222,28 @@ class OptionAnalysis(object):
         option_name = option_spec.criterion.name
 
         for judge in self.judge_to_capacity_cache:
-            if option_name == "reads" or judge[option_name] == option:
+            gender_option = 'prefer not to state'
+            if option_name == "gender":
+                gender_option = self.gender_match_dict[option]
+
+            if (
+                option_name == "reads" or
+                judge[option_name] == option or
+                judge[option_name] == gender_option
+            ):
                 result += max(0, judge['capacity'] - assignment_counts.get(
                     judge['judge_id'], 0))
         return result
 
     def app_ids_for_feedbacks(self, feedbacks, option_name, **kwargs):
-        key = (
-            self.option_spec.criterion.type,
-            self.option_spec.criterion.name,
-            option_name)
+        criterion_name = self.option_spec.criterion.name
+        criterion_type = self.option_spec.criterion.type
+
+        key = (criterion_type, criterion_name, option_name)
+
+        if criterion_name == "gender":
+            option_name = self.gender_match_dict[option_name]
+
         ids_cache_value = self.app_ids_for_feedbacks_cache.get(key)
         if ids_cache_value is None:
             ids_cache_value = self.filter_by_judge_option(
