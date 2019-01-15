@@ -256,14 +256,17 @@ status:
 
 checkout:
 	@for r in $(REPOS) ; do \
-	  cd $$r; \
-	  ((git -c 'color.ui=always' checkout $(branch) 2>&1 | \
-	   sed "s|^|$$r: |") || \
-	  (git -c 'color.ui=always' checkout $(DEFAULT_BRANCH) 2>&1 | \
-	   sed "s|^|$$r: |")) && \
-	  git pull | sed "s|^|$$r: |"; \
-	  echo; \
-	  done
+		cd $$r; \
+		git show-ref --verify --quiet refs/heads/$(branch); \
+		if [ $$? -eq 0 ]; then \
+			git -c 'color.ui=always' checkout $(branch) > /tmp/gitoutput 2>&1; \
+		else \
+			echo "$(branch) doesn't exist, checking out $(DEFAULT_BRANCH)..."; \
+			git -c 'color.ui=always' checkout $(DEFAULT_BRANCH) > /tmp/gitoutput 2>&1; \
+		fi; \
+		{ cat /tmp/gitoutput & git pull; } | sed "s|^|$$r: |"; \
+		echo; \
+	done
 
 watch-frontend stop-frontend: process-exists=$(shell ps -ef | grep "./watch_frontend.sh" | grep -v "grep" | awk '{print $$2}')
 watch-frontend:
