@@ -19,6 +19,7 @@ from impact.v1.helpers.model_helper import (
     READ_ONLY_OBJECT_FIELD,
     READ_ONLY_STRING_FIELD,
 )
+from impact.v1.helpers import CriterionHelper
 from impact.permissions import global_operations_manager_check
 
 ANALYZE_JUDGING_ROUND_FIELDS = {
@@ -69,6 +70,7 @@ class AnalyzeJudgingRoundView(ImpactView):
                                    self.instance,
                                    application_counts).analyses()
                     for option in options]
+        CriterionHelper.clear_cache()
         return Response({"results": list(chain.from_iterable(analyses))})
 
     def judge_to_count(self):
