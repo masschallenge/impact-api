@@ -256,28 +256,42 @@ status:
 
 checkout:
 	@for r in $(REPOS) ; do \
-	  cd $$r; \
-	  ((git -c 'color.ui=always' checkout $(branch) 2>&1 | \
-	   sed "s|^|$$r: |") || \
-	  (git -c 'color.ui=always' checkout $(DEFAULT_BRANCH) 2>&1 | \
-	   sed "s|^|$$r: |")) && \
-	  git pull | sed "s|^|$$r: |"; \
-	  echo; \
-	  done
+		cd $$r; \
+		git show-ref --verify --quiet refs/heads/$(branch); \
+		if [ $$? -eq 0 ]; then \
+			git -c 'color.ui=always' checkout $(branch) > /tmp/gitoutput 2>&1; \
+		else \
+			echo "$(branch) doesn't exist, checking out $(DEFAULT_BRANCH)..."; \
+			git -c 'color.ui=always' checkout $(DEFAULT_BRANCH) > /tmp/gitoutput 2>&1; \
+		fi; \
+		{ cat /tmp/gitoutput & git pull; } | sed "s|^|$$r: |"; \
+		echo; \
+	done
+
+watch-frontend stop-frontend: process-exists=$(shell ps -ef | grep "./watch_frontend.sh" | grep -v "grep" | awk '{print $$2}')
+watch-frontend:
+	@if [ -z "$(process-exists)" ]; then \
+		cd $(DIRECTORY) && nohup bash -c "./watch_frontend.sh &" && cd $(IMPACT_API); \
+	fi;
+
+stop-frontend:
+	@if [ -n "$(process-exists)" ]; then \
+		kill $(process-exists); \
+	fi;
 
 # Server and Virtual Machine related targets
 debug ?= 1
 
-run-server: run-server-$(debug)
+run-server: run-server-$(debug) watch-frontend
 
-run-server-0: .env initial-db-setup
+run-server-0: .env initial-db-setup watch-frontend
 	@docker-compose up
 
-run-detached-server: .env initial-db-setup
+run-detached-server: .env initial-db-setup watch-frontend
 	@docker-compose up -d
 	@docker-compose run --rm web /usr/bin/mysqlwait.sh
 
-run-server-1: run-detached-server
+run-server-1: run-detached-server watch-frontend
 	@docker-compose exec web /bin/bash /usr/bin/start-nodaemon.sh
 
 dev: run-server-0
@@ -291,11 +305,11 @@ initial-db-setup:
 		cp $(gz_file) ./mysql_entrypoint/0002_$(notdir $(gz_file)); \
 	fi;
 
-stop-server: .env
+stop-server: .env stop-frontend
 	@docker-compose stop
 	-@killall -9 docker-compose || true
 
-shutdown-vms: .env
+shutdown-vms: .env stop-frontend
 	@docker-compose down
 	@rm -rf ./mysql/data
 	@rm -rf ./redis
