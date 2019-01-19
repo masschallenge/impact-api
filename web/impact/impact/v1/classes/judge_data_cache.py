@@ -4,15 +4,19 @@ from impact.v1.helpers import CriterionHelper
 
 
 class JudgeDataCache(object):
-    def __init__(self, judges, criteria):
+    def __init__(self, judges, criteria, criterion_helpers):
         self.criteria = criteria
         self.data = {}
         fields = set(["id"])
-        for criterion in self.criteria:
-            helper = CriterionHelper.find_helper(criterion)
+        self.criterion_helpers = criterion_helpers or self._helpers()
+        for helper in self.criterion_helpers:
             fields.add(helper.judge_field)
         for datum in judges.values(*list(fields)):
             self.data[datum["id"]] = datum
+
+    def _helpers(self):
+        return [CriterionHelper.find_helper(criterion)
+                for criterion in self.criteria]
 
     def features(self, judge, weights):
         datum = self.data.get(judge.id, {})
