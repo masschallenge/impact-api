@@ -15,8 +15,7 @@ class ApplicationDataCache(object):
         self.data = {}
         fields = set(["id"])
         self.criterion_helpers = criterion_helpers or self._helpers()
-        for criterion in criteria:
-            helper = CriterionHelper.find_helper(criterion)
+        for helper in self.criterion_helpers:
             fields.add(helper.application_field)
         assignment_data = self._assignment_data()
         read_data = self._read_data()
