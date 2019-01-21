@@ -77,12 +77,14 @@ class AllocateApplicationsView(ImpactView):
             self.judging_round,
             self.criterion_helpers.values())
         self._application_cache = ApplicationDataCache(
-            self.apps, self._criteria_cache.criteria, self.feedback,
+            self.apps,
+            self._criteria_cache.criteria,
+            self.feedback,
             self.criterion_helpers.values())
         self._judge_cache = JudgeDataCache(
             self.judges,
             self._criteria_cache.criteria,
-            self.criterion_helpers.values())
+            self.criterion_helpers)
         if not self._judge_cache.data.get(self.judge.id, {}):
             self.errors.append(NO_DATA_FOR_JUDGE.format(
                 judging_round=self.judging_round,
