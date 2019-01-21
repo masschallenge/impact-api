@@ -11,7 +11,10 @@ from accelerator.models import (
 
 )
 from rest_framework.response import Response
-from impact.v1.views.impact_view import ImpactView
+from impact.v1.views import (
+    find_criterion_helpers,
+    ImpactView,
+)
 from impact.v1.classes.option_analysis import OptionAnalysis
 from impact.v1.helpers.model_helper import (
     READ_ONLY_ID_FIELD,
@@ -64,13 +67,16 @@ class AnalyzeJudgingRoundView(ImpactView):
             application_type=self.instance.application_type)
         application_counts = self.judge_to_count()
         app_ids = self.apps.values_list('id', flat=True)
-        analyses = [OptionAnalysis(option,
-                                   self.apps,
-                                   app_ids,
-                                   self.instance,
-                                   application_counts).analyses()
-                    for option in options]
         CriterionHelper.clear_cache()
+        criterion_helpers = find_criterion_helpers(self.instance)
+        analyses = [OptionAnalysis(
+            option,
+            self.apps,
+            app_ids,
+            self.instance,
+            application_counts,
+            criterion_helpers).analyses()
+            for option in options]
         return Response({"results": list(chain.from_iterable(analyses))})
 
     def judge_to_count(self):
