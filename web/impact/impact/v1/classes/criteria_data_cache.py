@@ -1,5 +1,4 @@
 from collections import OrderedDict
-from impact.v1.helpers import CriterionHelper
 
 
 class CriteriaDataCache(object):

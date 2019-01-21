@@ -1,6 +1,5 @@
 from collections import OrderedDict
 from numpy import matrix
-from impact.v1.helpers import CriterionHelper
 
 
 class JudgeDataCache(object):

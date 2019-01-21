@@ -1,5 +1,4 @@
 from impact.v1.classes.utils import collect_pairs
-from impact.v1.helpers import CriterionHelper
 from accelerator.models import (
     ApplicationPanelAssignment,
     JUDGING_FEEDBACK_STATUS_COMPLETE,
