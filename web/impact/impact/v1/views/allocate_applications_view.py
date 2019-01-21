@@ -54,7 +54,6 @@ class AllocateApplicationsView(ImpactView):
         applications = self._allocate()
         if self.errors:
             return self._failure()
-        CriterionHelper.clear_cache()
         return Response(applications)
 
     def _initialize(self, round_id, judge_id):
