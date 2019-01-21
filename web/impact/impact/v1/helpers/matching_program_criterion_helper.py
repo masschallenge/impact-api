@@ -69,7 +69,7 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
     def _program_name(self, field):
         if self._program_name_cache is None:
             self._program_name_cache = self._calc_program_name_cache()
-        return self._program_name_cache[field]
+        return self._program_name_cache.get(field)
 
     def _calc_program_name_cache(self):
         cache = {}
