@@ -3,16 +3,12 @@ from impact.v1.helpers import CriterionHelper
 
 
 class CriteriaDataCache(object):
-    def __init__(self, apps, judging_round, criterion_helpers=None):
+    def __init__(self, apps, judging_round, criterion_helpers):
         self.apps = apps
         self.judging_round = judging_round
         self.criteria = judging_round.criterion_set.all()
-        self.criterion_helpers = criterion_helpers or self._helpers()
+        self.criterion_helpers = criterion_helpers
         self._calc_weights()
-
-    def _helpers(self):
-        return [CriterionHelper.find_helper(criterion)
-                for criterion in self.criteria]
 
     def _calc_weights(self):
         self.weights = OrderedDict()

@@ -8,13 +8,13 @@ from accelerator.models import (
 
 
 class ApplicationDataCache(object):
-    def __init__(self, apps, criteria, feedback, criterion_helpers=None):
+    def __init__(self, apps, criteria, feedback, criterion_helpers):
         self.apps = apps
         self.criteria = criteria
         self.feedback = feedback
         self.data = {}
         fields = set(["id"])
-        self.criterion_helpers = criterion_helpers or self._helpers()
+        self.criterion_helpers = criterion_helpers
         for helper in self.criterion_helpers:
             fields.add(helper.application_field)
         assignment_data = self._assignment_data()
@@ -26,10 +26,6 @@ class ApplicationDataCache(object):
                 "feedbacks": read_data.get(app_id, []),
                 "fields": field_data,
             }
-
-    def _helpers(self):
-        return [CriterionHelper.find_helper(criterion)
-                for criterion in self.criteria]
 
     def _assignment_data(self):
         assignments = ApplicationPanelAssignment.objects.filter(

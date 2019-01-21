@@ -14,10 +14,6 @@ class JudgeDataCache(object):
         for datum in judges.values(*list(fields)):
             self.data[datum["id"]] = datum
 
-    def _helpers(self):
-        return [CriterionHelper.find_helper(criterion)
-                for criterion in self.criteria]
-
     def features(self, judge, weights):
         datum = self.data.get(judge.id, {})
         if not datum:
