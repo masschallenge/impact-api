@@ -5,7 +5,6 @@ class CriteriaDataCache(object):
     def __init__(self, apps, judging_round, criterion_helpers):
         self.apps = apps
         self.judging_round = judging_round
-        self.criteria = judging_round.criterion_set.all()
         self.criterion_helpers = criterion_helpers
         self._calc_weights()
 

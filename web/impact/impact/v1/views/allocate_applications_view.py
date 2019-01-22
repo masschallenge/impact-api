@@ -70,6 +70,7 @@ class AllocateApplicationsView(ImpactView):
         self.judges = self.judging_round.confirmed_judge_label.users
         self.feedback = feedbacks_for_judging_round(
             self.judging_round, self.apps).order_by("application_id")
+        self.criteria = self.judging_round.criterion_set.all()        
         self.criterion_helpers = find_criterion_helpers(self.judging_round)
         self._criteria_cache = CriteriaDataCache(
             self.apps,
@@ -77,13 +78,13 @@ class AllocateApplicationsView(ImpactView):
             self.criterion_helpers.values())
         self._application_cache = ApplicationDataCache(
             self.apps,
-            self._criteria_cache.criteria,
+            self.criteria,
             self.feedback,
             self.criterion_helpers.values())
         self._judge_cache = JudgeDataCache(
             self.judges,
-            self._criteria_cache.criteria,
-            self.criterion_helpers)
+            self.criteria,
+            self.criterion_helpers.values())
         if not self._judge_cache.data.get(self.judge.id, {}):
             self.errors.append(NO_DATA_FOR_JUDGE.format(
                 judging_round=self.judging_round,
