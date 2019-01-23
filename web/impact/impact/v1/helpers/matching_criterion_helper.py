@@ -14,7 +14,7 @@ class MatchingCriterionHelper(CriterionHelper):
         return self.target_counts(apps).get(option_name, 0)
 
     def find_app_ids(self, feedbacks, apps, target):
-        if not feedbacks:
+        if not feedbacks.exists():
             return []
         app_map = self.app_ids_to_targets(apps)
         return [app_id for app_id in
