@@ -6,6 +6,7 @@ from impact.v1.views.impact_view import ImpactView
 from impact.v1.views.allocate_applications_view import (
     ALREADY_ASSIGNED_ERROR,
     AllocateApplicationsView,
+    find_criterion_helpers,
     JUDGING_ROUND_INACTIVE_ERROR,
     NO_APP_LEFT_FOR_JUDGE,
     NO_DATA_FOR_JUDGE,

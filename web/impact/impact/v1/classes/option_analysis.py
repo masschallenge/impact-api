@@ -44,10 +44,13 @@ class OptionAnalysis(object):
                  apps,
                  app_ids,
                  judging_round,
-                 application_counts):
+                 application_counts,
+                 criterion_helpers):
         self.option_spec = option_spec
         self.judging_round = judging_round
-        self.helper = CriterionOptionSpecHelper(option_spec)
+        self.helper = CriterionOptionSpecHelper(
+            option_spec,
+            criterion_helpers)
         self.apps = apps
         self.app_ids = app_ids
         self.application_counts = application_counts

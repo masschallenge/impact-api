@@ -1,5 +1,4 @@
 from impact.v1.classes.utils import collect_pairs
-from impact.v1.helpers import CriterionHelper
 from accelerator.models import (
     ApplicationPanelAssignment,
     JUDGING_FEEDBACK_STATUS_COMPLETE,
@@ -8,14 +7,14 @@ from accelerator.models import (
 
 
 class ApplicationDataCache(object):
-    def __init__(self, apps, criteria, feedback):
+    def __init__(self, apps, criteria, feedback, criterion_helpers):
         self.apps = apps
         self.criteria = criteria
         self.feedback = feedback
         self.data = {}
         fields = set(["id"])
-        for criterion in criteria:
-            helper = CriterionHelper.find_helper(criterion)
+        self.criterion_helpers = criterion_helpers
+        for helper in self.criterion_helpers:
             fields.add(helper.application_field)
         assignment_data = self._assignment_data()
         read_data = self._read_data()
