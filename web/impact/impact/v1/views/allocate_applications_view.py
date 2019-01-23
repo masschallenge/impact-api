@@ -54,7 +54,6 @@ class AllocateApplicationsView(ImpactView):
         applications = self._allocate()
         if self.errors:
             return self._failure()
-        CriterionHelper.clear_cache()
         return Response(applications)
 
     def _initialize(self, round_id, judge_id):
@@ -71,11 +70,21 @@ class AllocateApplicationsView(ImpactView):
         self.judges = self.judging_round.confirmed_judge_label.users
         self.feedback = feedbacks_for_judging_round(
             self.judging_round, self.apps).order_by("application_id")
-        self._criteria_cache = CriteriaDataCache(self.apps, self.judging_round)
+        self.criteria = self.judging_round.criterion_set.all()        
+        self.criterion_helpers = find_criterion_helpers(self.judging_round)
+        self._criteria_cache = CriteriaDataCache(
+            self.apps,
+            self.judging_round,
+            self.criterion_helpers.values())
         self._application_cache = ApplicationDataCache(
-            self.apps, self._criteria_cache.criteria, self.feedback)
-        self._judge_cache = JudgeDataCache(self.judges,
-                                           self._criteria_cache.criteria)
+            self.apps,
+            self.criteria,
+            self.feedback,
+            self.criterion_helpers.values())
+        self._judge_cache = JudgeDataCache(
+            self.judges,
+            self.criteria,
+            self.criterion_helpers.values())
         if not self._judge_cache.data.get(self.judge.id, {}):
             self.errors.append(NO_DATA_FOR_JUDGE.format(
                 judging_round=self.judging_round,
@@ -118,7 +127,7 @@ class AllocateApplicationsView(ImpactView):
         keys = self._criteria_cache.weights.keys()
         for key in keys:
             criterion, option = key
-            helper = CriterionHelper.find_helper(criterion)
+            helper = self.criterion_helpers.get(criterion.id)
             if helper.field_matches_option(fields[helper.application_field],
                                            option):
                 needs[key] = (
@@ -138,7 +147,7 @@ class AllocateApplicationsView(ImpactView):
         return self._option_counts_cache[key]
 
     def _add_criterion_options_to_cache(self, criterion):
-        helper = CriterionHelper.find_helper(criterion)
+        helper = self.criterion_helpers.get(criterion.id)
         for spec in criterion.criterionoptionspec_set.all():
             for option in helper.options(spec, self.apps):
                 self._option_counts_cache[(criterion, option)] = spec.count
@@ -148,7 +157,7 @@ class AllocateApplicationsView(ImpactView):
         criterion, option = key
         for judge_id in judge_ids:
             judge_data = self._judge_cache.data.get(judge_id, {})
-            helper = CriterionHelper.find_helper(criterion)
+            helper = self.criterion_helpers.get(criterion.id)
             if helper.judge_matches_option(judge_data, option):
                 result += 1
         return result
@@ -226,3 +235,9 @@ class AllocateApplicationsView(ImpactView):
     def _failure(self):
         return Response(status=403,
                         data=self.errors)
+
+
+def find_criterion_helpers(judging_round):
+    c_set = judging_round.criterion_set.all()
+    return {criterion.id: CriterionHelper.find_helper(criterion)
+            for criterion in c_set}

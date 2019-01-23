@@ -1,18 +1,16 @@
 from collections import OrderedDict
-from impact.v1.helpers import CriterionHelper
 
 
 class CriteriaDataCache(object):
-    def __init__(self, apps, judging_round):
+    def __init__(self, apps, judging_round, criterion_helpers):
         self.apps = apps
         self.judging_round = judging_round
-        self.criteria = judging_round.criterion_set.all()
+        self.criterion_helpers = criterion_helpers
         self._calc_weights()
 
     def _calc_weights(self):
         self.weights = OrderedDict()
-        for criterion in self.criteria:
-            helper = CriterionHelper.find_helper(criterion)
+        for helper in self.criterion_helpers:
             self._add_specs(helper)
 
     def _add_specs(self, helper):
