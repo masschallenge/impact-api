@@ -7,7 +7,7 @@ from accelerator.models import (
     JudgeRoundCommitment,
     Scenario,
 )
-from django.db.models import Sum, F, Count
+from django.db.models import Sum, F
 from impact.v1.helpers.criterion_option_spec_helper import (
     CriterionOptionSpecHelper,
 )
@@ -83,12 +83,15 @@ class OptionAnalysis(object):
                 'filter_field': self.program_judge_field,
             }
         }
+
         active_scenarios = Scenario.objects.filter(
             judging_round=judging_round, is_active=True)
         self.jpa = JudgeApplicationFeedback.objects.filter(
             application__in=apps,
             panel__judgepanelassignment__scenario__in=active_scenarios)
-        self.app_ids_for_feedbacks_cache = {}
+        self.completed_feedbacks = self.jpa.filter(
+            feedback_status=JUDGING_FEEDBACK_STATUS_COMPLETE)
+        self.application_criteria_read_state_cache = {}
         self.gender_match_dict = dict(
             (value.lower(), key) for key, value in UI_GENDER_CHOICES)
 
@@ -133,13 +136,13 @@ class OptionAnalysis(object):
         }
 
     def calc_needs_distribution(self, option_name):
-        app_counts = self.app_ids_for_feedbacks(
-            self.completed_feedbacks(),
+        app_counts = self.application_criteria_read_state(
+            self.completed_feedbacks,
             option_name=option_name,
             applications=self.apps)
         counts = {}
-        for count in app_counts:
-            total = count["total"]
+        for count in app_counts.values():
+            total = count[self.option_spec.criterion.name].get(option_name, 0)
             counts[total] = (
                 1 if counts.get(total) is None else counts[total] + 1)
 
@@ -154,10 +157,6 @@ class OptionAnalysis(object):
             counts[0] = unread_count
         expected_count = self.option_spec.count
         return {expected_count - k: v for (k, v) in counts.items()}
-
-    def completed_feedbacks(self):
-        return self.jpa.filter(
-            feedback_status=JUDGING_FEEDBACK_STATUS_COMPLETE)
 
     def calc_capacity(self, option_name):
         commitments = JudgeRoundCommitment.objects.filter(
@@ -238,31 +237,59 @@ class OptionAnalysis(object):
                     judge['judge_id'], 0))
         return result
 
-    def app_ids_for_feedbacks(self, feedbacks, option_name, **kwargs):
+    def application_criteria_read_state(self, feedbacks, option_name, **kwargs):
         criterion_name = self.option_spec.criterion.name
-        criterion_type = self.option_spec.criterion.type
-
-        key = (criterion_type, criterion_name, option_name)
 
         if criterion_name == "gender":
             option_name = self.gender_match_dict[option_name]
 
-        ids_cache_value = self.app_ids_for_feedbacks_cache.get(key)
-        if ids_cache_value is None:
-            ids_cache_value = self.filter_by_judge_option(
-                feedbacks, option_name).values(
-                    "application_id").annotate(total=Count('application_id'))
-        return ids_cache_value
+        if not self.application_criteria_read_state_cache:
+            ids_cache_value = {}
+            db_values = feedbacks.values(
+                "application_id",
+                "judge_id",
+                self.industry_judge_field,
+                self.program_judge_field,
+                self.gender_judge_field,
+                self.role_judge_field,
+            ).annotate(
+                industry=F(self.industry_judge_field),
+                program=F(self.program_judge_field),
+                gender=F(self.gender_judge_field),
+                role=F(self.role_judge_field),
+            )
 
-    def filter_by_judge_option(self, query, option_name):
+            for db_value in db_values:
+                app_id = db_value["application_id"]
+                if ids_cache_value.get(app_id) is None:
+                    ids_cache_value[app_id] = {
+                        "industry": {},
+                        "program": {},
+                        "gender": {},
+                        "role": {},
+                        "reads": 0
+                    }
 
-        if self.option_spec.criterion.name == "reads":
-            return query
+                industry_value = ids_cache_value[app_id]["industry"].get(db_value["industry"])
+                ids_cache_value[app_id]["industry"][db_value["industry"]] = (
+                    1 if industry_value is None else industry_value + 1)
 
-        field = self.criterion_total_functions[
-            (self.option_spec.criterion.type, self.option_spec.criterion.name)
-        ]['filter_field']
-        return query.filter(**{field: option_name})
+                program_value = ids_cache_value[app_id]["program"].get(db_value["program"])
+                ids_cache_value[app_id]["program"][db_value["program"]] = (
+                    1 if program_value is None else program_value + 1)
+
+                gender_value = ids_cache_value[app_id]["gender"].get(db_value["gender"])
+                ids_cache_value[app_id]["gender"][db_value["gender"]] = (
+                    1 if gender_value is None else gender_value + 1)
+
+                role_value = ids_cache_value[app_id]["role"].get(db_value["role"])
+                ids_cache_value[app_id]["role"][db_value["role"]] = (
+                    1 if role_value is None else role_value + 1)
+
+                ids_cache_value[app_id]["reads"] = ids_cache_value[app_id]["reads"] + 1
+                self.application_criteria_read_state_cache = ids_cache_value
+
+        return self.application_criteria_read_state_cache
 
 
 def feedbacks_for_judging_round(judging_round, apps):
