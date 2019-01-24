@@ -141,8 +141,12 @@ class OptionAnalysis(object):
             option_name=option_name,
             applications=self.apps)
         counts = {}
+        criterion_name = self.option_spec.criterion.name
         for count in app_counts.values():
-            total = count[self.option_spec.criterion.name].get(option_name, 0)
+            total = (
+                count[criterion_name].get(option_name, 0)
+                if criterion_name != "reads" else count[criterion_name]
+            )
             counts[total] = (
                 1 if counts.get(total) is None else counts[total] + 1)
 
