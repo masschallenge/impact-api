@@ -11,10 +11,8 @@ from accelerator.models import (
 
 )
 from rest_framework.response import Response
-from impact.v1.views import (
-    find_criterion_helpers,
-    ImpactView,
-)
+from impact.v1.views import ImpactView
+from impact.v1.views.utils import find_criterion_helpers
 from impact.v1.classes.option_analysis import OptionAnalysis
 from impact.v1.helpers.model_helper import (
     READ_ONLY_ID_FIELD,

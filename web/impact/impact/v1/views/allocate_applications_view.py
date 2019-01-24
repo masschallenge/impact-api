@@ -22,12 +22,12 @@ from accelerator.models import (
     User,
 )
 from rest_framework.response import Response
-from impact.v1.helpers import CriterionHelper
 from impact.v1.views.impact_view import ImpactView
 from impact.permissions import (
     AllocateApplicationsPermissions,
 )
 from impact.v1.classes.option_analysis import feedbacks_for_judging_round
+from impact.v1.views.utils import find_criterion_helpers
 
 ALREADY_ASSIGNED_ERROR = "{judge} is already assigned to {count} applications"
 JUDGING_ROUND_INACTIVE_ERROR = "Judging round {} is not active"
@@ -236,8 +236,3 @@ class AllocateApplicationsView(ImpactView):
         return Response(status=403,
                         data=self.errors)
 
-
-def find_criterion_helpers(judging_round):
-    c_set = judging_round.criterion_set.all()
-    return {criterion.id: CriterionHelper.find_helper(criterion)
-            for criterion in c_set}
