@@ -3,7 +3,7 @@ RUN apk update
 RUN apk add --no-cache bash git
 RUN /entrypoint.sh \
     -a git \
-    -p python-semantic-release \
+    -p python-semantic-release==3.11.2 \
     && echo
 RUN apk add pcre git
 RUN git config --global user.email semantic-release@masschallenge.org
