@@ -75,9 +75,6 @@ class OptionAnalysis(object):
         return result
 
     def find_options(self):
-        spec = self.option_spec
-        if spec.option:
-            return [spec.option]
         return self.helper.options(self.apps)
 
     def calc_needs(self, option_name):

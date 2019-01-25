@@ -18,14 +18,13 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
         super().__init__(subject)
         self._top_level_id_cache = None
 
-    @classmethod
-    def _industry_map(cls):
-        if cls.industries is None:
-            cls.industries = cls.instances_by_name(Industry)
-        return cls.industries
+    def _industry_map(self):
+        if self.industries is None:
+            self.industries = self.instances_by_name(Industry)
+        return self.industries
 
     def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
-        target = self.__class__._industry_map()[option_name]
+        target = self._industry_map()[option_name]
         return self.find_app_ids(
             self.filter_by_judge_option(feedbacks, option_name),
             self.app_ids_to_targets(applications),
