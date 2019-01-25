@@ -190,7 +190,7 @@ class OptionAnalysis(object):
         ]['filter_field']
 
         if option_name == "gender":
-            option = self.gender_match_dict[option]
+            option = self.gender_match_dict.get(option)
 
         if self.criterion_total_capacities.get(option_name) is None:
             capacities = JudgeRoundCommitment.objects.filter(
@@ -229,7 +229,7 @@ class OptionAnalysis(object):
         for judge in self.judge_to_capacity_cache:
             gender_option = 'prefer not to state'
             if option_name == "gender":
-                gender_option = self.gender_match_dict[option]
+                gender_option = self.gender_match_dict.get(option)
 
             if (
                 option_name == "reads" or
@@ -242,9 +242,6 @@ class OptionAnalysis(object):
 
     def application_criteria_read_state(self, feedbacks, option_name):
         criterion_name = self.option_spec.criterion.name
-
-        if criterion_name == "gender":
-            option_name = self.gender_match_dict[option_name]
 
         if not self.application_criteria_read_state_cache:
             ids_cache_value = {}
