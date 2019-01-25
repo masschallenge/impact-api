@@ -7,6 +7,7 @@ from accelerator.models import (
     JudgeRoundCommitment,
     Scenario,
 )
+from collections import defaultdict
 from django.db.models import Sum, F
 from impact.v1.helpers.criterion_option_spec_helper import (
     CriterionOptionSpecHelper,
@@ -138,17 +139,15 @@ class OptionAnalysis(object):
     def calc_needs_distribution(self, option_name):
         app_counts = self.application_criteria_read_state(
             self.completed_feedbacks,
-            option_name=option_name,
-            applications=self.apps)
-        counts = {}
+            option_name=option_name)
+        counts = defaultdict(int)
         criterion_name = self.option_spec.criterion.name
         for count in app_counts.values():
             total = (
                 count[criterion_name].get(option_name, 0)
                 if criterion_name != "reads" else count[criterion_name]
             )
-            counts[total] = (
-                1 if counts.get(total) is None else counts[total] + 1)
+            counts[total] += 1
 
         read_count = 0
         for count_number in counts:
@@ -241,7 +240,7 @@ class OptionAnalysis(object):
                     judge['judge_id'], 0))
         return result
 
-    def application_criteria_read_state(self, feedbacks, option_name, **kwargs):
+    def application_criteria_read_state(self, feedbacks, option_name):
         criterion_name = self.option_spec.criterion.name
 
         if criterion_name == "gender":
@@ -274,23 +273,27 @@ class OptionAnalysis(object):
                         "reads": 0
                     }
 
-                industry_value = ids_cache_value[app_id]["industry"].get(db_value["industry"])
+                industry_value = ids_cache_value[app_id]["industry"].get(
+                    db_value["industry"])
                 ids_cache_value[app_id]["industry"][db_value["industry"]] = (
                     1 if industry_value is None else industry_value + 1)
 
-                program_value = ids_cache_value[app_id]["program"].get(db_value["program"])
+                program_value = ids_cache_value[app_id]["program"].get(
+                    db_value["program"])
                 ids_cache_value[app_id]["program"][db_value["program"]] = (
                     1 if program_value is None else program_value + 1)
 
-                gender_value = ids_cache_value[app_id]["gender"].get(db_value["gender"])
+                gender_value = ids_cache_value[app_id]["gender"].get(
+                    db_value["gender"])
                 ids_cache_value[app_id]["gender"][db_value["gender"]] = (
                     1 if gender_value is None else gender_value + 1)
 
-                role_value = ids_cache_value[app_id]["role"].get(db_value["role"])
+                role_value = ids_cache_value[app_id]["role"].get(
+                    db_value["role"])
                 ids_cache_value[app_id]["role"][db_value["role"]] = (
                     1 if role_value is None else role_value + 1)
 
-                ids_cache_value[app_id]["reads"] = ids_cache_value[app_id]["reads"] + 1
+                ids_cache_value[app_id]["reads"] += 1
                 self.application_criteria_read_state_cache = ids_cache_value
 
         return self.application_criteria_read_state_cache
