@@ -45,7 +45,8 @@ class OptionAnalysis(object):
                  app_ids,
                  judging_round,
                  application_counts,
-                 criterion_helpers):
+                 criterion_helpers,
+                 needs):
         self.option_spec = option_spec
         self.judging_round = judging_round
         self.helper = CriterionOptionSpecHelper(
@@ -54,6 +55,7 @@ class OptionAnalysis(object):
         self.apps = apps
         self.app_ids = app_ids
         self.application_counts = application_counts
+        self.needs = needs
 
     def analyses(self):
         return [self.analysis(option) for option in self.find_options()]

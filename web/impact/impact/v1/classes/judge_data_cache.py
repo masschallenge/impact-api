@@ -26,3 +26,6 @@ class JudgeDataCache(object):
             if key in keys:
                 row[key] = 1
         return matrix(list(row.values()))
+
+    def judge_feature_dict(self, judges, weights):
+        return {judge.id: self.features(judge, weights)}

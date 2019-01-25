@@ -151,7 +151,7 @@ class AllocateApplicationsView(ImpactView):
         for spec in criterion.criterionoptionspec_set.all():
             for option in helper.options(spec, self.apps):
                 self._option_counts_cache[(criterion, option)] = spec.count
-
+  
     def _sum_judge_data(self, key, judge_ids):
         result = 0
         criterion, option = key
