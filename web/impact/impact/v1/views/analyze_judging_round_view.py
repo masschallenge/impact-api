@@ -33,7 +33,7 @@ from impact.v1.classes.judge_data_cache import JudgeDataCache
 from impact.v1.classes.option_analysis import feedbacks_for_judging_round
 
 
-ASSIGNMENT_DISCOUNT = 1
+ASSIGNMENT_DISCOUNT = 0
 ANALYZE_JUDGING_ROUND_FIELDS = {
     "criterion_option_spec_id": READ_ONLY_ID_FIELD,
     "criterion_id": READ_ONLY_ID_FIELD,
@@ -89,7 +89,7 @@ class AnalyzeJudgingRoundView(ImpactView):
             app_ids,
             self.instance,
             application_counts,
-            self.criterion_helpers
+            self.criterion_helpers,
             needs).analyses()
             for option in options]
         return Response({"results": list(chain.from_iterable(analyses))})
@@ -137,7 +137,7 @@ class AnalyzeJudgingRoundView(ImpactView):
                      self._sum_judge_data(key, app_data["assignments"])))
             else:
                 needs[key] = 0
-        return array(list(needs.values()))
+        return needs
 
     def _sum_judge_data(self, key, judge_ids):
         result = 0

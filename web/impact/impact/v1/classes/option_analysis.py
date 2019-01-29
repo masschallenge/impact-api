@@ -78,35 +78,35 @@ class OptionAnalysis(object):
         return self.helper.options(self.apps)
 
     def calc_needs(self, option_name):
+        
         needs_dist = self.calc_needs_distribution(option_name)
         read_count = self.option_spec.count
+        remaining_needed_reads = sum([
+            v*k for (k, v) in needs_dist.items()])
+        total_required = self.helper.app_count(self.apps, option_name) * read_count
+        
         return {
             "needs_distribution": needs_dist,
-            "total_required_reads": read_count * sum(needs_dist.values()),
-            "completed_required_reads": sum(
-                [min(read_count, read_count - k) * v
-                 for (k, v) in needs_dist.items()]),
+            "total_required_reads": total_required,
+            "completed_required_reads": total_required - remaining_needed_reads,
+            # "completed_required_reads": sum(
+            #     [min(read_count, read_count - k) * v
+            #      for (k, v) in needs_dist.items()]),
             "satisfied_apps": sum(
                 [v for (k, v) in needs_dist.items() if k <= 0]),
             "needy_apps": sum(
                 [v for (k, v) in needs_dist.items() if k > 0]),
-            "remaining_needed_reads": sum(
-                [v*k for (k, v) in needs_dist.items() if k > 0])
+            "remaining_needed_reads": remaining_needed_reads
+            # "remaining_needed_reads": sum(
+            #     [v*k for (k, v) in needs_dist.items() if k > 0])
         }
 
     def calc_needs_distribution(self, option_name):
-        app_ids = self.helper.app_ids_for_feedbacks(self.completed_feedbacks(),
-                                                    option_name=option_name,
-                                                    applications=self.apps)
-        app_counts = Counter(app_ids)
-        counts = Counter(app_counts.values())
-        unread_count = (self.helper.app_count(self.apps, option_name) -
-                        len(app_counts))
-        if unread_count != 0:
-            counts[0] = unread_count
-        expected_count = self.option_spec.count
-        return {expected_count - k: v for (k, v) in counts.items()}
-
+        criterion = self.option_spec.criterion
+        app_counts = [row[(criterion, option_name)] for row in self.needs]
+        counts = Counter(app_counts)
+        return counts
+    
     def completed_feedbacks(self):
         return feedbacks_for_judging_round(
             self.judging_round, self.apps).filter(
