@@ -14,7 +14,7 @@ class JudgeRoleCriterionHelper(JudgeCriterionHelper):
             "role": F(self.judge_field),
         }
 
-    def analysis_tally(self, app_id, db_value, cache):
+    def analysis_tally(self, app_id, db_value, cache, **kwargs):
         role_value = cache[app_id]["role"].get(
             db_value["role"])
         cache[app_id]["role"][db_value["role"]] = (

@@ -104,7 +104,7 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
         })
         return fields
 
-    def analysis_tally(self, app_id, db_value, cache):
+    def analysis_tally(self, app_id, db_value, cache, **kwargs):
         judge_industry = db_value["judge_industry"]
         startup_industry = db_value["startup_industry"]
         primary_startup_industry = db_value["primary_startup_industry"]

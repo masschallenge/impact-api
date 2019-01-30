@@ -38,11 +38,6 @@ CriterionHelper.register_helper(
 
 class OptionAnalysis(object):
     _judge_to_count = None
-    expert_profile = "judge__expertprofile__"
-    industry_judge_field = expert_profile + "primary_industry__name"
-    program_judge_field = expert_profile + "home_program_family__name"
-    gender_judge_field = expert_profile + "gender"
-    role_judge_field = expert_profile + "expert_category__name"
 
     def __init__(self,
                  apps,
@@ -136,7 +131,7 @@ class OptionAnalysis(object):
         for count in app_counts.values():
             if criterion_name == "reads":
                 total = count[criterion_name]
-            else:                
+            else:
                 total = count[criterion_name].get(option_name, 0)
             counts[total] += 1
 
@@ -270,7 +265,8 @@ class OptionAnalysis(object):
                     criteria_helper.analysis_tally(
                         app_id,
                         db_value,
-                        ids_cache_value
+                        ids_cache_value,
+                        apps=self.apps
                     )
 
                 self.application_criteria_read_state_cache = ids_cache_value

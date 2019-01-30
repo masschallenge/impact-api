@@ -14,7 +14,7 @@ class JudgeGenderCriterionHelper(JudgeCriterionHelper):
             "gender": F(self.judge_field),
         }
 
-    def analysis_tally(self, app_id, db_value, cache):
+    def analysis_tally(self, app_id, db_value, cache, **kwargs):
         gender_value = cache[app_id]["gender"].get(
             db_value["gender"])
         cache[app_id]["gender"][db_value["gender"]] = (

@@ -138,7 +138,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
         options = _industry_options(context)
         dists = _calc_industry_dists(options, judge_key)
         self.assert_option_distributions(context, dists)
-        
+
     def test_get_with_program_criterion(self):
         context = AnalyzeJudgingContext(type="matching",
                                         name="program",
@@ -156,7 +156,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
         # This is where I gave up and just hard coded it!
         dists = {context.program.program_family.name: {0: 1, 1: 1}}
         self.assert_option_distributions(context, dists)
-        
+
     def assert_option_distributions(self, context, dists):
         judging_round_id = context.criterion.judging_round.id
         program_family = context.program.program_family

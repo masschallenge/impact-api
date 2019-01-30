@@ -19,6 +19,7 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
     def __init__(self, subject):
         super().__init__(subject)
         self._program_name_cache = None
+        self._app_ids_to_pf_name = {}
 
     @classmethod
     def _program_family(cls, family_name):
@@ -55,6 +56,7 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
             app_id = startup_to_app[startup_id]
             if app_id not in self._app_ids_to_targets:
                 self._app_ids_to_targets[app_id] = pf_id
+                self._app_ids_to_pf_name[app_id] = pf_name
                 self._target_counts[pf_name] = (
                     self._target_counts.get(pf_name, 0) + 1)
 
@@ -94,8 +96,14 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
             "program": F(self.judge_field),
         }
 
-    def analysis_tally(self, app_id, db_value, cache):
-        program_value = cache[app_id]["program"].get(
-            db_value["program"])
-        cache[app_id]["program"][db_value["program"]] = (
-            1 if program_value is None else program_value + 1)
+    def analysis_tally(self, app_id, db_value, cache, **kwargs):
+
+        if not self._app_ids_to_pf_name:
+            self.calc_app_ids_to_targets(kwargs["apps"])
+
+        program_family = self._app_ids_to_pf_name.get(app_id)
+        judge_program = db_value["program"]
+        if judge_program == program_family:
+            program_value = cache[app_id]["program"].get(judge_program)
+            cache[app_id]["program"][judge_program] = (
+                1 if program_value is None else program_value + 1)

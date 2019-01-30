@@ -125,5 +125,5 @@ class CriterionHelper(ModelHelper):
     def analysis_fields(self):
         return []
 
-    def analysis_tally(self, app_id, db_value, cache):
+    def analysis_tally(self, app_id, db_value, cache, **kwargs):
         cache[app_id]["reads"] += 1

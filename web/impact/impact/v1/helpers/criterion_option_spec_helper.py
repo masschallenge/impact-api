@@ -47,7 +47,7 @@ class CriterionOptionSpecHelper(ModelHelper):
     def __init__(self, subject, criterion_helpers=None):
         super().__init__(subject)
         criterion = subject.criterion
-        if criterion_helpers is not None:        
+        if criterion_helpers is not None:
             self.criterion_helper = criterion_helpers.get(criterion.id)
         else:
             CriterionHelper.find_helper(criterion)
