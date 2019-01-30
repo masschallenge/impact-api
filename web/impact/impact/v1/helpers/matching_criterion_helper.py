@@ -40,3 +40,8 @@ class MatchingCriterionHelper(CriterionHelper):
 
     def judge_matches_option(self, judge_data, option):
         return option == judge_data.get(self.judge_field)
+
+    def analysis_fields(self):
+        return [
+            self.judge_field,
+        ]

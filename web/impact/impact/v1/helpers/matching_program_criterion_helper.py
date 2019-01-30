@@ -6,12 +6,14 @@ from accelerator.models import (
     Startup,
     StartupProgramInterest,
 )
+from django.db.models import F
 from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
 
 
 class MatchingProgramCriterionHelper(MatchingCriterionHelper):
     application_field = "startup_id"
-    judge_field = "expertprofile__home_program_family__name"
+    cache_judge_field = "expertprofile__home_program_family__name"
+    judge_field = "judge__" + cache_judge_field
     program_families = None
 
     def __init__(self, subject):
@@ -86,3 +88,14 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
             if spi.startup_id not in cache:
                 cache[spi.startup_id] = spi.program.program_family.name
         return cache
+
+    def analysis_annotate_fields(self):
+        return {
+            "program": F(self.judge_field),
+        }
+
+    def analysis_tally(self, app_id, db_value, cache):
+        program_value = cache[app_id]["program"].get(
+            db_value["program"])
+        cache[app_id]["program"][db_value["program"]] = (
+            1 if program_value is None else program_value + 1)

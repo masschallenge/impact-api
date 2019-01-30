@@ -20,7 +20,7 @@ ALL_FIELDS = {
 
 class CriterionHelper(ModelHelper):
     application_field = "id"
-    judge_field = "id"
+    judge_field = cache_judge_field = "id"
 
     model = Criterion
 
@@ -112,3 +112,18 @@ class CriterionHelper(ModelHelper):
 
     def judge_matches_option(self, judge_data, option):
         return True
+
+    def app_state_analysis_fields(self):
+        return self.analysis_fields()
+
+    def analysis_annotate_fields(self):
+        return {}
+
+    def get_app_state_crtieria_annotate_fields(self):
+        return self.analysis_annotate_fields()
+
+    def analysis_fields(self):
+        return []
+
+    def analysis_tally(self, app_id, db_value, cache):
+        cache[app_id]["reads"] += 1

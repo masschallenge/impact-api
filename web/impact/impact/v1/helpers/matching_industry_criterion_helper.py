@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from django.db.models import Q
+from django.db.models import Q, F
 from accelerator.models import (
     Industry,
     Startup,
@@ -11,8 +11,14 @@ from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
 
 class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
     application_field = "startup__primary_industry__id"
-    judge_field = "expertprofile__primary_industry__name"
+    judge_prefix = "judge__"
+    cache_judge_field = "expertprofile__primary_industry__name"
+    judge_field = judge_prefix + cache_judge_field
+
     industries = None
+    primary_industry_prefix = "application__startup__primary_industry__"
+    startup_industry = primary_industry_prefix + "name"
+    parent_startup_industry = primary_industry_prefix + "parent__name"
 
     def __init__(self, subject):
         super().__init__(subject)
@@ -58,7 +64,7 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
         return industries.values_list("name", flat=True)
 
     def filter_by_judge_option(self, query, option_name):
-        key = "judge__" + self.judge_field
+        key = self.judge_field
         return query.filter(**{key: option_name})
 
     def option_for_field(self, field):
@@ -76,3 +82,37 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
                     parent_id__isnull=False).values_list(
                         "id", "parent__name")))
         return self._top_level_id_cache[field]
+
+    def app_state_analysis_fields(self):
+        fields = self.analysis_fields()
+        fields + [
+            self.startup_industry,
+            self.parent_startup_industry,
+        ]
+        return fields
+
+    def analysis_annotate_fields(self):
+        return {
+            "judge_industry": F(self.judge_field),
+        }
+
+    def get_app_state_crtieria_annotate_fields(self):
+        fields = self.analysis_annotate_fields()
+        fields.update({
+            "startup_industry": F(self.startup_industry),
+            "primary_startup_industry": F(self.parent_startup_industry),
+        })
+        return fields
+
+    def analysis_tally(self, app_id, db_value, cache):
+        judge_industry = db_value["judge_industry"]
+        startup_industry = db_value["startup_industry"]
+        primary_startup_industry = db_value["primary_startup_industry"]
+        industry_value = cache[app_id]["industry"].get(
+            judge_industry)
+        if (
+            judge_industry == startup_industry or
+            judge_industry == primary_startup_industry
+        ):
+            cache[app_id]["industry"][judge_industry] = (
+                1 if industry_value is None else industry_value + 1)

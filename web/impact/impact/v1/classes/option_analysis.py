@@ -8,7 +8,7 @@ from accelerator.models import (
     Scenario,
 )
 from collections import defaultdict
-from django.db.models import Sum, F
+from django.db.models import Sum
 from impact.v1.helpers.criterion_option_spec_helper import (
     CriterionOptionSpecHelper,
 )
@@ -24,9 +24,6 @@ from impact.v1.helpers.matching_industry_criterion_helper import (
 )
 from impact.v1.helpers.matching_program_criterion_helper import (
     MatchingProgramCriterionHelper,
-)
-from accelerator_abstract.models.base_core_profile import (
-    UI_GENDER_CHOICES
 )
 
 CriterionHelper.register_helper(
@@ -66,22 +63,18 @@ class OptionAnalysis(object):
         self.criterion_total_functions = {
             ("judge", "gender"): {
                 'function': self.general_criterion_total_capacity,
-                'filter_field': self.gender_judge_field,
             },
             ("reads", "reads"): {
                 'function': None,
             },
             ("judge", "role"): {
                 'function': self.general_criterion_total_capacity,
-                'filter_field': self.role_judge_field,
             },
             ("matching", "industry"): {
                 'function': self.general_criterion_total_capacity,
-                'filter_field': self.industry_judge_field,
             },
             ("matching", "program"): {
                 'function': self.general_criterion_total_capacity,
-                'filter_field': self.program_judge_field,
             }
         }
 
@@ -93,8 +86,6 @@ class OptionAnalysis(object):
         self.completed_feedbacks = self.jpa.filter(
             feedback_status=JUDGING_FEEDBACK_STATUS_COMPLETE)
         self.application_criteria_read_state_cache = {}
-        self.gender_match_dict = dict(
-            (value.lower(), key) for key, value in UI_GENDER_CHOICES)
 
     def analyses(self, option_spec):
         self.option_spec = option_spec
@@ -183,15 +174,7 @@ class OptionAnalysis(object):
             "remaining_capacity": remaining_capacity,
         }
 
-    def general_criterion_total_capacity(self, option):
-        option_name = self.option_spec.criterion.name
-        field = self.criterion_total_functions[
-            (self.option_spec.criterion.type, option_name)
-        ]['filter_field']
-
-        if option_name == "gender":
-            option = self.gender_match_dict.get(option)
-
+    def populate_criterion_total_capacities_cache(self, field, option_name):
         if self.criterion_total_capacities.get(option_name) is None:
             capacities = JudgeRoundCommitment.objects.filter(
                 judging_round=self.judging_round) \
@@ -202,62 +185,76 @@ class OptionAnalysis(object):
                 for cap in capacities}
             self.criterion_total_capacities[option_name] = result
 
+    def general_criterion_total_capacity(self, option):
+        option_name = self.option_spec.criterion.name
+        helper = self.criterion_helpers[self.option_spec.criterion.id]
+        field = helper.judge_field
+        self.populate_criterion_total_capacities_cache(field, option_name)
+
         key_exists = self.criterion_total_capacities[option_name].get(option)
         return 0 if not key_exists else self.criterion_total_capacities[
             option_name][option]
 
-    def remaining_capacity(self, assignment_counts, option_spec, option):
+    def populate_judge_to_capacity_cache(self):
         if self.judge_to_capacity_cache is None:
             self.judge_to_capacity_cache = JudgeRoundCommitment.objects.filter(
                 judging_round=self.judging_round).values(
-                    "judge_id",
-                    self.industry_judge_field,
-                    self.program_judge_field,
-                    self.gender_judge_field,
-                    self.role_judge_field,
-                    "capacity"
+                    *self.get_crtieria_fields("judge_id", "capacity")
                 ).annotate(
-                    industry=F(self.industry_judge_field),
-                    program=F(self.program_judge_field),
-                    gender=F(self.gender_judge_field),
-                    role=F(self.role_judge_field),
+                    **self.get_crtieria_annotate_fields()
                 )
+
+    def remaining_capacity(self, assignment_counts, option_spec, option):
+        self.populate_judge_to_capacity_cache()
 
         result = 0
         option_name = option_spec.criterion.name
 
         for judge in self.judge_to_capacity_cache:
-            gender_option = 'prefer not to state'
-            if option_name == "gender":
-                gender_option = self.gender_match_dict.get(option)
 
             if (
                 option_name == "reads" or
-                judge[option_name] == option or
-                judge[option_name] == gender_option
+                judge.get(option_name) == option
             ):
                 result += max(0, judge['capacity'] - assignment_counts.get(
                     judge['judge_id'], 0))
         return result
 
+    def get_crtieria_fields(self, *args):
+        fields = list(args)
+        for criteria_helper in self.criterion_helpers.values():
+            fields += criteria_helper.analysis_fields()
+        return fields
+
+    def get_app_state_crtieria_fields(self, *args):
+        fields = list(args)
+        for criteria_helper in self.criterion_helpers.values():
+            fields += criteria_helper.app_state_analysis_fields()
+        return fields
+
+    def get_crtieria_annotate_fields(self):
+        fields = {}
+        for criteria_helper in self.criterion_helpers.values():
+            fields.update(criteria_helper.analysis_annotate_fields())
+        return fields
+
+    def get_app_state_crtieria_annotate_fields(self):
+        fields = {}
+        for criteria_helper in self.criterion_helpers.values():
+            fields.update(
+                criteria_helper.get_app_state_crtieria_annotate_fields())
+        return fields
+
     def application_criteria_read_state(self, feedbacks, option_name):
-        criterion_name = self.option_spec.criterion.name
 
         if not self.application_criteria_read_state_cache:
             ids_cache_value = {}
+
             db_values = feedbacks.values(
-                "application_id",
-                "judge_id",
-                self.industry_judge_field,
-                self.program_judge_field,
-                self.gender_judge_field,
-                self.role_judge_field,
+                *self.get_app_state_crtieria_fields(
+                    "application_id", "judge_id")
             ).annotate(
-                industry=F(self.industry_judge_field),
-                program=F(self.program_judge_field),
-                gender=F(self.gender_judge_field),
-                role=F(self.role_judge_field),
-            )
+                **self.get_app_state_crtieria_annotate_fields())
 
             for db_value in db_values:
                 app_id = db_value["application_id"]
@@ -270,27 +267,13 @@ class OptionAnalysis(object):
                         "reads": 0
                     }
 
-                industry_value = ids_cache_value[app_id]["industry"].get(
-                    db_value["industry"])
-                ids_cache_value[app_id]["industry"][db_value["industry"]] = (
-                    1 if industry_value is None else industry_value + 1)
+                for criteria_helper in self.criterion_helpers.values():
+                    criteria_helper.analysis_tally(
+                        app_id,
+                        db_value,
+                        ids_cache_value
+                    )
 
-                program_value = ids_cache_value[app_id]["program"].get(
-                    db_value["program"])
-                ids_cache_value[app_id]["program"][db_value["program"]] = (
-                    1 if program_value is None else program_value + 1)
-
-                gender_value = ids_cache_value[app_id]["gender"].get(
-                    db_value["gender"])
-                ids_cache_value[app_id]["gender"][db_value["gender"]] = (
-                    1 if gender_value is None else gender_value + 1)
-
-                role_value = ids_cache_value[app_id]["role"].get(
-                    db_value["role"])
-                ids_cache_value[app_id]["role"][db_value["role"]] = (
-                    1 if role_value is None else role_value + 1)
-
-                ids_cache_value[app_id]["reads"] += 1
                 self.application_criteria_read_state_cache = ids_cache_value
 
         return self.application_criteria_read_state_cache
