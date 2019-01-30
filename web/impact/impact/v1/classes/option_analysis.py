@@ -134,10 +134,10 @@ class OptionAnalysis(object):
         counts = defaultdict(int)
         criterion_name = self.option_spec.criterion.name
         for count in app_counts.values():
-            total = (
-                count[criterion_name].get(option_name, 0)
-                if criterion_name != "reads" else count[criterion_name]
-            )
+            if criterion_name == "reads":
+                total = count[criterion_name]
+            else:                
+                total = count[criterion_name].get(option_name, 0)
             counts[total] += 1
 
         read_count = 0
@@ -180,9 +180,8 @@ class OptionAnalysis(object):
                 judging_round=self.judging_round) \
                 .values(field) \
                 .annotate(total=Sum("capacity"))
-            result = {
-                cap[field]: cap["total"]
-                for cap in capacities}
+            result = {cap[field]: cap["total"]
+                      for cap in capacities}
             self.criterion_total_capacities[option_name] = result
 
     def general_criterion_total_capacity(self, option):
