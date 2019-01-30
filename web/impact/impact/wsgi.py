@@ -1,8 +1,8 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+import newrelic.agent  # Must be first, per NR docs
 import os
-import newrelic.agent
 from django.conf import settings
 
 

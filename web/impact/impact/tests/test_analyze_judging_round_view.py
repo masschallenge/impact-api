@@ -125,6 +125,16 @@ class TestAnalyzeJudgingRoundView(APITestCase):
         dists = _calc_industry_dists(options, judge_key)
         self.assert_option_distributions(context, dists)
 
+    def test_industry_option_field_can_be_nonempty(self):
+        context = AnalyzeJudgingContext(type="matching",
+                                        name="industry",
+                                        read_count=1,
+                                        options=["some value"])
+        judge_key = context.judge.expertprofile.primary_industry.name
+        options = _industry_options(context)
+        dists = _calc_industry_dists(options, judge_key)
+        self.assert_option_distributions(context, dists)
+        
     def test_get_with_program_criterion(self):
         context = AnalyzeJudgingContext(type="matching",
                                         name="program",
@@ -134,6 +144,15 @@ class TestAnalyzeJudgingRoundView(APITestCase):
         dists = {context.program.program_family.name: {0: 1, 1: 1}}
         self.assert_option_distributions(context, dists)
 
+    def test_program_option_field_can_be_nonempty(self):
+        context = AnalyzeJudgingContext(type="matching",
+                                        name="program",
+                                        read_count=1,
+                                        options=["nonempty value"])
+        # This is where I gave up and just hard coded it!
+        dists = {context.program.program_family.name: {0: 1, 1: 1}}
+        self.assert_option_distributions(context, dists)
+        
     def assert_option_distributions(self, context, dists):
         judging_round_id = context.criterion.judging_round.id
         program_family = context.program.program_family
