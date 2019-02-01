@@ -85,9 +85,10 @@ class OptionAnalysis(object):
         spec_helper = CriterionOptionSpecHelper(
             option_spec, self.criterion_helpers)
         options = spec_helper.options(self.apps)
-        return [self.analysis(option, option_spec, criterion_helper, spec_helper) for option in options]
+        return [self.analysis(option,  criterion_helper, spec_helper) for option in options]
 
-    def analysis(self, option_name, option_spec, helper, spec_helper):
+    def analysis(self, option_name, helper, spec_helper):
+        option_spec = spec_helper.subject
         result = {
             "criterion_option_spec_id": option_spec.id,
             "criterion_name": option_spec.criterion.name,
@@ -97,12 +98,13 @@ class OptionAnalysis(object):
             "weight": option_spec.weight,
             "count": option_spec.count,
         }
-        result.update(self.calc_needs(option_name, option_spec, spec_helper))
-        result.update(self.calc_capacity(option_name, option_spec, helper, spec_helper))
+        result.update(self.calc_needs(option_name, spec_helper))
+        result.update(self.calc_capacity(option_name, helper, spec_helper))
         return result
 
-    def calc_needs(self, option_name, option_spec, spec_helper):
-        needs_dist = self.calc_needs_distribution(option_name, option_spec, spec_helper)
+    def calc_needs(self, option_name, spec_helper):
+        option_spec = spec_helper.subject
+        needs_dist = self.calc_needs_distribution(option_name, spec_helper)
         read_count = option_spec.count
         return {
             "needs_distribution": needs_dist,
@@ -118,17 +120,15 @@ class OptionAnalysis(object):
                 [v*k for (k, v) in needs_dist.items() if k > 0])
         }
 
-    def calc_needs_distribution(self, option_name, option_spec, spec_helper):
+    def calc_needs_distribution(self, option_name, spec_helper):
+        option_spec = spec_helper.subject        
         app_counts = self.application_criteria_read_state(
             self.completed_feedbacks,
             option_name=option_name)
         counts = defaultdict(int)
         criterion_name = option_spec.criterion.name
         for count in app_counts.values():
-            if criterion_name == "reads":
-                total = count[criterion_name]
-            else:
-                total = count[criterion_name].get(option_name, 0)
+            total = count[criterion_name].get(option_name, 0)
             counts[total] += 1
 
         read_count = 0
@@ -143,7 +143,8 @@ class OptionAnalysis(object):
         expected_count = option_spec.count
         return {expected_count - k: v for (k, v) in counts.items()}
 
-    def calc_capacity(self, option_name, option_spec, helper, spec_helper):
+    def calc_capacity(self, option_name, helper, spec_helper):
+        option_spec = spec_helper.subject        
         commitments = JudgeRoundCommitment.objects.filter(
             judging_round=self.judging_round)
         criteria_function = self.criterion_total_functions[
@@ -195,12 +196,12 @@ class OptionAnalysis(object):
                     **self.get_criteria_annotate_fields()
                 )
 
-    def remaining_capacity(self, assignment_counts, option_spec, option, helper):
+    def remaining_capacity(self, assignment_counts, option_spec, option, criterion_helper):
         self.populate_judge_to_capacity_cache()
-        return helper.remaining_capacity(assignment_counts,
-                                         option_spec,
-                                         option,
-                                         self.judge_to_capacity_cache)
+        return criterion_helper.remaining_capacity(assignment_counts,
+                                                   option_spec,
+                                                   option,
+                                                   self.judge_to_capacity_cache)
 
     def get_criteria_fields(self, *args):
         fields = list(args)
@@ -228,7 +229,6 @@ class OptionAnalysis(object):
         return fields
 
     def application_criteria_read_state(self, feedbacks, option_name):
-
         if not self.application_criteria_read_state_cache:
             ids_cache_value = {}
 
@@ -246,7 +246,7 @@ class OptionAnalysis(object):
                         "program": {},
                         "gender": {},
                         "role": {},
-                        "reads": 0
+                        "reads": {"": 0}
                     }
 
                 for criterion_helper in self.criterion_helpers.values():

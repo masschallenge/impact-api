@@ -127,4 +127,4 @@ class CriterionHelper(ModelHelper):
         return []
 
     def analysis_tally(self, app_id, db_value, cache, **kwargs):
-        cache[app_id]["reads"] += 1
+        cache[app_id]["reads"][""] += 1
