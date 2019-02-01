@@ -102,6 +102,7 @@ class Base(Configuration):
         'fluent_pages',
         'impact',
         'graphene_django',
+        'sitetree',
     ]
 
     ACCELERATOR_MODELS_ARE_MANAGED = True
