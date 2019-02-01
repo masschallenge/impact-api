@@ -86,17 +86,17 @@ class OptionAnalysis(object):
         self.option_spec = option_spec
         self.helper = CriterionOptionSpecHelper(
             option_spec, self.criterion_helpers)
-        return [self.analysis(option) for option in self.find_options()]
+        return [self.analysis(option, option_spec) for option in self.find_options()]
 
-    def analysis(self, option_name):
+    def analysis(self, option_name, option_spec):
         result = {
-            "criterion_option_spec_id": self.option_spec.id,
-            "criterion_name": self.option_spec.criterion.name,
-            "criterion_type": self.option_spec.criterion.type,
-            "criterion_id": self.option_spec.criterion.id,
+            "criterion_option_spec_id": option_spec.id,
+            "criterion_name": option_spec.criterion.name,
+            "criterion_type": option_spec.criterion.type,
+            "criterion_id": option_spec.criterion.id,
             "option": option_name,
-            "weight": self.option_spec.weight,
-            "count": self.option_spec.count,
+            "weight": option_spec.weight,
+            "count": option_spec.count,
         }
         result.update(self.calc_needs(option_name))
         result.update(self.calc_capacity(option_name))
