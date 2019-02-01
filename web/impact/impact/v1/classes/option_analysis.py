@@ -209,27 +209,27 @@ class OptionAnalysis(object):
 
     def get_criteria_fields(self, *args):
         fields = list(args)
-        for criteria_helper in self.criterion_helpers.values():
-            fields += criteria_helper.analysis_fields()
+        for criterion_helper in self.criterion_helpers.values():
+            fields += criterion_helper.analysis_fields()
         return fields
 
     def get_app_state_criteria_fields(self, *args):
         fields = list(args)
-        for criteria_helper in self.criterion_helpers.values():
-            fields += criteria_helper.app_state_analysis_fields()
+        for criterion_helper in self.criterion_helpers.values():
+            fields += criterion_helper.app_state_analysis_fields()
         return fields
 
     def get_criteria_annotate_fields(self):
         fields = {}
-        for criteria_helper in self.criterion_helpers.values():
-            fields.update(criteria_helper.analysis_annotate_fields())
+        for criterion_helper in self.criterion_helpers.values():
+            fields.update(criterion_helper.analysis_annotate_fields())
         return fields
 
     def get_app_state_criteria_annotate_fields(self):
         fields = {}
-        for criteria_helper in self.criterion_helpers.values():
+        for criterion_helper in self.criterion_helpers.values():
             fields.update(
-                criteria_helper.get_app_state_criteria_annotate_fields())
+                criterion_helper.get_app_state_criteria_annotate_fields())
         return fields
 
     def application_criteria_read_state(self, feedbacks, option_name):
@@ -254,8 +254,8 @@ class OptionAnalysis(object):
                         "reads": 0
                     }
 
-                for criteria_helper in self.criterion_helpers.values():
-                    criteria_helper.analysis_tally(
+                for criterion_helper in self.criterion_helpers.values():
+                    criterion_helper.analysis_tally(
                         app_id,
                         db_value,
                         ids_cache_value,
