@@ -98,16 +98,16 @@ class OptionAnalysis(object):
             "weight": option_spec.weight,
             "count": option_spec.count,
         }
-        result.update(self.calc_needs(option_name))
-        result.update(self.calc_capacity(option_name))
+        result.update(self.calc_needs(option_name, option_spec))
+        result.update(self.calc_capacity(option_name, option_spec))
         return result
 
     def find_options(self):
         return self.helper.options(self.apps)
 
-    def calc_needs(self, option_name):
-        needs_dist = self.calc_needs_distribution(option_name)
-        read_count = self.option_spec.count
+    def calc_needs(self, option_name, option_spec):
+        needs_dist = self.calc_needs_distribution(option_name, option_spec)
+        read_count = option_spec.count
         return {
             "needs_distribution": needs_dist,
             "total_required_reads": read_count * sum(needs_dist.values()),
@@ -122,12 +122,12 @@ class OptionAnalysis(object):
                 [v*k for (k, v) in needs_dist.items() if k > 0])
         }
 
-    def calc_needs_distribution(self, option_name):
+    def calc_needs_distribution(self, option_name, option_spec):
         app_counts = self.application_criteria_read_state(
             self.completed_feedbacks,
             option_name=option_name)
         counts = defaultdict(int)
-        criterion_name = self.option_spec.criterion.name
+        criterion_name = option_spec.criterion.name
         for count in app_counts.values():
             if criterion_name == "reads":
                 total = count[criterion_name]
@@ -144,14 +144,14 @@ class OptionAnalysis(object):
             self.helper.app_count(self.apps, option_name) - read_count)
         if unread_count != 0:
             counts[0] = unread_count
-        expected_count = self.option_spec.count
+        expected_count = option_spec.count
         return {expected_count - k: v for (k, v) in counts.items()}
 
-    def calc_capacity(self, option_name):
+    def calc_capacity(self, option_name, option_spec):
         commitments = JudgeRoundCommitment.objects.filter(
             judging_round=self.judging_round)
         criteria_function = self.criterion_total_functions[
-            (self.option_spec.criterion.type, self.option_spec.criterion.name)
+            (option_spec.criterion.type, option_spec.criterion.name)
         ]['function']
         total_capacity = (
             criteria_function(option_name)
@@ -162,7 +162,7 @@ class OptionAnalysis(object):
         )
         remaining_capacity = self.remaining_capacity(
             self.application_counts,
-            self.option_spec,
+            option_spec,
             option_name)
         return {
             "total_capacity": total_capacity,
