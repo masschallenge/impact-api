@@ -46,7 +46,6 @@ class OptionAnalysis(object):
                  application_counts,
                  criterion_helpers):
         self.criterion_helpers = criterion_helpers
-        self.option_spec = None
         self.judging_round = judging_round
         self.cycle = self.judging_round.program.cycle
         self.helper = None
@@ -84,7 +83,6 @@ class OptionAnalysis(object):
 
     def analyses(self, option_spec):
         criterion_helper = self.criterion_helpers.get(option_spec.criterion_id)
-        self.option_spec = option_spec
         self.helper = CriterionOptionSpecHelper(
             option_spec, self.criterion_helpers)
         return [self.analysis(option, option_spec, criterion_helper) for option in self.find_options()]
