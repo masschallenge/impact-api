@@ -96,7 +96,7 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
             "judge_industry": F(self.judge_field),
         }
 
-    def get_app_state_crtieria_annotate_fields(self):
+    def get_app_state_criteria_annotate_fields(self):
         fields = self.analysis_annotate_fields()
         fields.update({
             "startup_industry": F(self.startup_industry),

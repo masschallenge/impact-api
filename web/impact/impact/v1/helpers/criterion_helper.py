@@ -65,14 +65,15 @@ class CriterionHelper(ModelHelper):
         return self.filter_by_judge_option(commitments, option_name).aggregate(
             total=Sum("capacity"))["total"]
 
-    def remaining_capacity(self, commitments, assignment_counts, option_name):
-        judge_to_capacity = self.filter_by_judge_option(
-            commitments, option_name).values_list("judge_id", "capacity")
+    def remaining_capacity(self, assignment_counts, option_spec, option, judge_to_capacity_cache):
         result = 0
-        for judge_id, capacity in judge_to_capacity:
-            result += max(0, capacity - assignment_counts.get(judge_id, 0))
-        return result
+        option_name = option_spec.criterion.name
 
+        for judge in judge_to_capacity_cache:
+            if self.judge_matches_option(judge, option):
+                result += max(0, judge['capacity'] - assignment_counts.get(
+                    judge['judge_id'], 0))
+        return result
     def filter_by_judge_option(self, query, option_name):
         return query
 
@@ -119,7 +120,7 @@ class CriterionHelper(ModelHelper):
     def analysis_annotate_fields(self):
         return {}
 
-    def get_app_state_crtieria_annotate_fields(self):
+    def get_app_state_criteria_annotate_fields(self):
         return self.analysis_annotate_fields()
 
     def analysis_fields(self):

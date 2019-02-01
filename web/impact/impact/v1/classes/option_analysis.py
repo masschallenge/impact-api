@@ -83,12 +83,13 @@ class OptionAnalysis(object):
         self.application_criteria_read_state_cache = {}
 
     def analyses(self, option_spec):
+        criterion_helper = self.criterion_helpers.get(option_spec.criterion_id)
         self.option_spec = option_spec
         self.helper = CriterionOptionSpecHelper(
             option_spec, self.criterion_helpers)
-        return [self.analysis(option, option_spec) for option in self.find_options()]
+        return [self.analysis(option, option_spec, criterion_helper) for option in self.find_options()]
 
-    def analysis(self, option_name, option_spec):
+    def analysis(self, option_name, option_spec, helper):
         result = {
             "criterion_option_spec_id": option_spec.id,
             "criterion_name": option_spec.criterion.name,
@@ -99,7 +100,7 @@ class OptionAnalysis(object):
             "count": option_spec.count,
         }
         result.update(self.calc_needs(option_name, option_spec))
-        result.update(self.calc_capacity(option_name, option_spec))
+        result.update(self.calc_capacity(option_name, option_spec, helper))
         return result
 
     def find_options(self):
@@ -147,7 +148,7 @@ class OptionAnalysis(object):
         expected_count = option_spec.count
         return {expected_count - k: v for (k, v) in counts.items()}
 
-    def calc_capacity(self, option_name, option_spec):
+    def calc_capacity(self, option_name, option_spec, helper):
         commitments = JudgeRoundCommitment.objects.filter(
             judging_round=self.judging_round)
         criteria_function = self.criterion_total_functions[
@@ -163,7 +164,8 @@ class OptionAnalysis(object):
         remaining_capacity = self.remaining_capacity(
             self.application_counts,
             option_spec,
-            option_name)
+            option_name,
+            helper)
         return {
             "total_capacity": total_capacity,
             "remaining_capacity": remaining_capacity,
@@ -193,50 +195,41 @@ class OptionAnalysis(object):
         if self.judge_to_capacity_cache is None:
             self.judge_to_capacity_cache = JudgeRoundCommitment.objects.filter(
                 judging_round=self.judging_round).values(
-                    *self.get_crtieria_fields("judge_id", "capacity")
+                    *self.get_criteria_fields("judge_id", "capacity")
                 ).annotate(
-                    **self.get_crtieria_annotate_fields()
+                    **self.get_criteria_annotate_fields()
                 )
 
-    def remaining_capacity(self, assignment_counts, option_spec, option):
+    def remaining_capacity(self, assignment_counts, option_spec, option, helper):
         self.populate_judge_to_capacity_cache()
+        return helper.remaining_capacity(assignment_counts,
+                                         option_spec,
+                                         option,
+                                         self.judge_to_capacity_cache)
 
-        result = 0
-        option_name = option_spec.criterion.name
-
-        for judge in self.judge_to_capacity_cache:
-
-            if (
-                option_name == "reads" or
-                judge.get(option_name) == option
-            ):
-                result += max(0, judge['capacity'] - assignment_counts.get(
-                    judge['judge_id'], 0))
-        return result
-
-    def get_crtieria_fields(self, *args):
+    def get_criteria_fields(self, *args):
         fields = list(args)
         for criteria_helper in self.criterion_helpers.values():
             fields += criteria_helper.analysis_fields()
         return fields
 
-    def get_app_state_crtieria_fields(self, *args):
+    def get_app_state_criteria_fields(self, *args):
         fields = list(args)
         for criteria_helper in self.criterion_helpers.values():
             fields += criteria_helper.app_state_analysis_fields()
         return fields
 
-    def get_crtieria_annotate_fields(self):
+    def get_criteria_annotate_fields(self):
         fields = {}
         for criteria_helper in self.criterion_helpers.values():
             fields.update(criteria_helper.analysis_annotate_fields())
         return fields
 
-    def get_app_state_crtieria_annotate_fields(self):
+    def get_app_state_criteria_annotate_fields(self):
         fields = {}
         for criteria_helper in self.criterion_helpers.values():
             fields.update(
-                criteria_helper.get_app_state_crtieria_annotate_fields())
+                criteria_helper.get_app_state_criteria_annotate_fields())
         return fields
 
     def application_criteria_read_state(self, feedbacks, option_name):
@@ -245,10 +238,10 @@ class OptionAnalysis(object):
             ids_cache_value = {}
 
             db_values = feedbacks.values(
-                *self.get_app_state_crtieria_fields(
+                *self.get_app_state_criteria_fields(
                     "application_id", "judge_id")
             ).annotate(
-                **self.get_app_state_crtieria_annotate_fields())
+                **self.get_app_state_criteria_annotate_fields())
 
             for db_value in db_values:
                 app_id = db_value["application_id"]
