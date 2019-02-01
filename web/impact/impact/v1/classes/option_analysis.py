@@ -154,7 +154,7 @@ class OptionAnalysis(object):
             (option_spec.criterion.type, option_spec.criterion.name)
         ]['function']
         total_capacity = (
-            criteria_function(option_name)
+            criteria_function(option_name, option_spec)
             if criteria_function is not None
             else self.helper.total_capacity(
                 commitments=commitments,
@@ -179,9 +179,9 @@ class OptionAnalysis(object):
                       for cap in capacities}
             self.criterion_total_capacities[option_name] = result
 
-    def general_criterion_total_capacity(self, option):
-        option_name = self.option_spec.criterion.name
-        helper = self.criterion_helpers[self.option_spec.criterion.id]
+    def general_criterion_total_capacity(self, option, option_spec):
+        option_name = option_spec.criterion.name
+        helper = self.criterion_helpers[option_spec.criterion.id]
         field = helper.judge_field
         self.populate_criterion_total_capacities_cache(field, option_name)
 
