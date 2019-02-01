@@ -48,7 +48,6 @@ class OptionAnalysis(object):
         self.criterion_helpers = criterion_helpers
         self.judging_round = judging_round
         self.cycle = self.judging_round.program.cycle
-        self.helper = None
         self.apps = apps
         self.app_ids = app_ids
         self.application_counts = application_counts
@@ -83,11 +82,12 @@ class OptionAnalysis(object):
 
     def analyses(self, option_spec):
         criterion_helper = self.criterion_helpers.get(option_spec.criterion_id)
-        self.helper = CriterionOptionSpecHelper(
+        spec_helper = CriterionOptionSpecHelper(
             option_spec, self.criterion_helpers)
-        return [self.analysis(option, option_spec, criterion_helper) for option in self.find_options()]
+        options = spec_helper.options(self.apps)
+        return [self.analysis(option, option_spec, criterion_helper, spec_helper) for option in options]
 
-    def analysis(self, option_name, option_spec, helper):
+    def analysis(self, option_name, option_spec, helper, spec_helper):
         result = {
             "criterion_option_spec_id": option_spec.id,
             "criterion_name": option_spec.criterion.name,
@@ -97,15 +97,12 @@ class OptionAnalysis(object):
             "weight": option_spec.weight,
             "count": option_spec.count,
         }
-        result.update(self.calc_needs(option_name, option_spec))
-        result.update(self.calc_capacity(option_name, option_spec, helper))
+        result.update(self.calc_needs(option_name, option_spec, spec_helper))
+        result.update(self.calc_capacity(option_name, option_spec, helper, spec_helper))
         return result
 
-    def find_options(self):
-        return self.helper.options(self.apps)
-
-    def calc_needs(self, option_name, option_spec):
-        needs_dist = self.calc_needs_distribution(option_name, option_spec)
+    def calc_needs(self, option_name, option_spec, spec_helper):
+        needs_dist = self.calc_needs_distribution(option_name, option_spec, spec_helper)
         read_count = option_spec.count
         return {
             "needs_distribution": needs_dist,
@@ -121,7 +118,7 @@ class OptionAnalysis(object):
                 [v*k for (k, v) in needs_dist.items() if k > 0])
         }
 
-    def calc_needs_distribution(self, option_name, option_spec):
+    def calc_needs_distribution(self, option_name, option_spec, spec_helper):
         app_counts = self.application_criteria_read_state(
             self.completed_feedbacks,
             option_name=option_name)
@@ -140,13 +137,13 @@ class OptionAnalysis(object):
                 read_count = read_count + counts[count_number]
 
         unread_count = (
-            self.helper.app_count(self.apps, option_name) - read_count)
+            spec_helper.app_count(self.apps, option_name) - read_count)
         if unread_count != 0:
             counts[0] = unread_count
         expected_count = option_spec.count
         return {expected_count - k: v for (k, v) in counts.items()}
 
-    def calc_capacity(self, option_name, option_spec, helper):
+    def calc_capacity(self, option_name, option_spec, helper, spec_helper):
         commitments = JudgeRoundCommitment.objects.filter(
             judging_round=self.judging_round)
         criteria_function = self.criterion_total_functions[
@@ -155,7 +152,7 @@ class OptionAnalysis(object):
         total_capacity = (
             criteria_function(option_name, option_spec)
             if criteria_function is not None
-            else self.helper.total_capacity(
+            else spec_helper.total_capacity(
                 commitments=commitments,
                 option_name=option_name)
         )
