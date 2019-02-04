@@ -41,8 +41,7 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
             target)
 
     def calc_app_ids_to_targets(self, applications):
-        app_type = applications.first().application_type
-        cycle = app_type.application_type_for.first()
+        cycle = applications.first().cycle
         spi_data = StartupProgramInterest.objects.filter(
             startup__application__in=applications,
             applying=True,
