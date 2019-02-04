@@ -53,23 +53,6 @@ class OptionAnalysis(object):
         self.application_counts = application_counts
         self.criterion_total_capacities = {}
         self.judge_to_capacity_cache = None
-        self.criterion_total_functions = {
-            ("judge", "gender"): {
-                'function': self.general_criterion_total_capacity,
-            },
-            ("reads", "reads"): {
-                'function': None,
-            },
-            ("judge", "role"): {
-                'function': self.general_criterion_total_capacity,
-            },
-            ("matching", "industry"): {
-                'function': self.general_criterion_total_capacity,
-            },
-            ("matching", "program"): {
-                'function': self.general_criterion_total_capacity,
-            }
-        }
 
         active_scenarios = Scenario.objects.filter(
             judging_round=judging_round, is_active=True)
@@ -147,16 +130,7 @@ class OptionAnalysis(object):
         option_spec = spec_helper.subject        
         commitments = JudgeRoundCommitment.objects.filter(
             judging_round=self.judging_round)
-        criteria_function = self.criterion_total_functions[
-            (option_spec.criterion.type, option_spec.criterion.name)
-        ]['function']
-        total_capacity = (
-            criteria_function(option_name, option_spec)
-            if criteria_function is not None
-            else spec_helper.total_capacity(
-                commitments=commitments,
-                option_name=option_name)
-        )
+        total_capacity = self.total_capacity(option_name, option_spec)
         remaining_capacity = self.remaining_capacity(
             self.application_counts,
             option_spec,
@@ -177,7 +151,7 @@ class OptionAnalysis(object):
                       for cap in capacities}
             self.criterion_total_capacities[option_name] = result
 
-    def general_criterion_total_capacity(self, option, option_spec):
+    def total_capacity(self, option, option_spec):
         option_name = option_spec.criterion.name
         helper = self.criterion_helpers[option_spec.criterion.id]
         field = helper.judge_field

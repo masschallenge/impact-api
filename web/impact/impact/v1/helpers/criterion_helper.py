@@ -21,7 +21,7 @@ ALL_FIELDS = {
 class CriterionHelper(ModelHelper):
     application_field = "id"
     judge_field = cache_judge_field = "id"
-
+    
     model = Criterion
 
     REQUIRED_KEYS = ["name",
@@ -60,10 +60,6 @@ class CriterionHelper(ModelHelper):
         if self.app_count_cache == 0:
             self.app_count_cache = apps.count()
         return self.app_count_cache
-
-    def total_capacity(self, commitments, option_name):
-        return self.filter_by_judge_option(commitments, option_name).aggregate(
-            total=Sum("capacity"))["total"]
 
     def remaining_capacity(self, assignment_counts, option_spec, option, judge_to_capacity_cache):
         result = 0
