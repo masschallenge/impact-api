@@ -13,7 +13,7 @@ class JudgeCriterionHelper(CriterionHelper):
         return field
 
     def judge_matches_option(self, judge_data, option):
-        return option == judge_data.get(self.judge_field)
+        return option == judge_data.get(self.cache_judge_field)
 
     def analysis_fields(self):
         return [
