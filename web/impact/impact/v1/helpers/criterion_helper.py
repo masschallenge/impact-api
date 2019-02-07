@@ -50,10 +50,6 @@ class CriterionHelper(ModelHelper):
     def options(self, spec, apps):
         return [spec.option]
 
-    def app_ids_for_feedbacks(self, feedbacks, option_name, **kwargs):
-        return self.filter_by_judge_option(feedbacks, option_name).values_list(
-            "application_id", flat=True)
-
     def app_count(self, apps, option_name):
         if self.app_count_cache == 0:
             self.app_count_cache = apps.count()
@@ -68,9 +64,6 @@ class CriterionHelper(ModelHelper):
                 result += max(0, judge['capacity'] - assignment_counts.get(
                     judge['judge_id'], 0))
         return result
-
-    def filter_by_judge_option(self, query, option_name):
-        return query
 
     @classmethod
     def clone_criteria(cls, source_judging_round_id, target_judging_round_id):
