@@ -1,8 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from django.db.models import Sum
-
 from accelerator.models import Criterion
 from impact.v1.helpers.model_helper import (
     REQUIRED_INTEGER_FIELD,
@@ -21,7 +19,7 @@ ALL_FIELDS = {
 class CriterionHelper(ModelHelper):
     application_field = "id"
     judge_field = cache_judge_field = "id"
-    
+
     model = Criterion
 
     REQUIRED_KEYS = ["name",
@@ -61,15 +59,16 @@ class CriterionHelper(ModelHelper):
             self.app_count_cache = apps.count()
         return self.app_count_cache
 
-    def remaining_capacity(self, assignment_counts, option_spec, option, judge_to_capacity_cache):
+    def remaining_capacity(
+       self, assignment_counts, option_spec, option, judge_to_capacity_cache):
         result = 0
-        option_name = option_spec.criterion.name
 
         for judge in judge_to_capacity_cache:
             if self.judge_matches_option(judge, option):
                 result += max(0, judge['capacity'] - assignment_counts.get(
                     judge['judge_id'], 0))
         return result
+
     def filter_by_judge_option(self, query, option_name):
         return query
 
