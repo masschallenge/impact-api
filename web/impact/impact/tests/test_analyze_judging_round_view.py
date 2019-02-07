@@ -100,7 +100,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
                     context.needed_reads())
 
     def test_get_with_gender_criterion(self):
-        genders = ["female", "male"]
+        genders = ["f", "m"]
         context = AnalyzeJudgingContext(type="judge",
                                         name="gender",
                                         read_count=1,
