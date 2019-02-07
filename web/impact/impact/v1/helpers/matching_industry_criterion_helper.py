@@ -63,10 +63,6 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
         industries = Industry.objects.filter(top_q | child_q).distinct()
         return industries.values_list("name", flat=True)
 
-    def filter_by_judge_option(self, query, option_name):
-        key = self.judge_field
-        return query.filter(**{key: option_name})
-
     def option_for_field(self, field):
         return field
 
