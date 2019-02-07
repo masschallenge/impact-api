@@ -37,21 +37,13 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
             target)
 
     def calc_app_ids_to_targets(self, applications):
-        top_level_industry_map = {
-            industry.id: (industry.parent_id, industry.parent.name)
-            for industry in Industry.objects.filter(
-                parent_id__isnull=False).prefetch_related('parent')
-        }
-        top_level_industry_map.update({
-            industry.id: (industry.id, industry.name)
-            for industry in Industry.objects.filter(parent_id__isnull=True)
-        })
+        top_level_industry_map = compute_top_level_industry_map()
         for app_id, industry_id in applications.values_list(
-                "id", "startup__primary_industry"):
+                "id",
+                "startup__primary_industry"):
             top_id, top_name = top_level_industry_map[industry_id]
             self._app_ids_to_targets[app_id] = top_id
-            self._target_counts[top_name] = self._target_counts.get(
-                top_name, 0) + 1
+            self._target_counts[top_name] = 1 + self._target_counts[top_name]
 
     def options(self, spec, apps):
         startups = Startup.objects.filter(application__in=apps)
@@ -106,9 +98,19 @@ class MatchingIndustryCriterionHelper(MatchingCriterionHelper):
         primary_startup_industry = db_value["primary_startup_industry"]
         industry_value = cache[app_id]["industry"].get(
             judge_industry)
-        if (
-            judge_industry == startup_industry or
-            judge_industry == primary_startup_industry
-        ):
+        if judge_industry in (startup_industry, primary_startup_industry):
             cache[app_id]["industry"][judge_industry] = (
                 1 if industry_value is None else industry_value + 1)
+
+
+def compute_top_level_industry_map():
+    top_level_industry_map = {
+        industry.id: (industry.parent_id, industry.parent.name)
+        for industry in Industry.objects.filter(
+                parent_id__isnull=False).prefetch_related('parent')
+    }
+    top_level_industry_map.update({
+        industry.id: (industry.id, industry.name)
+        for industry in Industry.objects.filter(parent_id__isnull=True)
+    })
+    return top_level_industry_map

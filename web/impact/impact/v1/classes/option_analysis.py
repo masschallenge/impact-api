@@ -26,14 +26,18 @@ from impact.v1.helpers.matching_program_criterion_helper import (
     MatchingProgramCriterionHelper,
 )
 
-CriterionHelper.register_helper(
-    JudgeGenderCriterionHelper, "judge", "gender")
-CriterionHelper.register_helper(
-    JudgeRoleCriterionHelper, "judge", "role")
-CriterionHelper.register_helper(
-    MatchingIndustryCriterionHelper, "matching", "industry")
-CriterionHelper.register_helper(
-    MatchingProgramCriterionHelper, "matching", "program")
+CriterionHelper.register_helper(JudgeGenderCriterionHelper,
+                                "judge",
+                                "gender")
+CriterionHelper.register_helper(JudgeRoleCriterionHelper,
+                                "judge",
+                                "role")
+CriterionHelper.register_helper(MatchingIndustryCriterionHelper,
+                                "matching",
+                                "industry")
+CriterionHelper.register_helper(MatchingProgramCriterionHelper,
+                                "matching",
+                                "program")
 
 
 class OptionAnalysis(object):
@@ -52,7 +56,7 @@ class OptionAnalysis(object):
         self.app_ids = app_ids
         self.application_counts = application_counts
         self.criterion_total_capacities = {}
-        self.judge_to_capacity_cache = None
+        self.judge_capacity_cache = None
 
         active_scenarios = Scenario.objects.filter(
             judging_round=judging_round, is_active=True)
@@ -131,11 +135,10 @@ class OptionAnalysis(object):
     def calc_capacity(self, option_name, helper, spec_helper):
         option_spec = spec_helper.subject
         total_capacity = self.total_capacity(option_name, option_spec)
-        remaining_capacity = self.remaining_capacity(
-            self.application_counts,
-            option_spec,
-            option_name,
-            helper)
+        remaining_capacity = self.remaining_capacity(self.application_counts,
+                                                     option_spec,
+                                                     option_name,
+                                                     helper)
         return {
             "total_capacity": total_capacity,
             "remaining_capacity": remaining_capacity,
@@ -144,9 +147,8 @@ class OptionAnalysis(object):
     def populate_criterion_total_capacities_cache(self, field, option_name):
         if self.criterion_total_capacities.get(option_name) is None:
             capacities = JudgeRoundCommitment.objects.filter(
-                judging_round=self.judging_round) \
-                .values(field) \
-                .annotate(total=Sum("capacity"))
+                judging_round=self.judging_round).values(field).annotate(
+                    total=Sum("capacity"))
             result = {cap[field]: cap["total"]
                       for cap in capacities}
             self.criterion_total_capacities[option_name] = result
@@ -161,23 +163,25 @@ class OptionAnalysis(object):
         return 0 if not key_exists else self.criterion_total_capacities[
             option_name][option]
 
-    def populate_judge_to_capacity_cache(self):
-        if self.judge_to_capacity_cache is None:
-            self.judge_to_capacity_cache = JudgeRoundCommitment.objects.filter(
+    def populate_judge_capacity_cache(self):
+        if self.judge_capacity_cache is None:
+            self.judge_capacity_cache = JudgeRoundCommitment.objects.filter(
                 judging_round=self.judging_round).values(
                     *self.get_criteria_fields("judge_id", "capacity")
                 ).annotate(
                     **self.get_criteria_annotate_fields()
                 )
 
-    def remaining_capacity(
-       self, assignment_counts, option_spec, option, criterion_helper):
-        self.populate_judge_to_capacity_cache()
-        return criterion_helper.remaining_capacity(
-            assignment_counts,
-            option_spec,
-            option,
-            self.judge_to_capacity_cache)
+    def remaining_capacity(self,
+                           assignment_counts,
+                           option_spec,
+                           option,
+                           criterion_helper):
+        self.populate_judge_capacity_cache()
+        return criterion_helper.remaining_capacity(assignment_counts,
+                                                   option_spec,
+                                                   option,
+                                                   self.judge_capacity_cache)
 
     def get_criteria_fields(self, *args):
         fields = list(args)
@@ -226,12 +230,10 @@ class OptionAnalysis(object):
                     }
 
                 for criterion_helper in self.criterion_helpers.values():
-                    criterion_helper.analysis_tally(
-                        app_id,
-                        db_value,
-                        ids_cache_value,
-                        apps=self.apps
-                    )
+                    criterion_helper.analysis_tally(app_id,
+                                                    db_value,
+                                                    ids_cache_value,
+                                                    apps=self.apps)
 
                 self.application_criteria_read_state_cache = ids_cache_value
 

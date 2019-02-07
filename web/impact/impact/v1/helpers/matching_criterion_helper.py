@@ -1,6 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
-
+from collections import defaultdict
 from impact.v1.helpers.criterion_helper import CriterionHelper
 
 
@@ -8,7 +8,7 @@ class MatchingCriterionHelper(CriterionHelper):
     def __init__(self, subject):
         super().__init__(subject)
         self._app_ids_to_targets = {}
-        self._target_counts = {}
+        self._target_counts = defaultdict(int)
 
     def app_count(self, apps, option_name):
         return self.target_counts(apps).get(option_name, 0)
