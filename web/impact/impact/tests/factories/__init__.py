@@ -47,7 +47,6 @@ from accelerator.tests.factories.industry_factory import IndustryFactory
 from accelerator.tests.factories.interest_category_factory import (
     InterestCategoryFactory
 )
-from accelerator.tests.factories.job_posting_factory import JobPostingFactory
 from accelerator.tests.factories.judge_application_feedback_factory import (
     JudgeApplicationFeedbackFactory
 )
