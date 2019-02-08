@@ -2,6 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from django.apps import apps
+from django.http import Http404
+
 from rest_framework import viewsets
 from rest_framework import permissions
 
@@ -9,6 +11,9 @@ from impact.model_utils import snake_to_model_name
 from impact.permissions import DynamicModelPermissions
 from impact.serializers import GeneralSerializer
 from impact.utils import model_name_case
+
+
+EXCLUDE_MODELS = ["JobPosting"]
 
 
 class GeneralViewSet(viewsets.ModelViewSet):
@@ -22,9 +27,12 @@ class GeneralViewSet(viewsets.ModelViewSet):
         model = snake_to_model_name(self.kwargs.get('model', ''))
         related_model = self.kwargs.get('related_model', '')
         model_name = model_name_case(model, related_model)
-        return apps.get_model(
+        model = apps.get_model(
             app_label=self.kwargs['app'],
             model_name=model_name)
+        if model.__name__ in EXCLUDE_MODELS:
+            raise Http404
+        return model
 
     def get_queryset(self):
         return self.model.objects.all()
