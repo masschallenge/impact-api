@@ -112,8 +112,7 @@ class OptionAnalysis(object):
     def calc_needs_distribution(self, option_name, spec_helper):
         option_spec = spec_helper.subject
         app_counts = self.application_criteria_read_state(
-            self.completed_feedbacks,
-            option_name=option_name)
+            self.completed_feedbacks)
         counts = defaultdict(int)
         criterion_name = option_spec.criterion.name
         for count in app_counts.values():
@@ -208,7 +207,7 @@ class OptionAnalysis(object):
                 criterion_helper.get_app_state_criteria_annotate_fields())
         return fields
 
-    def application_criteria_read_state(self, feedbacks, option_name):
+    def application_criteria_read_state(self, feedbacks):
         if not self.application_criteria_read_state_cache:
             ids_cache_value = {}
 
@@ -226,7 +225,7 @@ class OptionAnalysis(object):
                         "program": {},
                         "gender": {},
                         "role": {},
-                        "reads": {"": 0}
+                        "reads": {}
                     }
 
                 for criterion_helper in self.criterion_helpers.values():

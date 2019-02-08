@@ -99,6 +99,22 @@ class TestAnalyzeJudgingRoundView(APITestCase):
             assert (first_result["remaining_needed_reads"] ==
                     context.needed_reads())
 
+    def test_get_with_unread_application_with_non_empty_option(self):
+        context = AnalyzeJudgingContext(type="reads",
+                                        name="reads",
+                                        read_count=2,
+                                        options=["reads"])
+        program_family = context.program.program_family
+        email = self.global_operations_manager(program_family).email
+        with self.login(email=email):
+            url = reverse(AnalyzeJudgingRoundView.view_name,
+                          args=[context.judging_round.id])
+            response = self.client.get(url)
+            assert len(response.data) == 1
+            first_result = response.data["results"][0]
+            assert (first_result["remaining_needed_reads"] ==
+                    context.needed_reads())
+
     def test_get_with_gender_criterion(self):
         genders = ["f", "m"]
         context = AnalyzeJudgingContext(type="judge",

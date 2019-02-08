@@ -33,6 +33,8 @@ class CriterionHelper(ModelHelper):
 
     def __init__(self, subject):
         super().__init__(subject)
+        self.subject = subject
+        self.reads_options = []
         self.app_count_cache = 0
 
     @classmethod
@@ -115,4 +117,14 @@ class CriterionHelper(ModelHelper):
         return []
 
     def analysis_tally(self, app_id, db_value, cache, **kwargs):
-        cache[app_id]["reads"][""] += 1
+
+        if not self.reads_options:
+            options = self.subject.criterionoptionspec_set.values_list(
+                'option', flat=True).distinct()
+            for option in options:
+                self.reads_options.append(option)
+
+        for option in self.reads_options:
+            reads_value = cache[app_id]["reads"].get(option)
+            cache[app_id]["reads"][option] = (
+                1 if reads_value is None else reads_value + 1)
