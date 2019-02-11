@@ -17,6 +17,7 @@ from impact.tests.factories import (
     UserRoleFactory,
 )
 from impact.tests.utils import capture_stderr
+from impact.graphql.query import EXPERT_NOT_FOUND_MESSAGE
 
 MENTEE_FIELDS = """
     startupId
@@ -27,8 +28,6 @@ MENTEE_FIELDS = """
     programYear
     programStatus
 """
-
-EXPERT_NOT_FOUND_MESSAGE = 'ExpertProfile matching query does not exist.'
 
 
 class TestGraphQL(APITestCase):

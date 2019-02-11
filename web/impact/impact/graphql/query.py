@@ -10,6 +10,7 @@ from accelerator.models import (
     StartupTeamMember,
 )
 from graphql import GraphQLError
+EXPERT_NOT_FOUND_MESSAGE = 'Expert matching the id does not exist.'
 
 
 class Query(graphene.ObjectType):
@@ -25,7 +26,7 @@ class Query(graphene.ObjectType):
             expert = ExpertProfile.objects.filter(user_id=user_id).first()
 
             if not expert:
-                return GraphQLError("Expert matching the id does not exist")
+                return GraphQLError(EXPERT_NOT_FOUND_MESSAGE)
 
             return expert
 
