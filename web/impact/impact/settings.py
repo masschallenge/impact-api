@@ -81,8 +81,8 @@ class Base(Configuration):
         'paypal.standard',
         'paypal.pro',
         'paypal.standard.pdt',
-        'accelerator.apps.AcceleratorConfig',
-        'simpleuser.apps.SimpleuserConfig',
+        'accelerator',
+        'simpleuser',
         'corsheaders',
         'django.contrib.admin',
         'django.contrib.admindocs',
@@ -102,6 +102,7 @@ class Base(Configuration):
         'fluent_pages',
         'impact',
         'graphene_django',
+        'sitetree',
     ]
 
     ACCELERATOR_MODELS_ARE_MANAGED = True
