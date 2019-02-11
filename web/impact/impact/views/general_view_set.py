@@ -12,7 +12,7 @@ from impact.serializers import GeneralSerializer
 from impact.utils import model_name_case
 
 
-EXCLUDE_MODELS = ["JobPosting"]
+MODELS_TO_EXCLUDE_FROM_URL_BINDING = ["JobPosting"]
 
 
 class GeneralViewSet(viewsets.ModelViewSet):
@@ -29,7 +29,7 @@ class GeneralViewSet(viewsets.ModelViewSet):
         model = apps.get_model(
             app_label=self.kwargs['app'],
             model_name=model_name)
-        if model.__name__ in EXCLUDE_MODELS:
+        if model.__name__ in MODELS_TO_EXCLUDE_FROM_URL_BINDING:
             raise LookupError( "'%s' is not available" % (model_name))
         return model
 
