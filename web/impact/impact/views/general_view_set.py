@@ -30,7 +30,7 @@ class GeneralViewSet(viewsets.ModelViewSet):
             app_label=self.kwargs['app'],
             model_name=model_name)
         if model.__name__ in MODELS_TO_EXCLUDE_FROM_URL_BINDING:
-            raise LookupError( "'%s' is not available" % (model_name))
+            raise LookupError("'%s' is not available" % (model_name))
         return model
 
     def get_queryset(self):

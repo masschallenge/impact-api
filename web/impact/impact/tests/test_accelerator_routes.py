@@ -23,7 +23,9 @@ from impact.tests.factories import (
 )
 from impact.tests.factories import PermissionFactory
 from accelerator.models import Startup
-from impact.views.general_view_set import EXCLUDE_MODELS
+from impact.views.general_view_set import (
+    MODELS_TO_EXCLUDE_FROM_URL_BINDING
+)
 
 VIEWS_PER_MODEL = 4
 
@@ -156,7 +158,8 @@ class TestAcceleratorRoutes(TestCase):
         accelerate_models = [
             model for model in apps.get_models('accelerator') if (
                 model._meta.app_label == 'accelerator' and hasattr(
-                    model, "Meta") and model.__name__ not in EXCLUDE_MODELS)]
+                    model, "Meta") and
+                model.__name__ not in MODELS_TO_EXCLUDE_FROM_URL_BINDING)]
         model_count = len(accelerate_models)
         # we should have two detail and list views per model
         self.assertEquals(
