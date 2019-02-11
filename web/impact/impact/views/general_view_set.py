@@ -2,7 +2,6 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from django.apps import apps
-from django.http import Http404
 
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -31,7 +30,7 @@ class GeneralViewSet(viewsets.ModelViewSet):
             app_label=self.kwargs['app'],
             model_name=model_name)
         if model.__name__ in EXCLUDE_MODELS:
-            raise Http404
+            raise LookupError( "'%s' is not available" % (model_name))
         return model
 
     def get_queryset(self):
