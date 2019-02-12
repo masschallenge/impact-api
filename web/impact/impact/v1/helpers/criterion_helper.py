@@ -1,8 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from django.db.models import Sum
-
 from accelerator.models import Criterion
 from impact.v1.helpers.model_helper import (
     REQUIRED_INTEGER_FIELD,
@@ -20,7 +18,7 @@ ALL_FIELDS = {
 
 class CriterionHelper(ModelHelper):
     application_field = "id"
-    judge_field = "id"
+    judge_field = cache_judge_field = "id"
 
     model = Criterion
 
@@ -32,6 +30,12 @@ class CriterionHelper(ModelHelper):
     INPUT_KEYS = ALL_KEYS
 
     specific_helpers = {}
+
+    def __init__(self, subject):
+        super().__init__(subject)
+        self.subject = subject
+        self.reads_options = []
+        self.app_count_cache = 0
 
     @classmethod
     def register_helper(cls, klass, type, name):
@@ -48,27 +52,20 @@ class CriterionHelper(ModelHelper):
     def options(self, spec, apps):
         return [spec.option]
 
-    def app_ids_for_feedbacks(self, feedbacks, option_name, **kwargs):
-        return self.filter_by_judge_option(feedbacks, option_name).values_list(
-            "application_id", flat=True)
-
     def app_count(self, apps, option_name):
-        return apps.count()
+        if self.app_count_cache == 0:
+            self.app_count_cache = apps.count()
+        return self.app_count_cache
 
-    def total_capacity(self, commitments, option_name):
-        return self.filter_by_judge_option(commitments, option_name).aggregate(
-            total=Sum("capacity"))["total"]
-
-    def remaining_capacity(self, commitments, assignment_counts, option_name):
-        judge_to_capacity = self.filter_by_judge_option(
-            commitments, option_name).values_list("judge_id", "capacity")
+    def remaining_capacity(
+       self, assignment_counts, option_spec, option, judge_to_capacity_cache):
         result = 0
-        for judge_id, capacity in judge_to_capacity:
-            result += max(0, capacity - assignment_counts.get(judge_id, 0))
-        return result
 
-    def filter_by_judge_option(self, query, option_name):
-        return query
+        for judge in judge_to_capacity_cache:
+            if self.judge_matches_option(judge, option):
+                result += max(0, judge['capacity'] - assignment_counts.get(
+                    judge['judge_id'], 0))
+        return result
 
     @classmethod
     def clone_criteria(cls, source_judging_round_id, target_judging_round_id):
@@ -106,3 +103,28 @@ class CriterionHelper(ModelHelper):
 
     def judge_matches_option(self, judge_data, option):
         return True
+
+    def app_state_analysis_fields(self):
+        return self.analysis_fields()
+
+    def analysis_annotate_fields(self):
+        return {}
+
+    def get_app_state_criteria_annotate_fields(self):
+        return self.analysis_annotate_fields()
+
+    def analysis_fields(self):
+        return []
+
+    def analysis_tally(self, app_id, db_value, cache, **kwargs):
+
+        if not self.reads_options:
+            options = self.subject.criterionoptionspec_set.values_list(
+                'option', flat=True).distinct()
+            for option in options:
+                self.reads_options.append(option)
+
+        for option in self.reads_options:
+            reads_value = cache[app_id]["reads"].get(option)
+            cache[app_id]["reads"][option] = (
+                1 if reads_value is None else reads_value + 1)

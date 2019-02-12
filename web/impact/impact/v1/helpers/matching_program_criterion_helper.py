@@ -6,40 +6,23 @@ from accelerator.models import (
     Startup,
     StartupProgramInterest,
 )
+from django.db.models import F
 from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
 
 
 class MatchingProgramCriterionHelper(MatchingCriterionHelper):
     application_field = "startup_id"
-    judge_field = "expertprofile__home_program_family__name"
+    cache_judge_field = "expertprofile__home_program_family__name"
+    judge_field = "judge__" + cache_judge_field
     program_families = None
 
     def __init__(self, subject):
         super().__init__(subject)
         self._program_name_cache = None
-
-    @classmethod
-    def _program_family(cls, family_name):
-        if cls.program_families is None:
-            cls.program_families = cls.instances_by_name(ProgramFamily)
-
-        program_family = cls.program_families.get(family_name)
-        if program_family is None:
-            program_family = ProgramFamily.objects.get(name=family_name)
-            cls.program_families[family_name] = program_family
-        return program_family
-
-    def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
-        target = self._program_family(option_name)
-
-        return self.find_app_ids(
-            self.filter_by_judge_option(feedbacks, option_name),
-            applications,
-            target)
+        self._app_ids_to_pf_name = {}
 
     def calc_app_ids_to_targets(self, applications):
-        app_type = applications.first().application_type
-        cycle = app_type.application_type_for.first()
+        cycle = applications.first().cycle
         spi_data = StartupProgramInterest.objects.filter(
             startup__application__in=applications,
             applying=True,
@@ -52,8 +35,8 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
             app_id = startup_to_app[startup_id]
             if app_id not in self._app_ids_to_targets:
                 self._app_ids_to_targets[app_id] = pf_id
-                self._target_counts[pf_name] = self._target_counts.get(pf_name,
-                                                                       0) + 1
+                self._app_ids_to_pf_name[app_id] = pf_name
+                self._target_counts[pf_name] += 1
 
     def options(self, spec, apps):
         pfs = ProgramFamily.objects.filter(
@@ -85,3 +68,17 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
             if spi.startup_id not in cache:
                 cache[spi.startup_id] = spi.program.program_family.name
         return cache
+
+    def analysis_annotate_fields(self):
+        return {"program": F(self.judge_field)}
+
+    def analysis_tally(self, app_id, db_value, cache, **kwargs):
+        if not self._app_ids_to_pf_name:
+            self.calc_app_ids_to_targets(kwargs["apps"])
+
+        program_family = self._app_ids_to_pf_name.get(app_id)
+        judge_program = db_value["program"]
+        if judge_program == program_family:
+            program_value = cache[app_id]["program"].get(judge_program)
+            cache[app_id]["program"][judge_program] = (
+                1 if program_value is None else program_value + 1)

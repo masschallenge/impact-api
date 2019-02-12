@@ -70,7 +70,7 @@ class AllocateApplicationsView(ImpactView):
         self.judges = self.judging_round.confirmed_judge_label.users
         self.feedback = feedbacks_for_judging_round(
             self.judging_round, self.apps).order_by("application_id")
-        self.criteria = self.judging_round.criterion_set.all()        
+        self.criteria = self.judging_round.criterion_set.all()
         self.criterion_helpers = find_criterion_helpers(self.judging_round)
         self._criteria_cache = CriteriaDataCache(
             self.apps,
