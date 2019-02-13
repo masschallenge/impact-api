@@ -1,23 +1,25 @@
 import graphene
 
-from impact.graphql.types.expert_profile_type import ExpertProfileType
-from impact.graphql.types.entrepreneur_profile_type import (
-    EntrepreneurProfileType
+from impact.graphql.types import (
+    ExpertProfileType,
+    StartupTeamMemberType,
 )
 from accelerator.models import (
     ExpertProfile,
-    EntrepreneurProfile,
     StartupTeamMember,
 )
 from graphql import GraphQLError
 EXPERT_NOT_FOUND_MESSAGE = 'Expert matching the id does not exist.'
+TEAM_MEMBER_NOT_FOUND_MESSAGE = (
+    'Startup Team Member matching id does not exist'
+)
 
 
 class Query(graphene.ObjectType):
     expert_profile = graphene.Field(
         ExpertProfileType, id=graphene.Int())
     entrepreneur_profile = graphene.Field(
-        EntrepreneurProfileType, id=graphene.Int())
+        StartupTeamMemberType, id=graphene.Int())
 
     def resolve_expert_profile(self, info, **kwargs):
         user_id = kwargs.get('id')
@@ -36,12 +38,12 @@ class Query(graphene.ObjectType):
         team_member_id = kwargs.get('id')
 
         if team_member_id is not None:
-            user_id = StartupTeamMember.objects.filter(
-                id=team_member_id).values_list("user_id", flat=True)
+            team_member = StartupTeamMember.objects.filter(
+                id=team_member_id).first()
 
-            if not user_id:
-                return GraphQLError("Startup Team Member does not exist")
+            if not team_member:
+                return GraphQLError(TEAM_MEMBER_NOT_FOUND_MESSAGE)
 
-            return EntrepreneurProfile.objects.filter(user_id=user_id).first()
+            return team_member
 
         return GraphQLError("Ensure url specifies a team member id")

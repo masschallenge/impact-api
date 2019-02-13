@@ -11,9 +11,7 @@ from impact.graphql.types.entrepreneur_profile_type import (
 from impact.graphql.types.functional_expertise_type import (
     FunctionalExpertiseType
 )
-from impact.graphql.types.entrepreneur_profile_type import (
-    EntrepreneurProfileType
-)
 from impact.graphql.types.startup_mentor_relationship_type import (
     StartupMentorRelationshipType
 )
+from impact.graphql.types.expert_profile_type import ExpertProfileType

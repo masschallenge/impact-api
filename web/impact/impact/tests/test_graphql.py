@@ -1,5 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
+import json
 from django.urls import reverse
 
 from accelerator.models import (
@@ -17,7 +18,11 @@ from impact.tests.factories import (
     UserRoleFactory,
 )
 from impact.tests.utils import capture_stderr
-from impact.graphql.query import EXPERT_NOT_FOUND_MESSAGE
+from impact.graphql.query import (
+    EXPERT_NOT_FOUND_MESSAGE,
+    TEAM_MEMBER_NOT_FOUND_MESSAGE
+)
+from accelerator.tests.contexts import StartupTeamMemberContext
 
 MENTEE_FIELDS = """
     startupId
@@ -92,6 +97,86 @@ class TestGraphQL(APITestCase):
                     }
                 }
             )
+
+    def test_query_with_entrepreneur(self):
+        with self.login(email=self.basic_user().email):
+            context = StartupTeamMemberContext(primary_contact=False)
+            user = context.user
+            profile = user.entrepreneurprofile
+            startup = context.startup
+            member = context.member
+
+            query = """
+                query {{
+                    entrepreneurProfile(id: {id}) {{
+                        title
+                        profile {{
+                            twitterHandle
+                            currentProgram
+                            imageUrl
+                            linkedInUrl
+                            facebookUrl
+                            personalWebsiteUrl
+                            phone
+                        }}
+                        user {{
+                            id
+                            email
+                            firstName
+                            lastName
+                        }}
+                        startups {{
+                            id
+                            name
+                            shortPitch
+                            highResolutionLogo
+                            program {{
+                                year
+                                family
+                            }}
+                        }}
+                    }}
+                }}
+            """.format(id=member.id)
+            response = self.client.post(self.url, data={'query': query})
+            data = json.loads(response.content.decode("utf-8"))["data"]
+            ent_profile = data["entrepreneurProfile"]
+
+            self.assertEqual(ent_profile["title"], member.title)
+
+            profile_response = ent_profile["profile"][0]
+            self.assertEqual(
+                profile_response["imageUrl"],
+                profile.image.url if profile.image else "")
+            self.assertEqual(
+                profile_response["linkedInUrl"], profile.linked_in_url)
+            self.assertEqual(
+                profile_response["personalWebsiteUrl"],
+                profile.personal_website_url)
+            self.assertEqual(profile_response["phone"], profile.phone)
+            self.assertEqual(
+                profile_response["facebookUrl"], profile.facebook_url)
+            self.assertEqual(
+                profile_response["twitterHandle"], profile.twitter_handle)
+            self.assertEqual(
+                profile_response["currentProgram"],
+                profile.current_program.name)
+
+            user_resp = ent_profile["user"]
+            self.assertEqual(user_resp["id"], str(user.id))
+            self.assertEqual(user_resp["email"], user.email)
+            self.assertEqual(user_resp["firstName"], user.first_name)
+            self.assertEqual(user_resp["lastName"], user.last_name)
+
+            startup_response = ent_profile["startups"][0]
+            self.assertEqual(startup_response["id"], str(startup.id))
+            self.assertEqual(startup_response["name"], startup.name)
+            self.assertEqual(
+                startup_response["shortPitch"], startup.short_pitch)
+            self.assertEqual(
+                startup_response["highResolutionLogo"],
+                startup.high_resolution_logo.url
+                if startup.high_resolution_logo else None)
 
     def test_office_url_field_returns_correct_value(self):
         program = ProgramFactory()
@@ -206,11 +291,11 @@ class TestGraphQL(APITestCase):
                 None
             )
 
-    def test_query_with_non_existent_user_id(self):
+    def test_query_with_non_existent_startup_team_member_id(self):
         with self.login(email=self.basic_user().email):
             query = """
                 query {{
-                    expertProfile(id: {id}) {{
+                    entrepreneurProfile(id: {id}) {{
                         user {{ firstName }}
                     }}
                 }}
@@ -222,8 +307,8 @@ class TestGraphQL(APITestCase):
                 error_messages = [x['message'] for x in
                                   response.json()['errors']]
 
-            self.assertIn(EXPERT_NOT_FOUND_MESSAGE, error_messages)
+            self.assertIn(TEAM_MEMBER_NOT_FOUND_MESSAGE, error_messages)
             self.assertEqual(
-                response.json()['data']['expertProfile'],
+                response.json()['data']['entrepreneurProfile'],
                 None
             )
