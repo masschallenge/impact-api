@@ -268,7 +268,7 @@ checkout:
 		echo; \
 	done
 
-watch-frontend stop-frontend: process-exists=$(shell ps -ef | egrep -h "./watch_frontend.sh|parcel watch" | grep -v "grep" | awk '{print $$2}')
+watch-frontend stop-frontend: process-exists=$(shell ps -ef | grep "./watch_frontend.sh" | grep -v "grep" | awk '{print $$2}')
 watch-frontend:
 	@if [ -z "$(process-exists)" ]; then \
 		cd $(DIRECTORY) && nohup bash -c "./watch_frontend.sh &" && cd $(IMPACT_API); \
