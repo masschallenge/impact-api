@@ -17,6 +17,8 @@ from impact.tests.factories import (
     StartupMentorRelationshipFactory,
     UserRoleFactory,
     ApplicationFactory,
+    ProgramStartupStatusFactory,
+    StartupStatusFactory,
 )
 from impact.tests.utils import capture_stderr
 from impact.graphql.query import (
@@ -103,11 +105,19 @@ class TestGraphQL(APITestCase):
         with self.login(email=self.basic_user().email):
             context = StartupTeamMemberContext(primary_contact=False)
             startup = context.startup
+            program = context.program
 
             ApplicationFactory(cycle=context.cycle, startup=startup)
+            ps = ProgramStartupStatusFactory(
+                program=program,
+                startup_list_tab_id='finalists')
+            StartupStatusFactory(
+                startup=startup,
+                program_startup_status=ps
+            )
+
             user = context.user
             profile = user.entrepreneurprofile
-            program = context.program
             member = context.member
 
             query = """

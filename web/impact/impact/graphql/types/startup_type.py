@@ -3,8 +3,7 @@ from graphene_django import DjangoObjectType
 
 from accelerator.models import (
     Startup,
-    Program,
-    Application,
+    StartupStatus,
 )
 from impact.graphql.types import (
     ProgramType
@@ -33,8 +32,13 @@ class StartupType(DjangoObjectType):
         return None
 
     def resolve_program(self, info, **kwargs):
-        cycles = Application.objects.filter(
-            startup=self).values_list("cycle", flat=True)
-        return [
-            program
-            for program in Program.objects.filter(cycle_id__in=cycles)]
+
+        status = StartupStatus.objects.filter(
+            startup=self,
+            program_startup_status__startup_list_tab_id='finalists'
+        ).first()
+
+        if status:
+            return [status.program_startup_status.program]
+
+        return []
