@@ -16,6 +16,7 @@ from impact.tests.factories import (
     ProgramRoleFactory,
     StartupMentorRelationshipFactory,
     UserRoleFactory,
+    ApplicationFactory,
 )
 from impact.tests.utils import capture_stderr
 from impact.graphql.query import (
@@ -101,9 +102,12 @@ class TestGraphQL(APITestCase):
     def test_query_with_entrepreneur(self):
         with self.login(email=self.basic_user().email):
             context = StartupTeamMemberContext(primary_contact=False)
+            startup = context.startup
+
+            ApplicationFactory(cycle=context.cycle, startup=startup)
             user = context.user
             profile = user.entrepreneurprofile
-            startup = context.startup
+            program = context.program
             member = context.member
 
             query = """
@@ -177,6 +181,13 @@ class TestGraphQL(APITestCase):
                 startup_response["highResolutionLogo"],
                 startup.high_resolution_logo.url
                 if startup.high_resolution_logo else None)
+
+            program_resp = startup_response["program"][0]
+            self.assertEqual(
+                program_resp["family"], str(program.program_family.name))
+            self.assertEqual(
+                program_resp["year"],
+                str(program.start_date.year) if program.start_date else '')
 
     def test_office_url_field_returns_correct_value(self):
         program = ProgramFactory()
