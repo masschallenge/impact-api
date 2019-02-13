@@ -154,8 +154,7 @@ deprecate the use of ImageTokens and rely entirely on public APIs.
 
 #### Parameters:
 
-* `ImageToken`: As returned by startup_list, startup_detail, mentors
-  and job_posting_detail calls.
+* `ImageToken`: As returned by startup_list, startup_detail and mentor calls.
 
 * `ImageType`: JPEG or PNG.  Defaults to JPEG.
 
@@ -174,134 +173,6 @@ deprecate the use of ImageTokens and rely entirely on public APIs.
 #### Example result:
 Image
 
-### /api/v0/job_posting_detail/
-
-Returns details on a specific job posting.
-
-HTTP method: POST
-
-Parameter:
-
-* `JobKey`: Should be the id of a job posting as returned by the job_list
-API call.
-
-#### Response: JSON object with the following names:
-
-* `startup_name`: Name of the startup with the job posting.
-
-* `startup_profile_url`: URL to startup profile page.
-
-* `startup_logo_image_token`: Image token for the startup logo.
-
-* `title`: Job title for the posting.
-
-* `type`: Job type. Currently supported values are:
-
-  * `"A full-time contract position"`
-
-  * `"A full-time permanent position"`
-
-  * `"A part-time contract position"`
-
-  * `"A part-time permanent position"`
-
-  * `"An internship"`
-
-* `application_email`: Email to send job applications to.
-
-* `more_info_url`: URL to get more information on the posting.
-
-* `description`: Description of the posting.
-
-* `post_date`: Date the position was posted.
-
-* `jobkey`: Unique id for this job posting.
-
-#### Example result:
-```
-{
-  "startup_name": "Startup 1234",
-  "startup_profile_url": "http://masschallenge.org/startups/2016/profile/startup-1234",
-  "startup_logo_image_token": "<imagetokenhash>=",
-  "title": "Job Posting Title 283",
-  "type": "A full-time permanent position",
-  "application_email": "283-jobposting@example.com",
-  "more_info_url": "",
-  "description": "Great role at a great place!",
-  "post_date": "2016-11-02",
-  "jobkey": 283
-}
-```
-
-
-### /api/v0/job_posting_list/
-
-Returns a list of job postings.
-
-HTTP method: POST
-
-#### Parameters:
-
-All parameters are optional. All parameters except OrderBy refine the full set of available
-job postings.
-
-* `JobType`: Supported values:
-
-  * `FULL_TIME_CONTRACT`
-
-  * `FULL_TIME_PERMANENT`
-
-  * `INTERNSHIP`
-
-  * `NONE`
-
-  * `PART_TIME_CONTRACT`
-
-  * `PART_TIME_PERMANENT`
-
-* `Keywords`: Comma separated words and phrases to search for in the job posting.  The
-  returned job postings must have at least one of the listed keywords.
-
-* `OrderBy`: Supported values:
-
-  * `jobtype`
-
-  * `postdatedesc`
-
-  * `startup`
-
-* `ProgramKey`: Name or Id of a particular program associated with the startup with the
-  job posting.
-
-* `StartupKey`: Id or URL slug of a particular startup.  Startup ids are returned by
-  the startup_list call.
-
-#### Response: JSON object with the following names:
-
-* `job_postings`: A list of the resulting job descriptions.  Job descriptions are the same
-  as described in job_posting_detail call.
-
-#### Example result:
-```
-{
-  "job_postings": [
-    {
-      "startup_name": "Startup 1234",
-      "startup_profile_url": "http://masschallenge.org/startups/2016/profile/startup-1234",
-      "startup_logo_image_token": "<imagetokenhash>=",
-      "title": "Job Posting Title 283",
-      "type": "A full-time permanent position",
-      "application_email": "283-jobposting@example.com",
-      "more_info_url": "",
-      "description": "Description 283 intentionally cleared",
-      "post_date": "2016-11-02",
-      "jobkey": 283
-    }
-  ]
-}
-```
-
-
 ### /api/v0/mentors/
 
 Returns information on a set of mentors.
@@ -311,9 +182,6 @@ HTTP method: POST
 #### Parameters:
 
 * `NumItems: Required.  Number of mentors to return.
-
-* `ProgramKey`: Name or Id of a particular program associated with the startup with the
-  job posting.
 
 #### Response: JSON object with the following names:
 
