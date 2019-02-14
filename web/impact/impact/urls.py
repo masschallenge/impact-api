@@ -120,7 +120,7 @@ urls = [
     url(r'^people/$', TemplateView.as_view(
         template_name='directory.html'),
         name="entreprenuer_profile"),
-    url(r'^people/(?P<pk>[0-9]+)/$', TemplateView.as_view(
+    url(r'^people/(.*)/$', TemplateView.as_view(
         template_name='directory.html'),
         name="entreprenuer_profile"),
     url(r'^openid/', include('oidc_provider.urls', namespace='oidc_provider')),
