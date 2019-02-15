@@ -47,32 +47,16 @@ class CriterionOptionSpecHelper(ModelHelper):
     def __init__(self, subject, criterion_helpers=None):
         super().__init__(subject)
         criterion = subject.criterion
-        self.criterion_helper = (
-            criterion_helpers.get(criterion.id)
-            if criterion_helpers is not None else
+        if criterion_helpers is not None:
+            self.criterion_helper = criterion_helpers.get(criterion.id)
+        else:
             CriterionHelper.find_helper(criterion)
-        )
-
-    def app_ids_for_feedbacks(self, feedbacks, option_name, applications):
-        return self.criterion_helper.app_ids_for_feedbacks(
-            feedbacks, option_name=option_name, applications=applications)
 
     def options(self, apps):
         return self.criterion_helper.options(self.subject, apps)
 
     def app_count(self, apps, option_name):
         return self.criterion_helper.app_count(apps, option_name)
-
-    def total_capacity(self, commitments, option_name):
-        return self.criterion_helper.total_capacity(
-            commitments=commitments,
-            option_name=option_name)
-
-    def remaining_capacity(self, commitments, assignment_counts, option_name):
-        return self.criterion_helper.remaining_capacity(
-            commitments,
-            assignment_counts,
-            option_name)
 
     @classmethod
     def fields(cls):

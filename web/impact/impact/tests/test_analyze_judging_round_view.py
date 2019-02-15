@@ -6,8 +6,10 @@ from jsonschema import Draft4Validator
 
 from django.urls import reverse
 
-from accelerator.tests.factories import CriterionOptionSpecFactory
-from accelerator.tests.contexts import AnalyzeJudgingContext
+from accelerator.tests.contexts import (
+    AnalyzeJudgingContext,
+    CriterionOptionSpecContext,
+)
 
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import assert_fields
@@ -16,7 +18,7 @@ from impact.v1.views import AnalyzeJudgingRoundView
 
 class TestAnalyzeJudgingRoundView(APITestCase):
     def test_basic_staff_permission_does_not_grant_access(self):
-        option = CriterionOptionSpecFactory()
+        option = CriterionOptionSpecContext().criterion_option_spec
         judging_round = option.criterion.judging_round
         with self.login(email=self.basic_user().email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
@@ -25,7 +27,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
             assert response.status_code == 403
 
     def test_get(self):
-        option = CriterionOptionSpecFactory()
+        option = CriterionOptionSpecContext().criterion_option_spec
         judging_round = option.criterion.judging_round
         program_family = judging_round.program.program_family
         email = self.global_operations_manager(program_family).email
@@ -38,7 +40,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
             assert first_result["criterion_option_spec_id"] == option.id
 
     def test_options(self):
-        option = CriterionOptionSpecFactory()
+        option = CriterionOptionSpecContext().criterion_option_spec
         judging_round = option.criterion.judging_round
         program_family = judging_round.program.program_family
         email = self.global_operations_manager(program_family).email
@@ -52,7 +54,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
             assert_fields(AnalyzeJudgingRoundView.fields().keys(), get_options)
 
     def test_options_against_get(self):
-        option = CriterionOptionSpecFactory()
+        option = CriterionOptionSpecContext().criterion_option_spec
         judging_round = option.criterion.judging_round
         program_family = judging_round.program.program_family
         email = self.global_operations_manager(program_family).email
@@ -67,7 +69,9 @@ class TestAnalyzeJudgingRoundView(APITestCase):
             assert validator.is_valid(json.loads(get_response.content))
 
     def test_get_with_implicit_option(self):
-        option = CriterionOptionSpecFactory(option="")
+        option = CriterionOptionSpecContext(
+            option=""
+        ).criterion_option_spec
         judging_round = option.criterion.judging_round
         program_family = judging_round.program.program_family
         email = self.global_operations_manager(program_family).email
@@ -84,6 +88,22 @@ class TestAnalyzeJudgingRoundView(APITestCase):
                                         name="reads",
                                         read_count=2,
                                         options=[""])
+        program_family = context.program.program_family
+        email = self.global_operations_manager(program_family).email
+        with self.login(email=email):
+            url = reverse(AnalyzeJudgingRoundView.view_name,
+                          args=[context.judging_round.id])
+            response = self.client.get(url)
+            assert len(response.data) == 1
+            first_result = response.data["results"][0]
+            assert (first_result["remaining_needed_reads"] ==
+                    context.needed_reads())
+
+    def test_get_with_unread_application_with_non_empty_option(self):
+        context = AnalyzeJudgingContext(type="reads",
+                                        name="reads",
+                                        read_count=2,
+                                        options=["reads"])
         program_family = context.program.program_family
         email = self.global_operations_manager(program_family).email
         with self.login(email=email):
@@ -134,7 +154,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
         options = _industry_options(context)
         dists = _calc_industry_dists(options, judge_key)
         self.assert_option_distributions(context, dists)
-        
+
     def test_get_with_program_criterion(self):
         context = AnalyzeJudgingContext(type="matching",
                                         name="program",
@@ -152,7 +172,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
         # This is where I gave up and just hard coded it!
         dists = {context.program.program_family.name: {0: 1, 1: 1}}
         self.assert_option_distributions(context, dists)
-        
+
     def assert_option_distributions(self, context, dists):
         judging_round_id = context.criterion.judging_round.id
         program_family = context.program.program_family
@@ -162,6 +182,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
                           args=[judging_round_id])
             response = self.client.get(url)
             results = response.data["results"]
+
             for result in results:
                 option = result["option"]
                 assert result["needs_distribution"] == dists[option]
@@ -175,13 +196,19 @@ class TestAnalyzeJudgingRoundView(APITestCase):
         judging_round_id = context.criterion.judging_round.id
         program_family = context.program.program_family
         email = self.global_operations_manager(program_family).email
+        program_family = context.program.program_family
         with self.login(email=email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
                           args=[judging_round_id])
             response = self.client.get(url)
-            result = response.data["results"][0]
-            assert commitment.capacity == result['total_capacity']
-            assert commitment.capacity - 1 == result['remaining_capacity']
+            results = response.data["results"]
+
+            for result in results:
+                if result["option"] == program_family:
+                    assert commitment.capacity == result[
+                        'total_capacity']
+                    assert commitment.capacity - 1 == result[
+                        'remaining_capacity']
 
 
 def _industry_options(context):

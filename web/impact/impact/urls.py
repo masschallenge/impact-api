@@ -35,14 +35,18 @@ from impact.views import (
     IndexView,
     JWTCookieNameView,
 )
+from .views.general_view_set import MODELS_TO_EXCLUDE_FROM_URL_BINDING
 
 accelerator_router = routers.DefaultRouter()
 simpleuser_router = routers.DefaultRouter()
 simpleuser_router.register('User', GeneralViewSet, base_name='User')
 
 for model in apps.get_models('accelerator'):
-    if model._meta.app_label == 'accelerator' and not model._meta.auto_created:
-        schema_router.register(model, url=model_name_to_snake(model.__name__))
+    if (model._meta.app_label == 'accelerator' and not
+            model._meta.auto_created and
+            model.__name__ not in MODELS_TO_EXCLUDE_FROM_URL_BINDING):
+        schema_router.register(
+            model, url=model_name_to_snake(model.__name__))
 
 sso_urlpatterns = [
     url(r'^obtain-token/', obtain_jwt_token),

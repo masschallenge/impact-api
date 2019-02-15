@@ -67,14 +67,14 @@ class AnalyzeJudgingRoundView(ImpactView):
         application_counts = self.judge_to_count()
         app_ids = self.apps.values_list('id', flat=True)
         criterion_helpers = find_criterion_helpers(self.instance)
-        analyses = [OptionAnalysis(
-            option,
+        option_analysis_instance = OptionAnalysis(
             self.apps,
             app_ids,
             self.instance,
             application_counts,
-            criterion_helpers).analyses()
-            for option in options]
+            criterion_helpers)
+        analyses = [option_analysis_instance.analyses(option)
+                    for option in options]
         return Response({"results": list(chain.from_iterable(analyses))})
 
     def judge_to_count(self):

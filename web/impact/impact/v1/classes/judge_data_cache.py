@@ -9,7 +9,7 @@ class JudgeDataCache(object):
         fields = set(["id"])
         self.criterion_helpers = criterion_helpers
         for helper in self.criterion_helpers:
-            fields.add(helper.judge_field)
+            fields.add(helper.cache_judge_field)
         for datum in judges.values(*list(fields)):
             self.data[datum["id"]] = datum
 
@@ -21,7 +21,7 @@ class JudgeDataCache(object):
         row = OrderedDict([(key, 0) for key in keys])
         for helper in self.criterion_helpers:
             option = helper.option_for_field(
-                datum[helper.judge_field])
+                datum[helper.cache_judge_field])
             key = (helper.subject, option)
             if key in keys:
                 row[key] = 1
