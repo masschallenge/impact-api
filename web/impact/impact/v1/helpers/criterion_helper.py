@@ -17,6 +17,13 @@ ALL_FIELDS = {
 
 
 class CriterionHelper(ModelHelper):
+    '''Encapsulates business logic for Criteria, including logic
+    around allocation, analysis, and cloning.
+    The CriterionHelper superclass counts judges without regard to any
+    features. Therefore it is a suitable class to use for the "reads"
+    criterion. 
+    '''
+
     application_field = "id"
     judge_field = cache_judge_field = "id"
 
@@ -69,7 +76,8 @@ class CriterionHelper(ModelHelper):
 
     @classmethod
     def clone_criteria(cls, source_judging_round_id, target_judging_round_id):
-
+        '''Clone criteria and options from one judging round to another.
+        Used by CloneCriteriaView'''
         cls.delete_existing_criteria(target_judging_round_id)
         criteria = cls.model.objects.filter(
             judging_round_id=source_judging_round_id)
@@ -84,16 +92,16 @@ class CriterionHelper(ModelHelper):
         criteria.delete()
 
     @classmethod
-    def fields(cls):
-        return ALL_FIELDS
-
-    @classmethod
     def clone_criterion(cls, criterion, target_judging_round_id):
         clone = cls.model.objects.create(
             judging_round_id=target_judging_round_id,
             type=criterion.type,
             name=criterion.name)
         return criterion.pk, clone.pk
+
+    @classmethod
+    def fields(cls):
+        return ALL_FIELDS
 
     def option_for_field(self, field):
         return ""

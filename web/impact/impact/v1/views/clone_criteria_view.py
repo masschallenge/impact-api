@@ -16,6 +16,10 @@ TARGET_JUDGING_ROUND_KEY = 'target_judging_round_id'
 
 
 class CloneCriteriaView(ImpactView):
+    '''Endpoint for duplicating criteria state from an existing
+    judging round onto a new round. Deletes any existing criteria
+    and options on the target round.'''
+
     view_name = "clone_criteria"
     model = JudgingRound
 

@@ -41,6 +41,10 @@ CriterionHelper.register_helper(MatchingProgramCriterionHelper,
 
 
 class OptionAnalysis(object):
+    '''Orchestration class for judging round analysis. Responsible
+    for fetching needed fields from CriterionHelpers, querying db
+    for needed data. Delegates criterion-specific logic to CriterionHelpers
+    whenever possible.'''
     _judge_to_count = None
 
     def __init__(self,
@@ -68,6 +72,8 @@ class OptionAnalysis(object):
         self.application_criteria_read_state_cache = {}
 
     def analyses(self, option_spec):
+        '''Iterate over criterion options for judging round and produce and
+        analysis for each.'''
         criterion_helper = self.criterion_helpers.get(option_spec.criterion_id)
         spec_helper = CriterionOptionSpecHelper(
             option_spec, self.criterion_helpers)
@@ -77,6 +83,7 @@ class OptionAnalysis(object):
             for option in options]
 
     def analysis(self, option_name, helper, spec_helper):
+        '''Produce an analysis for a particular option'''
         option_spec = spec_helper.subject
         result = {
             "criterion_option_spec_id": option_spec.id,
@@ -92,6 +99,7 @@ class OptionAnalysis(object):
         return result
 
     def calc_needs(self, option_name, spec_helper):
+        '''Parse needs distribution for a particular option'''
         option_spec = spec_helper.subject
         needs_dist = self.calc_needs_distribution(option_name, spec_helper)
         read_count = option_spec.count
@@ -110,6 +118,7 @@ class OptionAnalysis(object):
         }
 
     def calc_needs_distribution(self, option_name, spec_helper):
+        '''Calculate needs distribution for a particular option'''
         option_spec = spec_helper.subject
         app_counts = self.application_criteria_read_state(
             self.completed_feedbacks)
@@ -132,6 +141,7 @@ class OptionAnalysis(object):
         return {expected_count - k: v for (k, v) in counts.items()}
 
     def calc_capacity(self, option_name, helper, spec_helper):
+        '''Compute the total and unused capacity for an option'''
         option_spec = spec_helper.subject
         total_capacity = self.total_capacity(option_name, option_spec)
         remaining_capacity = self.remaining_capacity(self.application_counts,
@@ -144,6 +154,7 @@ class OptionAnalysis(object):
         }
 
     def populate_criterion_total_capacities_cache(self, field, option_name):
+        '''Query total capacity data and cache it.'''
         if self.criterion_total_capacities.get(option_name) is None:
             capacities = JudgeRoundCommitment.objects.filter(
                 judging_round=self.judging_round).values(field).annotate(
@@ -153,6 +164,7 @@ class OptionAnalysis(object):
             self.criterion_total_capacities[option_name] = result
 
     def total_capacity(self, option, option_spec):
+        '''Compute total capacity for a given option, using cached data'''
         option_name = option_spec.criterion.name
         helper = self.criterion_helpers[option_spec.criterion.id]
         field = helper.judge_field
@@ -163,6 +175,7 @@ class OptionAnalysis(object):
             option_name][option]
 
     def populate_judge_capacity_cache(self):
+        '''Query judge capacity data and cache it.'''
         if self.judge_capacity_cache is None:
             self.judge_capacity_cache = JudgeRoundCommitment.objects.filter(
                 judging_round=self.judging_round).values(
@@ -177,6 +190,8 @@ class OptionAnalysis(object):
                            option,
                            criterion_helper):
         self.populate_judge_capacity_cache()
+        '''Returns remaining capacity for a given option. Delegates work to
+        CriterionHelper'''
         return criterion_helper.remaining_capacity(assignment_counts,
                                                    option_spec,
                                                    option,

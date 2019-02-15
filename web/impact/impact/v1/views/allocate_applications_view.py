@@ -37,6 +37,7 @@ ASSIGNMENT_DISCOUNT = 0.85
 
 
 class AllocateApplicationsView(ImpactView):
+    '''Endpoint for allocation of applications to a judge.'''
     permission_classes = (
         AllocateApplicationsPermissions,
     )
