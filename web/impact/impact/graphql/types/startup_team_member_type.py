@@ -26,7 +26,7 @@ class StartupTeamMemberType(DjangoObjectType):
         ids = _startup_team_members({"user": self.user}).values_list(
             'startup', flat=True).distinct()
         startups = Startup.objects.filter(id__in=ids)
-        return [startup for startup in startups]
+        return startups
 
     def resolve_profile(self, info, **kwargs):
         return [EntrepreneurProfile.objects.filter(user=self.user).first()]
