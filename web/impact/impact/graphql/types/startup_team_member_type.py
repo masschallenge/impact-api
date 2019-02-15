@@ -13,7 +13,7 @@ from impact.graphql.types.entrepreneur_profile_type import (
 
 class StartupTeamMemberType(DjangoObjectType):
     startups = graphene.List(StartupType)
-    profile = graphene.List(EntrepreneurProfileType)
+    profile = graphene.Field(EntrepreneurProfileType)
 
     class Meta:
         model = StartupTeamMember
@@ -29,7 +29,7 @@ class StartupTeamMemberType(DjangoObjectType):
         return startups
 
     def resolve_profile(self, info, **kwargs):
-        return [EntrepreneurProfile.objects.filter(user=self.user).first()]
+        return EntrepreneurProfile.objects.filter(user=self.user).first()
 
 
 def _startup_team_members(filters):

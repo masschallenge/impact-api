@@ -158,7 +158,7 @@ class TestGraphQL(APITestCase):
 
             self.assertEqual(ent_profile["title"], member.title)
 
-            profile_response = ent_profile["profile"][0]
+            profile_response = ent_profile["profile"]
             self.assertEqual(
                 profile_response["imageUrl"],
                 profile.image.url if profile.image else "")

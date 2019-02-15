@@ -23,27 +23,19 @@ class Query(graphene.ObjectType):
 
     def resolve_expert_profile(self, info, **kwargs):
         user_id = kwargs.get('id')
+        expert = ExpertProfile.objects.filter(user_id=user_id).first()
 
-        if user_id is not None:
-            expert = ExpertProfile.objects.filter(user_id=user_id).first()
+        if not expert:
+            return GraphQLError(EXPERT_NOT_FOUND_MESSAGE)
 
-            if not expert:
-                return GraphQLError(EXPERT_NOT_FOUND_MESSAGE)
-
-            return expert
-
-        return GraphQLError("Ensure url specifies an expert id")
+        return expert
 
     def resolve_entrepreneur_profile(self, info, **kwargs):
         team_member_id = kwargs.get('id')
+        team_member = StartupTeamMember.objects.filter(
+            id=team_member_id).first()
 
-        if team_member_id is not None:
-            team_member = StartupTeamMember.objects.filter(
-                id=team_member_id).first()
+        if not team_member:
+            return GraphQLError(TEAM_MEMBER_NOT_FOUND_MESSAGE)
 
-            if not team_member:
-                return GraphQLError(TEAM_MEMBER_NOT_FOUND_MESSAGE)
-
-            return team_member
-
-        return GraphQLError("Ensure url specifies a team member id")
+        return team_member
