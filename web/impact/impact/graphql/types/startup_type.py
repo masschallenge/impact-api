@@ -36,7 +36,7 @@ class StartupType(DjangoObjectType):
         status = StartupStatus.objects.filter(
             startup=self,
             program_startup_status__startup_list_tab_id='finalists'
-        ).order_by('-created_date').first()
+        ).order_by('-created_at').first()
 
         if status:
             return [status.program_startup_status.program]
