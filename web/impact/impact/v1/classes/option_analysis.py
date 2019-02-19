@@ -73,9 +73,11 @@ class OptionAnalysis(object):
         self.application_criteria_read_state_cache = {}
 
     def analyses(self, option_spec):
+
         '''Iterate over criterion options for judging round and produce an
         analysis for each.
         '''
+        
         criterion_helper = self.criterion_helpers.get(option_spec.criterion_id)
         spec_helper = CriterionOptionSpecHelper(
             option_spec, self.criterion_helpers)
