@@ -27,7 +27,8 @@ CRITERION_OPTION_SPEC_FIELDS = {
 
 class CriterionOptionSpecHelper(ModelHelper):
     '''Encapsulates business logic for CriterionOptionSpecs, including logic
-    around allocation, analysis, and cloning.'''
+    around allocation, analysis, and cloning.
+    '''
     model = CriterionOptionSpec
     VALIDATORS = {
         "option": validate_string,
