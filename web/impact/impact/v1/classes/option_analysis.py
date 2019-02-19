@@ -44,7 +44,8 @@ class OptionAnalysis(object):
     '''Orchestration class for judging round analysis. Responsible
     for fetching needed fields from CriterionHelpers, querying db
     for needed data. Delegates criterion-specific logic to CriterionHelpers
-    whenever possible.'''
+    whenever possible.
+    '''
     _judge_to_count = None
 
     def __init__(self,
@@ -72,8 +73,11 @@ class OptionAnalysis(object):
         self.application_criteria_read_state_cache = {}
 
     def analyses(self, option_spec):
-        '''Iterate over criterion options for judging round and produce and
-        analysis for each.'''
+        '''Iterate over criterion options for judging round and produce an
+        analysis for each.
+        Analysis includes judge capacity and application need for this
+        criterion. 
+        '''
         criterion_helper = self.criterion_helpers.get(option_spec.criterion_id)
         spec_helper = CriterionOptionSpecHelper(
             option_spec, self.criterion_helpers)
@@ -189,9 +193,11 @@ class OptionAnalysis(object):
                            option_spec,
                            option,
                            criterion_helper):
-        self.populate_judge_capacity_cache()
         '''Returns remaining capacity for a given option. Delegates work to
-        CriterionHelper'''
+        CriterionHelper
+        '''
+        
+        self.populate_judge_capacity_cache()
         return criterion_helper.remaining_capacity(assignment_counts,
                                                    option_spec,
                                                    option,

@@ -7,7 +7,7 @@ from impact.v1.helpers.criterion_helper import CriterionHelper
 class MatchingCriterionHelper(CriterionHelper):
     '''Helper for MatchingCriteria. MatchingCriteria specify a parameter on
     which judges and applications should match, for example "All applications
-    should be read by at least one judge in the startup's industry"
+    should be read by at least one judge in the startup's industry".
     Each MatchingCriterion requires exactly one CriterionOptionSpec. The 
     `option` field on that spec is ignored, since we are looking for a match
     between two objects, not a specific option. 

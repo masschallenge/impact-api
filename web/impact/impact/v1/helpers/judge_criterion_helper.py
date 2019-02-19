@@ -7,7 +7,7 @@ from impact.v1.helpers.criterion_helper import CriterionHelper
 class JudgeCriterionHelper(CriterionHelper):
     '''Helper for JudgeCriteria. JudgeCriteria specify a feature which 
     all applications are "looking for", for example "All startups should be
-    read by at least one female judge"
+    read by at least one female judge".
     JudgeCriteria require one CriterionOptionSpec for each feature sought, for
     example, "one female judge and one male judge" would require two 
     OptionSpecs. Weight and count can be set independently for each option.
