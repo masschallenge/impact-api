@@ -197,7 +197,7 @@ class TestGraphQL(APITestCase):
                 program_resp["family"], str(program.program_family.name))
             self.assertEqual(
                 program_resp["year"],
-                str(program.start_date.year) if program.start_date else '')
+                str(program.start_date.year) if program.start_date else None)
 
     def test_office_url_field_returns_correct_value(self):
         program = ProgramFactory()

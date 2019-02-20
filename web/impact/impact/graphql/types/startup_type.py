@@ -29,16 +29,11 @@ class StartupType(DjangoObjectType):
         if self.high_resolution_logo:
             return self.high_resolution_logo.url
 
-        return None
-
     def resolve_program(self, info, **kwargs):
-
         status = StartupStatus.objects.filter(
             startup=self,
             program_startup_status__startup_list_tab_id='finalists'
         ).order_by('-created_at').first()
-
         if status:
             return [status.program_startup_status.program]
-
         return []

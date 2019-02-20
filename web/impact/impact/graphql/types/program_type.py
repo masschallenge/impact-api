@@ -19,7 +19,5 @@ class ProgramType(DjangoObjectType):
         if self.start_date:
             return self.start_date.year
 
-        return ''
-
     def resolve_family(self, info, **kwargs):
         return self.program_family.name
