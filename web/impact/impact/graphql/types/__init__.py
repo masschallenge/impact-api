@@ -15,3 +15,9 @@ from impact.graphql.types.startup_mentor_relationship_type import (
     StartupMentorRelationshipType
 )
 from impact.graphql.types.expert_profile_type import ExpertProfileType
+from impact.graphql.types.entrepreneur_startup_type import (
+    EntrepreneurStartupType
+)
+from impact.graphql.types.expert_startup_type import (
+    ExpertStartupType
+)

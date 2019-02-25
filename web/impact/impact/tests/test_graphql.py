@@ -28,13 +28,17 @@ from impact.graphql.query import (
 from accelerator.tests.contexts import StartupTeamMemberContext
 
 MENTEE_FIELDS = """
-    startupId
-    startupName
-    startupHighResolutionLogo
-    startupShortPitch
-    programLocation
-    programYear
     programStatus
+    startup {
+        id
+        name
+        highResolutionLogo
+        shortPitch
+        program {
+            family
+            year
+        }
+    }
 """
 
 
@@ -192,7 +196,7 @@ class TestGraphQL(APITestCase):
                 startup.high_resolution_logo.url
                 if startup.high_resolution_logo else None)
 
-            program_resp = startup_response["program"][0]
+            program_resp = startup_response["program"]
             self.assertEqual(
                 program_resp["family"], str(program.program_family.name))
             self.assertEqual(
@@ -264,23 +268,27 @@ class TestGraphQL(APITestCase):
             """.format(id=relationship.mentor.id,
                        MENTEE_FIELDS=MENTEE_FIELDS)
             response = self.client.post(self.url, data={'query': query})
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
+            self.assertEqual(
+                json.loads(response.content.decode("utf-8")),
                 {
                     'data': {
                         'expertProfile': {
                             'currentMentees': [{
-                                'startupId': str(startup.id),
-                                'startupName': startup.name,
-                                'startupHighResolutionLogo':
-                                    (startup.high_resolution_logo and
-                                     startup.high_resolution_logo.url or
-                                     ''),
-                                'startupShortPitch': startup.short_pitch,
-                                'programLocation':
-                                    program.program_family.name,
-                                'programYear': str(program.start_date.year),
-                                'programStatus': program.program_status
+                                'programStatus': program.program_status,
+                                'startup': {
+                                    'id': str(startup.id),
+                                    'name': startup.name,
+                                    'highResolutionLogo':
+                                        (startup.high_resolution_logo and
+                                            startup.high_resolution_logo.url or
+                                            None),
+                                    'shortPitch': startup.short_pitch,
+                                    'program': {
+                                        'family':
+                                            program.program_family.name,
+                                        'year': str(program.start_date.year),
+                                    },
+                                }
                             }],
                             'previousMentees': []
                         }

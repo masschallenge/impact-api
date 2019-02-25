@@ -3,8 +3,8 @@ from graphene_django import DjangoObjectType
 
 from accelerator.models import StartupTeamMember, Startup, EntrepreneurProfile
 
-from impact.graphql.types import (
-    StartupType,
+from impact.graphql.types.entrepreneur_startup_type import (
+    EntrepreneurStartupType,
 )
 from impact.graphql.types.entrepreneur_profile_type import (
     EntrepreneurProfileType
@@ -12,7 +12,7 @@ from impact.graphql.types.entrepreneur_profile_type import (
 
 
 class StartupTeamMemberType(DjangoObjectType):
-    startups = graphene.List(StartupType)
+    startups = graphene.List(EntrepreneurStartupType)
     profile = graphene.Field(EntrepreneurProfileType)
 
     class Meta:

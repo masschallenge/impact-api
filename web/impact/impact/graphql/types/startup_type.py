@@ -3,7 +3,6 @@ from graphene_django import DjangoObjectType
 
 from accelerator.models import (
     Startup,
-    StartupStatus,
 )
 from impact.graphql.types import (
     ProgramType
@@ -13,7 +12,7 @@ from impact.graphql.types import (
 class StartupType(DjangoObjectType):
     name = graphene.String()
     high_resolution_logo = graphene.String()
-    program = graphene.List(ProgramType)
+    program = graphene.Field(ProgramType)
 
     class Meta:
         model = Startup
@@ -28,12 +27,3 @@ class StartupType(DjangoObjectType):
     def resolve_high_resolution_logo(self, info, **kwargs):
         if self.high_resolution_logo:
             return self.high_resolution_logo.url
-
-    def resolve_program(self, info, **kwargs):
-        status = StartupStatus.objects.filter(
-            startup=self,
-            program_startup_status__startup_list_tab_id='finalists'
-        ).order_by('-created_at').first()
-        if status:
-            return [status.program_startup_status.program]
-        return []
