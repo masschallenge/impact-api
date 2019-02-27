@@ -117,6 +117,12 @@ urls = [
     url(r'^allocator/(?:.*)$', TemplateView.as_view(
         template_name='directory.html'),
         name="allocator"),
+    url(r'^people/$', TemplateView.as_view(
+        template_name='directory.html'),
+        name="entreprenuer_profile"),
+    url(r'^people/(.*)/$', TemplateView.as_view(
+        template_name='directory.html'),
+        name="entreprenuer_profile"),
     url(r'^openid/', include('oidc_provider.urls', namespace='oidc_provider')),
     url(r'^$', IndexView.as_view()),
 ]

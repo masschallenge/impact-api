@@ -12,14 +12,7 @@ from accelerator_abstract.models import (
     ACTIVE_PROGRAM_STATUS,
     ENDED_PROGRAM_STATUS,
 )
-from impact.graphql.types.industry_type import IndustryType  # noqa: F401
-from impact.graphql.types.startup_mentor_relationship_type import (
-    StartupMentorRelationshipType,
-)
-from impact.graphql.types.program_family_type import ProgramFamilyType  # noqa: F401, E501
-from impact.graphql.types.user_type import UserType  # noqa: F401
-from impact.graphql.types.functional_expertise_type import FunctionalExpertiseType  # noqa: F401, E501
-from impact.graphql.types.interest_category_type import InterestCategoryType  # noqa: F401, E501
+from impact.graphql.types import StartupMentorRelationshipType
 from django.db.models import Q
 
 from impact.utils import compose_filter
