@@ -106,7 +106,7 @@ class OptionAnalysis(object):
         return result
 
     def calc_needs(self, option_name, spec_helper):
-        '''Parse needs distribution for a particular option'''
+        '''Return a dict describing needs distribution for specified option'''
         option_spec = spec_helper.subject
         needs_dist = self.calc_needs_distribution(option_name, spec_helper)
         read_count = option_spec.count
