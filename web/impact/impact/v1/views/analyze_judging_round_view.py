@@ -44,6 +44,10 @@ ANALYZE_JUDGING_ROUND_FIELDS = {
 
 
 class AnalyzeJudgingRoundView(ImpactView):
+    '''Endpoint for judging round analysis. Analysis logic is delegated to
+    OptionAnalysis (and thence to CriterionHelpers)
+    '''
+    
     view_name = "analyze_judging_round"
     model = JudgingRound
     permission_classes = ()
