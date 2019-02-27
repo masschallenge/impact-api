@@ -73,11 +73,9 @@ class OptionAnalysis(object):
         self.application_criteria_read_state_cache = {}
 
     def analyses(self, option_spec):
-
         '''Iterate over criterion options for judging round and produce an
         analysis for each.
         '''
-        
         criterion_helper = self.criterion_helpers.get(option_spec.criterion_id)
         spec_helper = CriterionOptionSpecHelper(
             option_spec, self.criterion_helpers)
@@ -89,7 +87,7 @@ class OptionAnalysis(object):
     def analysis(self, option_name, helper, spec_helper):
         '''Produce an analysis for a particular option.
         Analysis includes judge capacity and application need for this
-        criterion. 
+        criterion.
         '''
         option_spec = spec_helper.subject
         result = {
@@ -199,7 +197,6 @@ class OptionAnalysis(object):
         '''Returns remaining capacity for a given option. Delegates work to
         CriterionHelper
         '''
-        
         self.populate_judge_capacity_cache()
         return criterion_helper.remaining_capacity(assignment_counts,
                                                    option_spec,
