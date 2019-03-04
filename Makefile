@@ -278,19 +278,20 @@ stop-frontend:
 		kill $(process-exists); \
 	fi;
 
+
 # Server and Virtual Machine related targets
 debug ?= 1
 
 run-server: run-server-$(debug)
 
-run-server-0: .env initial-db-setup watch-frontend kill-exited-containers ensure-mysql
+run-server-0: .env initial-db-setup watch-frontend ensure-mysql
 	@docker-compose up
 
-run-detached-server: .env initial-db-setup watch-frontend ensure-mysql kill-exited-containers
+run-detached-server: .env initial-db-setup watch-frontend ensure-mysql
 	@docker-compose up -d
 	@docker-compose run --rm web /usr/bin/mysqlwait.sh
 
-run-server-1: run-detached-server watch-frontend ensure-mysql kill-exited-containers
+run-server-1: run-detached-server watch-frontend ensure-mysql
 	@docker-compose exec web /bin/bash /usr/bin/start-nodaemon.sh
 
 dev: run-server-0
@@ -341,13 +342,13 @@ build-all: build
 
 # Interactive shell Targets
 
-bash-shell: .env kill-exited-containers ensure-mysql
+bash-shell: .env ensure-mysql
 	@docker-compose exec web /bin/bash || docker-compose run --rm web /bin/bash
 
-db-shell: .env kill-exited-containers ensure-mysql
+db-shell: .env ensure-mysql
 	@docker-compose run --rm web ./manage.py dbshell
 
-django-shell: .env kill-exited-containers ensure-mysql
+django-shell: .env ensure-mysql
 	@docker-compose run --rm web ./manage.py shell
 
 
@@ -358,7 +359,7 @@ s3_key = $(db_name).sql.gz
 gz_file ?= $(DB_CACHE_DIR)$(s3_key)
 intermediary_file = /tmp/sql_dump.sql
 
-load-db: $(DB_CACHE_DIR) $(gz_file) .env kill-exited-containers ensure-mysql
+load-db: $(DB_CACHE_DIR) $(gz_file) .env ensure-mysql
 	@echo "Loading $(gz_file)"
 	@echo "This will take a while, don't be alarmed if your console appears frozen."
 	@echo "drop database mc_dev; create database mc_dev; use mc_dev;" > $(intermediary_file)
@@ -378,7 +379,7 @@ ${DB_CACHE_DIR}:
 clean-db-cache:
 	@rm -f $(gz_file)
 
-load-remote-db: clean-db-cache ensure-mysql
+load-remote-db: clean-db-cache
 	$(MAKE) load-db gz_file=$(gz_file)
 
 mysql-container: run-detached-server
