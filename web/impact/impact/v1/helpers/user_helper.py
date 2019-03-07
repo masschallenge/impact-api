@@ -75,6 +75,7 @@ USER_FIELDS = {
     "linked_in_url": OPTIONAL_URL_FIELD,
     "personal_website_url": PERSONAL_WEBSITE_URL_FIELD,
     "functional_expertise": MPTT_ARRAY_FIELD,
+    "program_families": MPTT_ARRAY_FIELD,
 }
 
 
