@@ -21,19 +21,27 @@ from impact.v1.helpers.model_helper import (
     OPTIONAL_INTEGER_FIELD,
     OPTIONAL_STRING_FIELD,
     OPTIONAL_URL_FIELD,
+    PHONE_FIELD,
+    PHONE_REGEX,
     PK_FIELD,
     REQUIRED_STRING_FIELD,
+    TWITTER_REGEX,
     json_array,
     json_list_wrapper,
     json_object,
     json_simple_list,
+    merge_fields,
+    serialize_list_field,
+    ModelHelper,
 )
 from impact.v1.helpers.validators import (
     INVALID_INTEGER_ERROR,
+    INVALID_URL_ERROR,
     validate_boolean,
     validate_choices,
     validate_regex,
     validate_string,
+    validate_url,
 )
 from impact.v1.helpers.organization_helper import (
     COULD_BE_STARTUP_CHECK,
@@ -41,6 +49,10 @@ from impact.v1.helpers.organization_helper import (
     ORGANIZATION_FIELDS,
     ORGANIZATION_USER_FIELDS,
     OrganizationHelper,
+)
+from impact.v1.helpers.program_family_helper import (
+    PROGRAM_FAMILY_FIELDS,
+    ProgramFamilyHelper,
 )
 from impact.v1.helpers.profile_helper import (
     COULD_BE_EXPERT_CHECK,
@@ -68,10 +80,6 @@ from impact.v1.helpers.program_helper import (
 from impact.v1.helpers.program_cycle_helper import (
     PROGRAM_CYCLE_FIELDS,
     ProgramCycleHelper,
-)
-from impact.v1.helpers.program_family_helper import (
-    PROGRAM_FAMILY_FIELDS,
-    ProgramFamilyHelper,
 )
 from impact.v1.helpers.credit_code_helper import (
     CREDIT_CODE_FIELDS,
