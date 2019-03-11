@@ -213,6 +213,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
     def test_get_when_no_applications_for_round(self):
         context = AnalyzeJudgingContext(add_application=False)
         judging_round_id = context.criterion.judging_round.id
+        program_family = context.program.program_family
         email = self.global_operations_manager(program_family).email
         with self.login(email=email):
             url = reverse(AnalyzeJudgingRoundView.view_name,
