@@ -15,13 +15,10 @@ from accelerator.models import (
     ProgramFamily,
 )
 
-from impact.v1.helpers.functional_expertise_helper import (
-    FunctionalExpertiseHelper,
-)
-from impact.v1.helpers.industry_helper import IndustryHelper
-from impact.v1.helpers.model_helper import (
+from impact.v1.helpers import (
     BOOLEAN_FIELD,
-    ModelHelper,
+    INVALID_URL_ERROR,
+    MPTT_TYPE,
     PHONE_FIELD,
     PHONE_REGEX,
     OPTIONAL_STRING_FIELD,
@@ -29,16 +26,16 @@ from impact.v1.helpers.model_helper import (
     json_array,
     merge_fields,
     serialize_list_field,
-)
-from impact.v1.helpers.validators import (
-    INVALID_URL_ERROR,
     validate_boolean,
     validate_choices,
     validate_regex,
     validate_string,
     validate_url,
+    FunctionalExpertiseHelper,
+    IndustryHelper,
+    ModelHelper,
+    ProgramFamilyHelper,
 )
-from impact.v1.helpers.mptt_model_helper import MPTT_TYPE
 
 COULD_BE_EXPERT_CHECK = "could_be_expert"
 COULD_BE_NON_MEMBER_CHECK = "could_be_non_member"
@@ -414,6 +411,12 @@ class ProfileHelper(ModelHelper):
         return serialize_list_field(self.subject,
                                     "functional_expertise",
                                     FunctionalExpertiseHelper)
+
+    @property
+    def program_families(self):
+        return serialize_list_field(self.subject,
+                                    "program_families",
+                                    ProgramFamilyHelper)
 
     @property
     def expert_category(self):

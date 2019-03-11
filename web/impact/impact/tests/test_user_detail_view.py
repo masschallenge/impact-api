@@ -166,6 +166,32 @@ class TestUserDetailView(APITestCase):
             assert all([expertise.id in functional_expertise_ids
                         for expertise in functional_expertise])
 
+    def test_get_expert_with_program_family_interests(self):
+        program_families = ProgramFamilyFactory.create_batch(2)
+        context = UserContext(user_type=EXPERT_USER_TYPE,
+                              program_families=program_families)
+        user = context.user
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserDetailView.view_name, args=[user.id])
+            response = self.client.get(url)
+            program_family_ids = [
+                datum["id"] for datum in response.data["program_families"]]
+            assert all([program_family.id in program_family_ids
+                        for program_family in program_families])
+
+    def test_get_entrepreneur_with_program_family_interests(self):
+        program_families = ProgramFamilyFactory.create_batch(2)
+        context = UserContext(user_type=ENTREPRENEUR_USER_TYPE,
+                              program_families=program_families)
+        user = context.user
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserDetailView.view_name, args=[user.id])
+            response = self.client.get(url)
+            program_family_ids = [
+                datum["id"] for datum in response.data["program_families"]]
+            assert all([program_family.id in program_family_ids
+                        for program_family in program_families])
+
     def test_get_with_no_profile(self):
         context = UserContext(user_type=ENTREPRENEUR_USER_TYPE)
         user = context.user
