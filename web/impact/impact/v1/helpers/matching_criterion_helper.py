@@ -27,8 +27,10 @@ class MatchingCriterionHelper(CriterionHelper):
         return self._target_counts
 
     def _check_cache(self, apps):
-        if not self._app_ids_to_targets:
+        if not self._app_ids_to_targets and apps.count() > 0:
             self.calc_app_ids_to_targets(apps)
+        else:
+            self._app_ids_to_targets = {}
 
     def judge_matches_option(self, judge_data, option):
         return option == judge_data.get(self.judge_field)

@@ -73,8 +73,11 @@ class MatchingProgramCriterionHelper(MatchingCriterionHelper):
         return {"program": F(self.judge_field)}
 
     def analysis_tally(self, app_id, db_value, cache, **kwargs):
-        if not self._app_ids_to_pf_name:
-            self.calc_app_ids_to_targets(kwargs["apps"])
+        apps = kwargs.get("apps")
+        if not self._app_ids_to_pf_name and apps.count() > 0:
+            self.calc_app_ids_to_targets(apps)
+        else:
+            self._app_ids_to_targets = {}
 
         program_family = self._app_ids_to_pf_name.get(app_id)
         judge_program = db_value["program"]
