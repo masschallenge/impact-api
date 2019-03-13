@@ -228,7 +228,6 @@ DIRECTORY = ../directory
 SEMANTIC = ../semantic-ui-theme
 REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(DIRECTORY) $(SEMANTIC) $(IMPACT_API) 
 
-
 # Database migration related targets
 
 data-migration migrations: .env
@@ -279,19 +278,20 @@ stop-frontend:
 		kill $(process-exists); \
 	fi;
 
+
 # Server and Virtual Machine related targets
 debug ?= 1
 
-run-server: run-server-$(debug) watch-frontend
+run-server: run-server-$(debug)
 
-run-server-0: .env initial-db-setup watch-frontend
+run-server-0: .env initial-db-setup watch-frontend ensure-mysql
 	@docker-compose up
 
-run-detached-server: .env initial-db-setup watch-frontend
+run-detached-server: .env initial-db-setup watch-frontend ensure-mysql
 	@docker-compose up -d
 	@docker-compose run --rm web /usr/bin/mysqlwait.sh
 
-run-server-1: run-detached-server watch-frontend
+run-server-1: run-detached-server watch-frontend ensure-mysql
 	@docker-compose exec web /bin/bash /usr/bin/start-nodaemon.sh
 
 dev: run-server-0
@@ -307,11 +307,9 @@ initial-db-setup:
 
 stop-server: .env stop-frontend
 	@docker-compose stop
-	-@killall -9 docker-compose || true
 
 shutdown-vms: .env stop-frontend
 	@docker-compose down
-	@rm -rf ./mysql/data
 	@rm -rf ./redis
 
 REMOVE_IMAGES = no
@@ -344,13 +342,13 @@ build-all: build
 
 # Interactive shell Targets
 
-bash-shell: .env
+bash-shell: .env ensure-mysql
 	@docker-compose exec web /bin/bash || docker-compose run --rm web /bin/bash
 
-db-shell: .env
+db-shell: .env ensure-mysql
 	@docker-compose run --rm web ./manage.py dbshell
 
-django-shell: .env
+django-shell: .env ensure-mysql
 	@docker-compose run --rm web ./manage.py shell
 
 
@@ -361,7 +359,7 @@ s3_key = $(db_name).sql.gz
 gz_file ?= $(DB_CACHE_DIR)$(s3_key)
 intermediary_file = /tmp/sql_dump.sql
 
-load-db: $(DB_CACHE_DIR) $(gz_file) .env
+load-db: $(DB_CACHE_DIR) $(gz_file) .env ensure-mysql
 	@echo "Loading $(gz_file)"
 	@echo "This will take a while, don't be alarmed if your console appears frozen."
 	@echo "drop database mc_dev; create database mc_dev; use mc_dev;" > $(intermediary_file)
@@ -492,5 +490,16 @@ comp-messages: .env
 messages: .env
 	@docker-compose exec web python manage.py makemessages -a
 
-lint: .env
+lint: .env ensure-mysql
 	@docker-compose run --rm web pylint impact
+
+ensure-mysql: kill-exited-containers
+	@$(ACCELERATE_MAKE) ensure-mysql
+
+kill-exited-containers: containers-to-kill=$(shell docker ps -a -q --filter status=exited --filter name=impact)
+kill-exited-containers:
+	-@if [ -n "$(containers-to-kill)" ]; then \
+		echo "Removing unused impact docker containers..."; \
+		docker rm -f $(containers-to-kill); \
+		echo "Done removing containers."; \
+	fi;
