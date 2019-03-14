@@ -210,6 +210,19 @@ class TestAnalyzeJudgingRoundView(APITestCase):
                     assert commitment.capacity - 1 == result[
                         'remaining_capacity']
 
+    def test_get_when_no_applications_for_round(self):
+        context = AnalyzeJudgingContext(add_application=False)
+        judging_round_id = context.criterion.judging_round.id
+        program_family = context.program.program_family
+        email = self.global_operations_manager(program_family).email
+        with self.login(email=email):
+            url = reverse(AnalyzeJudgingRoundView.view_name,
+                          args=[judging_round_id])
+            response = self.client.get(url)
+            results = response.data["results"]
+            for result in results:
+                assert result["needy_apps"] == 0    
+
 
 def _industry_options(context):
     return [app.startup.primary_industry.name
