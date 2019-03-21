@@ -63,4 +63,3 @@ from impact.v1.views.user_detail_view import UserDetailView
 from impact.v1.views.user_history_view import UserHistoryView
 from impact.v1.views.user_list_view import UserListView
 from impact.v1.views.user_organizations_view import UserOrganizationsView
-from accelerator.side_nav_tree_utils import MC_SIDE_NAV_TREE_ALIAS
