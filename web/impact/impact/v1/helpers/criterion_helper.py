@@ -64,8 +64,11 @@ class CriterionHelper(ModelHelper):
             self.app_count_cache = apps.count()
         return self.app_count_cache
 
-    def remaining_capacity(
-       self, assignment_counts, option_spec, option, judge_to_capacity_cache):
+    def remaining_capacity(self,
+                           assignment_counts,
+                           option_spec,
+                           option,
+                           judge_to_capacity_cache):
         result = 0
 
         for judge in judge_to_capacity_cache:
