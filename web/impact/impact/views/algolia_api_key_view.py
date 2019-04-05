@@ -31,6 +31,7 @@ from impact.permissions import DirectoryAccessPermissions
 
 IS_CONFIRMED_MENTOR_FILTER = "is_confirmed_mentor:true"
 CONFIRMED_MENTOR_IN_PROGRAM_FILTER = 'confirmed_mentor_programs:"{program}"'
+IS_TEAM_MEMBER_FILTER = 'is_team_member:true'
 
 
 class AlgoliaApiKeyView(APIView):
@@ -69,33 +70,38 @@ def _get_search_key(request):
 
 def _get_filters(request):
 
+    if request.GET['index'] == 'people':
+        return IS_TEAM_MEMBER_FILTER
+
     # an empty filter i.e. [], means the user sees all mentors
     if is_employee(request.user):
         return []
-    participant_roles = [UserRole.AIR, UserRole.STAFF, UserRole.MENTOR]
 
-    participant_roles = _entrepreneur_specific_alumni_filter(
-        participant_roles, request)
+    if request.GET['index'] == 'mentor':
+        participant_roles = [UserRole.AIR, UserRole.STAFF, UserRole.MENTOR]
 
-    participant_roles = _entrepreneur_specific_finalist_filter(
-        participant_roles, request)
+        participant_roles = _entrepreneur_specific_alumni_filter(
+            participant_roles, request)
 
-    user_program_roles_as_participant = ProgramRole.objects.filter(
-        programrolegrant__person=request.user,
-        user_role__name__in=participant_roles
-    )
+        participant_roles = _entrepreneur_specific_finalist_filter(
+            participant_roles, request)
 
-    program_groups = Program.objects.filter(
-        programrole__in=user_program_roles_as_participant).values_list(
-        'mentor_program_group', flat=True).distinct()
-    program_families = ProgramFamily.objects.filter(
-        programs__mentor_program_group__in=program_groups).prefetch_related(
-        'programs').distinct()
-    facet_filters = _facet_filters(program_families)
-    if len(facet_filters) > 0:
-        return " OR ".join(facet_filters)
-    else:
-        return IS_CONFIRMED_MENTOR_FILTER
+        user_program_roles_as_participant = ProgramRole.objects.filter(
+            programrolegrant__person=request.user,
+            user_role__name__in=participant_roles
+        )
+
+        program_groups = Program.objects.filter(
+            programrole__in=user_program_roles_as_participant).values_list(
+            'mentor_program_group', flat=True).distinct()
+        program_families = ProgramFamily.objects.filter(
+            programs__mentor_program_group__in=program_groups).prefetch_related(
+            'programs').distinct()
+        facet_filters = _facet_filters(program_families)
+        if len(facet_filters) > 0:
+            return " OR ".join(facet_filters)
+        else:
+            return IS_CONFIRMED_MENTOR_FILTER
 
 
 def _entrepreneur_specific_finalist_filter(roles, request):
