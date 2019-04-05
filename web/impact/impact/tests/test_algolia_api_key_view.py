@@ -57,7 +57,7 @@ def _create_batch_program_and_named_group(status, batch_size):
 class TestAlgoliaApiKeyView(APITestCase):
     client_class = APIClient
     user_factory = UserFactory
-    url = reverse(AlgoliaApiKeyView.view_name)
+    url = "{}?index=mentor".format(reverse(AlgoliaApiKeyView.view_name))
 
     def test_logged_in_user_with_role_grants_in_ended_programs_gets_403(self):
         program = _create_batch_program_and_named_group(
