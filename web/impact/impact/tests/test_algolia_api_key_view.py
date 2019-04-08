@@ -19,13 +19,11 @@ from accelerator.tests.factories import (
 from accelerator_abstract.models import (
     ACTIVE_PROGRAM_STATUS,
     UPCOMING_PROGRAM_STATUS,
-    ENDED_PROGRAM_STATUS,
-    ENTREPRENEUR_USER_TYPE
+    ENDED_PROGRAM_STATUS
 )
 from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import UserFactory
 from impact.views import AlgoliaApiKeyView
-from impact.views.algolia_api_key_view import IS_CONFIRMED_MENTOR_FILTER
 
 User = get_user_model()  # pylint: disable=invalid-name
 
