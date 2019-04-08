@@ -19,19 +19,18 @@ from accelerator.models import (
 from accelerator_abstract.models import (
     ACTIVE_PROGRAM_STATUS,
     ENDED_PROGRAM_STATUS,
-    ENTREPRENEUR_USER_TYPE,
 )
 
 from accelerator_abstract.models.base_user_utils import (
     is_entrepreneur,
-    is_employee,   
+    is_employee,
 )
 
 from impact.permissions import DirectoryAccessPermissions
 
 IS_CONFIRMED_MENTOR_FILTER = "is_confirmed_mentor:true"
 CONFIRMED_MENTOR_IN_PROGRAM_FILTER = 'confirmed_mentor_programs:"{program}"'
-IS_TEAM_MEMBER_FILTER = 'is_team_member:true'
+IS_TEAM_MEMBER_FILTER = 'is_team_member:true AND has_a_finalist_role:true'
 
 
 class AlgoliaApiKeyView(APIView):
@@ -92,11 +91,12 @@ def _get_filters(request):
         )
 
         program_groups = Program.objects.filter(
-            programrole__in=user_program_roles_as_participant).values_list(
+            programrole__in=user_program_roles_as_participant
+        ).values_list(
             'mentor_program_group', flat=True).distinct()
         program_families = ProgramFamily.objects.filter(
-            programs__mentor_program_group__in=program_groups).prefetch_related(
-            'programs').distinct()
+            programs__mentor_program_group__in=program_groups
+        ).prefetch_related('programs').distinct()
         facet_filters = _facet_filters(program_families)
         if len(facet_filters) > 0:
             return " OR ".join(facet_filters)
