@@ -5,6 +5,8 @@ import time
 
 from algoliasearch import algoliasearch
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
+
 from rest_framework import permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -24,6 +26,10 @@ from accelerator_abstract.models import (
 from accelerator_abstract.models.base_user_utils import (
     is_entrepreneur,
     is_employee,
+)
+
+from accelerator_abstract.models.base_permission_checks import (
+    base_accelerator_check
 )
 
 from impact.permissions import DirectoryAccessPermissions
@@ -70,7 +76,10 @@ def _get_search_key(request):
 def _get_filters(request):
 
     if request.GET['index'] == 'people':
-        return IS_TEAM_MEMBER_FILTER
+        if base_accelerator_check(request.user):
+            return IS_TEAM_MEMBER_FILTER
+        else:
+            raise PermissionDenied()
 
     # an empty filter i.e. [], means the user sees all mentors
     if is_employee(request.user):

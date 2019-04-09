@@ -4,6 +4,7 @@
 import simplejson as json
 from django.contrib.auth import get_user_model
 from django.urls import reverse
+
 from rest_framework.test import APIClient
 
 from accelerator.models import UserRole
@@ -24,6 +25,7 @@ from accelerator_abstract.models import (
 from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import UserFactory
 from impact.views import AlgoliaApiKeyView
+from impact.views.algolia_api_key_view import IS_TEAM_MEMBER_FILTER
 
 User = get_user_model()  # pylint: disable=invalid-name
 
@@ -55,7 +57,13 @@ def _create_batch_program_and_named_group(status, batch_size):
 class TestAlgoliaApiKeyView(APITestCase):
     client_class = APIClient
     user_factory = UserFactory
-    url = "{}?index=mentor".format(reverse(AlgoliaApiKeyView.view_name))
+    url = reverse(AlgoliaApiKeyView.view_name)
+
+    def _mentor_directory_url(self):
+        return self.url + "?index=mentor"
+
+    def _person_directory_url(self):
+        return self.url + "?index=people"
 
     def test_logged_in_user_with_role_grants_in_ended_programs_gets_403(self):
         program = _create_batch_program_and_named_group(
@@ -65,7 +73,7 @@ class TestAlgoliaApiKeyView(APITestCase):
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
             with self.login(email=user.email):
-                response = self.client.get(self.url)
+                response = self.client.get(self._mentor_directory_url())
                 self.assertTrue(response.status_code, 403)
 
     def test_logged_in_user_generates_token(self):
@@ -76,7 +84,7 @@ class TestAlgoliaApiKeyView(APITestCase):
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
             with self.login(email=user.email):
-                response = self.client.get(self.url)
+                response = self.client.get(self._mentor_directory_url())
                 response_data = json.loads(response.content)
                 self.assertTrue('token' in response_data.keys())
 
@@ -84,7 +92,7 @@ class TestAlgoliaApiKeyView(APITestCase):
         with self.settings(
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
-            response = self.client.get(self.url)
+            response = self.client.get(self._mentor_directory_url())
             response_data = json.loads(response.content)
             self.assertTrue(
                 response_data['detail'] == 'Authentication credentials '
@@ -96,7 +104,7 @@ class TestAlgoliaApiKeyView(APITestCase):
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
             with self.login(email=user.email):
-                response = self.client.get(self.url)
+                response = self.client.get(self._mentor_directory_url())
                 self.assertTrue(response.status_code, 403)
 
     def test_user_with_staff_role_grant_sees_all_mentors(self):
@@ -110,7 +118,7 @@ class TestAlgoliaApiKeyView(APITestCase):
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
             with self.login(email=user.email):
-                response = self.client.get(self.url)
+                response = self.client.get(self._mentor_directory_url())
                 response_data = json.loads(response.content)
                 self.assertEqual(response_data["filters"], [])
 
@@ -125,7 +133,7 @@ class TestAlgoliaApiKeyView(APITestCase):
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
             with self.login(email=user.email):
-                response = self.client.get(self.url)
+                response = self.client.get(self._mentor_directory_url())
                 response_data = json.loads(response.content)
 
                 for program in programs:
@@ -145,7 +153,7 @@ class TestAlgoliaApiKeyView(APITestCase):
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
             with self.login(email=user.email):
-                response = self.client.get(self.url)
+                response = self.client.get(self._mentor_directory_url())
                 response_data = json.loads(response.content)
 
                 for program in programs:
@@ -171,7 +179,7 @@ class TestAlgoliaApiKeyView(APITestCase):
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
             with self.login(email=user.email):
-                response = self.client.get(self.url)
+                response = self.client.get(self._mentor_directory_url())
                 response_data = json.loads(response.content)
 
                 for program in programs:
@@ -197,7 +205,7 @@ class TestAlgoliaApiKeyView(APITestCase):
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
             with self.login(email=user.email):
-                response = self.client.get(self.url)
+                response = self.client.get(self._mentor_directory_url())
                 response_data = json.loads(response.content)
 
                 for program in programs:
@@ -213,10 +221,26 @@ class TestAlgoliaApiKeyView(APITestCase):
                 ALGOLIA_APPLICATION_ID='test',
                 ALGOLIA_API_KEY='test'):
             with self.login(email=user.email):
-                response = self.client.get(self.url)
+                response = self.client.get(self._mentor_directory_url())
                 response_data = json.loads(response.content)
 
                 self.assertEqual(response_data["filters"], [])
+
+    def test_superuser_employee_sees_people_directory(self):
+        user = _create_expert()
+        user.is_superuser = True
+        user.save()
+
+        with self.settings(
+                ALGOLIA_APPLICATION_ID='test',
+                ALGOLIA_API_KEY='test'):
+            with self.login(email=user.email):
+                response = self.client.get(self._person_directory_url())
+                response_data = json.loads(response.content)
+
+                self.assertEqual(
+                    response_data["filters"],
+                    IS_TEAM_MEMBER_FILTER)
 
     def _create_user_with_role_grant(
             self, program, user_role_name, user=False):
