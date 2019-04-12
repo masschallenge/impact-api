@@ -1,0 +1,17 @@
+version: '2.3'
+services:
+  web:
+    image: 997386117669.dkr.ecr.us-east-1.amazonaws.com/impact-api
+    user: root
+    links:
+      - redis
+    ports:
+      - "80:80"
+      - "443:443"
+    expose:
+      - "443:443"
+      - "80:80"
+  redis:
+    image: 997386117669.dkr.ecr.us-east-1.amazonaws.com/redis
+    volumes:
+      - "redis:/var/lib/redis/data:rw"

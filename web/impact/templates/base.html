@@ -1,0 +1,89 @@
+{% extends "rest_framework/base.html" %}
+{% load staticfiles %}
+{% load rest_framework %}
+{% load i18n %}
+{% block head %}
+  {% block meta %}
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="robots" content="NONE,NOARCHIVE" />
+  {% endblock %}
+  <title>{% block title %}{% if name %}{{ name }} – {% endif %}Impact{% endblock %}</title>
+  {% block style %}
+    <link rel="stylesheet" type="text/css" href="{% static "css/dev/style.css" %}"/>
+    {% block bootstrap_theme %}
+      <link rel="stylesheet" type="text/css" href="{% static "rest_framework/css/bootstrap.min.css" %}"/>
+      <link rel="stylesheet" type="text/css" href="{% static "rest_framework/css/bootstrap-tweaks.css" %}"/>
+    {% endblock %}
+    <link rel="stylesheet" type="text/css" href="{% static "rest_framework/css/prettify.css" %}"/>
+    <link rel="stylesheet" type="text/css" href="{% static "rest_framework/css/default.css" %}"/>
+  {% endblock %}
+{% endblock %}
+{% block body %}
+  <body class="container">
+    <div class="container-fluid col-sm-6 col-sm-offset-3">
+      <div class="row-fluid">
+        <div class="well" class="branding-well">
+          <div class="row-fluid">
+            {% block branding %}
+              <h3>
+              <img
+              src="{% static 'img/logo.png' %}"
+              class="logo"
+              width="50"
+              />
+              Impact
+              </h3>
+            {% endblock %}
+            </div><!-- /row fluid -->
+            {% block content %}
+              <div id="main-content" class="row-fluid">
+                <form action="{% url 'auth_login' %}" role="form" method="post">
+                  {% csrf_token %}
+                  <input type="hidden" name="next" value="{{ next }}" />
+                  <div id="div_id_username" class="clearfix control-group {% if form.username.errors %}error{% endif %}">
+                  <div class="form-group">
+                    <label for="id_username">{% trans "Username" %}:</label>
+                    <input type="text" name="username" maxlength="100"
+                    autocapitalize="off"
+                    autocorrect="off" class="form-control textinput textInput"
+                    id="id_username" required autofocus
+                    {% if form.username.value %}value="{{ form.username.value }}"{% endif %}>
+                    {% if form.username.errors %}
+                      <p class="text-error">
+                        {{ form.username.errors|striptags }}
+                      </p>
+                    {% endif %}
+                  </div>
+                </div>
+                <div id="div_id_password" class="clearfix control-group {% if form.password.errors %}error{% endif %}">
+                <div class="form-group">
+                  <label for="id_password">{% trans "Password" %}:</label>
+                  <input type="password" name="password" maxlength="100" autocapitalize="off" autocorrect="off" class="form-control textinput textInput" id="id_password" required>
+                  {% if form.password.errors %}
+                    <p class="text-error">
+                      {{ form.password.errors|striptags }}
+                    </p>
+                  {% endif %}
+                </div>
+              </div>
+              {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}
+                  <div class="well well-small text-error" style="border: none">{{ error }}</div>
+                {% endfor %}
+              {% endif %}
+              <div class="form-actions-no-box">
+                <input type="submit" name="submit" value="{% trans "Log in" %}" class="btn btn-primary form-control" id="submit-id-submit">
+              </div>
+            </form>
+            </div><!-- /.row-fluid -->
+            <hr/>
+            <h2 class="text-center">OR</h2>
+            <hr/>
+            <a class="btn btn-primary form-control" href="https://accelerate.masschallenge.org/accounts/register/entrepreneur/" target="_blank">{% trans "Register" %}</a>
+            <p class="register-redirect">Click the button above to create an account on the Accelerate platform. Then return here and sign in using that account's username and password.</p>
+          {% endblock %}
+          </div><!--/.well-->
+          </div><!-- /.row-fluid -->
+          </div><!-- /.container-fluid -->
+        </body>
+      {% endblock %}

@@ -1,0 +1,93 @@
+#: simpleuser/models.py:53
+msgid "full name"
+msgstr ""
+
+#: simpleuser/models.py:58
+msgid "short name"
+msgstr ""
+
+#: simpleuser/models.py:62
+msgid "staff status"
+msgstr ""
+
+#: simpleuser/models.py:65
+msgid "Designates whether the user can log into the admin site."
+msgstr ""
+
+#: simpleuser/models.py:67
+msgid "active"
+msgstr ""
+
+#: simpleuser/models.py:69
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+
+#: simpleuser/models.py:71
+msgid "date joined"
+msgstr ""
+
+#: simpleuser/models.py:92
+msgid "email address"
+msgstr ""
+
+#: simpleuser/models.py:100
+msgid "user"
+msgstr ""
+
+#: simpleuser/models.py:101
+msgid "users"
+msgstr ""
+
+#: simpleuser/models.py:114
+msgid "username"
+msgstr ""
+
+#: templates/base.html:45
+msgid "Username"
+msgstr ""
+
+#: templates/base.html:60
+msgid "Password"
+msgstr ""
+
+#: templates/base.html:75
+msgid "Log in"
+msgstr ""
+
+#: templates/base.html:82
+msgid "Register"
+msgstr ""
+
+#: templates/oauth2_provider/application_form.html:8
+msgid "Edit application"
+msgstr ""
+
+#: templates/oauth2_provider/application_form.html:35
+msgid "Back"
+msgstr ""
+
+#: templates/oauth2_provider/application_form.html:37
+msgid "Save"
+msgstr ""
+
+#: templates/oauth2_provider/application_list.html:6
+msgid "Your applications"
+msgstr ""
+
+#: templates/oauth2_provider/application_list.html:16
+msgid "No applications defined"
+msgstr ""
+
+#: templates/oauth2_provider/application_list.html:16
+msgid "Register a new application"
+msgstr ""
+
+#: templates/registration/logout.html:3
+msgid "Logged out"
+msgstr ""
+
+#: templates/registration/logout.html:5
+msgid "Successfully logged out!"
+msgstr ""

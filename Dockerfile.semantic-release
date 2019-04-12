@@ -1,0 +1,13 @@
+FROM jfloff/alpine-python:2.7-slim
+RUN apk update
+RUN apk add --no-cache bash git
+RUN /entrypoint.sh \
+    -a git \
+    -p python-semantic-release==3.11.2 \
+    && echo
+RUN apk add pcre git
+RUN git config --global user.email semantic-release@masschallenge.org
+RUN mkdir /app
+WORKDIR /app
+ADD setup.cfg .
+
