@@ -26,6 +26,7 @@ class CriterionHelper(ModelHelper):
 
     application_field = "id"
     judge_field = cache_judge_field = "id"
+    cache_key = "reads"
 
     model = Criterion
 

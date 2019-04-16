@@ -1,6 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+from django.db.models import F
 from impact.v1.helpers.criterion_helper import CriterionHelper
 
 
@@ -17,9 +18,14 @@ class JudgeCriterionHelper(CriterionHelper):
         return field
 
     def judge_matches_option(self, judge_data, option):
-        return option == judge_data.get(self.judge_field)
+        return option == judge_data.get(self.cache_key)
 
     def analysis_fields(self):
         return [
             self.judge_field,
         ]
+
+    def analysis_annotate_fields(self):
+        return {
+            self.cache_key: F(self.judge_field),
+            }
