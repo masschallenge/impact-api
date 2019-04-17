@@ -161,13 +161,18 @@ class OptionAnalysis(object):
             "remaining_capacity": remaining_capacity,
         }
 
-    def populate_criterion_total_capacities_cache(self, field, option_name, cache_key):
-        '''Query total capacity data and cache it.'''
+    def populate_criterion_total_capacities_cache(self,
+                                                  field,
+                                                  option_name,
+                                                  cache_key):
+        '''Query total capacity data and cache it.
+        Use annotation to ensure that cache keys are consistent'''
         if self.criterion_total_capacities.get(option_name) is None:
             capacities = JudgeRoundCommitment.objects.annotate(
-                **{cache_key: F(field)}).filter( 
-                    judging_round=self.judging_round).values(cache_key).annotate(
-                        total=Sum("capacity"))
+                **{cache_key: F(field)}).filter(
+                    judging_round=self.judging_round).values(
+                        cache_key).annotate(
+                            total=Sum("capacity"))
             result = {cap[cache_key]: cap["total"]
                       for cap in capacities}
             self.criterion_total_capacities[option_name] = result

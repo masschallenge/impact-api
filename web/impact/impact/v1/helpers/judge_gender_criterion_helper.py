@@ -9,7 +9,7 @@ class JudgeGenderCriterionHelper(JudgeCriterionHelper):
     cache_judge_field = "expertprofile__gender"
     judge_field = "judge__" + cache_judge_field
     cache_key = cache_judge_field
-    
+
     def analysis_annotate_fields(self):
         return {
             "gender": F(self.judge_field),

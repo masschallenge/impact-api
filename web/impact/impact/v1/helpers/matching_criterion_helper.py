@@ -8,13 +8,14 @@ class MatchingCriterionHelper(CriterionHelper):
     '''Helper for MatchingCriteria. MatchingCriteria specify a parameter on
     which judges and applications should match, for example "All applications
     should be read by at least one judge in the startup's industry".
-    Each MatchingCriterion requires exactly one CriterionOptionSpec. The 
+    Each MatchingCriterion requires exactly one CriterionOptionSpec. The
     `option` field on that spec is ignored, since we are looking for a match
-    between two objects, not a specific option. 
+    between two objects, not a specific option.
     A matching criterion's weight and count cannot be set independently for
-    different "options", since there are no distinct options. 
+    different "options", since there are no distinct options.
     '''
     cache_key = ""
+    
     def __init__(self, subject):
         super().__init__(subject)
         self._app_ids_to_targets = {}

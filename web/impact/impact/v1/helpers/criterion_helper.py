@@ -21,7 +21,7 @@ class CriterionHelper(ModelHelper):
     around allocation, analysis, and cloning.
     The CriterionHelper superclass counts judges without regard to any
     features. Therefore it is a suitable class to use for the "reads"
-    criterion. 
+    criterion.
     '''
 
     application_field = "id"
