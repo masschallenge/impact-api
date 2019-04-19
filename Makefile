@@ -163,8 +163,6 @@ no_release_error_msg = RELEASE must be set.  E.g., 'make deploy RELEASE=1.2.3.4'
 
 .PHONY: $(targets) $(deprecated_targets)
 
-YELLOW=\033[0;33m
-NO_COLOR=\033[0m
 
 .env:
 	@touch .env
@@ -260,15 +258,15 @@ checkout:
 		cd $$r; \
 		git fetch 2>/dev/null; \
 		if [ $$? -ne 0 ]; then \
-			echo "$(YELLOW)Fetching the latest from the remote failed, you may not be able to checkout an existing remote branch.$(NO_COLOR)"; \
-			echo "$(YELLOW)Check your internet connection if the checkout fails.$(NO_COLOR)"; \
+			echo "Fetching the latest from the remote failed, you may not be able to checkout an existing remote branch."; \
+			echo "Check your internet connection if the checkout fails."; \
 			echo ""; \
 		fi; \
 		git branch -a | egrep $(branch) > /dev/null; \
 		if [ $$? -eq 0 ]; then \
 			git -c 'color.ui=always' checkout $(branch) > /tmp/gitoutput 2>&1; \
 		else \
-			echo "$(YELLOW)$(branch) doesn't exist, checking out $(DEFAULT_BRANCH)...$(NO_COLOR)"; \
+			echo "$(branch) doesn't exist, checking out $(DEFAULT_BRANCH)..."; \
 			git -c 'color.ui=always' checkout $(DEFAULT_BRANCH) > /tmp/gitoutput 2>&1; \
 		fi; \
 		{ cat /tmp/gitoutput & git pull; } | sed "s|^|$$r: |"; \
