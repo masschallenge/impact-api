@@ -112,16 +112,16 @@ urls = [
         include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^schema/$', schema_view, name='schema'),
     url(r'^directory/(?:.*)$', TemplateView.as_view(
-        template_name='directory.html'),
+        template_name='front-end.html'),
         name="directory"),
     url(r'^allocator/(?:.*)$', TemplateView.as_view(
-        template_name='directory.html'),
+        template_name='front-end.html'),
         name="allocator"),
     url(r'^people/$', TemplateView.as_view(
-        template_name='directory.html'),
+        template_name='front-end.html'),
         name="entreprenuer_profile"),
     url(r'^people/(.*)/$', TemplateView.as_view(
-        template_name='directory.html'),
+        template_name='front-end.html'),
         name="entreprenuer_profile"),
     url(r'^openid/', include('oidc_provider.urls', namespace='oidc_provider')),
     url(r'^$', IndexView.as_view()),
