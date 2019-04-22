@@ -21,5 +21,6 @@ cd ../django-accelerator && git tag "v${TAG}"
 git push --tags 
 cd ../accelerate && git tag "v${TAG}"
 git push --tags
-cd ../directory && git tag "v${TAG}"
+cd ../front-end && git tag "v${TAG}"
 git push --tags
+

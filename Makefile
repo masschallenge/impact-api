@@ -224,9 +224,9 @@ code-check:
 ACCELERATE = ../accelerate
 DJANGO_ACCELERATOR = ../django-accelerator
 IMPACT_API = ../impact-api
-DIRECTORY = ../directory
+FRONT_END = ../front-end
 SEMANTIC = ../semantic-ui-theme
-REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(DIRECTORY) $(SEMANTIC) $(IMPACT_API) 
+REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(FRONT_END) $(SEMANTIC) $(IMPACT_API) 
 
 # Database migration related targets
 
@@ -270,7 +270,7 @@ checkout:
 watch-frontend stop-frontend: process-exists=$(shell ps -ef | egrep -h "./watch_frontend.sh|parcel watch" | grep -v "grep" | awk '{print $$2}')
 watch-frontend:
 	@if [ -z "$(process-exists)" ]; then \
-		cd $(DIRECTORY) && nohup bash -c "./watch_frontend.sh &" && cd $(IMPACT_API); \
+		cd $(FRONT_END) && nohup bash -c "./watch_frontend.sh &" && cd $(IMPACT_API); \
 	fi;
 
 stop-frontend:
