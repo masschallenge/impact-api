@@ -9,13 +9,13 @@ if [ ! -n "$tag" ]; then
 else
     echo "You passed in '$tag' as the custom tag"
     # TR == test release
-    echo "We're going to refactor the tag into 'TR-$tag' to avoid any conflicts."
-    TAG="TR-$tag"
-    git tag "v${TAG}"
+    echo "Renaming as 'TR-$tag' to avoid potential conflicts."
+    export TAG="TR-$tag"
 fi
 
 echo $TAG
 
+git tag "v${TAG}"
 git push --tags
 cd ../django-accelerator && git tag "v${TAG}"
 git push --tags 
