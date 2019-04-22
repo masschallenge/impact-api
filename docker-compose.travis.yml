@@ -44,7 +44,7 @@ services:
     volumes:
       - ./web/impact:/wwwroot
       - ./db_cache:/db_cache
-      - ../directory/dist:/wwwroot/static/directory-dist
+      - ../front-end/dist:/wwwroot/static/front-end-dist
       - ./web/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./web/impact/media:/media:ro
     depends_on:
