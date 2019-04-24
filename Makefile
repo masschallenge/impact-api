@@ -256,7 +256,13 @@ status:
 checkout:
 	@for r in $(REPOS) ; do \
 		cd $$r; \
-		git show-ref --verify --quiet refs/heads/$(branch); \
+		git fetch 2>/dev/null; \
+		if [ $$? -ne 0 ]; then \
+			echo "Fetching the latest from the remote failed, you may not be able to checkout an existing remote branch."; \
+			echo "Check your internet connection if the checkout fails."; \
+			echo ""; \
+		fi; \
+		git branch -a | egrep $(branch) > /dev/null; \
 		if [ $$? -eq 0 ]; then \
 			git -c 'color.ui=always' checkout $(branch) > /tmp/gitoutput 2>&1; \
 		else \
