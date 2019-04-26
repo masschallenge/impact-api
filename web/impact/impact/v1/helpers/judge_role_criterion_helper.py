@@ -8,10 +8,12 @@ from django.db.models import F
 class JudgeRoleCriterionHelper(JudgeCriterionHelper):
     cache_judge_field = "expertprofile__expert_category__name"
     judge_field = "judge__" + cache_judge_field
+    cache_key = cache_judge_field
 
     def analysis_annotate_fields(self):
         return {
             "role": F(self.judge_field),
+            self.cache_key: F(self.judge_field),
         }
 
     def analysis_tally(self, app_id, db_value, cache, **kwargs):

@@ -8,7 +8,10 @@ from accelerator.models import (
     Scenario,
 )
 from collections import defaultdict
-from django.db.models import Sum
+from django.db.models import (
+    F,
+    Sum,
+)
 from impact.v1.helpers.criterion_option_spec_helper import (
     CriterionOptionSpecHelper,
 )
@@ -158,13 +161,19 @@ class OptionAnalysis(object):
             "remaining_capacity": remaining_capacity,
         }
 
-    def populate_criterion_total_capacities_cache(self, field, option_name):
-        '''Query total capacity data and cache it.'''
+    def populate_criterion_total_capacities_cache(self,
+                                                  field,
+                                                  option_name,
+                                                  cache_key):
+        '''Query total capacity data and cache it.
+        Use annotation to ensure that cache keys are consistent'''
         if self.criterion_total_capacities.get(option_name) is None:
-            capacities = JudgeRoundCommitment.objects.filter(
-                judging_round=self.judging_round).values(field).annotate(
-                    total=Sum("capacity"))
-            result = {cap[field]: cap["total"]
+            capacities = JudgeRoundCommitment.objects.annotate(
+                **{cache_key: F(field)}).filter(
+                    judging_round=self.judging_round).values(
+                        cache_key).annotate(
+                            total=Sum("capacity"))
+            result = {cap[cache_key]: cap["total"]
                       for cap in capacities}
             self.criterion_total_capacities[option_name] = result
 
@@ -173,7 +182,10 @@ class OptionAnalysis(object):
         option_name = option_spec.criterion.name
         helper = self.criterion_helpers[option_spec.criterion.id]
         field = helper.judge_field
-        self.populate_criterion_total_capacities_cache(field, option_name)
+        cache_key = helper.cache_key or field
+        self.populate_criterion_total_capacities_cache(field,
+                                                       option_name,
+                                                       cache_key)
 
         key_exists = self.criterion_total_capacities[option_name].get(option)
         return 0 if not key_exists else self.criterion_total_capacities[
