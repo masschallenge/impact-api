@@ -47,7 +47,7 @@ class AnalyzeJudgingRoundView(ImpactView):
     '''Endpoint for judging round analysis. Analysis logic is delegated to
     OptionAnalysis (and thence to CriterionHelpers)
     '''
-    
+
     view_name = "analyze_judging_round"
     model = JudgingRound
     permission_classes = ()
@@ -59,8 +59,7 @@ class AnalyzeJudgingRoundView(ImpactView):
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
         program_family = self.instance.program.program_family
-        cleared = global_operations_manager_check(request.user, program_family)
-        if not cleared:
+        if not global_operations_manager_check(request.user, program_family):
             return Response(status=403)
         options = CriterionOptionSpec.objects.filter(
             criterion__judging_round=self.instance).prefetch_related(
