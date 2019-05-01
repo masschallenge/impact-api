@@ -21,7 +21,7 @@ services:
   front-end-semantic-assets:
     container_name: front-end-semantic-assets
     build:
-      context: ../accelerate
+      context: ../semantic-ui-theme
       dockerfile: semantic_main.Dockerfile
     ports:
       - "35731:35729"
