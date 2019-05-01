@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   # Redis
   redis:
@@ -18,6 +18,19 @@ services:
       - ./web/impact/sass:/gulp/sass:cached
       - ./web/impact/static/css:/gulp/css:cached
       - ./web/impact/static/js:/gulp/js:cached
+  front-end-semantic-assets:
+    container_name: front-end-semantic-assets
+    build:
+      context: ../accelerate
+      dockerfile: semantic_main.Dockerfile
+    ports:
+      - "35731:35729"
+    volumes:
+      - ../semantic-ui-theme/src/theme.config:/gulp/semantic/src/theme.config:cached
+      - ../semantic-ui-theme/src/themes/masschallenge:/gulp/semantic/src/themes/masschallenge:cached
+      - ../front-end/src/semantic-ui-theme/dist:/gulp/semantic/dist:cached
+    command: >
+      build watch
   front-end:
     build:
       dockerfile: dev.Dockerfile
@@ -71,7 +84,6 @@ services:
         echo \"BUILDING FRONTEND...\"
         sleep 5
       done; echo \"FRONTEND BUILD COMPLETE - visit http://localhost:1234 in a browser\";"
-
 
 networks:
   default:
