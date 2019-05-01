@@ -38,7 +38,7 @@ before_script:
 - echo "" >> .prod.env
 - git clone https://$GITHUB_ACCESS_TOKEN@github.com/masschallenge/front-end -b $FRONT_END_REVISION ../front-end
 - git clone https://$GITHUB_ACCESS_TOKEN@github.com/masschallenge/semantic-ui-theme -b $FRONT_END_REVISION ../semantic-ui-theme
-- mkdir -p ../front-end/src/semantic-ui-theme && cp -R ../semantic-ui-theme ../front-end/src/semantic-ui-theme
+- mkdir -p ../front-end/src/semantic-ui-theme && cp -R ../semantic-ui-theme ../front-end/src/
 - cp .prod.env ../front-end/.env
 - cp .prod.env .env
 - docker build --no-cache -t masschallenge/front-end ../front-end
