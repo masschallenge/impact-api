@@ -224,9 +224,9 @@ code-check:
 ACCELERATE = ../accelerate
 DJANGO_ACCELERATOR = ../django-accelerator
 IMPACT_API = ../impact-api
-DIRECTORY = ../directory
+FRONT_END = ../front-end
 SEMANTIC = ../semantic-ui-theme
-REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(DIRECTORY) $(SEMANTIC) $(IMPACT_API) 
+REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(FRONT_END) $(SEMANTIC) $(IMPACT_API) 
 
 # Database migration related targets
 
@@ -256,7 +256,13 @@ status:
 checkout:
 	@for r in $(REPOS) ; do \
 		cd $$r; \
-		git show-ref --verify --quiet refs/heads/$(branch); \
+		git fetch 2>/dev/null; \
+		if [ $$? -ne 0 ]; then \
+			echo "Fetching the latest from the remote failed, you may not be able to checkout an existing remote branch."; \
+			echo "Check your internet connection if the checkout fails."; \
+			echo ""; \
+		fi; \
+		git branch -a | egrep $(branch) > /dev/null; \
 		if [ $$? -eq 0 ]; then \
 			git -c 'color.ui=always' checkout $(branch) > /tmp/gitoutput 2>&1; \
 		else \
@@ -270,7 +276,7 @@ checkout:
 watch-frontend stop-frontend: process-exists=$(shell ps -ef | egrep -h "./watch_frontend.sh|parcel watch" | grep -v "grep" | awk '{print $$2}')
 watch-frontend:
 	@if [ -z "$(process-exists)" ]; then \
-		cd $(DIRECTORY) && nohup bash -c "./watch_frontend.sh &" && cd $(IMPACT_API); \
+		cd $(FRONT_END) && nohup bash -c "./watch_frontend.sh &" && cd $(IMPACT_API); \
 	fi;
 
 stop-frontend:

@@ -5,7 +5,7 @@ until `curl --output /dev/null --silent --head --fail http://web:8000`; do
 done
 echo "WEB BUILD COMPLETE - visit http://localhost:8000 in a browser"
 
-until `curl --output /dev/null --silent --head --fail http://mentor_directory:1234`; do
+until `curl --output /dev/null --silent --head --fail http://front-end:1234`; do
     echo "BUILDING FRONTEND..."
     sleep 5
 done

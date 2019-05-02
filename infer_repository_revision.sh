@@ -9,9 +9,9 @@ if [[  (! -z $DJANGO_ACCELERATOR_REVISION) && $REPO_URL == *"django-accelerator"
   echo $DJANGO_ACCELERATOR_REVISION
   exit
 fi
-# allow for an override, if DIRECTORY_REVISION is already set in env.
-if [[ (! -z $DIRECTORY_REVISION) && $REPO_URL == *"directory"* ]];then
-  echo $DIRECTORY_REVISION
+# allow for an override, if FRONT_END_REVISION is already set in env.
+if [[ (! -z $FRONT_END_REVISION) && $REPO_URL == *"front-end"* ]];then
+  echo $FRONT_END_REVISION
   exit
 fi
 

@@ -33,7 +33,7 @@ ALREADY_ASSIGNED_ERROR = "{judge} is already assigned to {count} applications"
 JUDGING_ROUND_INACTIVE_ERROR = "Judging round {} is not active"
 NO_APP_LEFT_FOR_JUDGE = "{} has provided feedback on all applications"
 NO_DATA_FOR_JUDGE = "Judging round {judging_round} has no data for {judge}"
-ASSIGNMENT_DISCOUNT = 0.85
+ASSIGNMENT_DISCOUNT = 0.45
 
 
 class AllocateApplicationsView(ImpactView):
