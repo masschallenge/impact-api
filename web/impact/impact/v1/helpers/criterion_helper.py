@@ -21,11 +21,12 @@ class CriterionHelper(ModelHelper):
     around allocation, analysis, and cloning.
     The CriterionHelper superclass counts judges without regard to any
     features. Therefore it is a suitable class to use for the "reads"
-    criterion. 
+    criterion.
     '''
 
     application_field = "id"
     judge_field = cache_judge_field = "id"
+    cache_key = "reads"
 
     model = Criterion
 
@@ -64,8 +65,11 @@ class CriterionHelper(ModelHelper):
             self.app_count_cache = apps.count()
         return self.app_count_cache
 
-    def remaining_capacity(
-       self, assignment_counts, option_spec, option, judge_to_capacity_cache):
+    def remaining_capacity(self,
+                           assignment_counts,
+                           option_spec,
+                           option,
+                           judge_to_capacity_cache):
         result = 0
 
         for judge in judge_to_capacity_cache:
