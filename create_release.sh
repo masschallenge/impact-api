@@ -15,13 +15,13 @@ fi
 
 echo $TAG
 
-git tag "v${TAG}"
+cd ../semantic-ui-theme && git tag "v${TAG}"
+git push --tags
+cd ../impact-api && tag "v${TAG}"
 git push --tags
 cd ../django-accelerator && git tag "v${TAG}"
 git push --tags 
 cd ../accelerate && git tag "v${TAG}"
 git push --tags
 cd ../front-end && git tag "v${TAG}"
-git push --tags
-cd ../semantic-ui-theme && git tag "v${TAG}"
 git push --tags
