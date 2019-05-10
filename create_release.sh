@@ -17,7 +17,7 @@ echo $TAG
 
 cd ../semantic-ui-theme && git tag "v${TAG}"
 git push --tags
-cd ../impact-api && tag "v${TAG}"
+cd ../impact-api && git tag "v${TAG}"
 git push --tags
 cd ../django-accelerator && git tag "v${TAG}"
 git push --tags 
