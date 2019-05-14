@@ -192,7 +192,6 @@ class AllocateApplicationsView(ImpactView):
             assignment_status=ASSIGNED_PANEL_ASSIGNMENT_STATUS)
 
     def _make_panel(self, choices):
-        self._enable_additional_assignments(len(choices))
         panel = Panel.objects.create(status=ACTIVE_PANEL_STATUS)
         JudgePanelAssignment.objects.create(
             judge=self.judge,
@@ -204,17 +203,6 @@ class AllocateApplicationsView(ImpactView):
                 application_id=choice,
                 panel=panel,
                 scenario=self.scenario)
-
-    def _enable_additional_assignments(self, desired):
-        goal = self._judge_assignment_count() + desired
-        commitment = self.judge.judgeroundcommitment_set.filter(
-            judging_round=self.judging_round).first()
-        if commitment.current_quota is None:
-            commitment.current_quota = 0
-        if commitment:
-            commitment.capacity = max(goal, commitment.capacity)
-            commitment.current_quota = max(goal, commitment.current_quota)
-            commitment.save()
 
     def _judge_assignment_count(self):
         scenarios = Scenario.objects.filter(
