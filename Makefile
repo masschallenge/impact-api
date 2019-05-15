@@ -188,8 +188,9 @@ build: shutdown-vms delete-vms setup
 
 tests ?= $(TESTS)  # Backwards compatibility
 test: setup
-	@docker-compose run --rm web \
-		python3 manage.py test --configuration=Test $(tests)
+	@@if [ -z $$keepdb ]; then keepdb="--keepdb"; else keepdb=""; fi; \
+	docker-compose run --rm web \
+		python3 manage.py test $$keepdb --configuration=Test $(tests)
 
 coverage: coverage-run coverage-report coverage-html-report
 
