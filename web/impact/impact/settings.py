@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 import os
-
+import logging
 import datetime
 from configurations import (
     Configuration,
@@ -319,6 +319,8 @@ class Test(Base):
     DATABASE_ROUTERS = []
     DEBUG = False
     LANGUAGE_CODE = 'en'
+
+    logging.disable(logging.CRITICAL)
 
 
 class Prod(Base):
