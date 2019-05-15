@@ -94,19 +94,6 @@ class TestAllocateApplicationsView(APITestCase):
             assert [NO_APP_LEFT_FOR_JUDGE.format(context.judge.email)
                     in response.data]
 
-    def test_get_adds_capacity_and_quota(self):
-        context = AnalyzeJudgingContext()
-        judging_round = context.judging_round
-        commitment = context.judges[0].judgeroundcommitment_set.first()
-        with self.login(email=self.basic_user().email):
-            url = reverse(AllocateApplicationsView.view_name,
-                          args=[judging_round.id, context.judge.id])
-            response = self.client.get(url)
-            assert response.status_code == 200
-            commitment.refresh_from_db()
-            assert commitment.capacity > 0
-            assert commitment.current_quota > 0
-
     def test_get_for_unknown_judge_fails(self):
         context = AnalyzeJudgingContext()
         judging_round = context.judging_round
