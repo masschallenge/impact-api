@@ -69,8 +69,9 @@ lower_target_help = \
 target_help = \
   'help - Prints this help message.' \
   ' ' \
-  'test - Run tests with no coverage. Run just those specified in $$(tests)' \
-  '\tif provided.  E.g.:' \
+  'test - Run tests with no coverage and while preserving the test database.' \
+	'\tIf you do not want to preserve the database add the keepdb=no flag E.g. make test keepdb=no' \
+	'\tRun just those specified in $$(tests)' \
   '\tmake test tests="impact.tests.test_file1 impact.tests.test_file2"' \
   'coverage - Run tests with coverage summary in terminal.' \
   'coverage-html - Run tests with coverage and open report in browser.' \
