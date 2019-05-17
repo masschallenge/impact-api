@@ -319,8 +319,7 @@ class Test(Base):
     DATABASE_ROUTERS = []
     DEBUG = False
     LANGUAGE_CODE = 'en'
-
-    logging.disable(logging.CRITICAL)
+    logging.disable(logging.INFO)
 
 
 class Prod(Base):
