@@ -54,3 +54,4 @@ django-sitetree==1.12.0
 
 # django-configurations from Git master (needed for Django 1.8 support)
 git+https://github.com/jezdez/django-configurations
+git+https://github.com/masschallenge/add2cal

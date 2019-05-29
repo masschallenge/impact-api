@@ -5,14 +5,22 @@ from django.http import HttpResponseRedirect
 from add2cal import Add2Cal
 import time
 from rest_framework import renderers
-from rest_framework.renderers import BrowsableAPIRenderer, JSONRenderer, TemplateHTMLRenderer
+from rest_framework.renderers import (
+    BrowsableAPIRenderer,
+    JSONRenderer,
+    TemplateHTMLRenderer)
 
 
 class ICalRenderer(renderers.BaseRenderer):
     media_type = 'text/calendar'
     format = 'ics'
 
-    def render(self, data, accepted_media_type=None,  media_type=None, renderer_context=None):
+    def render(
+            self,
+            data,
+            accepted_media_type=None,
+            media_type=None,
+            renderer_context=None):
         return data
 
 
@@ -25,7 +33,9 @@ class CalendarReminderView(APIView):
 
     actions = ["GET"]
 
-    renderer_classes = (ICalRenderer, JSONRenderer)
+    renderer_classes = (
+        ICalRenderer, BrowsableAPIRenderer,
+        JSONRenderer, TemplateHTMLRenderer,)
 
     def get(self, request, format=None):
         params = self.request.query_params
@@ -46,15 +56,23 @@ class CalendarReminderView(APIView):
             location=location)
         calendar_data = add2cal.as_dict()
         if link_type == 'ical':
-            response = Response(calendar_data['ical_content'], content_type='text/calendar')
+            response = Response(
+                calendar_data['ical_content'], content_type='text/calendar')
+            attachment = 'attachment; filename={title}.ics'.format(
+                title=title)
             response['Content-Type'] = 'text/calendar'
-            response['Content-Disposition'] = 'attachment; filename={title}.ics'.format(title=title)
+            response[
+                'Content-Disposition'] = attachment
             return response
         elif link_type == 'outlook':
-            return HttpResponseRedirect(redirect_to=calendar_data['outlook_link'])
+            return HttpResponseRedirect(
+                redirect_to=calendar_data['outlook_link'])
         elif link_type == 'google':
-            return HttpResponseRedirect(redirect_to=calendar_data['google_link'])
+            return HttpResponseRedirect(
+                redirect_to=calendar_data['gcal_link'])
         elif link_type == 'yahoo':
-            return HttpResponseRedirect(redirect_to=calendar_data['yahoo_link'])
+
+            return HttpResponseRedirect(
+                redirect_to=calendar_data['yahoo_link'])
         else:
             return Response(add2cal.as_dict())
