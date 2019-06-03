@@ -3,12 +3,14 @@ from rest_framework import permissions
 from rest_framework.response import Response
 from django.http import HttpResponseRedirect
 from add2cal import Add2Cal
-import time
+import datetime
 from rest_framework import renderers
 from rest_framework.renderers import (
     BrowsableAPIRenderer,
     JSONRenderer,
     TemplateHTMLRenderer)
+
+DATE_FORMAT = "%Y%m%dT%H%M%SZ"
 
 
 class ICalRenderer(renderers.BaseRenderer):
@@ -39,20 +41,19 @@ class CalendarReminderView(APIView):
 
     def get(self, request, format=None):
         params = self.request.query_params
-        start = float(params.get('start', time.time()))
-        end = float(params.get('end', time.time()))
+        start = params.get('start', datetime.datetime.now().strftime(
+            DATE_FORMAT))
+        end = params.get('end', datetime.datetime.now().strftime(DATE_FORMAT))
         title = params.get('title', 'new reminder')
         description = params.get('description', '')
         location = params.get('location', 'Boston, MA')
         link_type = params.get('link_type', 'data')
-        timezone = params.get('timezone', 'America/New_York')
 
         add2cal = Add2Cal(
             start=start,
             end=end,
             title=title,
             description=description,
-            tz=timezone,
             location=location)
         calendar_data = add2cal.as_dict()
         if link_type == 'ical':

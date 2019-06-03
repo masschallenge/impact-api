@@ -21,8 +21,7 @@ class TestCalendarReminderView(APITestCase):
             end=float(1558634120),
             title="mentoring session with dj shank",
             location='boston',
-            description='test',
-            tz='America/New_York'
+            description='test'
         )
 
     def test_outlook_reminder_link(self):
