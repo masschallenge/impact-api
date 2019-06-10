@@ -1,5 +1,4 @@
 from rest_framework.views import APIView
-from rest_framework import permissions
 from rest_framework.response import Response
 from django.http import HttpResponseRedirect
 from add2cal import Add2Cal
@@ -30,7 +29,6 @@ class CalendarReminderView(APIView):
     view_name = 'calendar_reminder_view'
 
     permission_classes = (
-        permissions.IsAuthenticated,
     )
 
     actions = ["GET"]
