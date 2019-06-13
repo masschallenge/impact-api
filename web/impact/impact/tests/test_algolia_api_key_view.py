@@ -25,7 +25,11 @@ from accelerator_abstract.models import (
 from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import UserFactory
 from impact.views import AlgoliaApiKeyView
-from impact.views.algolia_api_key_view import IS_TEAM_MEMBER_FILTER
+from impact.views.algolia_api_key_view import (
+    HAS_FINALIST_ROLE_FILTER,
+    IS_ACTIVE_FILTER,
+    IS_TEAM_MEMBER_FILTER,
+)
 
 User = get_user_model()  # pylint: disable=invalid-name
 
@@ -121,6 +125,30 @@ class TestAlgoliaApiKeyView(APITestCase):
                 response = self.client.get(self._mentor_directory_url())
                 response_data = json.loads(response.content)
                 self.assertEqual(response_data["filters"], [])
+
+    def test_staff_user_does_not_have_is_active_filter(self):
+        user = self.basic_user()
+        program = _create_batch_program_and_named_group(
+                        ACTIVE_PROGRAM_STATUS, 1)
+        self._create_user_with_role_grant(program[0], UserRole.STAFF, user)
+        with self.settings(
+                ALGOLIA_APPLICATION_ID='test',
+                ALGOLIA_API_KEY='test'):
+            with self.login(email=user.email):
+                response = self.client.get(self._person_directory_url())
+                response_data = json.loads(response.content)
+                self.assertFalse(IS_ACTIVE_FILTER in response_data["filters"])
+
+    def test_finalist_user_filter_includes_is_active_filter(self):
+        program = ProgramFactory(program_status=ACTIVE_PROGRAM_STATUS)
+        user = self._create_user_with_role_grant(program, UserRole.FINALIST)
+        with self.settings(
+                ALGOLIA_APPLICATION_ID='test',
+                ALGOLIA_API_KEY='test'):
+            with self.login(email=user.email):
+                response = self.client.get(self._person_directory_url())
+                response_data = json.loads(response.content)
+                self.assertTrue(IS_ACTIVE_FILTER in response_data["filters"])
 
     def test_finalist_user_gets_all_programs_in_program_group(
             self):
@@ -238,9 +266,9 @@ class TestAlgoliaApiKeyView(APITestCase):
                 response = self.client.get(self._person_directory_url())
                 response_data = json.loads(response.content)
 
-                self.assertEqual(
-                    response_data["filters"],
-                    IS_TEAM_MEMBER_FILTER)
+                expected_filter = (IS_TEAM_MEMBER_FILTER + ' AND ' +
+                                   HAS_FINALIST_ROLE_FILTER)
+                self.assertEqual(response_data["filters"], expected_filter)
 
     def _create_user_with_role_grant(
             self, program, user_role_name, user=False):

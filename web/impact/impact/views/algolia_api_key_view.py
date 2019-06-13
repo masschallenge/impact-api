@@ -36,7 +36,9 @@ from impact.permissions import DirectoryAccessPermissions
 
 IS_CONFIRMED_MENTOR_FILTER = "is_confirmed_mentor:true"
 CONFIRMED_MENTOR_IN_PROGRAM_FILTER = 'confirmed_mentor_programs:"{program}"'
-IS_TEAM_MEMBER_FILTER = 'is_team_member:true AND has_a_finalist_role:true'
+IS_TEAM_MEMBER_FILTER = 'is_team_member:true'
+HAS_FINALIST_ROLE_FILTER = 'has_a_finalist_role:true'
+IS_ACTIVE_FILTER = 'is_active:true'
 
 
 class AlgoliaApiKeyView(APIView):
@@ -74,12 +76,16 @@ def _get_search_key(request):
 
 
 def _get_filters(request):
-
     if request.GET['index'] == 'people':
-        if base_accelerator_check(request.user):
-            return IS_TEAM_MEMBER_FILTER
-        else:
+        if not base_accelerator_check(request.user):
             raise PermissionDenied()
+        if is_employee(request.user):
+            return _build_filter(
+                IS_TEAM_MEMBER_FILTER, HAS_FINALIST_ROLE_FILTER)
+        else:
+            return _build_filter(
+                IS_TEAM_MEMBER_FILTER,
+                HAS_FINALIST_ROLE_FILTER, IS_ACTIVE_FILTER)
 
     # an empty filter i.e. [], means the user sees all mentors
     if is_employee(request.user):
@@ -159,3 +165,10 @@ def _get_public_key(params, search_key):
         settings.ALGOLIA_API_KEY)
     public_key = client.generateSecuredApiKey(search_key, params)
     return public_key
+
+
+def _build_filter(*args):
+    overall_filter = args[0] if args else ''
+    for filter_part in args[1:]:
+        overall_filter += (' AND ' + filter_part)
+    return overall_filter
