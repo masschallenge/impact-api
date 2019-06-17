@@ -63,3 +63,6 @@ from impact.v1.views.user_detail_view import UserDetailView
 from impact.v1.views.user_history_view import UserHistoryView
 from impact.v1.views.user_list_view import UserListView
 from impact.v1.views.user_organizations_view import UserOrganizationsView
+from impact.v1.views.mentor_program_office_hour_list_view import (
+    MentorProgramOfficeHourListView,
+)
