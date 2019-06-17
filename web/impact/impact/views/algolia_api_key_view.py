@@ -168,7 +168,4 @@ def _get_public_key(params, search_key):
 
 
 def _build_filter(*args):
-    overall_filter = args[0] if args else ''
-    for filter_part in args[1:]:
-        overall_filter += (' AND ' + filter_part)
-    return overall_filter
+    return " AND ".join(args)
