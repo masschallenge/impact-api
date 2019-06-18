@@ -5,6 +5,7 @@ from accelerator.models import MentorProgramOfficeHour
 from impact.v1.helpers.model_helper import (
     ModelHelper,
     PK_FIELD,
+    OPTIONAL_INTEGER_FIELD,
     OPTIONAL_STRING_FIELD,
 )
 
@@ -15,8 +16,10 @@ OFFFICE_HOUR_FIELDS = {
     "start_time": OPTIONAL_STRING_FIELD,
     "end_time": OPTIONAL_STRING_FIELD,
     "date": OPTIONAL_STRING_FIELD,
+    "mentor_id": OPTIONAL_INTEGER_FIELD,
     "mentor_name": OPTIONAL_STRING_FIELD,
     "mentor_email": OPTIONAL_STRING_FIELD,
+    "finalist_id": OPTIONAL_INTEGER_FIELD,
     "finalist_name": OPTIONAL_STRING_FIELD,
     "finalist_email": OPTIONAL_STRING_FIELD,
 }
@@ -34,12 +37,20 @@ class MentorProgramOfficeHourHelper(ModelHelper):
         return str(self.subject)
 
     @property
+    def mentor_id(self):
+        return self.field_element("mentor", "id")
+
+    @property
     def mentor_name(self):
         return self.subject.mentor.full_name()
 
     @property
     def mentor_email(self):
         return self.field_element("mentor", "email")
+
+    @property
+    def finalist_id(self):
+        return self.field_element("finalist", "id")
 
     @property
     def finalist_name(self):
