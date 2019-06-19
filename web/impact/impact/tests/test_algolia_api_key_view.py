@@ -101,18 +101,18 @@ class TestAlgoliaApiKeyView(APITestCase):
             self.assertTrue(response.status_code, 403)
 
     def test_user_with_staff_role_grant_sees_all_mentors(self):
-        user = self.basic_user()
+        user = self.staff_user()
         program = _create_batch_program_and_named_group(
                         ACTIVE_PROGRAM_STATUS, 1)
-        self._create_user_with_role_grant(program[0], UserRole.STAFF, user)
+        self._create_user_with_role_grant(program[0], user)
         response_data = self._get_response_data(
             user, self._mentor_directory_url())
         self.assertEqual(response_data["filters"], [])
 
     def test_staff_user_does_not_have_is_active_filter(self):
-        user = self.basic_user()
+        user = self.staff_user()
         program = ProgramFactory(program_status=ACTIVE_PROGRAM_STATUS)
-        self._create_user_with_role_grant(program, UserRole.STAFF, user)
+        self._create_user_with_role_grant(program, user)
         response_data = self._get_response_data(
             user, self._person_directory_url())
         self.assertNotIn(IS_ACTIVE_FILTER, response_data["filters"])

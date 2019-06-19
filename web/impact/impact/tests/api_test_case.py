@@ -10,13 +10,12 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from django.urls import reverse
 
-from accelerator.models import UserRole
 from accelerator_abstract.models.base_clearance import (
     CLEARANCE_LEVEL_GLOBAL_MANAGER,
+    CLEARANCE_LEVEL_STAFF
 )
 from impact.tests.factories import (
     ClearanceFactory,
-    ProgramRoleGrantFactory,
     UserFactory,
 )
 
@@ -49,10 +48,11 @@ class APITestCase(TestCase):
 
     def staff_user(self):
         user = self.make_user('basic_user@test.com')
-        staff_grant = ProgramRoleGrantFactory(
-            program_role__user_role__name=UserRole.STAFF,
-            person=user)
-        return staff_grant.person
+        clearance = ClearanceFactory(
+        level=CLEARANCE_LEVEL_STAFF,
+        user=user 
+    )
+        return clearance.user
 
     def global_operations_manager(self, program_family):
         user = self.staff_user()
