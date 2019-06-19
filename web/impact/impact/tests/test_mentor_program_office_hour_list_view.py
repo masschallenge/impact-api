@@ -50,72 +50,83 @@ class TestMentorProgramOfficeHourListView(APITestCase):
 
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)
-            assert validator.is_valid(json.loads(get_response.content))
+            self.assertTrue(
+                validator.is_valid(json.loads(get_response.content)))
 
     def test_filters_by_mentor_id(self):
-        mentor_1_count = 3
-        mentor_1 = ExpertFactory()
-        mentor_1_office_hours = MentorProgramOfficeHourFactory.create_batch(
-            mentor_1_count, mentor=mentor_1)
-        mentor_2_count = 2
-        mentor_2 = ExpertFactory()
-        MentorProgramOfficeHourFactory.create_batch(
-            mentor_2_count, mentor=mentor_2)
-
-        with self.login(email=self.basic_user().email):
-            response = self.client.get(self.url, {'mentor_id': mentor_1.id})
-            self.assertEqual(
-                response.data["count"], mentor_1_count)
-            self.assertTrue(all(
-                [MentorProgramOfficeHourListView.serialize(office_hour)
-                 in response.data["results"]
-                 for office_hour in mentor_1_office_hours]))
+        mentor_count = 2
+        mentor, mentor_office_hours = self._create_office_hours_for_user(
+            mentor_count)
+        response = self._get_response_as_logged_in_user(
+            {'mentor_id': mentor.id}
+        )
+        self.assertEqual(
+            response.data["count"], mentor_count)
+        self.assertTrue(all(
+            [MentorProgramOfficeHourListView.serialize(office_hour)
+             in response.data["results"]
+             for office_hour in mentor_office_hours]))
 
     def test_filters_by_mentor_email(self):
-        mentor_1_count = 3
-        mentor_1 = ExpertFactory()
-        MentorProgramOfficeHourFactory.create_batch(
-            mentor_1_count, mentor=mentor_1)
-        mentor_2_count = 2
-        mentor_2 = ExpertFactory()
-        mentor_2_office_hours = MentorProgramOfficeHourFactory.create_batch(
-            mentor_2_count, mentor=mentor_2)
+        mentor_count = 2
+        mentor, mentor_office_hours = self._create_office_hours_for_user(
+            count=mentor_count)
+        MentorProgramOfficeHourFactory.create_batch(3)
+        response = self._get_response_as_logged_in_user(
+            {'mentor_email': mentor.email}
+        )
 
-        with self.login(email=self.basic_user().email):
-            response = self.client.get(
-                self.url, {'mentor_email': mentor_2.email})
-            self.assertEqual(
-                response.data["count"], mentor_2_count)
-            self.assertTrue(all(
-                [MentorProgramOfficeHourListView.serialize(office_hour)
-                 in response.data["results"]
-                 for office_hour in mentor_2_office_hours]))
+        self.assertEqual(
+            response.data["count"], mentor_count)
+        self.assertTrue(all(
+            [MentorProgramOfficeHourListView.serialize(office_hour)
+             in response.data["results"]
+             for office_hour in mentor_office_hours]))
 
     def test_filters_by_finalist_id(self):
-        finalist = EntrepreneurFactory()
-        MentorProgramOfficeHourFactory.create_batch(5)
-        finalist_office_hour = MentorProgramOfficeHourFactory(
-            finalist=finalist)
+        finalist_count = 1
+        finalist, finalist_office_hours = self._create_office_hours_for_user(
+            finalist_count, mentor=False
+        )
+        response = self._get_response_as_logged_in_user(
+            {'finalist_id': finalist.id}
+        )
 
-        with self.login(email=self.basic_user().email):
-            response = self.client.get(self.url, {'finalist_id': finalist.id})
-            self.assertEqual(
-                response.data["count"], 1)
-            self.assertTrue(
-                MentorProgramOfficeHourListView.serialize(finalist_office_hour)
-                in response.data["results"])
+        self.assertEqual(
+            response.data["count"], finalist_count)
+        self.assertTrue(all(
+            [MentorProgramOfficeHourListView.serialize(office_hour)
+             in response.data["results"]
+             for office_hour in finalist_office_hours]))
 
     def test_filters_by_finalist_email(self):
-        finalist = EntrepreneurFactory()
-        MentorProgramOfficeHourFactory.create_batch(5)
-        finalist_office_hour = MentorProgramOfficeHourFactory(
-            finalist=finalist)
+        finalist_count = 2
+        finalist, finalist_office_hours = self._create_office_hours_for_user(
+            finalist_count, mentor=False
+        )
+        response = self._get_response_as_logged_in_user(
+            {'finalist_email': finalist.email}
+        )
 
-        with self.login(email=self.basic_user().email):
-            response = self.client.get(
-                self.url, {'finalist_email': finalist.email})
-            self.assertEqual(
-                response.data["count"], 1)
-            self.assertTrue(
-                MentorProgramOfficeHourListView.serialize(finalist_office_hour)
-                in response.data["results"])
+        self.assertEqual(
+            response.data["count"], finalist_count)
+        self.assertTrue(all(
+            [MentorProgramOfficeHourListView.serialize(office_hour)
+             in response.data["results"]
+             for office_hour in finalist_office_hours]))
+
+    def _create_office_hours_for_user(self, count=1, mentor=True):
+        if mentor:
+            user = ExpertFactory()
+            office_hours = MentorProgramOfficeHourFactory.create_batch(
+                count, mentor=user)
+        else:
+            user = EntrepreneurFactory()
+            office_hours = MentorProgramOfficeHourFactory.create_batch(
+                count, finalist=user)
+
+        return user, office_hours
+
+    def _get_response_as_logged_in_user(self, params):
+        self.login(email=self.basic_user().email)
+        return self.client.get(self.url, params)
