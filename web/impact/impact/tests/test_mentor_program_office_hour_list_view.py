@@ -1,5 +1,5 @@
 # MIT License
-# Copyright (c) 2017 MassChallenge, Inc.
+# Copyright (c) 2019 MassChallenge, Inc.
 
 import json
 from jsonschema import Draft4Validator

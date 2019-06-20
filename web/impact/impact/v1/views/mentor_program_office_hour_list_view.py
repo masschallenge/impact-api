@@ -28,8 +28,9 @@ class MentorProgramOfficeHourListView(BaseListView):
             return self._filter_by_participant_id(qs, param_items)
 
     def _filter_by_participant_name(self, qs):
-        mentor_name = self.request.query_params.get('mentor_name', None)
-        finalist_name = self.request.query_params.get('finalist_name', None)
+        params = self.request.query_params
+        mentor_name = params.get('mentor_name', None)
+        finalist_name = params.get('finalist_name', None)
 
         if mentor_name:
             return self._generate_name_query(qs, 'mentor', mentor_name)
