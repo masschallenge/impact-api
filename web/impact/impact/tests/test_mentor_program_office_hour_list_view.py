@@ -29,10 +29,7 @@ class TestMentorProgramOfficeHourListView(APITestCase):
         with self.login(email=self.basic_user().email):
             response = self.client.get(self.url)
             self.assertEqual(response.data["count"], count)
-            self.assertTrue(all(
-                [MentorProgramOfficeHourListView.serialize(office_hour)
-                 in response.data["results"]
-                 for office_hour in office_hours]))
+            self.assertTrue(self._compare_ids(office_hours, response))
 
     def test_options(self):
         with self.login(email=self.basic_user().email):
@@ -60,28 +57,8 @@ class TestMentorProgramOfficeHourListView(APITestCase):
         response = self._get_response_as_logged_in_user(
             {'mentor_id': mentor.id}
         )
-        self.assertEqual(
-            response.data["count"], mentor_count)
-        self.assertTrue(all(
-            [MentorProgramOfficeHourListView.serialize(office_hour)
-             in response.data["results"]
-             for office_hour in mentor_office_hours]))
-
-    def test_filters_by_mentor_email(self):
-        mentor_count = 2
-        mentor, mentor_office_hours = self._create_office_hours_for_user(
-            count=mentor_count)
-        MentorProgramOfficeHourFactory.create_batch(3)
-        response = self._get_response_as_logged_in_user(
-            {'mentor_email': mentor.email}
-        )
-
-        self.assertEqual(
-            response.data["count"], mentor_count)
-        self.assertTrue(all(
-            [MentorProgramOfficeHourListView.serialize(office_hour)
-             in response.data["results"]
-             for office_hour in mentor_office_hours]))
+        self.assertEqual(response.data["count"], mentor_count)
+        self.assertTrue(self._compare_ids(mentor_office_hours, response))
 
     def test_filters_by_finalist_id(self):
         finalist_count = 1
@@ -91,29 +68,8 @@ class TestMentorProgramOfficeHourListView(APITestCase):
         response = self._get_response_as_logged_in_user(
             {'finalist_id': finalist.id}
         )
-
-        self.assertEqual(
-            response.data["count"], finalist_count)
-        self.assertTrue(all(
-            [MentorProgramOfficeHourListView.serialize(office_hour)
-             in response.data["results"]
-             for office_hour in finalist_office_hours]))
-
-    def test_filters_by_finalist_email(self):
-        finalist_count = 2
-        finalist, finalist_office_hours = self._create_office_hours_for_user(
-            finalist_count, mentor=False
-        )
-        response = self._get_response_as_logged_in_user(
-            {'finalist_email': finalist.email}
-        )
-
-        self.assertEqual(
-            response.data["count"], finalist_count)
-        self.assertTrue(all(
-            [MentorProgramOfficeHourListView.serialize(office_hour)
-             in response.data["results"]
-             for office_hour in finalist_office_hours]))
+        self.assertEqual(response.data["count"], finalist_count)
+        self.assertTrue(self._compare_ids(finalist_office_hours, response))
 
     def _create_office_hours_for_user(self, count=1, mentor=True):
         if mentor:
@@ -130,3 +86,11 @@ class TestMentorProgramOfficeHourListView(APITestCase):
     def _get_response_as_logged_in_user(self, params):
         self.login(email=self.basic_user().email)
         return self.client.get(self.url, params)
+
+    def _compare_ids(self, office_hours, response):
+        office_hour_ids = [
+            office_hour.id for office_hour in office_hours]
+        result_ids = [
+            result['id'] for result in response.data["results"]
+        ]
+        return office_hour_ids == result_ids
