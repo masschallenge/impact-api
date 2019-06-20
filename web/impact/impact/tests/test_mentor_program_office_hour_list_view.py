@@ -20,6 +20,8 @@ from impact.tests.utils import assert_fields
 from impact.v1.views import MentorProgramOfficeHourListView
 
 COUNT = 3
+NON_EXISTENT_ID = 999
+NON_EXISTENT_NAME = 'qwerty'
 
 
 class TestMentorProgramOfficeHourListView(APITestCase):
@@ -51,59 +53,82 @@ class TestMentorProgramOfficeHourListView(APITestCase):
 
     def test_filters_by_mentor_id(self):
         mentor, mentor_office_hours = self._create_office_hours()
-        response = self._get_response_as_logged_in_user(
-            {'mentor_id': mentor.id}
+        self._check_response_values(
+            {'mentor_id': mentor.id},
+            mentor_office_hours
         )
-        self.assertEqual(response.data["count"], COUNT)
-        self.assertTrue(self._compare_ids(mentor_office_hours, response))
 
     def test_filters_by_mentor_name(self):
         mentor, mentor_office_hours = self._create_office_hours()
-        response = self._get_response_as_logged_in_user(
-            {'mentor_name': mentor.full_name()}
+        self._check_response_values(
+            {'mentor_name': mentor.full_name()},
+            mentor_office_hours
         )
-        self.assertEqual(response.data["count"], COUNT)
-        self.assertTrue(self._compare_ids(mentor_office_hours, response))
+
+    def test_nonexistent_mentor_id_returns_nothing(self):
+        mentor, mentor_office_hours = self._create_office_hours()
+        self._assert_nil_response_values(
+            {'mentor_id': NON_EXISTENT_ID}
+        )
+
+    def test_nonexistent_mentor_name_returns_nothing(self):
+        mentor, mentor_office_hours = self._create_office_hours()
+        self._assert_nil_response_values(
+            {'mentor_name': NON_EXISTENT_NAME}
+        )
 
     def test_filters_by_finalist_id(self):
         finalist, finalist_office_hours = self._create_office_hours(
             mentor=False
         )
-        response = self._get_response_as_logged_in_user(
-            {'finalist_id': finalist.id}
+        self._check_response_values(
+            {'finalist_id': finalist.id},
+            finalist_office_hours
         )
-        self.assertEqual(response.data["count"], COUNT)
-        self.assertTrue(self._compare_ids(finalist_office_hours, response))
-
-    def test_invalid_finalist_id_returns_nothing(self):
-        finalist, finalist_office_hours = self._create_office_hours(
-            mentor=False
-        )
-        response = self._get_response_as_logged_in_user(
-            {'finalist_id': 9999999}
-        )
-        self.assertEqual(response.data["count"], 0)
-        self.assertEqual(response.data["results"], [])
-
-    def test_invalid_finalist_name_returns_nothing(self):
-        finalist, finalist_office_hours = self._create_office_hours(
-            mentor=False
-        )
-        response = self._get_response_as_logged_in_user(
-            {'finalist_name': ''}
-        )
-        self.assertEqual(response.data["count"], 0)
-        self.assertEqual(response.data["results"], [])
 
     def test_filters_by_finalist_name(self):
         finalist, finalist_office_hours = self._create_office_hours(
             mentor=False
         )
-        response = self._get_response_as_logged_in_user(
-            {'finalist_name': finalist.full_name()}
+        self._check_response_values(
+            {'finalist_name': finalist.full_name()},
+            finalist_office_hours
         )
+
+    def test_filters_by_partial_finalist_name(self):
+        finalist, finalist_office_hours = self._create_office_hours(
+            mentor=False
+        )
+        self._check_response_values(
+            {'finalist_name': finalist.first_name},
+            finalist_office_hours
+        )
+
+    def test_nonexistent_finalist_id_returns_nothing(self):
+        finalist, finalist_office_hours = self._create_office_hours(
+            mentor=False
+        )
+        self._assert_nil_response_values(
+            {'finalist_id': NON_EXISTENT_ID}
+        )
+
+    def test_nonexistent_finalist_name_returns_nothing(self):
+        finalist, finalist_office_hours = self._create_office_hours(
+            mentor=False
+        )
+        self._assert_nil_response_values(
+            {'finalist_name': NON_EXISTENT_NAME}
+        )
+
+    def _check_response_values(self, params, office_hours):
+        response = self._get_response_as_logged_in_user(params)
         self.assertEqual(response.data["count"], COUNT)
-        self.assertTrue(self._compare_ids(finalist_office_hours, response))
+        self.assertTrue(self._compare_ids(office_hours, response))
+
+    def _assert_nil_response_values(self, params):
+        response = self._get_response_as_logged_in_user(params)
+        self.assertEqual(response.data["count"], 0)
+        self.assertEqual(response.data["results"], [])
 
     def _create_office_hours(self, mentor=True):
         if mentor:
@@ -114,7 +139,7 @@ class TestMentorProgramOfficeHourListView(APITestCase):
             user = EntrepreneurFactory()
             office_hours = MentorProgramOfficeHourFactory.create_batch(
                 COUNT, finalist=user)
-        # create no user associated office hours
+        # create office hours not associated with user
         MentorProgramOfficeHourFactory.create_batch(4)
         return user, office_hours
 
