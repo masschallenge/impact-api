@@ -7,28 +7,18 @@ from impact.v1.helpers import (
 )
 
 
-LOOKUPS = {
-    'mentor_email': 'mentor__email__icontains',
-    'mentor_id': 'mentor_id',
-    'finalist_email': 'finalist__email__icontains',
-    'finalist_id': 'finalist_id',
-}
-
-
 class MentorProgramOfficeHourListView(BaseListView):
     view_name = "office_hour"
     helper_class = MentorProgramOfficeHourHelper
 
     def filter(self, queryset):
-        if self.request.query_params.keys():
-            filter_values = self._get_filter()
-            return queryset.filter(**filter_values)
-        return queryset
+        allowed_params = ['mentor_id', 'finalist_d']
+        param_items = self.request.query_params.items()
 
-    def _get_filter(self):
-        query_params = self.request.query_params.dict()
-        query_filter = {
-            LOOKUPS[key]: value for key, value in query_params.items()
-            if key in LOOKUPS.keys()
-        }
-        return query_filter
+        if not param_items:
+            return queryset
+
+        filter_values = {
+            key: value for (key, value) in param_items
+            if key in allowed_params}
+        return queryset.filter(**filter_values)
