@@ -12,7 +12,7 @@ class MentorProgramOfficeHourListView(BaseListView):
     helper_class = MentorProgramOfficeHourHelper
 
     def filter(self, queryset):
-        allowed_params = ['mentor_id', 'finalist_d']
+        allowed_params = ['mentor_id', 'finalist_id']
         param_items = self.request.query_params.items()
 
         if not param_items:
