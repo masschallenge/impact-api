@@ -49,8 +49,10 @@ class MentorProgramOfficeHourListView(BaseListView):
     def _filter_by_participant_id(self, qs, param_items):
         filter_values = {
             key: value for key, value in param_items
-            if key in ID_FIELDS}
-        return qs.filter(**filter_values)
+            if key in ID_FIELDS and value.isdigit()}
+        if filter_values:
+            return qs.filter(**filter_values)
+        return qs.none()
 
     def _has_participant_filter(self, fields):
         return any(
