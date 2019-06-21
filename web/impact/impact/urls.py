@@ -114,6 +114,9 @@ urls = [
     url(r'^directory/(?:.*)$', TemplateView.as_view(
         template_name='front-end.html'),
         name="directory"),
+    url(r'^directory/people/(?:.*)$', TemplateView.as_view(
+        template_name='front-end.html'),
+        name="directory_people"),
     url(r'^allocator/(?:.*)$', TemplateView.as_view(
         template_name='front-end.html'),
         name="allocator"),
