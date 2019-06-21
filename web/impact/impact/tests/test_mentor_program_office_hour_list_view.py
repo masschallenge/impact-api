@@ -19,8 +19,8 @@ from impact.v1.helpers.mentor_program_office_hour_helper import (
 from impact.tests.utils import assert_fields
 from impact.v1.views import MentorProgramOfficeHourListView
 
-USER_COUNT = 3
-NON_USER_COUNT = 4
+USER_OFFICE_HOUR_COUNT = 3
+NON_USER_OFFICE_HOUR_COUNT = 4
 NON_EXISTENT_ID = 999
 NON_EXISTENT_NAME = 'qwerty'
 
@@ -30,7 +30,7 @@ class TestMentorProgramOfficeHourListView(APITestCase):
 
     def setUp(self):
         self.test_office_hours = MentorProgramOfficeHourFactory.create_batch(
-            NON_USER_COUNT
+            NON_USER_OFFICE_HOUR_COUNT
         )
 
     def tearDown(self):
@@ -39,12 +39,12 @@ class TestMentorProgramOfficeHourListView(APITestCase):
     def test_get(self):
         _, office_hours = self._create_user_office_hours()
         response = self._get_response_as_logged_in_user()
-        total_count = USER_COUNT + NON_USER_COUNT
+        total_count = USER_OFFICE_HOUR_COUNT + NON_USER_OFFICE_HOUR_COUNT
         self.assertEqual(response.data["count"], total_count)
         self.assertTrue(self._compare_ids(office_hours, response))
         self.assertTrue(self._compare_ids(self.test_office_hours, response))
 
-    def test_options(self):
+    def test_get_options_match_model_helper_fields(self):
         with self.login(email=self.basic_user().email):
             response = self.client.options(self.url)
             self.assertEqual(response.status_code, 200)
@@ -132,7 +132,7 @@ class TestMentorProgramOfficeHourListView(APITestCase):
 
     def _check_response_values(self, params, office_hours):
         response = self._get_response_as_logged_in_user(params)
-        self.assertEqual(response.data["count"], USER_COUNT)
+        self.assertEqual(response.data["count"], USER_OFFICE_HOUR_COUNT)
         self.assertTrue(self._compare_ids(office_hours, response))
 
     def _assert_nil_response_values(self, params):
@@ -144,11 +144,11 @@ class TestMentorProgramOfficeHourListView(APITestCase):
         if mentor:
             user = ExpertFactory()
             office_hours = MentorProgramOfficeHourFactory.create_batch(
-                USER_COUNT, mentor=user)
+                USER_OFFICE_HOUR_COUNT, mentor=user)
         else:
             user = EntrepreneurFactory()
             office_hours = MentorProgramOfficeHourFactory.create_batch(
-                USER_COUNT, finalist=user)
+                USER_OFFICE_HOUR_COUNT, finalist=user)
         return user, office_hours
 
     def _get_response_as_logged_in_user(self, params=None):
@@ -156,9 +156,8 @@ class TestMentorProgramOfficeHourListView(APITestCase):
         return self.client.get(self.url, params)
 
     def _compare_ids(self, office_hours, response):
-        office_hour_ids = [
-            office_hour.id for office_hour in office_hours]
         result_ids = [
             result['id'] for result in response.data["results"]
         ]
-        return all([id in result_ids for id in office_hour_ids])
+        return all(
+            [office_hour.id in result_ids for office_hour in office_hours])
