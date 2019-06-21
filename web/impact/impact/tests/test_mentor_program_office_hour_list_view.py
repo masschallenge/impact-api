@@ -130,39 +130,36 @@ class TestMentorProgramOfficeHourListView(APITestCase):
             {'finalist_name': NON_EXISTENT_NAME}
         )
 
-    def test_filters_by_mentor_id_and_finalist_id(self):
+    def test_filters_by_both_mentor_id_and_finalist_id(self):
+        self._assert_response_for_params_of_type('id')
+
+    def test_filters_by_both_mentor_name_and_finalist_name(self):
+        self._assert_response_for_params_of_type('name')
+
+    def _assert_response_for_params_of_type(
+            self, param_type):
         finalist, finalist_office_hours = self._create_user_office_hours(
             mentor=False
         )
         mentor, mentor_office_hours = self._create_user_office_hours()
         mentor_finalist_office_hour = MentorProgramOfficeHourFactory(
             finalist=finalist, mentor=mentor)
-        response = self._get_response_as_logged_in_user(
-            {
-                'finalist_id': finalist.id,
-                'mentor_id': mentor.id
-            }
-        )
+        params = self._generate_params(finalist, mentor, param_type)
+        response = self._get_response_as_logged_in_user(params)
         self.assertEqual(response.data["count"], 1)
         self.assertTrue(
             response.data["results"][0]["id"], mentor_finalist_office_hour.id)
 
-    def test_filters_by_mentor_name_and_finalist_name(self):
-        finalist, finalist_office_hours = self._create_user_office_hours(
-            mentor=False
-        )
-        mentor, mentor_office_hours = self._create_user_office_hours()
-        mentor_finalist_office_hour = MentorProgramOfficeHourFactory(
-            finalist=finalist, mentor=mentor)
-        response = self._get_response_as_logged_in_user(
-            {
-                'finalist_name': finalist.first_name,
-                'mentor_name': mentor.last_name
+    def _generate_params(self, finalist, mentor, param_type='id'):
+        if param_type == 'id':
+            return {
+                'finalist_id': finalist.id,
+                'mentor_id': mentor.id
             }
-        )
-        self.assertEqual(response.data["count"], 1)
-        self.assertTrue(
-            response.data["results"][0]["id"], mentor_finalist_office_hour.id)
+        return {
+            'finalist_name': finalist.first_name,
+            'mentor_name': mentor.last_name
+        }
 
     def _check_response_values(self, params, office_hours):
         response = self._get_response_as_logged_in_user(params)
