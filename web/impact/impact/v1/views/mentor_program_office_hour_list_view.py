@@ -17,6 +17,7 @@ class MentorProgramOfficeHourListView(BaseListView):
     helper_class = MentorProgramOfficeHourHelper
 
     def filter(self, qs):
+        qs = super().filter(qs)
         if not self.request.query_params.keys():
             return qs
 
@@ -57,4 +58,4 @@ class MentorProgramOfficeHourListView(BaseListView):
 
     def _has_participant_filter(self, fields):
         return any(
-            key in self.request.query_params.keys() for key in fields)
+            field in self.request.query_params.keys() for field in fields)
