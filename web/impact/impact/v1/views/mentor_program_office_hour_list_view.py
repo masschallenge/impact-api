@@ -25,8 +25,18 @@ class MentorProgramOfficeHourListView(BaseListView):
             return self._filter_by_participant_name(qs)
 
         if self._has_participant_filter(ID_FIELDS):
-            param_items = self.request.query_params.dict().items()
-            return self._filter_by_participant_id(qs, param_items)
+            return self._filter_by_ids(qs)
+
+    def _filter_by_ids(self, qs):
+        params = self.request.query_params
+        mentor_id = params.get('mentor_id', None)
+        finalist_id = params.get('finalist_id', None)
+
+        if mentor_id and mentor_id.isdigit():
+            qs = self.filter_by_field('mentor_id', qs)
+        if finalist_id and mentor_id.isdigit():
+            qs = self.filter_by_field('finalist_id', qs)
+        return qs
 
     def _filter_by_participant_name(self, qs):
         params = self.request.query_params
@@ -47,14 +57,6 @@ class MentorProgramOfficeHourListView(BaseListView):
                 first_name_field, V(' '), last_name_field)).filter(
                     full_name__icontains=name_value)
         return result
-
-    def _filter_by_participant_id(self, qs, param_items):
-        filter_values = {
-            key: value for key, value in param_items
-            if key in ID_FIELDS and value.isdigit()}
-        if filter_values:
-            return qs.filter(**filter_values)
-        return qs.none()
 
     def _has_participant_filter(self, fields):
         return any(
