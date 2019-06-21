@@ -147,6 +147,23 @@ class TestMentorProgramOfficeHourListView(APITestCase):
         self.assertTrue(
             response.data["results"][0]["id"], mentor_finalist_office_hour.id)
 
+    def test_filters_by_mentor_name_and_finalist_name(self):
+        finalist, finalist_office_hours = self._create_user_office_hours(
+            mentor=False
+        )
+        mentor, mentor_office_hours = self._create_user_office_hours()
+        mentor_finalist_office_hour = MentorProgramOfficeHourFactory(
+            finalist=finalist, mentor=mentor)
+        response = self._get_response_as_logged_in_user(
+            {
+                'finalist_name': finalist.first_name,
+                'mentor_name': mentor.last_name
+            }
+        )
+        self.assertEqual(response.data["count"], 1)
+        self.assertTrue(
+            response.data["results"][0]["id"], mentor_finalist_office_hour.id)
+
     def _check_response_values(self, params, office_hours):
         response = self._get_response_as_logged_in_user(params)
         self.assertEqual(response.data["count"], USER_OFFICE_HOUR_COUNT)

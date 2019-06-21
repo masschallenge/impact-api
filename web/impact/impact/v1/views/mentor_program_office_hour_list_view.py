@@ -34,7 +34,7 @@ class MentorProgramOfficeHourListView(BaseListView):
 
         if mentor_id and mentor_id.isdigit():
             qs = self.filter_by_field('mentor_id', qs)
-        if finalist_id and mentor_id.isdigit():
+        if finalist_id and finalist_id.isdigit():
             qs = self.filter_by_field('finalist_id', qs)
         return qs
 
@@ -44,10 +44,10 @@ class MentorProgramOfficeHourListView(BaseListView):
         finalist_name = params.get('finalist_name', None)
 
         if mentor_name:
-            return self._filter_by_full_name(qs, 'mentor', mentor_name)
+            qs = self._filter_by_full_name(qs, 'mentor', mentor_name)
         if finalist_name:
-            return self._filter_by_full_name(qs, 'finalist', finalist_name)
-        return qs.none()
+            qs = self._filter_by_full_name(qs, 'finalist', finalist_name)
+        return qs
 
     def _filter_by_full_name(self, qs, user, name_value):
         first_name_field = '{}__first_name'.format(user)
