@@ -34,12 +34,12 @@ class MentorProgramOfficeHourListView(BaseListView):
         finalist_name = params.get('finalist_name', None)
 
         if mentor_name:
-            return self._generate_name_query(qs, 'mentor', mentor_name)
+            return self._filter_by_full_name(qs, 'mentor', mentor_name)
         if finalist_name:
-            return self._generate_name_query(qs, 'finalist', finalist_name)
+            return self._filter_by_full_name(qs, 'finalist', finalist_name)
         return qs.none()
 
-    def _generate_name_query(self, qs, user, name_value):
+    def _filter_by_full_name(self, qs, user, name_value):
         first_name_field = '{}__first_name'.format(user)
         last_name_field = '{}__last_name'.format(user)
         result = qs.annotate(
