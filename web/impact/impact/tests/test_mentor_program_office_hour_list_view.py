@@ -19,7 +19,8 @@ from impact.v1.helpers.mentor_program_office_hour_helper import (
 from impact.tests.utils import assert_fields
 from impact.v1.views import MentorProgramOfficeHourListView
 
-COUNT = 3
+USER_COUNT = 3
+NON_USER_COUNT = 4
 NON_EXISTENT_ID = 999
 NON_EXISTENT_NAME = 'qwerty'
 
@@ -29,7 +30,7 @@ class TestMentorProgramOfficeHourListView(APITestCase):
 
     def setUp(self):
         self.test_office_hours = MentorProgramOfficeHourFactory.create_batch(
-            COUNT
+            NON_USER_COUNT
         )
 
     def tearDown(self):
@@ -38,7 +39,7 @@ class TestMentorProgramOfficeHourListView(APITestCase):
     def test_get(self):
         _, office_hours = self._create_user_office_hours()
         response = self._get_response_as_logged_in_user()
-        total_count = COUNT + COUNT
+        total_count = USER_COUNT + NON_USER_COUNT
         self.assertEqual(response.data["count"], total_count)
         self.assertTrue(self._compare_ids(office_hours, response))
         self.assertTrue(self._compare_ids(self.test_office_hours, response))
@@ -131,7 +132,7 @@ class TestMentorProgramOfficeHourListView(APITestCase):
 
     def _check_response_values(self, params, office_hours):
         response = self._get_response_as_logged_in_user(params)
-        self.assertEqual(response.data["count"], COUNT)
+        self.assertEqual(response.data["count"], USER_COUNT)
         self.assertTrue(self._compare_ids(office_hours, response))
 
     def _assert_nil_response_values(self, params):
@@ -143,11 +144,11 @@ class TestMentorProgramOfficeHourListView(APITestCase):
         if mentor:
             user = ExpertFactory()
             office_hours = MentorProgramOfficeHourFactory.create_batch(
-                COUNT, mentor=user)
+                USER_COUNT, mentor=user)
         else:
             user = EntrepreneurFactory()
             office_hours = MentorProgramOfficeHourFactory.create_batch(
-                COUNT, finalist=user)
+                USER_COUNT, finalist=user)
         return user, office_hours
 
     def _get_response_as_logged_in_user(self, params=None):
