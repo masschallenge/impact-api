@@ -22,31 +22,32 @@ class MentorProgramOfficeHourListView(BaseListView):
             return qs
 
         if self._has_participant_filter(NAME_FIELDS):
-            return self._filter_by_participant_name(qs)
+            return self._filter_by_participant_names(qs)
 
         if self._has_participant_filter(ID_FIELDS):
             return self._filter_by_ids(qs)
 
-    def _filter_by_ids(self, qs):
-        params = self.request.query_params
-        mentor_id = params.get('mentor_id', None)
-        finalist_id = params.get('finalist_id', None)
-
-        if mentor_id and mentor_id.isdigit():
-            qs = self.filter_by_field('mentor_id', qs)
-        if finalist_id and finalist_id.isdigit():
-            qs = self.filter_by_field('finalist_id', qs)
+    def _filter_by_id(self, id_field, qs):
+        value = self.request.query_params.get(id_field, None)
+        if value and value.isdigit():
+            return self.filter_by_field(id_field, qs)
         return qs
 
-    def _filter_by_participant_name(self, qs):
-        params = self.request.query_params
-        mentor_name = params.get('mentor_name', None)
-        finalist_name = params.get('finalist_name', None)
+    def _filter_by_ids(self, qs):
+        qs = self._filter_by_id('mentor_id', qs)
+        qs = self._filter_by_id('finalist_id', qs)
+        return qs
 
-        if mentor_name:
-            qs = self._filter_by_full_name(qs, 'mentor', mentor_name)
-        if finalist_name:
-            qs = self._filter_by_full_name(qs, 'finalist', finalist_name)
+    def _filter_by_participant_names(self, qs):
+        qs = self._filter_by_participant_name('mentor_name', qs)
+        qs = self._filter_by_participant_name('finalist_name', qs)
+        return qs
+
+    def _filter_by_participant_name(self, name_field, qs):
+        value = self.request.query_params.get(name_field, None)
+        user_type = name_field.replace('_name', '')
+        if value:
+            return self._filter_by_full_name(qs, user_type, value)
         return qs
 
     def _filter_by_full_name(self, qs, user, name_value):
