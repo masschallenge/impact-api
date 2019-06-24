@@ -21,15 +21,13 @@ class MentorProgramOfficeHourListView(BaseListView):
         if not self.request.query_params.keys():
             return qs
 
-        if self._has_participant_filter(NAME_FIELDS):
-            return self._filter_by_participant_names(qs)
+        if self._has_mentor_or_finalist_filter(NAME_FIELDS):
+            return self._filter_by_mentor_or_finalist_names(qs)
 
-        if self._has_participant_filter(ID_FIELDS):
+        if self._has_mentor_or_finalist_filter(ID_FIELDS):
             return self._filter_by_ids(qs)
 
-        user_name = self.request.query_params.get('user_name', None)
-        if user_name:
-            return self._filter_by_user_name(user_name, qs)
+        return self._filter_by_user_name(qs)
 
     def _filter_by_id(self, id_field, qs):
         value = self.request.query_params.get(id_field, None)
@@ -42,19 +40,25 @@ class MentorProgramOfficeHourListView(BaseListView):
         qs = self._filter_by_id('finalist_id', qs)
         return qs
 
-    def _filter_by_participant_names(self, qs):
-        qs = self._filter_by_participant_name('mentor_name', qs)
-        qs = self._filter_by_participant_name('finalist_name', qs)
+    def _filter_by_mentor_or_finalist_names(self, qs):
+        qs = self._filter_by_mentor_or_finalist_name('mentor_name', qs)
+        qs = self._filter_by_mentor_or_finalist_name('finalist_name', qs)
         return qs
 
-    def _filter_by_participant_name(self, name_field, qs):
+    def _filter_by_mentor_or_finalist_name(self, name_field, qs):
         value = self.request.query_params.get(name_field, None)
         user_type = name_field.replace('_name', '')
         if value:
             return self._filter_by_full_name(qs, user_type, value)
         return qs
 
-    def _filter_by_user_name(self, user_name, qs):
+    def _filter_by_user_name(self, qs):
+        user_name = self.request.query_params.get('user_name', None)
+        if user_name:
+            return self._filter_by_user_names(user_name, qs)
+        return qs
+
+    def _filter_by_user_names(self, user_name, qs):
         mentor_qs = self._filter_by_full_name(qs, 'mentor', user_name)
         finalist_qs = self._filter_by_full_name(qs, 'finalist', user_name)
         return mentor_qs | finalist_qs
@@ -68,6 +72,6 @@ class MentorProgramOfficeHourListView(BaseListView):
                     full_name__icontains=name_value)
         return result
 
-    def _has_participant_filter(self, fields):
+    def _has_mentor_or_finalist_filter(self, fields):
         return any(
             field in self.request.query_params.keys() for field in fields)
