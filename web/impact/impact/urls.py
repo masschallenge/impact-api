@@ -123,7 +123,7 @@ urls = [
     url(r'^people/(.*)/$', TemplateView.as_view(
         template_name='front-end.html'),
         name="entreprenuer_profile"),
-    url(r'^startup/$', TemplateView.as_view(
+    url(r'^startups/$', TemplateView.as_view(
         template_name='front-end.html'),
         name="startup_profile"),
     url(r'^openid/', include('oidc_provider.urls', namespace='oidc_provider')),
