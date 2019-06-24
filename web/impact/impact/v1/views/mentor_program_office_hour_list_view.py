@@ -27,6 +27,10 @@ class MentorProgramOfficeHourListView(BaseListView):
         if self._has_participant_filter(ID_FIELDS):
             return self._filter_by_ids(qs)
 
+        user_name = self.request.query_params.get('user_name', None)
+        if user_name:
+            return self._filter_by_user_name(user_name, qs)
+
     def _filter_by_id(self, id_field, qs):
         value = self.request.query_params.get(id_field, None)
         if value and value.isdigit():
@@ -49,6 +53,11 @@ class MentorProgramOfficeHourListView(BaseListView):
         if value:
             return self._filter_by_full_name(qs, user_type, value)
         return qs
+
+    def _filter_by_user_name(self, user_name, qs):
+        mentor_qs = self._filter_by_full_name(qs, 'mentor', user_name)
+        finalist_qs = self._filter_by_full_name(qs, 'finalist', user_name)
+        return mentor_qs | finalist_qs
 
     def _filter_by_full_name(self, qs, user, name_value):
         first_name_field = '{}__first_name'.format(user)
