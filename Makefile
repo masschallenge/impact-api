@@ -438,15 +438,6 @@ release:
 	@bash create_release.sh
 
 
-old-deploy: DOCKER_REGISTRY = $(aws ecr describe-repositories --repository-name impact-api | cut -d"\"" -f4 | cut -d"/" -f1 | grep -i "amazonaws.com")
-old-deploy:
-ifndef RELEASE
-	$(error $(no_release_error_msg))
-endif
-	@ecs deploy --ignore-warnings $(TARGET) impact \
-	--image web $(DOCKER_REGISTRY)/impact-api:$(RELEASE) \
-	--image redis $(DOCKER_REGISTRY)/redis:$(RELEASE)
-
 travis-release: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
 travis-release:
 ifndef AWS_SECRET_ACCESS_KEY
@@ -474,12 +465,14 @@ endif
 	@ecs-cli compose -f docker-compose.prod.yml up
 
 
+deploy:
+	@if [ "$$TRAVIS_PULL_REQUEST" != "false" ] || [ "$$IMAGE_TAG" != "development" ]; then exit 1; fi;
+	@pip install --upgrade certifi pyopenssl requests[security] ndg-httpsclient pyasn1 pip botocore
+	@curl -s https://raw.githubusercontent.com/silinternational/ecs-deploy/master/ecs-deploy | sudo tee /usr/bin/ecs-deploy
+	@sudo chmod +x /usr/bin/ecs-deploy
+	@ecs-deploy -c $$PRE_STAGING_ECS_CLUSTER -n $$PRE_STAGING_ECS_SERVICE -i $$DOCKER_REGISTRY/impact-api:$$IMAGE_TAG --force-new-deployment
 
 # Deprecated targets
-deploy:
-	@echo $@ ERROR: see deployment steps for accelerate.
-	@echo see: https://github.com/masschallenge/standards/blob/376d290b41a202acc5c2263d7275ba4a57330ad7/create_new_release.md#deploy-to-staging
-
 dbdump:
 	@echo ERROR: dbdump has been replaced by dump-db
 
