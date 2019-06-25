@@ -17,8 +17,8 @@ class TestCalendarReminderView(APITestCase):
 
     def setUp(self):
         self.add2cal = Add2Cal(
-            start=float(1558634110),
-            end=float(1558634120),
+            start='20190523T144641',
+            end='20190523T144641',
             title="mentoring session with dj shank",
             location='boston',
             description='test'
@@ -28,8 +28,8 @@ class TestCalendarReminderView(APITestCase):
         with self.login(email=self.basic_user().email):
             params = {
                 "link_type": "outlook",
-                "start": "1558634110",
-                "end": "1558634120",
+                "start": "20190523T144641",
+                "end": "20190523T144641",
                 "title": "mentoring session with dj shank",
                 'location': 'boston',
                 'description': 'test'
@@ -46,8 +46,8 @@ class TestCalendarReminderView(APITestCase):
         with self.login(email=self.basic_user().email):
             params = {
                 "link_type": "google",
-                "start": "1558634110",
-                "end": "1558634120",
+                "start": "20190523T144641",
+                "end": "20190523T144641",
                 "title": "mentoring session with dj shank",
                 'location': 'boston',
                 'description': 'test'
@@ -65,8 +65,8 @@ class TestCalendarReminderView(APITestCase):
         with self.login(email=self.basic_user().email):
             params = {
                 "link_type": "yahoo",
-                "start": "1558634110",
-                "end": "1558634120",
+                "start": "20190523T144641",
+                "end": "20190523T144641",
                 "title": "mentoring session with dj shank",
                 'location': 'boston',
                 'description': 'test'
@@ -83,8 +83,8 @@ class TestCalendarReminderView(APITestCase):
         with self.login(email=self.basic_user().email):
             params = {
                 "link_type": "ical",
-                "start": "1558634110",
-                "end": "1558634120",
+                "start": "20190523T144641",
+                "end": "20190523T144641",
                 "title": "mentoring session with dj shank",
                 'location': 'boston',
                 'description': 'test'
