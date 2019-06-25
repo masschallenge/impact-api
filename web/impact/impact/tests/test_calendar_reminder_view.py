@@ -54,7 +54,6 @@ class TestCalendarReminderView(APITestCase):
             }
             response = self.get("calendar_reminder_view", data=params)
             self.response_302()
-        print(self.add2cal.as_dict()['gcal_link'])
         self.assertEquals(
             response.url,
             self.add2cal.as_dict()['gcal_link']
