@@ -9,7 +9,7 @@ from rest_framework.renderers import (
     JSONRenderer,
     TemplateHTMLRenderer)
 
-DATE_FORMAT = "%Y%m%dT%H%M%SZ"
+DATE_FORMAT = "%Y%m%dT%H%M%S"
 
 
 class ICalRenderer(renderers.BaseRenderer):
