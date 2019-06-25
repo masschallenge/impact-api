@@ -76,20 +76,17 @@ def _get_search_key(request):
 
 
 def _get_filters(request):
+    if is_employee(request.user):
+        return []
+
+
     if request.GET['index'] == 'people':
         if not base_accelerator_check(request.user):
             raise PermissionDenied()
-        if is_employee(request.user):
-            return _build_filter(
-                IS_TEAM_MEMBER_FILTER, HAS_FINALIST_ROLE_FILTER)
-        else:
-            return _build_filter(
-                IS_TEAM_MEMBER_FILTER,
-                HAS_FINALIST_ROLE_FILTER, IS_ACTIVE_FILTER)
+        return _build_filter(
+            IS_TEAM_MEMBER_FILTER,
+            HAS_FINALIST_ROLE_FILTER, IS_ACTIVE_FILTER)
 
-    # an empty filter i.e. [], means the user sees all mentors
-    if is_employee(request.user):
-        return []
 
     if request.GET['index'] == 'mentor':
         participant_roles = [UserRole.AIR, UserRole.STAFF, UserRole.MENTOR]
