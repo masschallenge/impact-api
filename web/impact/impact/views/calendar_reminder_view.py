@@ -31,6 +31,9 @@ class CalendarReminderView(APIView):
     permission_classes = (
     )
 
+    authentication_classes = (
+    )
+
     actions = ["GET"]
 
     renderer_classes = (
