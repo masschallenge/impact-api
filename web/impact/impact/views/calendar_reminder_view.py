@@ -1,47 +1,19 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from django.views import View
 from django.http import HttpResponseRedirect
 from add2cal import Add2Cal
 import datetime
-from rest_framework import renderers
-from rest_framework.renderers import (
-    BrowsableAPIRenderer,
-    JSONRenderer,
-    TemplateHTMLRenderer)
+from django.http import (
+    JsonResponse,
+    HttpResponse
+)
 
 DATE_FORMAT = "%Y%m%dT%H%M%S"
 
 
-class ICalRenderer(renderers.BaseRenderer):
-    media_type = 'text/calendar'
-    format = 'ics'
+class CalendarReminderView(View):
 
-    def render(
-            self,
-            data,
-            accepted_media_type=None,
-            media_type=None,
-            renderer_context=None):
-        return data
-
-
-class CalendarReminderView(APIView):
-    view_name = 'calendar_reminder_view'
-
-    permission_classes = (
-    )
-
-    authentication_classes = (
-    )
-
-    actions = ["GET"]
-
-    renderer_classes = (
-        ICalRenderer, BrowsableAPIRenderer,
-        JSONRenderer, TemplateHTMLRenderer,)
-
-    def get(self, request, format=None):
-        params = self.request.query_params
+    def get(self, request, *args, **kwargs):
+        params = self.request.GET
         start = params.get('start', datetime.datetime.now().strftime(
             DATE_FORMAT))
         end = params.get('end', datetime.datetime.now().strftime(DATE_FORMAT))
@@ -58,7 +30,7 @@ class CalendarReminderView(APIView):
             location=location)
         calendar_data = add2cal.as_dict()
         if link_type == 'ical':
-            response = Response(
+            response = HttpResponse(
                 calendar_data['ical_content'], content_type='text/calendar')
             attachment = 'attachment; filename={title}.ics'.format(
                 title=title)
@@ -77,4 +49,4 @@ class CalendarReminderView(APIView):
             return HttpResponseRedirect(
                 redirect_to=calendar_data['yahoo_link'])
         else:
-            return Response(add2cal.as_dict())
+            return JsonResponse(add2cal.as_dict())

@@ -65,7 +65,7 @@ urls = [
     url(r'^api/algolia/api_key/$', AlgoliaApiKeyView.as_view(),
         name=AlgoliaApiKeyView.view_name),
     url(r'^api/calendar/reminder/$', CalendarReminderView.as_view(),
-        name=CalendarReminderView.view_name),
+        name='calendar-reminder-view'),
     url(r'^api/v0/', include(v0_urlpatterns)),
     url(r'^api/v1/', include(v1_urlpatterns)),
     url(r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/'
