@@ -228,3 +228,4 @@ you would invoke:
 This is equivalent to running `make bash-shell`.
 
 FOOBAR
+BARFOO
