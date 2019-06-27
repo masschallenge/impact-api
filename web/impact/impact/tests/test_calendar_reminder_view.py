@@ -90,5 +90,7 @@ class TestCalendarReminderView(APITestCase):
             }
             response = self.get("calendar_reminder_view", data=params)
             self.response_200()
-        self.assertEquals(response.content_type, 'text/calendar')
-        self.assertTrue(response.data.startswith('BEGIN:VCALENDAR'))
+        self.assertEquals(
+            response.request['CONTENT_TYPE'], 'application/octet-stream')
+        self.assertTrue(
+            response.content.decode().startswith('BEGIN:VCALENDAR'))
