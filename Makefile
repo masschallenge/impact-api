@@ -466,7 +466,7 @@ endif
 
 
 deploy:
-	@if [ "$$IMAGE_TAG" != "development" ]; then exit 1; fi;
+	@if [ "$$TRAVIS_PULL_REQUEST" != "false" ] || [ "$$IMAGE_TAG" != "development" ]; then exit 1; fi;
 	@pip install --upgrade certifi pyopenssl requests[security] ndg-httpsclient pyasn1 pip botocore
 	@curl -s https://raw.githubusercontent.com/silinternational/ecs-deploy/master/ecs-deploy | sudo tee /usr/bin/ecs-deploy
 	@sudo chmod +x /usr/bin/ecs-deploy
