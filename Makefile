@@ -69,8 +69,9 @@ lower_target_help = \
 target_help = \
   'help - Prints this help message.' \
   ' ' \
-  'test - Run tests with no coverage. Run just those specified in $$(tests)' \
-  '\tif provided.  E.g.:' \
+  'test - Run tests with no coverage and while preserving the test database.' \
+	'\tIf you do not want to preserve the database add the keepdb=no flag E.g. make test keepdb=no' \
+	'\tRun just those specified in $$(tests)' \
   '\tmake test tests="impact.tests.test_file1 impact.tests.test_file2"' \
   'coverage - Run tests with coverage summary in terminal.' \
   'coverage-html - Run tests with coverage and open report in browser.' \
@@ -188,8 +189,9 @@ build: shutdown-vms delete-vms setup
 
 tests ?= $(TESTS)  # Backwards compatibility
 test: setup
-	@docker-compose run --rm web \
-		python3 manage.py test --configuration=Test $(tests)
+	@@if [ -z $$keepdb ]; then keepdb="--keepdb"; else keepdb=""; fi; \
+	docker-compose run --rm web \
+		python3 manage.py test $$keepdb --configuration=Test $(tests)
 
 coverage: coverage-run coverage-report coverage-html-report
 
@@ -224,9 +226,9 @@ code-check:
 ACCELERATE = ../accelerate
 DJANGO_ACCELERATOR = ../django-accelerator
 IMPACT_API = ../impact-api
-DIRECTORY = ../directory
+FRONT_END = ../front-end
 SEMANTIC = ../semantic-ui-theme
-REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(DIRECTORY) $(SEMANTIC) $(IMPACT_API) 
+REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(FRONT_END) $(SEMANTIC) $(IMPACT_API) 
 
 # Database migration related targets
 
@@ -256,7 +258,13 @@ status:
 checkout:
 	@for r in $(REPOS) ; do \
 		cd $$r; \
-		git show-ref --verify --quiet refs/heads/$(branch); \
+		git fetch 2>/dev/null; \
+		if [ $$? -ne 0 ]; then \
+			echo "Fetching the latest from the remote failed, you may not be able to checkout an existing remote branch."; \
+			echo "Check your internet connection if the checkout fails."; \
+			echo ""; \
+		fi; \
+		git branch -a | egrep $(branch) > /dev/null; \
 		if [ $$? -eq 0 ]; then \
 			git -c 'color.ui=always' checkout $(branch) > /tmp/gitoutput 2>&1; \
 		else \
@@ -270,7 +278,7 @@ checkout:
 watch-frontend stop-frontend: process-exists=$(shell ps -ef | egrep -h "./watch_frontend.sh|parcel watch" | grep -v "grep" | awk '{print $$2}')
 watch-frontend:
 	@if [ -z "$(process-exists)" ]; then \
-		cd $(DIRECTORY) && nohup bash -c "./watch_frontend.sh &" && cd $(IMPACT_API); \
+		cd $(FRONT_END) && nohup bash -c "./watch_frontend.sh &" && cd $(IMPACT_API); \
 	fi;
 
 stop-frontend:
@@ -430,15 +438,6 @@ release:
 	@bash create_release.sh
 
 
-old-deploy: DOCKER_REGISTRY = $(aws ecr describe-repositories --repository-name impact-api | cut -d"\"" -f4 | cut -d"/" -f1 | grep -i "amazonaws.com")
-old-deploy:
-ifndef RELEASE
-	$(error $(no_release_error_msg))
-endif
-	@ecs deploy --ignore-warnings $(TARGET) impact \
-	--image web $(DOCKER_REGISTRY)/impact-api:$(RELEASE) \
-	--image redis $(DOCKER_REGISTRY)/redis:$(RELEASE)
-
 travis-release: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
 travis-release:
 ifndef AWS_SECRET_ACCESS_KEY
@@ -466,12 +465,14 @@ endif
 	@ecs-cli compose -f docker-compose.prod.yml up
 
 
+deploy:
+	@if [ "$$TRAVIS_PULL_REQUEST" != "false" ] || [ "$$IMAGE_TAG" != "development" ]; then exit 1; fi;
+	@pip install --upgrade certifi pyopenssl requests[security] ndg-httpsclient pyasn1 pip botocore
+	@curl -s https://raw.githubusercontent.com/silinternational/ecs-deploy/master/ecs-deploy | sudo tee /usr/bin/ecs-deploy
+	@sudo chmod +x /usr/bin/ecs-deploy
+	@ecs-deploy -c $$PRE_STAGING_ECS_CLUSTER -n $$PRE_STAGING_ECS_SERVICE -i $$DOCKER_REGISTRY/impact-api:$$IMAGE_TAG --force-new-deployment
 
 # Deprecated targets
-deploy:
-	@echo $@ ERROR: see deployment steps for accelerate.
-	@echo see: https://github.com/masschallenge/standards/blob/376d290b41a202acc5c2263d7275ba4a57330ad7/create_new_release.md#deploy-to-staging
-
 dbdump:
 	@echo ERROR: dbdump has been replaced by dump-db
 

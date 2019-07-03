@@ -12,7 +12,7 @@ env:
     - RELEASE_TAG=$(git tag -l --points-at HEAD | head -n1)
     - BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
     - DJANGO_ACCELERATOR_REVISION=`./infer_repository_revision.sh "$BRANCH" https://www.github.com/masschallenge/django-accelerator.git`
-    - MENTOR_DIRECTORY_REVISION=`./infer_repository_revision.sh "$BRANCH" https://$GITHUB_ACCESS_TOKEN@github.com/masschallenge/directory.git`
+    - FRONT_END_REVISION=`./infer_repository_revision.sh "$BRANCH" https://$GITHUB_ACCESS_TOKEN@github.com/masschallenge/front-end.git`
 
 before_install:
 - echo -e "machine github.com\n  login $GITHUB_ACCESS_TOKEN" >> ~/.netrc
@@ -36,13 +36,14 @@ before_script:
 - for key in $keys; do echo "$key=${!key}" >> .prod.env; echo "" >> .prod.env; done
 - echo "DATABASE_URL=mysql://${DATABASE_USER}:${DATABASE_PASSWORD}@${DATABASE_HOST}/${DATABASE_NAME}" >> .prod.env
 - echo "" >> .prod.env
-- git clone https://$GITHUB_ACCESS_TOKEN@github.com/masschallenge/directory -b $MENTOR_DIRECTORY_REVISION ../directory
-- cp .prod.env ../directory/.env
+- git clone https://$GITHUB_ACCESS_TOKEN@github.com/masschallenge/front-end -b $FRONT_END_REVISION ../front-end
+- cp .prod.env ../front-end/.env
 - cp .prod.env .env
-- docker build --no-cache -t masschallenge/mentor-directory ../directory
-- docker run -v $(pwd)/../directory/dist:/usr/src/app/dist -t masschallenge/mentor-directory
-- cp -r ../directory/dist web/impact/static/directory-dist
-- cp ../directory/dist/index.html web/impact/templates/directory.html
+- docker build --no-cache -t masschallenge/front-end ../front-end
+- docker run -v $(pwd)/../front-end/dist:/usr/src/app/dist -t masschallenge/front-end
+- cp -r ../front-end/dist web/impact/static/front-end-dist
+- cp -r ../front-end/dist web/impact/static-compiled/front-end-dist
+- cp ../front-end/dist/index.html web/impact/templates/front-end.html
 - docker network create impact-api_default 
 - docker-compose -f docker-compose.travis.yml build --no-cache --build-arg DJANGO_ACCELERATOR_REVISION=$DJANGO_ACCELERATOR_REVISION
 - docker-compose -f docker-compose.travis.yml up -d
@@ -63,3 +64,4 @@ after_success:
 - export DOCKER_PASSWORD=$ECR_TOKEN
 - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin $ECR_HOST
 - make travis-release AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ENVIRONMENT=$DEPLOY_ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY IMAGE_TAG=$TAG;
+- make deploy IMAGE_TAG=$TAG;
