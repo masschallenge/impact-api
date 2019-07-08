@@ -101,3 +101,6 @@ from impact.v1.helpers.judging_round_helper import (
     JUDGING_ROUND_FIELDS,
     JudgingRoundHelper,
 )
+from impact.v1.helpers.mentor_program_office_hour_helper import (
+    MentorProgramOfficeHourHelper,
+)

@@ -123,9 +123,6 @@ from accelerator.tests.factories.program_startup_status_factory import (
     ProgramStartupStatusFactory
 )
 from accelerator.tests.factories.question_factory import QuestionFactory
-from accelerator.tests.factories.recommendation_tag_factory import (
-    RecommendationTagFactory
-)
 from accelerator.tests.factories.reference_factory import ReferenceFactory
 from accelerator.tests.factories.refund_code_factory import RefundCodeFactory
 from accelerator.tests.factories.refund_code_redemption_factory import (

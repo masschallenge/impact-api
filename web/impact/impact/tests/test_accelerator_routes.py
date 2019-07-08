@@ -33,7 +33,6 @@ MC_CONTENTTYPES = [
     'startup',
     'organization',
     'programrole',
-    'recommendationtag'
 ]
 
 

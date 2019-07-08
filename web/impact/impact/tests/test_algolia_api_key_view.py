@@ -197,15 +197,14 @@ class TestAlgoliaApiKeyView(APITestCase):
 
         self.assertEqual(response_data["filters"], [])
 
-    def test_superuser_employee_sees_people_directory(self):
+    def test_superuser_employee_sees_people_directory_with_no_filters(self):
         user = _create_expert()
         user.is_superuser = True
         user.save()
         response_data = self._get_response_data(
             user, self._person_directory_url())
 
-        expected_filter = (IS_TEAM_MEMBER_FILTER + ' AND ' +
-                           HAS_FINALIST_ROLE_FILTER)
+        expected_filter = []
         self.assertEqual(response_data["filters"], expected_filter)
 
     def _create_user_with_role_grant(
