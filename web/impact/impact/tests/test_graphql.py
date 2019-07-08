@@ -216,7 +216,7 @@ class TestGraphQL(APITestCase):
         mentor_program = program_grant_role.program_role.program
         family_slug = mentor_program.program_family.url_slug
         program_slug = mentor_program.url_slug
-        office_hours_url = ("/officehours/{family_slug}/{program_slug}/"
+        office_hours_url = ("/officehours/list/{family_slug}/{program_slug}/"
                             .format(
                                 family_slug=family_slug,
                                 program_slug=program_slug) + (
