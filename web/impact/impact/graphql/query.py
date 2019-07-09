@@ -1,25 +1,23 @@
 import graphene
 
 from impact.graphql.types import (
+    EntrepreneurProfileType,
     ExpertProfileType,
-    StartupTeamMemberType,
 )
 from accelerator.models import (
+    EntrepreneurProfile,
     ExpertProfile,
-    StartupTeamMember,
 )
 from graphql import GraphQLError
+ENTREPRENEUR_NOT_FOUND_MESSAGE = 'Entrepreneur matching the id does not exist.'
 EXPERT_NOT_FOUND_MESSAGE = 'Expert matching the id does not exist.'
-TEAM_MEMBER_NOT_FOUND_MESSAGE = (
-    'Startup Team Member matching id does not exist'
-)
 
 
 class Query(graphene.ObjectType):
     expert_profile = graphene.Field(
         ExpertProfileType, id=graphene.Int())
     entrepreneur_profile = graphene.Field(
-        StartupTeamMemberType, id=graphene.Int())
+        EntrepreneurProfileType, id=graphene.Int())
 
     def resolve_expert_profile(self, info, **kwargs):
         user_id = kwargs.get('id')
@@ -31,11 +29,10 @@ class Query(graphene.ObjectType):
         return expert
 
     def resolve_entrepreneur_profile(self, info, **kwargs):
-        team_member_id = kwargs.get('id')
-        team_member = StartupTeamMember.objects.filter(
-            id=team_member_id).first()
+        user_id = kwargs.get('id')
+        entrepreneur = EntrepreneurProfile.objects.filter(user_id=user_id).first()
 
-        if not team_member:
-            return GraphQLError(TEAM_MEMBER_NOT_FOUND_MESSAGE)
+        if not entrepreneur:
+            return GraphQLError(ENTREPRENEUR_NOT_FOUND_MESSAGE)
 
-        return team_member
+        return entrepreneur
