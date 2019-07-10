@@ -74,7 +74,7 @@ class ExpertProfileType(DjangoObjectType):
                 program_role__user_role__name=UserRole.MENTOR
             ).latest('created_at')
             latest_mentor_program = latest_grant.program_role.program
-            return "/officehours/{family_slug}/{program_slug}/".format(
+            return "/officehours/list/{family_slug}/{program_slug}/".format(
                 family_slug=latest_mentor_program.program_family.url_slug,
                 program_slug=latest_mentor_program.url_slug) + (
                 '?mentor_id={mentor_id}'.format(
