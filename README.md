@@ -229,3 +229,4 @@ This is equivalent to running `make bash-shell`.
 # DONT MERGE
 # DONT MERGE 2
 # DONT MERGE 3
+# DONT MERGE 4
