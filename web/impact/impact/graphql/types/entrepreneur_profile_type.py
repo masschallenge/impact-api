@@ -43,3 +43,4 @@ class EntrepreneurProfileType(DjangoObjectType):
         team_member = self.user.startupteammember_set.last()
         if team_member:
             return team_member.title
+        return ""
