@@ -317,7 +317,7 @@ class TestGraphQL(APITestCase):
                 None
             )
 
-    def test_query_with_non_existent_startup_team_member_id(self):
+    def test_query_with_non_existent_entrepreneur_id(self):
         with self.login(email=self.basic_user().email):
             query = """
                 query {{
