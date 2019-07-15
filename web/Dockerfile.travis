@@ -10,7 +10,7 @@ COPY scripts/mysqlwait.sh /usr/bin
 # python2.7 is required to run supervisor
 RUN apt-get update -y && apt-get install -y \
     gettext \
-    mysql-client \
+    mysql-client-5.5 \
     netcat \
     nginx \
     python-setuptools \
