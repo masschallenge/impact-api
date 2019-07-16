@@ -4,13 +4,12 @@ WORKDIR /wwwroot
 COPY impact /wwwroot
 COPY scripts/start.sh /usr/bin
 COPY scripts/start-nodaemon.sh /usr/bin
-
+COPY scripts/mysql-client-install.sh .
 COPY scripts/mysqlwait.sh /usr/bin
 
 # python2.7 is required to run supervisor
-RUN apt-get update -y && apt-get install -y \
-    gettext \
-    mysql-client \
+RUN ./mysql-client-install.sh
+RUN apt-get install -y gettext \
     netcat \
     nginx \
     python-setuptools \
