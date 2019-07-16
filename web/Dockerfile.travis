@@ -8,8 +8,9 @@ COPY scripts/mysql-client-install.sh .
 COPY scripts/mysqlwait.sh /usr/bin
 
 # python2.7 is required to run supervisor
-RUN ./mysql-client-install.sh
-RUN apt-get install -y gettext \
+# RUN ./mysql-client-install.sh
+RUN apt-get update && apt-get upgrade && \
+    apt-get install -y gettext mariadb-client \
     netcat \
     nginx \
     python-setuptools \
