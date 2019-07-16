@@ -23,7 +23,7 @@ from impact.tests.factories import (
 from impact.tests.utils import capture_stderr
 from impact.graphql.query import (
     EXPERT_NOT_FOUND_MESSAGE,
-    TEAM_MEMBER_NOT_FOUND_MESSAGE
+    ENTREPRENEUR_NOT_FOUND_MESSAGE
 )
 from accelerator.tests.contexts import StartupTeamMemberContext
 
@@ -128,15 +128,13 @@ class TestGraphQL(APITestCase):
                 query {{
                     entrepreneurProfile(id: {id}) {{
                         title
-                        profile {{
-                            twitterHandle
-                            currentProgram
-                            imageUrl
-                            linkedInUrl
-                            facebookUrl
-                            personalWebsiteUrl
-                            phone
-                        }}
+                        twitterHandle
+                        currentProgram
+                        imageUrl
+                        linkedInUrl
+                        facebookUrl
+                        personalWebsiteUrl
+                        phone
                         user {{
                             id
                             email
@@ -155,29 +153,28 @@ class TestGraphQL(APITestCase):
                         }}
                     }}
                 }}
-            """.format(id=member.id)
+            """.format(id=user.id)
             response = self.client.post(self.url, data={'query': query})
             data = json.loads(response.content.decode("utf-8"))["data"]
             ent_profile = data["entrepreneurProfile"]
 
             self.assertEqual(ent_profile["title"], member.title)
 
-            profile_response = ent_profile["profile"]
             self.assertEqual(
-                profile_response["imageUrl"],
+                ent_profile["imageUrl"],
                 profile.image.url if profile.image else "")
             self.assertEqual(
-                profile_response["linkedInUrl"], profile.linked_in_url)
+                ent_profile["linkedInUrl"], profile.linked_in_url)
             self.assertEqual(
-                profile_response["personalWebsiteUrl"],
+                ent_profile["personalWebsiteUrl"],
                 profile.personal_website_url)
-            self.assertEqual(profile_response["phone"], profile.phone)
+            self.assertEqual(ent_profile["phone"], profile.phone)
             self.assertEqual(
-                profile_response["facebookUrl"], profile.facebook_url)
+                ent_profile["facebookUrl"], profile.facebook_url)
             self.assertEqual(
-                profile_response["twitterHandle"], profile.twitter_handle)
+                ent_profile["twitterHandle"], profile.twitter_handle)
             self.assertEqual(
-                profile_response["currentProgram"],
+                ent_profile["currentProgram"],
                 profile.current_program.name)
 
             user_resp = ent_profile["user"]
@@ -320,7 +317,7 @@ class TestGraphQL(APITestCase):
                 None
             )
 
-    def test_query_with_non_existent_startup_team_member_id(self):
+    def test_query_with_non_existent_entrepreneur_id(self):
         with self.login(email=self.basic_user().email):
             query = """
                 query {{
@@ -336,7 +333,7 @@ class TestGraphQL(APITestCase):
                 error_messages = [x['message'] for x in
                                   response.json()['errors']]
 
-            self.assertIn(TEAM_MEMBER_NOT_FOUND_MESSAGE, error_messages)
+            self.assertIn(ENTREPRENEUR_NOT_FOUND_MESSAGE, error_messages)
             self.assertEqual(
                 response.json()['data']['entrepreneurProfile'],
                 None
