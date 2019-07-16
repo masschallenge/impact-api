@@ -47,6 +47,7 @@ djangorestframework-jwt
 drf-schema-adapter
 drf-tracking
 graphene-django==2.1
+graphql-core==2.1
 sorl-thumbnail==12.4.1
 django-oidc-provider==0.6.2
 django-sitetree==1.12.0
