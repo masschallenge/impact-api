@@ -8,9 +8,10 @@ COPY scripts/start-nodaemon.sh /usr/bin
 COPY scripts/mysqlwait.sh /usr/bin
 
 # python2.7 is required to run supervisor
-RUN apt-get update -y && apt-get install -y \
+RUN apt-get update -y && apt-get upgrade -y && \
+    apt-get install -y \
     gettext \
-    mysql-client \
+    mariadb-client \
     netcat \
     nginx \
     python-setuptools \
