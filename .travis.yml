@@ -8,8 +8,6 @@ env:
   global:
     - DOCKER_COMPOSE_VERSION=1.20.1
       # get all the branches referencing this commit
-    - IS_RELEASE=$(git ls-remote origin | grep "$TRAVIS_COMMIT\s\+refs/heads/release$")
-    - RELEASE_TAG=$(git tag -l --points-at HEAD | head -n1)
     - BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then echo $TRAVIS_BRANCH; else echo $TRAVIS_PULL_REQUEST_BRANCH; fi)
     - DJANGO_ACCELERATOR_REVISION=`./infer_repository_revision.sh "$BRANCH" https://www.github.com/masschallenge/django-accelerator.git`
     - FRONT_END_REVISION=`./infer_repository_revision.sh "$BRANCH" https://$MC_DEV_ADMIN_GH_TOKEN@github.com/masschallenge/front-end.git`
@@ -57,7 +55,7 @@ after_success:
 - sudo chmod +x /usr/local/bin/ecs-cli;
 - pip install awscli==1.15.3;
 - export PATH=$PATH:$HOME/.local/bin;
-- export TAG=$(if [ "$RELEASE_TAG" = "" ]; then echo "$BRANCH"; else echo "$RELEASE_TAG"; fi);
+- export TAG=$BRANCH;
 - export ECR_TOKEN=`aws ecr get-authorization-token --region us-east-1 --output text --query 'authorizationData[].authorizationToken' | base64 --decode | cut -d':' -f2`
 - export ECR_HOST=`aws ecr get-authorization-token --region us-east-1 --output text --query 'authorizationData[].proxyEndpoint'`
 - export DOCKER_USER=AWS
