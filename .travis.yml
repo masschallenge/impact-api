@@ -52,7 +52,6 @@ before_script:
 - docker-compose -f docker-compose.travis.yml up -d
 
 script:
-- make test
 - make coverage
 - make coverage-xml-report
 
@@ -72,4 +71,4 @@ after_success:
 - make deploy IMAGE_TAG=$TAG;
 
 after_script:
-- ./cc-test-reporter after-build -t coverage.py --exit-code $TRAVIS_TEST_RESULT
+- ./cc-test-reporter after-build --prefix $TRAVIS_BUILD_DIR/web/impact/ -t coverage.py --exit-code $TRAVIS_TEST_RESULT

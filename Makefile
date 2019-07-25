@@ -208,7 +208,7 @@ coverage-html-report: .env
 	@docker-compose run --rm web coverage html --omit="*/tests/*"
 
 coverage-xml-report: .env
-  @docker-compose run --rm web coverage xml --omit="*/tests/*"
+	@docker-compose run --rm web coverage xml -i  --omit="*/tests/*"
 
 coverage-html: coverage
 	@open web/impact/htmlcov/index.html
