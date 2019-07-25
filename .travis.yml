@@ -71,4 +71,5 @@ after_success:
 - make deploy IMAGE_TAG=$TAG;
 
 after_script:
+- mv web/impact/coverage.xml .
 - ./cc-test-reporter after-build --prefix $TRAVIS_BUILD_DIR/web/impact/ -t coverage.py --exit-code $TRAVIS_TEST_RESULT
