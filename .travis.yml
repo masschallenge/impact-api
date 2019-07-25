@@ -72,4 +72,4 @@ after_success:
 
 after_script:
 - mv web/impact/coverage.xml .
-- ./cc-test-reporter after-build --prefix $TRAVIS_BUILD_DIR/web/impact/ -t coverage.py --exit-code $TRAVIS_TEST_RESULT
+- ./cc-test-reporter after-build -t coverage.py --exit-code $TRAVIS_TEST_RESULT
