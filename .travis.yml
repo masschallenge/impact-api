@@ -28,6 +28,9 @@ before_install:
 - docker-compose --version
 
 before_script:
+- curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+- chmod +x ./cc-test-reporter
+- ./cc-test-reporter before-build
 - if [ -z $TRAVIS_TAG ]; then git remote set-branches origin $BRANCH; fi
 - git fetch
 - git checkout $BRANCH
@@ -50,6 +53,8 @@ before_script:
 
 script:
 - make test
+- make coverage
+- make coverage-xml-report
 
 after_success:
 - if [ "$DEPLOY_ENVIRONMENT" = "" ]; then export DEPLOY_ENVIRONMENT=$(if [ "$BRANCH" = "master" ]; then echo "production"; else echo "staging"; fi); fi;
@@ -65,3 +70,6 @@ after_success:
 - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin $ECR_HOST
 - make travis-release AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ENVIRONMENT=$DEPLOY_ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY IMAGE_TAG=$TAG;
 - make deploy IMAGE_TAG=$TAG;
+
+after_script:
+- ./cc-test-reporter after-build -t coverage.py --exit-code $TRAVIS_TEST_RESULT
