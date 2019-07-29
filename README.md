@@ -6,6 +6,7 @@ _Copyright (c) 2017 MassChallenge, Inc._
 
  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Build Status](https://travis-ci.org/masschallenge/impact-api.svg?branch=development)](https://travis-ci.org/masschallenge/impact-api)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/919b52c7bf78bfc67bb6/test_coverage)](https://codeclimate.com/github/masschallenge/impact-api/test_coverage)
 <a href="https://codeclimate.com/github/masschallenge/impact-api/maintainability">
   <img src="https://api.codeclimate.com/v1/badges/919b52c7bf78bfc67bb6/maintainability" />
 </a>
