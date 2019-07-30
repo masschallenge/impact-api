@@ -60,9 +60,7 @@ class ExpertProfileType(DjangoObjectType):
         now = timezone.now()
         if not user.is_staff and user != self.user and not user.is_superuser:
             filter_kwargs['program__in'] = _get_user_programs(user)
-        future_datetime_filter = Q(
-            date=now,
-            start_time__gte=now.time()) | Q(date__gt=now)
+        future_datetime_filter = Q(start_date_time__gte=now)
         return self.user.mentor_officehours.filter(**filter_kwargs).filter(
             future_datetime_filter).exists()
 
