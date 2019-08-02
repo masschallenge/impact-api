@@ -34,6 +34,7 @@ JUDGING_ROUND_INACTIVE_ERROR = "Judging round {} is not active"
 NO_APP_LEFT_FOR_JUDGE = "{} has provided feedback on all applications"
 NO_DATA_FOR_JUDGE = "Judging round {judging_round} has no data for {judge}"
 ASSIGNMENT_DISCOUNT = 0.45
+PANEL_SLOT_NUMBER = 8
 
 
 class AllocateApplicationsView(ImpactView):
@@ -202,7 +203,9 @@ class AllocateApplicationsView(ImpactView):
             ApplicationPanelAssignment.objects.create(
                 application_id=choice,
                 panel=panel,
-                scenario=self.scenario)
+                scenario=self.scenario,
+                panel_slot_number=PANEL_SLOT_NUMBER,
+            )
 
     def _judge_assignment_count(self):
         scenarios = Scenario.objects.filter(
