@@ -13,7 +13,6 @@ then
 	cp /wwwroot/static/front-end-dist/index.html templates/front-end.html
 fi
 
-python3 manage.py migrate --noinput
 python3 manage.py collectstatic --noinput
 python3 manage.py graphql_schema --schema impact.graphql.schema.schema --indent=2
 
