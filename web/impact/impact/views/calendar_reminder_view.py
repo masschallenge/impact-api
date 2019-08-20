@@ -9,6 +9,10 @@ from django.http import (
 
 DATE_FORMAT = "%Y%m%dT%H%M%S"
 CALENDAR_CONTENT_TYPE = 'text/calendar'
+OUTLOOK_LINK_TYPE = 'outlook'
+GOOGLE_LINK_TYPE = 'google'
+YAHOO_LINK_TYPE = 'yahoo'
+ICAL_LINK_TYPE = 'ical'
 
 
 class CalendarReminderView(View):
@@ -32,21 +36,21 @@ class CalendarReminderView(View):
             description=description,
             location=location)
         calendar_data = add2cal.as_dict()
-        if link_type == 'ical':
+        if link_type == ICAL_LINK_TYPE:
             response = HttpResponse(
-                calendar_data['ical_content'], content_type=CALENDAR_CONTENT_TYPE)
+                calendar_data['ical_content'],
+                content_type=CALENDAR_CONTENT_TYPE)
             attachment = 'attachment; filename={title}.ics'.format(title=title)
             response['Content-Type'] = CALENDAR_CONTENT_TYPE
             response['Content-Disposition'] = attachment
             return response
-        elif link_type == 'outlook':
+        elif link_type == OUTLOOK_LINK_TYPE:
             return HttpResponseRedirect(
                 redirect_to=calendar_data['outlook_link'])
-        elif link_type == 'google':
+        elif link_type == GOOGLE_LINK_TYPE:
             return HttpResponseRedirect(
                 redirect_to=calendar_data['gcal_link'])
-        elif link_type == 'yahoo':
-
+        elif link_type == YAHOO_LINK_TYPE:
             return HttpResponseRedirect(
                 redirect_to=calendar_data['yahoo_link'])
         else:
