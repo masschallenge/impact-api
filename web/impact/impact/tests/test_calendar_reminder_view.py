@@ -10,6 +10,8 @@ from impact.tests.factories import UserFactory
 
 User = get_user_model()  # pylint: disable=invalid-name
 
+VCALENDAR_HEADER_TEXT = 'BEGIN:VCALENDAR'
+
 
 class TestCalendarReminderView(APITestCase):
     client_class = APIClient
@@ -40,7 +42,6 @@ class TestCalendarReminderView(APITestCase):
             response.url,
             self.add2cal.as_dict()['outlook_link']
         )
-        self.assertEquals(302, response.status_code)
 
     def test_gcal_reminder_link(self):
         with self.login(email=self.basic_user().email):
@@ -58,7 +59,6 @@ class TestCalendarReminderView(APITestCase):
             response.url,
             self.add2cal.as_dict()['gcal_link']
         )
-        self.assertEquals(302, response.status_code)
 
     def test_yahoo_reminder_link(self):
         with self.login(email=self.basic_user().email):
@@ -76,7 +76,6 @@ class TestCalendarReminderView(APITestCase):
             response.url,
             self.add2cal.as_dict()['yahoo_link']
         )
-        self.assertEquals(302, response.status_code)
 
     def test_ical_reminder_link(self):
         with self.login(email=self.basic_user().email):
@@ -93,4 +92,4 @@ class TestCalendarReminderView(APITestCase):
         self.assertEquals(
             response.request['CONTENT_TYPE'], 'application/octet-stream')
         self.assertTrue(
-            response.content.decode().startswith('BEGIN:VCALENDAR'))
+            response.content.decode().startswith(VCALENDAR_HEADER_TEXT))

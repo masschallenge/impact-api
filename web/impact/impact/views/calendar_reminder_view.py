@@ -12,6 +12,8 @@ DATE_FORMAT = "%Y%m%dT%H%M%S"
 
 class CalendarReminderView(View):
 
+    view_name = 'calendar_reminder_view'
+
     def get(self, request, *args, **kwargs):
         params = self.request.GET
         start = params.get('start', datetime.datetime.now().strftime(
