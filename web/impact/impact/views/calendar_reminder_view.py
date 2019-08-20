@@ -28,7 +28,6 @@ class CalendarReminderView(View):
         description = params.get('description', '')
         location = params.get('location', 'Boston, MA')
         link_type = params.get('link_type', 'data')
-
         add2cal = Add2Cal(
             start=start,
             end=end,
@@ -43,15 +42,15 @@ class CalendarReminderView(View):
             attachment = 'attachment; filename={title}.ics'.format(title=title)
             response['Content-Type'] = CALENDAR_CONTENT_TYPE
             response['Content-Disposition'] = attachment
-            return response
         elif link_type == OUTLOOK_LINK_TYPE:
-            return HttpResponseRedirect(
+            response = HttpResponseRedirect(
                 redirect_to=calendar_data['outlook_link'])
         elif link_type == GOOGLE_LINK_TYPE:
-            return HttpResponseRedirect(
+            response = HttpResponseRedirect(
                 redirect_to=calendar_data['gcal_link'])
         elif link_type == YAHOO_LINK_TYPE:
-            return HttpResponseRedirect(
+            response = HttpResponseRedirect(
                 redirect_to=calendar_data['yahoo_link'])
         else:
-            return JsonResponse(add2cal.as_dict())
+            response = JsonResponse(add2cal.as_dict())
+        return response
