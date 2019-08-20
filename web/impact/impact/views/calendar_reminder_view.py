@@ -8,6 +8,7 @@ from django.http import (
 )
 
 DATE_FORMAT = "%Y%m%dT%H%M%S"
+CALENDAR_CONTENT_TYPE = 'text/calendar'
 
 
 class CalendarReminderView(View):
@@ -33,12 +34,10 @@ class CalendarReminderView(View):
         calendar_data = add2cal.as_dict()
         if link_type == 'ical':
             response = HttpResponse(
-                calendar_data['ical_content'], content_type='text/calendar')
-            attachment = 'attachment; filename={title}.ics'.format(
-                title=title)
-            response['Content-Type'] = 'text/calendar'
-            response[
-                'Content-Disposition'] = attachment
+                calendar_data['ical_content'], content_type=CALENDAR_CONTENT_TYPE)
+            attachment = 'attachment; filename={title}.ics'.format(title=title)
+            response['Content-Type'] = CALENDAR_CONTENT_TYPE
+            response['Content-Disposition'] = attachment
             return response
         elif link_type == 'outlook':
             return HttpResponseRedirect(
