@@ -11,6 +11,7 @@ from impact.tests.factories import UserFactory
 User = get_user_model()  # pylint: disable=invalid-name
 
 VCALENDAR_HEADER_TEXT = 'BEGIN:VCALENDAR'
+CALENDAR_MEDIA_TYPE = 'application/octet-stream'
 
 
 class TestCalendarReminderView(APITestCase):
@@ -90,6 +91,6 @@ class TestCalendarReminderView(APITestCase):
             response = self.get("calendar_reminder_view", data=params)
             self.response_200()
         self.assertEquals(
-            response.request['CONTENT_TYPE'], 'application/octet-stream')
+            response.request['CONTENT_TYPE'], CALENDAR_MEDIA_TYPE)
         self.assertTrue(
             response.content.decode().startswith(VCALENDAR_HEADER_TEXT))
