@@ -122,7 +122,7 @@ def _user_description(member):
 def _image_fields(user):
     profile = get_profile(user)
     image = profile and profile.image
-    return {"photo_url": image.url if image else "" }
+    return {"photo_url": image.url if image else ""}
 
 
 def _find_members(startup):
