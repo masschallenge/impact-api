@@ -26,7 +26,7 @@ class CalendarReminderView(View):
         end = params.get('end', datetime.datetime.now().strftime(DATE_FORMAT))
         title = params.get('title', 'new reminder')
         description = params.get('description', '')
-        location = params.get('location', 'Boston, MA')
+        location = params.get('location', 'MassChallenge')
         link_type = params.get('link_type', 'data')
         add2cal = Add2Cal(
             start=start,
