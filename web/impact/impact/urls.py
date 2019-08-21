@@ -30,6 +30,7 @@ from impact.schema import schema_view
 from impact.v0.urls import v0_urlpatterns
 from impact.v1.urls import v1_urlpatterns
 from impact.views import (
+    CalendarReminderView,
     AlgoliaApiKeyView,
     GeneralViewSet,
     IndexView,
@@ -63,6 +64,8 @@ urls = [
         name=JWTCookieNameView.view_name),
     url(r'^api/algolia/api_key/$', AlgoliaApiKeyView.as_view(),
         name=AlgoliaApiKeyView.view_name),
+    url(r'^api/calendar/reminder/$', CalendarReminderView.as_view(),
+        name=CalendarReminderView.view_name),
     url(r'^api/v0/', include(v0_urlpatterns)),
     url(r'^api/v1/', include(v1_urlpatterns)),
     url(r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/'
