@@ -18,7 +18,6 @@ from impact.utils import get_profile
 from impact.v0.api_data.startup_detail_data import StartupDetailData
 from impact.v0.views.utils import (
     BADGE_DISPLAYS,
-    encrypt_image_token,
     logo_url,
     status_description,
 )
@@ -29,7 +28,6 @@ EMPTY_DETAIL_RESULT = {
     "additional_industries": [],
     "facebook_url": "",
     "full_elevator_pitch": "",
-    "image_token": "",
     "is_visible": False,
     "linked_in_url": "",
     "logo_url": "",
@@ -81,9 +79,6 @@ class StartupDetailView(APIView):
             "short_pitch": startup.short_pitch,
             "twitter_handle": startup.twitter_handle,
             "website_url": startup.website_url,
-
-            "image_token": encrypt_image_token(
-                startup.high_resolution_logo.name),
             "logo_url": logo_url(startup),
             "profile_background_color":
                 "#" + (startup.profile_background_color or
@@ -127,10 +122,7 @@ def _user_description(member):
 def _image_fields(user):
     profile = get_profile(user)
     image = profile and profile.image
-    return {
-        "photo_url": image.url if image else "",
-        "photo_token": encrypt_image_token(image.name) if image else "",
-    }
+    return {"photo_url": image.url if image else ""}
 
 
 def _find_members(startup):
