@@ -1,16 +1,12 @@
 from django.conf.urls import url
 
 from impact.v0.views import (
-    ImageProxyView,
     MentorsProxyView,
     StartupListView,
     StartupDetailView,
 )
 
 v0_urlpatterns = [
-    url(r"^image/$",
-        ImageProxyView.as_view(),
-        name="image"),
     url(r"^mentors/$",
         MentorsProxyView.as_view(),
         name="mentors"),
