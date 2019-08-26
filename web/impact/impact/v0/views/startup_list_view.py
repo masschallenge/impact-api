@@ -19,7 +19,6 @@ from impact.v0.api_data.startup_list_data import StartupListData
 from impact.v0.views.utils import (
     BADGE_DISPLAYS,
     base_program_url,
-    encrypt_image_token,
     logo_url,
     status_description,
 )
@@ -179,9 +178,6 @@ def _startup_description(startup, statuses, base_url):
             "name": startup.name,
             "id": startup.id,
             "profile_url": base_url + startup.organization.url_slug,
-            "image_token": encrypt_image_token(
-                startup.high_resolution_logo.name)
-                   if startup.high_resolution_logo else '',
             "logo_url": logo_url(startup),
             "statuses": [status_description(status) for status in statuses],
             }
@@ -190,7 +186,6 @@ def _startup_description(startup, statuses, base_url):
             "is_visible": False,
             "name": startup.name,
             "profile_url": "",
-            "image_token": "",
             "logo_url": "",
             "statuses": [],
             }
