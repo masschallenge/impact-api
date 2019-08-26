@@ -138,40 +138,6 @@ delivered in an `Authorization` HTTP header with a value of "Bearer
 <access_token>".
 
 
-### /api/v0/image/
-
-Returns an image given an ImageToken from another API call.
-
-HTTP method: GET
-
-IMPORTANT: The ImageToken field should no longer be encrypted by
-the client with the SecurityKey.  Just use the value returned by one
-of the other API calls.
-
-Note: You are encouraged to use image URLs rather than ImageTokens
-when possible.  The next generation of the API is expected to
-deprecate the use of ImageTokens and rely entirely on public APIs.
-
-#### Parameters:
-
-* `ImageToken`: As returned by startup_list, startup_detail and mentor calls.
-
-* `ImageType`: JPEG or PNG.  Defaults to JPEG.
-
-* `Size`: The size the returned image should be (example:
-  200x200). Specified as widthxheight, width or xheight. Width and
-  height are in pixels. Example values: 200x100, 200, x100.  Image is
-  scaled to the given size and the aspect ratio preserved. If width
-  and height are given the image is rescaled to maximum values of
-  height and width given.
-
-* `Crop`: Deprecated.
-
-* `Upscale`: Deprecated.
-
-
-#### Example result:
-Image
 
 ### /api/v0/mentors/
 
@@ -223,8 +189,6 @@ Mentor descriptions are in turn JSON objects with the following name:
 
 * `photo_url`: URL to photo for this mentor.
 
-* `image_token`: Image token which can be given to the images call.
-
 #### Example result:
 ```
 {
@@ -246,7 +210,6 @@ Mentor descriptions are in turn JSON objects with the following name:
         "Strategy and Business"
       ],
       "photo_url": "https://accelerate.masschallenge.org/media/profile_pics/John_Doe.PNG",
-      "image_token": "<imagetokenhash>="
     }
   ]
 }
@@ -310,9 +273,6 @@ HTTP method: POST
 
   * `photo_url`: URL to a photo of this user.
 
-  * `photo_token`: ImageToken for the user.  Can be used with the image call
-   to get the image.
-
 * `website_url`: Optional website for the startup.
 
 * `facebook_url`: Optional Facebook URL.
@@ -320,8 +280,6 @@ HTTP method: POST
 * `linked_in_url`: Optional LinkedIn URL.
 
 * `twitter_handle`: Optional Twitter handle.
-
-* `image_token`: ImageToken for this startup's logo.
 
 * `logo_url`: URL to the startup's logo.
 
@@ -346,7 +304,6 @@ HTTP method: POST
   "short_pitch": "Elevators!",
   "twitter_handle": "",
   "website_url": "http://example.com/ERU",
-  "image_token": "<imagetokenhash>=",
   "logo_url": "http://accelerate.masschallenge.org/media/startup_pics/ERU.png",
   "profile_background_color": "#217181",
   "profile_text_color": "#FFFFFF",
@@ -364,7 +321,6 @@ HTTP method: POST
       "email": "elle@example.com",
       "title": "",
       "photo_url": "",
-      "photo_token": ""
     }
   ],
   "video_elevator_pitch_url": ""
@@ -421,8 +377,6 @@ the name:
   * `is_visible`: Returns boolean indicating if this startup is
   "public" (vs. "stealth").
 
-  * `image_token`: ImageToken for this startup's logo.
-
   * `logo_url`: URL to the startup's logo.
 
   * `profile_url`: URL to the MassChallenge startup profile page.
@@ -445,7 +399,6 @@ the name:
       "id": 1234,
       "is_visible": true,
       "profile_url": "http://masschallenge.org/startups/2016/profile/startup-1234",
-      "image_token": "<imagetokenhash>=",
       "logo_url": "http://accelerate.masschallenge.org/media/startup_pics/Startup1234.png",
       "statuses": [
         {
@@ -506,7 +459,6 @@ the following names:
           "name": "Startup 1234",
           "id": 1234,
           "profile_url": "http://masschallenge.org/startups/2016/profile/startup-1234",
-          "image_token": "<imagetokenhash>=",
           "logo_url": "http://accelerate.masschallenge.org/media/startup_pics/startup-1234.png",
           "statuses": [
             {
