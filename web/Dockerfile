@@ -31,7 +31,6 @@ RUN wget --no-check-certificate https://bootstrap.pypa.io/ez_setup.py -O - | pyt
 RUN easy_install-2.7 supervisor
 RUN useradd -s /bin/bash -u 3000 -m impact_user
 RUN pip3 install -r /wwwroot/requirements/dev.txt
-RUN pip3 install --no-dependencies -r /wwwroot/requirements/no_dependencies.txt
 
 # place django-accelerator's source where it will be overriden by the mounted
 # volume, and then install in an editable mode. This causes changes in the
