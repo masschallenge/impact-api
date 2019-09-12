@@ -59,14 +59,19 @@ class AlgoliaApiKeyView(APIView):
             'validUntil': int(time.time()) + 3600,
             'userToken': request.user.id,
         }
+        programs_finalist_in = _get_finalist_program_role_grants(
+            request.user).values_list('program_role__program__name', flat=True)
         if filters:
             params['filters'] = filters
         public_key = _get_public_key(params, search_key)
-        return Response({
+        response_data = {
             'token': public_key,
             'index_prefix': settings.ALGOLIA_INDEX_PREFIX,
-            'filters': filters
-        })
+            'filters': filters,
+        }
+        if programs_finalist_in.exists():
+            response_data['finalist_programs'] = programs_finalist_in
+        return Response(response_data)
 
 
 def _get_search_key(request):
@@ -79,14 +84,12 @@ def _get_filters(request):
     if is_employee(request.user):
         return []
 
-
     if request.GET['index'] == 'people':
         if not base_accelerator_check(request.user):
             raise PermissionDenied()
         return _build_filter(
             IS_TEAM_MEMBER_FILTER,
             HAS_FINALIST_ROLE_FILTER, IS_ACTIVE_FILTER)
-
 
     if request.GET['index'] == 'mentor':
         participant_roles = [UserRole.AIR, UserRole.STAFF, UserRole.MENTOR]
@@ -118,16 +121,21 @@ def _get_filters(request):
 
 def _entrepreneur_specific_finalist_filter(roles, request):
     if is_entrepreneur(request.user):
-        has_current_finalist_roles = ProgramRoleGrant.objects.filter(
-            program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
-            program_role__user_role__name=UserRole.FINALIST,
-            person=request.user
-        ).exists()
+        has_current_finalist_roles = _get_finalist_program_role_grants(
+            request.user).exists()
 
         if has_current_finalist_roles:
             roles.append(UserRole.FINALIST)
 
     return roles
+
+
+def _get_finalist_program_role_grants(user):
+    return ProgramRoleGrant.objects.filter(
+        program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
+        program_role__user_role__name=UserRole.FINALIST,
+        person=user
+    )
 
 
 def _entrepreneur_specific_alumni_filter(roles, request):

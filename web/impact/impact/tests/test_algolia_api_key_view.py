@@ -27,9 +27,7 @@ from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import UserFactory
 from impact.views import AlgoliaApiKeyView
 from impact.views.algolia_api_key_view import (
-    HAS_FINALIST_ROLE_FILTER,
     IS_ACTIVE_FILTER,
-    IS_TEAM_MEMBER_FILTER,
 )
 
 User = get_user_model()  # pylint: disable=invalid-name
@@ -118,6 +116,19 @@ class TestAlgoliaApiKeyView(APITestCase):
         response_data = self._get_response_data(
             user, self._person_directory_url())
         self.assertIn(IS_ACTIVE_FILTER, response_data["filters"])
+
+    def test_finalist_user_response_has_programs_finalist_in(self):
+        program = ProgramFactory(program_status=ACTIVE_PROGRAM_STATUS)
+        user = self._create_user_with_role_grant(program, UserRole.FINALIST)
+        response_data = self._get_response_data(
+            user, self._mentor_directory_url())
+        self.assertIn(program.name, response_data["finalist_programs"])
+
+    def test_staff_user_response_has_no_programs_finalist_in_field(self):
+        user = self.staff_user()
+        response_data = self._get_response_data(
+            user, self._person_directory_url())
+        self.assertNotIn("finalist_programs", response_data.keys())
 
     def test_finalist_user_gets_all_programs_in_program_group(
             self):
