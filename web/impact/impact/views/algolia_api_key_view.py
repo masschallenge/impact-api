@@ -59,19 +59,17 @@ class AlgoliaApiKeyView(APIView):
             'validUntil': int(time.time()) + 3600,
             'userToken': request.user.id,
         }
-        programs_finalist_in = _get_finalist_program_role_grants(
+        finalist_programs = _get_finalist_program_role_grants(
             request.user).values_list('program_role__program__name', flat=True)
         if filters:
             params['filters'] = filters
         public_key = _get_public_key(params, search_key)
-        response_data = {
+        return Response({
             'token': public_key,
             'index_prefix': settings.ALGOLIA_INDEX_PREFIX,
             'filters': filters,
-        }
-        if programs_finalist_in.exists():
-            response_data['finalist_programs'] = programs_finalist_in
-        return Response(response_data)
+            'finalist_programs': finalist_programs
+        })
 
 
 def _get_search_key(request):

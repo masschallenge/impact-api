@@ -124,11 +124,11 @@ class TestAlgoliaApiKeyView(APITestCase):
             user, self._mentor_directory_url())
         self.assertIn(program.name, response_data["finalist_programs"])
 
-    def test_staff_user_response_has_no_programs_finalist_in_field(self):
+    def test_non_finalists_have_no_finalist_programs(self):
         user = self.staff_user()
         response_data = self._get_response_data(
             user, self._person_directory_url())
-        self.assertNotIn("finalist_programs", response_data.keys())
+        self.assertEqual(response_data["finalist_programs"], [])
 
     def test_finalist_user_gets_all_programs_in_program_group(
             self):
