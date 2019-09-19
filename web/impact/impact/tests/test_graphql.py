@@ -28,16 +28,15 @@ from impact.graphql.query import (
 from accelerator.tests.contexts import StartupTeamMemberContext
 
 MENTEE_FIELDS = """
-    programStatus
     startup {
         id
         name
         highResolutionLogo
         shortPitch
-        program {
-            family
-            year
-        }
+    }
+    program {
+        family
+        year
     }
 """
 
@@ -271,7 +270,6 @@ class TestGraphQL(APITestCase):
                     'data': {
                         'expertProfile': {
                             'currentMentees': [{
-                                'programStatus': program.program_status,
                                 'startup': {
                                     'id': str(startup.id),
                                     'name': startup.name,
@@ -280,12 +278,12 @@ class TestGraphQL(APITestCase):
                                             startup.high_resolution_logo.url or
                                             None),
                                     'shortPitch': startup.short_pitch,
-                                    'program': {
+                                },
+                                'program': {
                                         'family':
                                             program.program_family.name,
                                         'year': str(program.start_date.year),
-                                    },
-                                }
+                                },
                             }],
                             'previousMentees': []
                         }
