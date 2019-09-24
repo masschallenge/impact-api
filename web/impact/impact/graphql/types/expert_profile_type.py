@@ -74,10 +74,8 @@ class ExpertProfileType(DjangoObjectType):
                 program_role__program__end_date__gte=datetime.now()
             ))
             user = info.context.user
-            print(latest_grant, ">>>>", _get_user_programs(user))
             for mentor_program in latest_grant:
                 mentor_program_view = mentor_program.program_role.program
-                print("pooi",  mentor_program_view, mentor_program_view.program_family.url_slug,mentor_program_view.url_slug )
                 if(mentor_program_view in _get_user_programs(user)):
                     return "/officehours/list/{family_slug}/{program_slug}/".format(
                         family_slug=mentor_program_view.program_family.url_slug,
