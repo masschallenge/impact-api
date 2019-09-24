@@ -1,6 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from django.utils import timezone
+from datetime import datetime
 from accelerator.models import (
     ExpertProfile,
     UserRole,
@@ -68,15 +69,21 @@ class ExpertProfileType(DjangoObjectType):
         if self.user.programrolegrant_set.filter(
                 program_role__user_role__name=UserRole.MENTOR
         ).exists():
-            latest_grant = self.user.programrolegrant_set.filter(
-                program_role__user_role__name=UserRole.MENTOR
-            ).latest('created_at')
-            latest_mentor_program = latest_grant.program_role.program
-            return "/officehours/list/{family_slug}/{program_slug}/".format(
-                family_slug=latest_mentor_program.program_family.url_slug,
-                program_slug=latest_mentor_program.url_slug) + (
-                '?mentor_id={mentor_id}'.format(
-                    mentor_id=self.user.id))
+            latest_grant = list(self.user.programrolegrant_set.filter(
+                program_role__user_role__name=UserRole.MENTOR,
+                program_role__program__end_date__gte=datetime.now()
+            ))
+            user = info.context.user
+            print(latest_grant, ">>>>", _get_user_programs(user))
+            for mentor_program in latest_grant:
+                mentor_program_view = mentor_program.program_role.program
+                print("pooi",  mentor_program_view, mentor_program_view.program_family.url_slug,mentor_program_view.url_slug )
+                if(mentor_program_view in _get_user_programs(user)):
+                    return "/officehours/list/{family_slug}/{program_slug}/".format(
+                        family_slug=mentor_program_view.program_family.url_slug,
+                        program_slug=mentor_program_view.url_slug) + (
+                        '?mentor_id={mentor_id}'.format(
+                            mentor_id=self.user.id))
 
     def resolve_current_mentees(self, info, **kwargs):
         return _get_mentees(self.user, ACTIVE_PROGRAM_STATUS)
@@ -95,7 +102,7 @@ def _get_user_programs(user):
     )
     return Program.objects.filter(
         programrole__in=user_program_roles_as_participant).distinct()
-
+        
 
 def _get_mentees(user, program_status):
     mentee_filter = compose_filter([
