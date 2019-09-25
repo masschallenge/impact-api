@@ -19,8 +19,7 @@ from impact.tests.factories import (
     UserRoleFactory,
     ApplicationFactory,
     ProgramStartupStatusFactory,
-    StartupStatusFactory,
-    UserFactory,
+    StartupStatusFactory
 )
 from impact.tests.utils import capture_stderr
 from impact.graphql.query import (
@@ -220,12 +219,13 @@ class TestGraphQL(APITestCase):
         family_slug = mentor_program.program_family.url_slug
         program_slug = mentor_program.url_slug
         if(finalist_program == mentor_program):
-            office_hours_url = ("/officehours/list/{family_slug}/{program_slug}/"
-                                .format(
-                                    family_slug=family_slug,
-                                    program_slug=program_slug) + (
-                                    '?mentor_id={mentor_id}'.format(
-                                        mentor_id=mentor_profile.user_id)))
+            office_hours_url = (
+                            "/officehours/list/{family_slug}/{program_slug}/"
+                            .format(
+                                family_slug=family_slug,
+                                program_slug=program_slug) + (
+                                '?mentor_id={mentor_id}'.format(
+                                    mentor_id=mentor_profile.user_id)))
 
             query = """
                 query {{

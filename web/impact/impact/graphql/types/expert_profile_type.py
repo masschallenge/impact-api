@@ -69,25 +69,33 @@ class ExpertProfileType(DjangoObjectType):
         if self.user.programrolegrant_set.filter(
                 program_role__user_role__name=UserRole.MENTOR
         ).exists():
-            role_grant = self.user.programrolegrant_set.filter(
-                program_role__user_role__name=UserRole.MENTOR,
-                program_role__program__end_date__gte=datetime.now()
-            ).distinct()
-            user = info.context.user
-            for mentor_program in role_grant:
-                mentor_program_view = mentor_program.program_role.program
-                if(mentor_program_view in _get_user_programs(user)):
-                    return "/officehours/list/{family_slug}/{program_slug}/".format(
-                        family_slug=mentor_program_view.program_family.url_slug,
-                        program_slug=mentor_program_view.url_slug) + (
-                        '?mentor_id={mentor_id}'.format(
-                            mentor_id=self.user.id))
+            slugs = _get_slugs(self, info)
+            return "/officehours/list/{family_slug}/{program_slug}/".format(
+                family_slug=slugs[0],
+                program_slug=slugs[1]) + (
+                '?mentor_id={mentor_id}'.format(
+                    mentor_id=self.user.id))
 
     def resolve_current_mentees(self, info, **kwargs):
         return _get_mentees(self.user, ACTIVE_PROGRAM_STATUS)
 
     def resolve_previous_mentees(self, info, **kwargs):
         return _get_mentees(self.user, ENDED_PROGRAM_STATUS)
+
+
+def _get_slugs(self, info):
+    role_grant = self.user.programrolegrant_set.filter(
+            program_role__user_role__name=UserRole.MENTOR,
+            program_role__program__end_date__gte=datetime.now()
+            ).distinct()
+    user = info.context.user
+    for mentor_program in role_grant:
+        mentor_program_view = mentor_program.program_role.program
+        if(mentor_program_view in _get_user_programs(user)):
+            return (
+                mentor_program_view.program_family.url_slug,
+                mentor_program_view.url_slug
+                )
 
 
 def _get_user_programs(user):
@@ -99,7 +107,8 @@ def _get_user_programs(user):
         user_role__name__in=participant_roles
     )
     return Program.objects.filter(
-        programrole__in=user_program_roles_as_participant).distinct()     
+        programrole__in=user_program_roles_as_participant).distinct()
+
 
 def _get_mentees(user, program_status):
     mentee_filter = compose_filter([
