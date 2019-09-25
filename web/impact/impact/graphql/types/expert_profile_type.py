@@ -69,12 +69,12 @@ class ExpertProfileType(DjangoObjectType):
         if self.user.programrolegrant_set.filter(
                 program_role__user_role__name=UserRole.MENTOR
         ).exists():
-            latest_grant = list(self.user.programrolegrant_set.filter(
+            role_grant = self.user.programrolegrant_set.filter(
                 program_role__user_role__name=UserRole.MENTOR,
                 program_role__program__end_date__gte=datetime.now()
-            ))
+            ).distinct()
             user = info.context.user
-            for mentor_program in latest_grant:
+            for mentor_program in role_grant:
                 mentor_program_view = mentor_program.program_role.program
                 if(mentor_program_view in _get_user_programs(user)):
                     return "/officehours/list/{family_slug}/{program_slug}/".format(
@@ -99,8 +99,7 @@ def _get_user_programs(user):
         user_role__name__in=participant_roles
     )
     return Program.objects.filter(
-        programrole__in=user_program_roles_as_participant).distinct()
-        
+        programrole__in=user_program_roles_as_participant).distinct()     
 
 def _get_mentees(user, program_status):
     mentee_filter = compose_filter([

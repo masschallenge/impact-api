@@ -6,6 +6,7 @@ from django.urls import reverse
 from accelerator.models import (
     UserRole,
 )
+from datetime import datetime
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
 from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import (
@@ -208,7 +209,9 @@ class TestGraphQL(APITestCase):
                                           user_role=confirmed_role)
         program_grant_role = ProgramRoleGrantFactory(
             person=confirmed,
-            program_role=program_role)
+            program_role=program_role,
+            program_role__program__end_date__gte=datetime.now()
+            )
         finalist = ProgramRoleGrantFactory(
             program_role__user_role__name=UserRole.FINALIST)
         mentor_profile = confirmed.get_profile()
@@ -216,7 +219,7 @@ class TestGraphQL(APITestCase):
         finalist_program = finalist.program_role.program
         family_slug = mentor_program.program_family.url_slug
         program_slug = mentor_program.url_slug
-        if(str(finalist_program) == str(mentor_program)):
+        if(finalist_program == mentor_program):
             office_hours_url = ("/officehours/list/{family_slug}/{program_slug}/"
                                 .format(
                                     family_slug=family_slug,
