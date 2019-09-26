@@ -218,7 +218,7 @@ class TestGraphQL(APITestCase):
         finalist_program = finalist.program_role.program
         family_slug = mentor_program.program_family.url_slug
         program_slug = mentor_program.url_slug
-        if(finalist_program == mentor_program):
+        if(finalist_program in mentor_program):
             office_hours_url = (
                             "/officehours/list/{family_slug}/{program_slug}/"
                             .format(

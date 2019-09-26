@@ -83,7 +83,7 @@ class ExpertProfileType(DjangoObjectType):
         return _get_mentees(self.user, ENDED_PROGRAM_STATUS)
 
 
-def _get_slugs(self, info):
+def _get_slugs(self, info, **kwargs):
     role_grant = self.user.programrolegrant_set.filter(
             program_role__user_role__name=UserRole.MENTOR,
             program_role__program__end_date__gte=datetime.now()
