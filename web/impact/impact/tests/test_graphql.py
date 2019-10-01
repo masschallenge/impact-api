@@ -210,47 +210,41 @@ class TestGraphQL(APITestCase):
             person=confirmed,
             program_role=program_role,
             )
-        finalist = ProgramRoleGrantFactory(
-            program_role__user_role__name=UserRole.FINALIST,
-            program_role=program_role
-        )
         mentor_program = program_grant_role.program_role.program
-        finalist_program = finalist.program_role.program
-        if(finalist_program == mentor_program):
-            family_slug = mentor_program.program_family.url_slug
-            program_slug = mentor_program.url_slug
-            office_hours_url = (
-                            "/officehours/list/{family_slug}/{program_slug}/"
-                            .format(
-                                family_slug=family_slug,
-                                program_slug=program_slug) + (
-                                '?mentor_id={mentor_id}'.format(
-                                    mentor_id=confirmed.id)))
+        family_slug = mentor_program.program_family.url_slug
+        program_slug = mentor_program.url_slug
+        office_hours_url = (
+                        "/officehours/list/{family_slug}/{program_slug}/"
+                        .format(
+                            family_slug=family_slug,
+                            program_slug=program_slug) + (
+                            '?mentor_id={mentor_id}'.format(
+                                mentor_id=confirmed.id)))
 
-            query = """
-                query {{
-                    expertProfile(id: {id}) {{
-                        user {{ firstName }}
-                        officeHoursUrl
-                    }}
+        query = """
+            query {{
+                expertProfile(id: {id}) {{
+                    user {{ firstName }}
+                    officeHoursUrl
                 }}
-            """.format(id=confirmed.id)
+            }}
+        """.format(id=confirmed.id)
 
-            with self.login(email=self.basic_user().email):
-                response = self.client.post(self.url, data={'query': query})
-                self.assertJSONEqual(
-                    str(response.content, encoding='utf8'),
-                    {
-                        'data': {
-                            'expertProfile': {
-                                'user': {
-                                    'firstName': confirmed.first_name,
-                                },
-                                'officeHoursUrl': office_hours_url
-                            }
+        with self.login(email=self.basic_user().email):
+            response = self.client.post(self.url, data={'query': query})
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                {
+                    'data': {
+                        'expertProfile': {
+                            'user': {
+                                'firstName': confirmed.first_name,
+                            },
+                            'officeHoursUrl': office_hours_url
                         }
                     }
-                )
+                }
+            )
 
     def test_requested_fields_for_startup_mentor_relationship_type(self):
         with self.login(email=self.basic_user().email):
