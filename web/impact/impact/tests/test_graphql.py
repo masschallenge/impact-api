@@ -6,7 +6,6 @@ from django.urls import reverse
 from accelerator.models import (
     UserRole,
 )
-from datetime import datetime
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
 from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import (

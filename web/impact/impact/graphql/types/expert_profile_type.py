@@ -70,7 +70,6 @@ class ExpertProfileType(DjangoObjectType):
                 program_role__user_role__name=UserRole.MENTOR
         ).exists():
             slugs = _get_slugs(self, info)
-            print(">>>", slugs)
             return "/officehours/list/{family_slug}/{program_slug}/".format(
                 family_slug=slugs[0],
                 program_slug=slugs[1]) + (
@@ -90,16 +89,21 @@ def _get_slugs(self, info, **kwargs):
             program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
             program_role__program__end_date__gte=datetime.now()
             ).distinct()
+
     user = info.context.user
     for role_grant in role_grants:
         mentor_program = role_grant.program_role.program
-        if mentor_program in _get_user_programs(user):
+        if mentor_program.name != "MassChallenge Global Alumni":
+            if (mentor_program in _get_user_programs(user)):
+                return (
+                    mentor_program.program_family.url_slug,
+                    mentor_program.url_slug
+                )
             return (
                 mentor_program.program_family.url_slug,
                 mentor_program.url_slug
-            )
-        return (mentor_program.program_family.url_slug, 
-         mentor_program.url_slug)
+                )
+
 
 def _get_user_programs(user):
     # todo: refactor this and move it to a sensible place
