@@ -69,7 +69,12 @@ class ExpertProfileType(DjangoObjectType):
         if self.user.programrolegrant_set.filter(
                 program_role__user_role__name=UserRole.MENTOR
         ).exists():
-            slugs = _get_slugs(self, info)
+            role_grants = self.user.programrolegrant_set.filter(
+            program_role__user_role__name=UserRole.MENTOR,
+            program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
+            program_role__program__end_date__gte=datetime.now()
+            ).distinct()
+            slugs = _get_slugs(self, info, role_grants)
             return "/officehours/list/{family_slug}/{program_slug}/".format(
                 family_slug=slugs[0],
                 program_slug=slugs[1]) + (
@@ -83,19 +88,13 @@ class ExpertProfileType(DjangoObjectType):
         return _get_mentees(self.user, ENDED_PROGRAM_STATUS)
 
 
-def _get_slugs(self, info, **kwargs):
-    role_grants = self.user.programrolegrant_set.filter(
-            program_role__user_role__name=UserRole.MENTOR,
-            program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
-            program_role__program__end_date__gte=datetime.now()
-            ).distinct()
-
+def _get_slugs(self, info, role_grants,**kwargs):
     user = info.context.user
     user_program = _get_user_programs(user)
     for role_grant in role_grants:
         mentor_program = role_grant.program_role.program
         if mentor_program.name != "MassChallenge Global Alumni":
-            if (mentor_program in user_program):
+            if mentor_program in user_program:
                 return (
                     mentor_program.program_family.url_slug,
                     mentor_program.url_slug
