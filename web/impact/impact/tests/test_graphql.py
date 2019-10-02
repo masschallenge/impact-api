@@ -209,7 +209,7 @@ class TestGraphQL(APITestCase):
         program_grant_role = ProgramRoleGrantFactory(
             person=confirmed,
             program_role=program_role,
-            )
+        )
         mentor_program = program_grant_role.program_role.program
         family_slug = mentor_program.program_family.url_slug
         program_slug = mentor_program.url_slug
@@ -218,7 +218,7 @@ class TestGraphQL(APITestCase):
                         .format(
                             family_slug=family_slug,
                             program_slug=program_slug) + (
-                            '?mentor_id={mentor_id}'.format(
+                            '?mentor_id={mentor_id}/'.format(
                                 mentor_id=confirmed.id)))
 
         query = """
