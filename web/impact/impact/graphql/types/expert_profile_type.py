@@ -91,10 +91,11 @@ def _get_slugs(self, info, **kwargs):
             ).distinct()
 
     user = info.context.user
+    user_program = _get_user_programs(user)
     for role_grant in role_grants:
         mentor_program = role_grant.program_role.program
         if mentor_program.name != "MassChallenge Global Alumni":
-            if (mentor_program in _get_user_programs(user)):
+            if (mentor_program in user_program):
                 return (
                     mentor_program.program_family.url_slug,
                     mentor_program.url_slug
