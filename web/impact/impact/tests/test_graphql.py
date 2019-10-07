@@ -18,7 +18,7 @@ from impact.tests.factories import (
     UserRoleFactory,
     ApplicationFactory,
     ProgramStartupStatusFactory,
-    StartupStatusFactory,
+    StartupStatusFactory
 )
 from impact.tests.utils import capture_stderr
 from impact.graphql.query import (
@@ -205,19 +205,21 @@ class TestGraphQL(APITestCase):
         confirmed_role = UserRoleFactory(name=UserRole.MENTOR)
         program_role = ProgramRoleFactory(program=program,
                                           user_role=confirmed_role)
+
         program_grant_role = ProgramRoleGrantFactory(
             person=confirmed,
-            program_role=program_role)
-        mentor_profile = confirmed.get_profile()
+            program_role=program_role,
+        )
         mentor_program = program_grant_role.program_role.program
         family_slug = mentor_program.program_family.url_slug
         program_slug = mentor_program.url_slug
-        office_hours_url = ("/officehours/list/{family_slug}/{program_slug}/"
-                            .format(
-                                family_slug=family_slug,
-                                program_slug=program_slug) + (
-                                '?mentor_id={mentor_id}'.format(
-                                    mentor_id=mentor_profile.user_id)))
+        office_hours_url = (
+                        "/officehours/list/{family_slug}/{program_slug}/"
+                        .format(
+                            family_slug=family_slug,
+                            program_slug=program_slug) + (
+                            '?mentor_id={mentor_id}/'.format(
+                                mentor_id=confirmed.id)))
 
         query = """
             query {{
@@ -226,7 +228,7 @@ class TestGraphQL(APITestCase):
                     officeHoursUrl
                 }}
             }}
-        """.format(id=mentor_profile.user_id)
+        """.format(id=confirmed.id)
 
         with self.login(email=self.basic_user().email):
             response = self.client.post(self.url, data={'query': query})
