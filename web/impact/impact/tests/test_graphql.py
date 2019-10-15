@@ -218,7 +218,7 @@ class TestGraphQL(APITestCase):
                         .format(
                             family_slug=family_slug,
                             program_slug=program_slug) + (
-                            '?mentor_id={mentor_id}/'.format(
+                            '?mentor_id={mentor_id}'.format(
                                 mentor_id=confirmed.id)))
 
         query = """
