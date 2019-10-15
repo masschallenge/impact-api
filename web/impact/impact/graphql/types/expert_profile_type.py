@@ -1,6 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from django.utils import timezone
+from datetime import datetime
 from accelerator.models import (
     ExpertProfile,
     UserRole,
@@ -68,15 +69,25 @@ class ExpertProfileType(DjangoObjectType):
         if self.user.programrolegrant_set.filter(
                 program_role__user_role__name=UserRole.MENTOR
         ).exists():
-            latest_grant = self.user.programrolegrant_set.filter(
-                program_role__user_role__name=UserRole.MENTOR
+            role_grants = self.user.programrolegrant_set.filter(
+            program_role__user_role__name=UserRole.MENTOR,
+            program_role__program__end_date__gte=datetime.now()
+            ).distinct()
+
+            latest_grant = self.user.programrolegrant_set.filter(	            
+                program_role__user_role__name=UserRole.MENTOR	       
             ).latest('created_at')
-            latest_mentor_program = latest_grant.program_role.program
-            return "/officehours/list/{family_slug}/{program_slug}/".format(
-                family_slug=latest_mentor_program.program_family.url_slug,
-                program_slug=latest_mentor_program.url_slug) + (
-                '?mentor_id={mentor_id}'.format(
-                    mentor_id=self.user.id))
+            latest_mentor_program = latest_grant.program_role.program	
+            user = info.context.user
+            mentor_program = [role_grant.program_role.program for role_grant in role_grants 
+                              if role_grant.program_role.program in _get_user_programs(user)]
+            if mentor_program or latest_mentor_program:
+                slugs = _get_slugs(self, mentor_program, latest_mentor_program)
+                return "/officehours/list/{family_slug}/{program_slug}/".format(
+                    family_slug=slugs[0],
+                    program_slug=slugs[1] + (
+                    '/?mentor_id={mentor_id}'.format(
+                        mentor_id=self.user.id)))
 
     def resolve_current_mentees(self, info, **kwargs):
         return _get_mentees(self.user, ACTIVE_PROGRAM_STATUS)
@@ -84,6 +95,17 @@ class ExpertProfileType(DjangoObjectType):
     def resolve_previous_mentees(self, info, **kwargs):
         return _get_mentees(self.user, ENDED_PROGRAM_STATUS)
 
+
+def _get_slugs(self, mentor_program, latest_mentor_program, **kwargs):
+    if mentor_program:
+        return (
+            mentor_program[0].program_family.url_slug,
+            mentor_program[0].url_slug,
+        )
+    return (
+            latest_mentor_program.program_family.url_slug,
+            latest_mentor_program.url_slug,
+        )
 
 def _get_user_programs(user):
     # todo: refactor this and move it to a sensible place
