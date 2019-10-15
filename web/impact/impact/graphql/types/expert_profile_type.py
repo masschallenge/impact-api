@@ -85,9 +85,9 @@ class ExpertProfileType(DjangoObjectType):
                 slugs = _get_slugs(self, mentor_program, latest_mentor_program)
                 return "/officehours/list/{family_slug}/{program_slug}/".format(
                     family_slug=slugs[0],
-                    program_slug=slugs[1] + (
-                    '/?mentor_id={mentor_id}'.format(
-                        mentor_id=self.user.id)))
+                    program_slug=slugs[1]) + (
+                    '?mentor_id={mentor_id}'.format(
+                        mentor_id=self.user.id))
 
     def resolve_current_mentees(self, info, **kwargs):
         return _get_mentees(self.user, ACTIVE_PROGRAM_STATUS)
