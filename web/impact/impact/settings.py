@@ -124,6 +124,7 @@ class Base(Configuration):
         'django.middleware.locale.LocaleMiddleware',
         'oauth2_provider.middleware.OAuth2TokenMiddleware',
         'impact.middleware.MethodOverrideMiddleware',
+        'impact.middleware.TrackAPICalls',
     ]
 
     CACHES = {
