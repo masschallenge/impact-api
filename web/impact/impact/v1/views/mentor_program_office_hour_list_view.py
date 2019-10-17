@@ -28,7 +28,7 @@ class MentorProgramOfficeHourListView(BaseListView):
             # user relevant timezone
             timezone = "America/New_York"
             today = localized_today_utc_date(timezone)
-            qs = qs.filter(start_date_time__gte=todayt)
+            qs = qs.filter(start_date_time__gte=today)
 
         if self._has_mentor_or_finalist_filter(NAME_FIELDS):
             return self._filter_by_mentor_or_finalist_names(qs)
