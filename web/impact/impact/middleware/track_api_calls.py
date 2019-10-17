@@ -2,6 +2,7 @@ import logging
 
 logger = logging.getLogger(__file__)
 
+
 class TrackAPICalls(object):
     def process_request(self, request):
         user = getattr(request, 'user', None)
