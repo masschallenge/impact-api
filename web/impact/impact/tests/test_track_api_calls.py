@@ -17,6 +17,16 @@ class TestTrackAPICalls(APITestCase):
         with self.login(email=email):
             self.client.get('/')
             logger_patch.info.assert_called_with(expected)
+    
+    @patch('impact.middleware.track_api_calls.logger')
+    def test_when_no_user_authenticated(self, logger_patch):
+        expected = {
+            'user': None,
+            'path': '/',
+            'uri': 'http://testserver/',
+            'is_ajax': False,
+        }
 
-    def test_when_no_user_authenticated(self):
-        pass
+    
+        self.client.get('/')
+        logger_patch.info.assert_called_with(expected)
