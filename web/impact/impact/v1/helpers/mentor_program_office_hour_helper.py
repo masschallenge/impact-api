@@ -38,6 +38,10 @@ class MentorProgramOfficeHourHelper(ModelHelper):
         return str(self.subject)
 
     @property
+    def location(self):
+        return self.field_element("location", "name")
+
+    @property
     def mentor_id(self):
         return self.field_element("mentor", "id")
 
