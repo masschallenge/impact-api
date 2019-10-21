@@ -43,6 +43,10 @@ class MentorProgramOfficeHourHelper(ModelHelper):
         return self.field_element("location", "name")
 
     @property
+    def timezone(self):
+        return self.field_element("location", "timezone")
+
+    @property
     def mentor_id(self):
         return self.field_element("mentor", "id")
 
@@ -69,11 +73,3 @@ class MentorProgramOfficeHourHelper(ModelHelper):
     @property
     def is_open(self):
         return self.subject.is_open()
-
-    @property
-    def location(self):
-        return self.field_element("location", "name")
-
-    @property
-    def timezone(self):
-        return self.field_element("location", "timezone")
