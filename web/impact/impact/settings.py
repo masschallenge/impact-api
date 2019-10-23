@@ -280,6 +280,8 @@ class Base(Configuration):
     IMAGE_RESIZE_HOST = "https://dl4fx6jt7wkin.cloudfront.net"
     IMAGE_RESIZE_TEMPLATE = "/fit-in/500x500/media/{}"
 
+LOG_FORMAT_STRING = "host:%s " % (
+    HOSTNAME,) + ' %(name)s[%(process)d]: %(levelname)s %(message)s'
 
 class Dev(Base):
     DEBUG = True
@@ -304,6 +306,71 @@ class Dev(Base):
 
     DEBUG_TOOLBAR_CONFIG = {
         'SHOW_TOOLBAR_CALLBACK': lambda x: True
+    }
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'filters': {
+            'require_debug_false': {
+                '()': 'django.utils.log.RequireDebugFalse'
+            }
+        },
+        'formatters': {
+            'detail': {
+                'format': LOG_FORMAT_STRING,
+                'datefmt': '%Y-%m-%dT%H:%M:%S',
+            },
+        },
+        'handlers': {
+            'null': {
+                'class': 'logging.NullHandler',
+            },
+            'file': {
+                'level': 'INFO',
+                'class': 'logging.handlers.RotatingFileHandler',
+                'maxBytes': 1024 * 1024 * 5,
+                'backupCount': 5,
+                'formatter': 'detail',
+                'filename': 'debug.log',
+            },
+            'mail_admins': {
+                'level': 'ERROR',
+                'filters': ['require_debug_false'],
+                'class': 'django.utils.log.AdminEmailHandler'
+            },
+            'SysLog': {
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+                'class': 'logging.handlers.SysLogHandler',
+                'formatter': 'detail',
+                'filters': ['require_debug_false'],
+                'address': ('logs2.papertrailapp.com', 19120)
+            },
+            'console': {
+                'level': 'INFO',
+                'class': 'logging.StreamHandler',
+                'formatter': 'detail'
+            }
+        },
+        'loggers': {
+            'root': {
+                'handlers': ['console', 'file', 'SysLog'],
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+                'propagate': True
+            },
+            'django.request': {
+                'handlers': ['SysLog', 'file', 'mail_admins', 'console'],
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+                'propagate': True,
+            }, '': {
+                'handlers': ['file', 'console', 'SysLog'],
+                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+                'propagate': True,
+            }, 'django.security.DisallowedHost': {
+                'handlers': ['null'],
+                'propagate': False,
+            },
+        }
     }
 
 
