@@ -1,12 +1,13 @@
 # MIT License
 # Copyright (c) 2019 MassChallenge, Inc.
+from datetime import datetime
 from django.db.models import Value as V
 from django.db.models.functions import Concat
 
-from impact.v1.views.base_list_view import BaseListView
 from impact.v1.helpers import (
     MentorProgramOfficeHourHelper,
 )
+from impact.v1.views.base_list_view import BaseListView
 
 ID_FIELDS = ['mentor_id', 'finalist_id']
 NAME_FIELDS = ['mentor_name', 'finalist_name']
@@ -20,6 +21,10 @@ class MentorProgramOfficeHourListView(BaseListView):
         qs = super().filter(qs)
         if not self.request.query_params.keys():
             return qs
+
+        if 'upcoming' in self.request.query_params.keys():
+            today = datetime.utcnow()
+            qs = qs.filter(start_date_time__gte=today)
 
         if self._has_mentor_or_finalist_filter(NAME_FIELDS):
             return self._filter_by_mentor_or_finalist_names(qs)
