@@ -3,6 +3,13 @@
 
 import json
 from jsonschema import Draft4Validator
+from datetime import (
+    date,
+    datetime,
+    time,
+    timedelta,
+)
+from pytz import utc
 
 from django.urls import reverse
 
@@ -146,6 +153,30 @@ class TestMentorProgramOfficeHourListView(APITestCase):
 
     def test_filters_by_both_mentor_name_and_finalist_name(self):
         self._assert_response_for_params_of_type('name')
+
+    def test_only_upcoming_office_hours_are_returned(self):
+        yesterday_offset = -2
+        tomorrow_offset = 1
+        mentor = ExpertFactory()
+        MentorProgramOfficeHourFactory(
+            mentor=mentor,
+            start_date_time=self._get_office_hour_date(yesterday_offset, 10),
+            end_date_time=self._get_office_hour_date(yesterday_offset, 12))
+        tomorrow_office_hour = MentorProgramOfficeHourFactory(
+            mentor=mentor,
+            start_date_time=self._get_office_hour_date(tomorrow_offset, 10),
+            end_date_time=self._get_office_hour_date(tomorrow_offset, 12))
+        response = self._get_response_as_logged_in_user({
+            'mentor_id': mentor.id,
+            'upcoming': None})
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]['id'],
+                         tomorrow_office_hour.pk)
+
+    def _get_office_hour_date(self, day_offset, hour):
+        return utc.localize(
+            datetime.combine(date.today() + timedelta(days=day_offset),
+                             time(hour=hour)))
 
     def _assert_response_for_params_of_type(
             self, param_type):

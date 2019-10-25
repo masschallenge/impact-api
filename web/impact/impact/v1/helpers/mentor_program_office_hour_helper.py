@@ -14,6 +14,7 @@ OFFFICE_HOUR_FIELDS = {
     "id": PK_FIELD,
     "title": OPTIONAL_STRING_FIELD,
     "location": OPTIONAL_STRING_FIELD,
+    "timezone": OPTIONAL_STRING_FIELD,
     "start_date_time": OPTIONAL_STRING_FIELD,
     "end_date_time": OPTIONAL_STRING_FIELD,
     "mentor_id": OPTIONAL_INTEGER_FIELD,
@@ -40,6 +41,10 @@ class MentorProgramOfficeHourHelper(ModelHelper):
     @property
     def location(self):
         return self.field_element("location", "name")
+
+    @property
+    def timezone(self):
+        return self.field_element("location", "timezone")
 
     @property
     def mentor_id(self):
