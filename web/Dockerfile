@@ -20,6 +20,7 @@ RUN apt-get update -y && apt-get upgrade -y && \
 
 # Install remote_syslog2 to talk to papertrail
 RUN cd /tmp/ && curl -LOs https://github.com/papertrail/remote_syslog2/releases/download/v0.20/remote-syslog2_0.20_amd64.deb
+RUN echo exit 0 > /usr/sbin/policy-rc.d
 RUN dpkg -i /tmp/remote-syslog2_0.20_amd64.deb
 
 # Copy config files after installation so installers don't get tripped up
