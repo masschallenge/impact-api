@@ -420,4 +420,4 @@ class Prod(Base):
 
 
 if len(sys.argv) > 1 and sys.argv[1] == 'test':
-    logging.disable(logging.info)
+    logging.disable(logging.INFO)
