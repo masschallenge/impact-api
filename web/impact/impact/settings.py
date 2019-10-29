@@ -330,6 +330,11 @@ class Base(Configuration):
             }
         },
         'loggers': {
+            'root': {
+                'handlers': ['console', 'file', 'SysLog'],
+                'level': 'INFO',
+                'propagate': True
+            },
             'django': {
                 'handlers': ['console'],
                 'level': 'INFO',
@@ -341,7 +346,7 @@ class Base(Configuration):
             },
             'django.request': {
                 'handlers': ['SysLog', 'file', 'mail_admins', 'console'],
-                'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+                'level': 'INFO',
                 'propagate': True,
             }, '': {
                 'handlers': ['file', 'console', 'SysLog'],
