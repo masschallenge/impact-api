@@ -2,6 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 import os
+import sys
 import logging
 import datetime
 from configurations import (
@@ -381,7 +382,6 @@ class Dev(Base):
 
 
 class Test(Base):
-
     MIGRATION_MODULES = {'django.contrib.auth': None, 'impact': None}
     DATABASES = {
         'default': {
@@ -417,6 +417,7 @@ class Prod(Base):
     DEFAULT_FILE_STORAGE = 'impact.media_storage_backend.MediaStorageBackend'
     STATICFILES_STORAGE = (
         'django.contrib.staticfiles.storage.StaticFilesStorage')
+
 
 if len(sys.argv) > 1 and sys.argv[1] == 'test':
     logging.disable(logging.info)
