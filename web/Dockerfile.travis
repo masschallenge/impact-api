@@ -42,4 +42,4 @@ USER impact_user
 ENV PYTHONUNBUFFERED 1
 EXPOSE 8000
 
-CMD ["/bin/bash", "/usr/bin/start.sh"]
+CMD ["/bin/bash", "/usr/bin/start.sh"] || (echo "start.sh failed" ; exit 1)
