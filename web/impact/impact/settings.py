@@ -350,7 +350,7 @@ class Base(Configuration):
                 'propagate': True,
             }, '': {
                 'handlers': ['file', 'console', 'SysLog'],
-                'level': 'DEBUG',
+                'level': 'INFO',
                 'propagate': True,
             }, 'django.security.DisallowedHost': {
                 'handlers': ['null'],
@@ -387,6 +387,12 @@ class Dev(Base):
 
 
 class Test(Base):
+
+    def __init__(self, *args, **kwargs):
+        super(Test, self).__init__(*args, **kwargs)
+        self.LOGGING['loggers']['django.request']['level'] = 'CRITICAL'
+        self.LOGGING['loggers']['']['level'] = 'CRITICAL'
+        
     MIGRATION_MODULES = {'django.contrib.auth': None, 'impact': None}
     DATABASES = {
         'default': {
@@ -422,7 +428,3 @@ class Prod(Base):
     DEFAULT_FILE_STORAGE = 'impact.media_storage_backend.MediaStorageBackend'
     STATICFILES_STORAGE = (
         'django.contrib.staticfiles.storage.StaticFilesStorage')
-
-
-if len(sys.argv) > 1 and sys.argv[1] == 'test':
-    logging.disable(logging.INFO)
