@@ -24,6 +24,12 @@ OFFFICE_HOUR_FIELDS = {
     "finalist_name": OPTIONAL_STRING_FIELD,
     "finalist_email": OPTIONAL_STRING_FIELD,
     "is_open": BOOLEAN_FIELD,
+    "topics": OPTIONAL_STRING_FIELD,
+    "description": OPTIONAL_STRING_FIELD,
+    "street_address": OPTIONAL_STRING_FIELD,
+    "city": OPTIONAL_STRING_FIELD,
+    "state": OPTIONAL_STRING_FIELD,
+
 }
 
 
@@ -41,6 +47,18 @@ class MentorProgramOfficeHourHelper(ModelHelper):
     @property
     def location(self):
         return self.field_element("location", "name")
+
+    @property
+    def street_address(self):
+        return self.field_element("location", "street_address")
+
+    @property
+    def city(self):
+        return self.field_element("location", "city")
+
+    @property
+    def state(self):
+        return self.field_element("location", "state")
 
     @property
     def timezone(self):
@@ -73,3 +91,11 @@ class MentorProgramOfficeHourHelper(ModelHelper):
     @property
     def is_open(self):
         return self.subject.is_open()
+
+    @property
+    def topics(self):
+        return self.subject.topics
+
+    @property
+    def description(self):
+        return self.subject.description
