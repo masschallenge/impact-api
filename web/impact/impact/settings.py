@@ -122,6 +122,7 @@ class Base(Configuration):
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
         'impact.graphql.auth.middleware.CookieJSONWebTokenMiddleware',
+        'impact.middleware.TrackAPICalls',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django.middleware.security.SecurityMiddleware',
@@ -129,7 +130,6 @@ class Base(Configuration):
         'django.middleware.locale.LocaleMiddleware',
         'oauth2_provider.middleware.OAuth2TokenMiddleware',
         'impact.middleware.MethodOverrideMiddleware',
-        'impact.middleware.TrackAPICalls',
     ]
 
     CACHES = {
