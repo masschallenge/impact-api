@@ -15,6 +15,7 @@ NAME_FIELDS = ['mentor_name', 'finalist_name']
 
 
 class MentorProgramOfficeHourListView(BaseListView):
+    permission_classes = ()
     view_name = "office_hour"
     helper_class = MentorProgramOfficeHourHelper
 
