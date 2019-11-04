@@ -2,6 +2,7 @@ FROM python:3.6
 
 WORKDIR /wwwroot
 COPY impact /wwwroot
+COPY scripts/migrate-and-check.sh /usr/bin
 COPY scripts/start.sh /usr/bin
 COPY scripts/start-nodaemon.sh /usr/bin
 
@@ -45,9 +46,13 @@ RUN pip3 install -e /packages/src/django-accelerator
 RUN chown impact_user /usr/bin/start.sh
 RUN chown -R impact_user /wwwroot
 RUN chown -R impact_user /home/impact_user
+RUN chown impact_user /usr/bin/migrate-and-check.sh
 
 USER impact_user
+# Don't hardcode in final (this Dockerfile is used for both local dev and AWS)
+ENV DJANGO_CONFIGURATION Dev
+RUN ["/bin/bash", "/usr/bin/migrate-and-check.sh"]
+
 ENV PYTHONUNBUFFERED 1
 EXPOSE 8000
-
 CMD ["/bin/bash", "/usr/bin/start.sh"]
