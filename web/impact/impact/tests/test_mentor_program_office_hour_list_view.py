@@ -120,17 +120,17 @@ class TestMentorProgramOfficeHourListView(APITestCase):
             {'finalist_name': finalist.first_name},
             finalist_office_hours
         )
-    #Working this
-    # def test_filters_by_user_name(self):
-    #     finalist, finalist_office_hours = self._create_user_office_hours(
-    #         mentor=False
-    #     )
-    #     mentor_with_same_name = ExpertFactory(first_name=finalist.first_name)
-    #     MentorProgramOfficeHourFactory(mentor=mentor_with_same_name)
-    #     response = self._get_response_as_logged_in_user(
-    #         {'user_name': finalist.first_name},
-    #     )
-        # self.assertEqual(response.data["count"], USER_OFFICE_HOUR_COUNT+1)
+
+    def test_filters_by_user_name(self):
+        finalist, finalist_office_hours = self._create_user_office_hours(
+            mentor=False
+        )
+        mentor_with_same_name = ExpertFactory(first_name=finalist.first_name)
+        MentorProgramOfficeHourFactory(mentor=mentor_with_same_name)
+        response = self._get_response_as_logged_in_user(
+            {'user_name': finalist.first_name},
+        )
+        self.assertEqual(response.data["count"], USER_OFFICE_HOUR_COUNT+1)
 
     def test_nonexistent_finalist_id_returns_nothing(self):
         finalist, finalist_office_hours = self._create_user_office_hours(
