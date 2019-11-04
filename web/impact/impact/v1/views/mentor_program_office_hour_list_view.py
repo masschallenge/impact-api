@@ -35,6 +35,8 @@ class MentorProgramOfficeHourListView(BaseListView):
         if self._has_mentor_or_finalist_filter(ID_FIELDS):
             return self._filter_by_ids(qs)
 
+        return self._filter_by_user_name(qs)
+
     def _filter_by_user_open_hours(self, qs):
         roles = UserRole.FINALIST_USER_ROLES
         program_ids = self.request.user.programrolegrant_set.filter(
