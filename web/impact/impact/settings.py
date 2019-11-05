@@ -2,7 +2,6 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 import os
-import logging
 import datetime
 from configurations import (
     Configuration,
@@ -10,6 +9,10 @@ from configurations import (
 )
 from django.urls import reverse_lazy
 from unipath import Path
+
+
+LOG_FORMAT = 'host: localhost  %(name)s[%(process)d]: ' \
+                '%(levelname)s %(message)s'
 
 
 class Base(Configuration):
@@ -117,6 +120,7 @@ class Base(Configuration):
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
         'impact.graphql.auth.middleware.CookieJSONWebTokenMiddleware',
+        'impact.middleware.TrackAPICalls',
         'django.contrib.messages.middleware.MessageMiddleware',
         'django.middleware.clickjacking.XFrameOptionsMiddleware',
         'django.middleware.security.SecurityMiddleware',
@@ -279,6 +283,80 @@ class Base(Configuration):
     IMAGE_RESIZE_HOST = "https://dl4fx6jt7wkin.cloudfront.net"
     IMAGE_RESIZE_TEMPLATE = "/fit-in/500x500/media/{}"
 
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': True,
+        'filters': {
+            'require_debug_false': {
+                '()': 'django.utils.log.RequireDebugFalse'
+            }
+        },
+        'formatters': {
+            'detail': {
+                'format': LOG_FORMAT,
+                'datefmt': '%Y-%m-%dT%H:%M:%S',
+            },
+        },
+        'handlers': {
+            'null': {
+                'class': 'logging.NullHandler',
+            },
+            'file': {
+                'level': 'INFO',
+                'class': 'logging.handlers.RotatingFileHandler',
+                'maxBytes': 1024 * 1024 * 5,
+                'backupCount': 5,
+                'formatter': 'detail',
+                'filename': 'debug.log',
+            },
+            'mail_admins': {
+                'level': 'ERROR',
+                'filters': ['require_debug_false'],
+                'class': 'django.utils.log.AdminEmailHandler'
+            },
+            'SysLog': {
+                'level': 'DEBUG',
+                'class': 'logging.handlers.SysLogHandler',
+                'formatter': 'detail',
+                'filters': [],
+                'address': ('logs2.papertrailapp.com', 19120)
+            },
+            'console': {
+                'level': 'INFO',
+                'class': 'logging.StreamHandler',
+                'formatter': 'detail'
+            }
+        },
+        'loggers': {
+            'root': {
+                'handlers': ['console', 'file', 'SysLog'],
+                'level': 'INFO',
+                'propagate': True
+            },
+            'django': {
+                'handlers': ['console'],
+                'level': 'INFO',
+            },
+            'django.server': {
+                'handlers': [],
+                'level': 'INFO',
+                'propagate': False,
+            },
+            'django.request': {
+                'handlers': ['SysLog', 'file', 'mail_admins', 'console'],
+                'level': 'INFO',
+                'propagate': True,
+            }, '': {
+                'handlers': ['file', 'console', 'SysLog'],
+                'level': 'INFO',
+                'propagate': True,
+            }, 'django.security.DisallowedHost': {
+                'handlers': ['null'],
+                'propagate': False,
+            },
+        }
+    }
+
 
 class Dev(Base):
     DEBUG = True
@@ -307,6 +385,12 @@ class Dev(Base):
 
 
 class Test(Base):
+
+    def __init__(self, *args, **kwargs):
+        super(Test, self).__init__(*args, **kwargs)
+        self.LOGGING['loggers']['django.request']['level'] = 'CRITICAL'
+        self.LOGGING['loggers']['']['level'] = 'CRITICAL'
+
     MIGRATION_MODULES = {'django.contrib.auth': None, 'impact': None}
     DATABASES = {
         'default': {
@@ -320,7 +404,6 @@ class Test(Base):
     DATABASE_ROUTERS = []
     DEBUG = False
     LANGUAGE_CODE = 'en'
-    logging.disable(logging.INFO)
 
 
 class Prod(Base):
