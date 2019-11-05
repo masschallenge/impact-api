@@ -2,8 +2,6 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 import os
-import sys
-import logging
 import datetime
 from configurations import (
     Configuration,
@@ -392,7 +390,7 @@ class Test(Base):
         super(Test, self).__init__(*args, **kwargs)
         self.LOGGING['loggers']['django.request']['level'] = 'CRITICAL'
         self.LOGGING['loggers']['']['level'] = 'CRITICAL'
-        
+
     MIGRATION_MODULES = {'django.contrib.auth': None, 'impact': None}
     DATABASES = {
         'default': {
