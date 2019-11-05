@@ -13,9 +13,13 @@ from pytz import utc
 
 from django.urls import reverse
 
+from accelerator.models import UserRole
 from accelerator.tests.factories import (
     EntrepreneurFactory,
     ExpertFactory,
+    ProgramFactory,
+    ProgramRoleFactory,
+    ProgramRoleGrantFactory,
 )
 
 from impact.tests.factories import MentorProgramOfficeHourFactory
@@ -173,6 +177,40 @@ class TestMentorProgramOfficeHourListView(APITestCase):
         self.assertEqual(response.data["results"][0]['id'],
                          tomorrow_office_hour.pk)
 
+    def test_only_the_user_open_upcoming_hours_are_returned(self):
+        tomorrow_offset = 1
+        mentor = ExpertFactory()
+        program = ProgramFactory()
+        user = self.basic_user()
+        user_role = UserRole.FINALIST
+        pr = ProgramRoleFactory(program=program,
+                                user_role__name=user_role)
+        ProgramRoleGrantFactory(person=user, program_role=pr,
+                                program_role__user_role__name=user_role)
+        self.mentor = mentor
+        self._create_office_hours(tomorrow_offset, 13, program, user)
+        user_open_upcoming_hour = self._create_office_hours(
+            tomorrow_offset, 15, program)
+        params = {
+            'mentor_id': mentor.id,
+            'upcoming': None,
+            'my_hours': None,
+        }
+        response = self._get_response_as_logged_in_user(params, user)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]['id'],
+                         user_open_upcoming_hour.pk)
+
+    def _create_office_hours(self, offset, hour, program, finalist=None):
+        hour = MentorProgramOfficeHourFactory(
+            mentor=self.mentor,
+            program=program,
+            finalist=finalist,
+            start_date_time=self._get_office_hour_date(offset, hour),
+            end_date_time=self._get_office_hour_date(offset, hour+1)
+        )
+        return hour
+
     def _get_office_hour_date(self, day_offset, hour):
         return utc.localize(
             datetime.combine(date.today() + timedelta(days=day_offset),
@@ -224,8 +262,11 @@ class TestMentorProgramOfficeHourListView(APITestCase):
                 USER_OFFICE_HOUR_COUNT, finalist=user)
         return user, office_hours
 
-    def _get_response_as_logged_in_user(self, params=None):
-        self.login(email=self.basic_user().email)
+    def _get_response_as_logged_in_user(self, params=None, user=None):
+        if user:
+            self.login(email=user.email)
+        else:
+            self.login(email=self.basic_user().email)
         return self.client.get(self.url, params)
 
     def _compare_ids(self, office_hours, response):
