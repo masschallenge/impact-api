@@ -45,6 +45,9 @@ services:
       - ./web/nginx/nginx.conf:/etc/nginx/nginx.conf:cached
       - ./web/impact/media:/media:cached
       - ./web/scripts/mysqlwait.sh:/usr/bin/mysqlwait.sh:cached
+      - ./web/scripts/start-nodaemon.sh:/usr/bin/start-nodaemon.sh:cached
+      - ./web/scripts/start.sh:/usr/bin/start.sh:cached
+      - ./web/scripts/notify_slack_on_failure.sh:/usr/bin/notify_slack_on_failure:cached
     depends_on:
       - front-end
       - assets
