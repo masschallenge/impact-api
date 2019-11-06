@@ -3,6 +3,8 @@ FROM python:3.6
 WORKDIR /wwwroot
 COPY impact /wwwroot
 COPY scripts/start.sh /usr/bin
+COPY scripts/notify_slack_on_failure.sh /usr/bin
+COPY scripts/notify_slack_on_success.sh /usr/bin
 COPY scripts/start-nodaemon.sh /usr/bin
 
 COPY scripts/mysqlwait.sh /usr/bin
