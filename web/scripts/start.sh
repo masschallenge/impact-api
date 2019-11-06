@@ -14,6 +14,11 @@ then
 fi
 
 python3 manage.py migrate --noinput
+# TODO remove after confirming the file sends a notification
+. /usr/bin/noti:fy_slack_on_failure.sh
+if [ $? -ne 0 ]; then
+  . /usr/bin/notify_slack_on_failure.sh
+fi
 python3 manage.py collectstatic --noinput
 python3 manage.py graphql_schema --schema impact.graphql.schema.schema --indent=2
 
