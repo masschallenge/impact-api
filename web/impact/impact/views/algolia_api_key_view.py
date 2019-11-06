@@ -85,7 +85,7 @@ def _get_filters(request):
         return []
 
     if request.GET['index'] == 'startup':
-        participant_roles = [UserRole.ALUM, UserRole.FINALIST, UserRole.MENTOR]
+        participant_roles = []
 
         alumni = _entrepreneur_specific_alumni_filter(
             participant_roles, request)
