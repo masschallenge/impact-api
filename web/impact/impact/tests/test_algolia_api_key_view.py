@@ -28,6 +28,7 @@ from impact.tests.factories import UserFactory
 from impact.views import AlgoliaApiKeyView
 from impact.views.algolia_api_key_view import (
     IS_ACTIVE_FILTER,
+    IS_FINALIST
 )
 
 User = get_user_model()  # pylint: disable=invalid-name
@@ -68,6 +69,9 @@ class TestAlgoliaApiKeyView(APITestCase):
 
     def _person_directory_url(self):
         return self.url + "?index=people"
+
+    def _startup_directory_url(self):
+        return self.url + "?index=startup"
 
     def test_logged_in_user_with_role_grants_in_ended_programs_gets_403(self):
         program = _create_batch_program_and_named_group(
@@ -198,6 +202,13 @@ class TestAlgoliaApiKeyView(APITestCase):
         for program in programs:
             self.assertIn(program.name, response_data["filters"])
         self.assertIn(other_program.name, response_data["filters"])
+
+    def test_alumni_finalist_mentors_view_finalist_startups(self):
+        program = ProgramFactory(program_status=ACTIVE_PROGRAM_STATUS)
+        user = self._create_user_with_role_grant(program, UserRole.FINALIST)
+        response_data = self._get_response_data(
+            user, self._startup_directory_url())
+        self.assertIn(IS_FINALIST, response_data["filters"])
 
     def test_superuser_employee_sees_all_mentors(self):
         user = _create_expert()

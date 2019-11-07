@@ -26,6 +26,7 @@ from accelerator_abstract.models import (
 from accelerator_abstract.models.base_user_utils import (
     is_entrepreneur,
     is_employee,
+    is_expert,
 )
 
 from accelerator_abstract.models.base_permission_checks import (
@@ -39,6 +40,7 @@ CONFIRMED_MENTOR_IN_PROGRAM_FILTER = 'confirmed_mentor_programs:"{program}"'
 IS_TEAM_MEMBER_FILTER = 'is_team_member:true'
 HAS_FINALIST_ROLE_FILTER = 'has_a_finalist_role:true'
 IS_ACTIVE_FILTER = 'is_active:true'
+IS_FINALIST = 'is_finalist:true'
 
 
 class AlgoliaApiKeyView(APIView):
@@ -81,6 +83,20 @@ def _get_search_key(request):
 def _get_filters(request):
     if is_employee(request.user):
         return []
+
+    if request.GET['index'] == 'startup':
+        participant_roles = []
+
+        alumni = _entrepreneur_specific_alumni_filter(
+            participant_roles, request)
+
+        finalist = _entrepreneur_specific_finalist_filter(
+            participant_roles, request)
+
+        mentor = _expert_specific_filter(
+            participant_roles, request)
+        if alumni or finalist or mentor:
+            return IS_FINALIST
 
     if request.GET['index'] == 'people':
         if not base_accelerator_check(request.user):
@@ -146,6 +162,20 @@ def _entrepreneur_specific_alumni_filter(roles, request):
 
         if has_current_alum_roles:
             roles.append(UserRole.ALUM)
+
+    return roles
+
+
+def _expert_specific_filter(roles, request):
+    if is_expert(request.user):
+        has_current_mentor_roles = ProgramRoleGrant.objects.filter(
+            program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
+            program_role__user_role__name=UserRole.MENTOR,
+            person=request.user
+        ).exists()
+
+        if has_current_mentor_roles:
+            roles.append(UserRole.MENTOR)
 
     return roles
 

@@ -4,6 +4,7 @@ from datetime import datetime
 from django.db.models import Value as V
 from django.db.models.functions import Concat
 
+from accelerator.models import UserRole
 from impact.v1.helpers import (
     MentorProgramOfficeHourHelper,
 )
@@ -14,6 +15,7 @@ NAME_FIELDS = ['mentor_name', 'finalist_name']
 
 
 class MentorProgramOfficeHourListView(BaseListView):
+    permission_classes = ()
     view_name = "office_hour"
     helper_class = MentorProgramOfficeHourHelper
 
@@ -21,7 +23,8 @@ class MentorProgramOfficeHourListView(BaseListView):
         qs = super().filter(qs)
         if not self.request.query_params.keys():
             return qs
-
+        if 'my_hours' in self.request.query_params.keys():
+            qs = self._filter_by_user_open_hours(qs)
         if 'upcoming' in self.request.query_params.keys():
             today = datetime.utcnow()
             qs = qs.filter(start_date_time__gte=today)
@@ -33,6 +36,14 @@ class MentorProgramOfficeHourListView(BaseListView):
             return self._filter_by_ids(qs)
 
         return self._filter_by_user_name(qs)
+
+    def _filter_by_user_open_hours(self, qs):
+        roles = UserRole.FINALIST_USER_ROLES
+        program_ids = self.request.user.programrolegrant_set.filter(
+            program_role__user_role__name__in=roles).values_list(
+                'program_role__program_id', flat=True)
+        qs = qs.filter(program_id__in=program_ids, finalist__isnull=True)
+        return qs
 
     def _filter_by_id(self, id_field, qs):
         value = self.request.query_params.get(id_field, None)
