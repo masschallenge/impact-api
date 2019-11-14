@@ -1,18 +1,25 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-import os
 import datetime
+import os
+import warnings
+
 from configurations import (
     Configuration,
     values,
 )
-from django.urls import reverse_lazy
 from unipath import Path
 
+from django.urls import reverse_lazy
+from django.utils.deprecation import RemovedInDjango20Warning
 
 LOG_FORMAT = 'host: localhost  %(name)s[%(process)d]: ' \
                 '%(levelname)s %(message)s'
+
+# Squelch Test DB complaining about timezone support
+warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, 
+    module='django.db.backends.sqlite3.base', lineno=53)
 
 
 class Base(Configuration):
