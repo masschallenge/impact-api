@@ -97,7 +97,7 @@ urls = [
     url(r'^api/accelerator/', include(schema_router.urls),
         name='api-root'),
     url(r'^sso/', include(sso_urlpatterns, namespace="sso")),
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^admin/', admin.site.urls),
     url(r'^accounts/', include(account_urlpatterns)),
     url(r'^graphql/$',
         csrf_exempt(SafeGraphQLView.as_view(
