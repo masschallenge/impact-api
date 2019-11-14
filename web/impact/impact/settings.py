@@ -112,7 +112,7 @@ class Base(Configuration):
 
     AUTH_USER_MODEL = 'simpleuser.User'
 
-    MIDDLEWARE_CLASSES = [
+    MIDDLEWARE = [
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.middleware.common.CommonMiddleware',
         'django.middleware.csrf.CsrfViewMiddleware',
@@ -371,9 +371,9 @@ class Dev(Base):
         '*'
     ]
 
-    MIDDLEWARE_CLASSES = [
-                             'debug_toolbar.middleware.DebugToolbarMiddleware',
-                         ] + Base.MIDDLEWARE_CLASSES
+    MIDDLEWARE = [
+        'debug_toolbar.middleware.DebugToolbarMiddleware',
+    ] + Base.MIDDLEWARE
 
     INSTALLED_APPS = Base.INSTALLED_APPS + [
         'debug_toolbar',
