@@ -1,4 +1,5 @@
 FROM python:3.6
+ARG ACCELERATE_VERSION=none # default value
 
 WORKDIR /wwwroot
 COPY impact /wwwroot
