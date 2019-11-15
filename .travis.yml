@@ -40,7 +40,7 @@ before_script:
 - git clone https://$MC_DEV_ADMIN_GH_TOKEN@github.com/masschallenge/front-end -b $FRONT_END_REVISION ../front-end
 - cp .prod.env ../front-end/.env
 - cp .prod.env .env
-- ACCELERATE_VERSION='`git status | grep HEAD | cut -d ' ' -f4`'
+- ACCELERATE_VERSION=$(git describe --abbrev=0)
 - export ACCELERATE_VERSION
 - echo $ACCELERATE_VERSION
 - docker build --no-cache -t masschallenge/front-end ../front-end
