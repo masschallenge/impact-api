@@ -47,7 +47,7 @@ before_script:
 - cp -r ../front-end/dist web/impact/static-compiled/front-end-dist
 - cp ../front-end/dist/index.html web/impact/templates/front-end.html
 - docker network create impact-api_default 
-- docker-compose -f docker-compose.travis.yml build --no-cache --build-arg DJANGO_ACCELERATOR_REVISION=$DJANGO_ACCELERATOR_REVISION ACCELERATE_VERSION=$ACCELERATE_VERSION
+- docker-compose -f docker-compose.travis.yml build --no-cache --build-arg DJANGO_ACCELERATOR_REVISION=$DJANGO_ACCELERATOR_REVISION --build-arg ACCELERATE_VERSION=$ACCELERATE_VERSION
 - docker-compose -f docker-compose.travis.yml up -d
 
 script:
