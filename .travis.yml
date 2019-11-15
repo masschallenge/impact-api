@@ -40,16 +40,14 @@ before_script:
 - git clone https://$MC_DEV_ADMIN_GH_TOKEN@github.com/masschallenge/front-end -b $FRONT_END_REVISION ../front-end
 - cp .prod.env ../front-end/.env
 - cp .prod.env .env
-- ACCELERATE_VERSION=$(git describe --abbrev=0)
-- export ACCELERATE_VERSION
-- echo $ACCELERATE_VERSION
+- export ACCELERATE_VERSION=$(git describe --abbrev=0)
 - docker build --no-cache -t masschallenge/front-end ../front-end
 - docker run -v $(pwd)/../front-end/dist:/usr/src/app/dist -t masschallenge/front-end
 - cp -r ../front-end/dist web/impact/static/front-end-dist
 - cp -r ../front-end/dist web/impact/static-compiled/front-end-dist
 - cp ../front-end/dist/index.html web/impact/templates/front-end.html
 - docker network create impact-api_default 
-- docker-compose -f docker-compose.travis.yml build --no-cache --build-arg DJANGO_ACCELERATOR_REVISION=$DJANGO_ACCELERATOR_REVISION
+- docker-compose -f docker-compose.travis.yml build --no-cache --build-arg DJANGO_ACCELERATOR_REVISION=$DJANGO_ACCELERATOR_REVISION ACCELERATE_VERSION=$ACCELERATE_VERSION
 - docker-compose -f docker-compose.travis.yml up -d
 
 script:
