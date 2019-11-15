@@ -196,8 +196,6 @@ test: setup
 coverage: coverage-run coverage-report coverage-html-report
 
 coverage-run: .env
-	@export ACCELERATE_VERSION=$('`git status | grep HEAD | cut -d ' ' -f4`')
-	@echo $(echo ACCELERATE_VERSION)
 	@docker-compose run --rm web coverage run --omit="*/tests/*" --source='.' manage.py test --configuration=Test
 
 coverage-report: diff_files:=$(shell git diff --name-only $(branch))
