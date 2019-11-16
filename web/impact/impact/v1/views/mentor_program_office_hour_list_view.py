@@ -18,6 +18,7 @@ class MentorProgramOfficeHourListView(BaseListView):
     permission_classes = ()
     view_name = "office_hour"
     helper_class = MentorProgramOfficeHourHelper
+    DEFAULT_LIMIT = 150
 
     def filter(self, qs):
         qs = super().filter(qs)
@@ -26,6 +27,9 @@ class MentorProgramOfficeHourListView(BaseListView):
         if 'my_hours' in self.request.query_params.keys():
             qs = self._filter_by_user_open_hours(qs)
         if 'upcoming' in self.request.query_params.keys():
+            today = datetime.utcnow()
+            qs = qs.filter(start_date_time__gte=today)
+        if 'month' in self.request.query_params.keys():
             today = datetime.utcnow()
             qs = qs.filter(start_date_time__gte=today)
 
