@@ -457,7 +457,6 @@ endif
 	export ECR_HOST=`aws ecr get-authorization-token --region us-east-1 --output text --query 'authorizationData[].proxyEndpoint'`; \
 	export DOCKER_USER=AWS; \
 	export DOCKER_PASSWORD=$$ECR_TOKEN; \
-	export ACCELERATE_VERSION=$('`git status | grep HEAD | cut -d ' ' -f4`')
 	echo $$DOCKER_PASSWORD | docker login -u $$DOCKER_USER --password-stdin $$ECR_HOST;
 	@ecs-cli configure profile travis --access-key $(AWS_ACCESS_KEY_ID) --secret-key $(AWS_SECRET_ACCESS_KEY);
 	@ecs-cli configure --region us-east-1 --cluster $(ENVIRONMENT);
