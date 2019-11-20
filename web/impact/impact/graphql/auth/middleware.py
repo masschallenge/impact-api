@@ -1,12 +1,14 @@
-from django.contrib.auth import authenticate
-from django.http import JsonResponse
 from graphql_jwt.exceptions import GraphQLJWTError
 from graphql_jwt.middleware import JSONWebTokenMiddleware
+
+from django.contrib.auth import authenticate
+from django.http import JsonResponse
+from django.utils.deprecation import MiddlewareMixin
 
 from impact.graphql.auth.utils import get_jwt_cookie
 
 
-class CookieJSONWebTokenMiddleware(JSONWebTokenMiddleware):
+class CookieJSONWebTokenMiddleware(JSONWebTokenMiddleware, MiddlewareMixin):
 
     def process_request(self, request):
         if get_jwt_cookie(request) is None:
