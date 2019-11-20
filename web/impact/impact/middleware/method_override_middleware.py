@@ -1,10 +1,11 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
+from django.utils.deprecation import MiddlewareMixin
 
 METHOD_OVERRIDE_HEADER = 'HTTP_X_HTTP_METHOD_OVERRIDE'
 
 
-class MethodOverrideMiddleware(object):
+class MethodOverrideMiddleware(MiddlewareMixin):
     def process_request(self, request):
         if request.method != 'POST':
             return

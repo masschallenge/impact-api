@@ -1,9 +1,11 @@
 import logging
 
+from django.utils.deprecation import MiddlewareMixin
+
 logger = logging.getLogger()
 
 
-class TrackAPICalls(object):
+class TrackAPICalls(MiddlewareMixin):
     def process_request(self, request):
         user = getattr(request, 'user', None)
 
