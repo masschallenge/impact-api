@@ -36,14 +36,14 @@ django-filter==2.2.0
 django-multidb-router
 django-oauth-toolkit<1.1
 django-paypal
-django-polymorphic==2.1.2
+django-polymorphic==3.0.1
 django-redis-cache
-django-registration==2.4.1
+django-registration==2.5.2
 django-rest-framework-proxy
 django-rest-swagger
 django-storages==1.6.5
 Django==1.11.23
-djangorestframework==3.8.2
+djangorestframework==3.10.3
 djangorestframework-jwt
 drf-schema-adapter
 drf-tracking
@@ -52,6 +52,6 @@ graphql-core==2.1
 sorl-thumbnail==12.4.1
 django-oidc-provider==0.6.2
 django-sitetree==1.12.0
-django-graphql-jwt==0.1.10
+django-graphql-jwt==0.2.2
 
 git+https://github.com/masschallenge/add2cal
