@@ -18,8 +18,8 @@ LOG_FORMAT = 'host: localhost  %(name)s[%(process)d]: ' \
                 '%(levelname)s %(message)s'
 
 # Squelch Test DB complaining about timezone support
-warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, 
-    module='django.db.backends.sqlite3.base', lineno=53)
+warnings.filterwarnings("ignore", category=RemovedInDjango20Warning,
+                        module='django.db.backends.sqlite3.base', lineno=53)
 
 
 class Base(Configuration):
@@ -251,7 +251,7 @@ class Base(Configuration):
 
     AUTHENTICATION_BACKENDS = (
         'oauth2_provider.backends.OAuth2Backend',
-        'impact.graphql.auth.authentication_backend.JWTokenCookieBackend',
+        'graphql_jwt.backends.JSONWebTokenBackend',
         'simpleuser.email_model_backend.EmailModelBackend',
         'django.contrib.auth.backends.ModelBackend',
     )
