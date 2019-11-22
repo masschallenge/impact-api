@@ -191,7 +191,7 @@ tests ?= $(TESTS)  # Backwards compatibility
 test: setup
 	@@if [ -z $$keepdb ]; then keepdb="--keepdb"; else keepdb=""; fi; \
 	docker-compose run --rm web \
-		python3 manage.py test $$keepdb --configuration=Test $(tests)
+		python3 -Wa manage.py test $$keepdb --configuration=Test $(tests)
 
 coverage: coverage-run coverage-report coverage-html-report
 
