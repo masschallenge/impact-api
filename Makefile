@@ -298,7 +298,10 @@ run-server: run-server-$(debug)
 run-server-0: .env initial-db-setup watch-frontend ensure-mysql
 	@docker-compose up
 
+ACCELERATE_VERSION:=$(shell git describe --tags --abbrev=0)
 run-detached-server: .env initial-db-setup watch-frontend ensure-mysql
+	@echo $(ACCELERATE_VERSION)
+	@docker-compose build --build-arg ACCELERATE_VERSION=$(ACCELERATE_VERSION)
 	@docker-compose up -d
 	@docker-compose run --rm web /usr/bin/mysqlwait.sh
 
@@ -505,3 +508,5 @@ kill-exited-containers:
 		docker rm -f $(containers-to-kill); \
 		echo "Done removing containers."; \
 	fi;
+print:
+	@echo $$hello
