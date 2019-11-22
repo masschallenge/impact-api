@@ -508,5 +508,3 @@ kill-exited-containers:
 		docker rm -f $(containers-to-kill); \
 		echo "Done removing containers."; \
 	fi;
-print:
-	@echo $$hello

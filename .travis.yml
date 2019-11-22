@@ -40,8 +40,7 @@ before_script:
 - git clone https://$MC_DEV_ADMIN_GH_TOKEN@github.com/masschallenge/front-end -b $FRONT_END_REVISION ../front-end
 - cp .prod.env ../front-end/.env
 - cp .prod.env .env
-- ACCELERATE_VERSION=$(git describe --tags --abbrev=0)
-- export ACCELERATE_VERSION
+- export ACCELERATE_VERSION=`git describe --tags --abbrev=0`
 - docker build --no-cache -t masschallenge/front-end ../front-end
 - docker run -v $(pwd)/../front-end/dist:/usr/src/app/dist -t masschallenge/front-end
 - cp -r ../front-end/dist web/impact/static/front-end-dist
@@ -50,6 +49,7 @@ before_script:
 - docker network create impact-api_default 
 - docker-compose -f docker-compose.travis.yml build --no-cache --build-arg DJANGO_ACCELERATOR_REVISION=$DJANGO_ACCELERATOR_REVISION --build-arg ACCELERATE_VERSION=$ACCELERATE_VERSION
 - docker-compose -f docker-compose.travis.yml up -d
+- docker images
 
 script:
 - make coverage
@@ -66,7 +66,7 @@ after_success:
 - export ECR_HOST=`aws ecr get-authorization-token --region us-east-1 --output text --query 'authorizationData[].proxyEndpoint'`
 - export DOCKER_USER=AWS
 - export DOCKER_PASSWORD=$ECR_TOKEN
-- ACCELERATE_VERSION=$(git describe --tags --abbrev=0)
+- export ACCELERATE_VERSION=`git describe --tags --abbrev=0`
 - echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin $ECR_HOST
 - make travis-release AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY ENVIRONMENT=$DEPLOY_ENVIRONMENT DOCKER_REGISTRY=$DOCKER_REGISTRY IMAGE_TAG=$TAG;
 - make deploy IMAGE_TAG=$TAG;
