@@ -12,6 +12,6 @@ class IndexView(View):
     template_name = 'base.html'
 
     def get(self, request, *args, **kwargs):
-        if request.user and request.user.is_authenticated():
+        if request.user and request.user.is_authenticated:
             return HttpResponseRedirect(reverse('api-root'))
         return render(request, self.template_name, {})
