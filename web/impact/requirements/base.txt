@@ -13,15 +13,13 @@ newrelic
 
 # Misc
 gunicorn
+mock
+numpy
 oauth2_provider
 pycrypto
+python-magic
 pytz
 urllib3
-mock
-pycrypto
-python-magic
-gunicorn
-numpy
 
 # Django
 boto3==1.6.0
@@ -43,8 +41,8 @@ django-rest-framework-proxy
 drf-yasg==1.17.0
 django-storages==1.8
 Django==1.11.23
-djangorestframework==3.10.3
-djangorestframework-jwt
+djangorestframework==3.8.2
+drf-jwt==1.13.3
 drf-schema-adapter
 drf-tracking
 graphene-django==2.3.2
