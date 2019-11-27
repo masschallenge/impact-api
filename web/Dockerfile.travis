@@ -1,4 +1,6 @@
 FROM python:3.6
+ARG ACCELERATE_VERSION=development
+ENV ACCELERATE_VERSION=${ACCELERATE_VERSION}
 
 WORKDIR /wwwroot
 COPY impact /wwwroot
