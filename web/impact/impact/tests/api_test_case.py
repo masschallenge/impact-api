@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-import simplejson as json
+import json
 from oauth2_provider.models import get_application_model
 from rest_framework.test import APIClient
 from test_plus.test import TestCase
