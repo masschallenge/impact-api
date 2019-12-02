@@ -61,7 +61,7 @@ class APITestCase(TestCase):
         return user
 
     def get_access_token(self, user):
-        app = OAuth_App.objects.create(
+        app, _ = OAuth_App.objects.get_or_create(
             user=user,
             name="Test666",
             client_type=OAuth_App.CLIENT_PUBLIC,
