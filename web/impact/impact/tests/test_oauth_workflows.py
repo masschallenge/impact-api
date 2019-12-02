@@ -21,7 +21,7 @@ from impact.tests.factories import (
 OAuth_App = get_application_model()
 
 
-class TestOAuthRoutes(TestCase):
+class TestOAuthWorkflows(TestCase)
     """Integration tests to simulate User interaction"""
     user_factory = UserFactory
 
