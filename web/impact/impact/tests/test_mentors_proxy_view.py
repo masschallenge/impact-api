@@ -97,7 +97,7 @@ class TestMentorsProxyView(APITestCase):
                 'Accept': 'application/json',
                 'Content-Type': 'application/x-www-form-urlencoded',
             }, HTTP_AUTHORIZATION='Bearer %s' % access_token)
-        self.assertEqual(404, response.status_code)
+        assert 404 == response.status_code
         assert match_errors({"SiteName": "deprecated",
                              "SecurityKey": "deprecated"},
                             response.data)
@@ -123,7 +123,7 @@ class TestMentorsProxyView(APITestCase):
                     'Accept': 'application/json',
                     'Content-Type': 'application/x-www-form-urlencoded',
                     }, HTTP_AUTHORIZATION='Bearer %s' % access_token)
-            self.assertEqual(404, response.status_code)
+            assert 404 == response.status_code
             assert match_errors({"Default SiteName": "not set",
                                  "Default SecurityKey": "not set"},
                                 response.data)
