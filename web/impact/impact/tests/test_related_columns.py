@@ -114,7 +114,7 @@ class TestRelatedColumns(TestCase):
             codename='view_startup_stealth_mode_true',
             name='Can view Startups in Stealth Mode',
         )
-        _, startupteammember_permission = Permission.objects.get_or_create(
+        startupteammember_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
                 app_label='accelerator',
                 model='startupteammember'),
