@@ -1,7 +1,10 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from collections import OrderedDict
+from collections import (
+    defaultdict,
+    OrderedDict,
+)
 from numpy import (
     array,
     matrix,
@@ -34,6 +37,8 @@ JUDGING_ROUND_INACTIVE_ERROR = "Judging round {} is not active"
 NO_APP_LEFT_FOR_JUDGE = "{} has provided feedback on all applications"
 NO_DATA_FOR_JUDGE = "Judging round {judging_round} has no data for {judge}"
 ASSIGNMENT_DISCOUNT = 0.45
+ASSIGNMENT_STALE_DAYS = 7.0
+ASSIGNMENT_STALE_SECONDS = ASSIGNMENT_STALE_DAYS * 24 * 60 * 60
 
 
 class AllocateApplicationsView(ImpactView):
@@ -134,8 +139,9 @@ class AllocateApplicationsView(ImpactView):
                 needs[key] = (
                     self._option_counts(key) -
                     self._sum_judge_data(key, app_data["feedbacks"]) -
-                    (ASSIGNMENT_DISCOUNT *
-                     self._sum_judge_data(key, app_data["assignments"])))
+                    self._sum_judge_data(key,
+                                         app_data["assignments"],
+                                         assignment_ages=app_data['assignment_ages']))
             else:
                 needs[key] = 0
         return array(list(needs.values()))
@@ -153,14 +159,15 @@ class AllocateApplicationsView(ImpactView):
             for option in helper.options(spec, self.apps):
                 self._option_counts_cache[(criterion, option)] = spec.count
 
-    def _sum_judge_data(self, key, judge_ids):
+    def _sum_judge_data(self, key, judge_ids, assignment_ages=None):
+        assignment_ages = assignment_ages or defaultdict(int)        
         result = 0
         criterion, option = key
         for judge_id in judge_ids:
             judge_data = self._judge_cache.data.get(judge_id, {})
             helper = self.criterion_helpers.get(criterion.id)
             if helper.judge_matches_option(judge_data, option):
-                result += 1
+                result += calc_discount(judge_id, assignment_ages)
         return result
 
     def _choose_app_ids(self, preferences):
@@ -230,3 +237,10 @@ def find_criterion_helpers(judging_round):
     c_set = judging_round.criterion_set.all()
     return {criterion.id: CriterionHelper.find_helper(criterion)
             for criterion in c_set}
+
+
+def calc_discount(judge_id, assignment_ages):
+    age = assignment_ages[judge_id]
+    age_score = (ASSIGNMENT_STALE_SECONDS - age) / ASSIGNMENT_STALE_SECONDS
+    return max(0, age_score)
+               
