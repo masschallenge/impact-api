@@ -180,10 +180,11 @@ setup: .env
 	@mkdir -p ./mysql/data
 	@mkdir -p ./redis
 
+ACCELERATE_VERSION:=$(shell git describe --tags --abbrev=0)
 build: shutdown-vms delete-vms setup
 	@docker build -f Dockerfile.fpdiff -t masschallenge/fpdiff .
 	@docker build  -f Dockerfile.semantic-release -t semantic-release .
-	@docker-compose build
+	@docker-compose build --build-arg ACCELERATE_VERSION=$(ACCELERATE_VERSION)
 
 # Testing, coverage, and code checking targets
 
@@ -298,10 +299,7 @@ run-server: run-server-$(debug)
 run-server-0: .env initial-db-setup watch-frontend ensure-mysql
 	@docker-compose up
 
-ACCELERATE_VERSION:=$(shell git describe --tags --abbrev=0)
 run-detached-server: .env initial-db-setup watch-frontend ensure-mysql
-	@echo $(ACCELERATE_VERSION)
-	@docker-compose build --build-arg ACCELERATE_VERSION=$(ACCELERATE_VERSION)
 	@docker-compose up -d
 	@docker-compose run --rm web /usr/bin/mysqlwait.sh
 

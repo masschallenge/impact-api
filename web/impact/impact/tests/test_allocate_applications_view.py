@@ -1,7 +1,11 @@
 # MIT License
 # Copyright (c) 2018 MassChallenge, Inc.
 
-
+from datetime import (
+    datetime,
+    timedelta,
+    )
+from pytz import utc
 from collections import namedtuple
 from itertools import chain
 from django.urls import reverse
@@ -15,13 +19,18 @@ from accelerator.models import (
 from accelerator.tests.factories import (
     AllocatorFactory,
     ApplicationPanelAssignmentFactory,
+    CriterionOptionSpecFactory,
     ExpertFactory,
     IndustryFactory,
     JudgeApplicationFeedbackFactory,
+    JudgePanelAssignmentFactory,
     ProgramFactory,
     StartupProgramInterestFactory,
 )
-from accelerator.tests.contexts import AnalyzeJudgingContext
+from accelerator.tests.contexts import (
+    AnalyzeJudgingContext,
+    JudgeFeedbackContext,
+)
 from impact.tests.api_test_case import APITestCase
 from impact.v1.views import (
     ALREADY_ASSIGNED_ERROR,
@@ -134,6 +143,55 @@ class TestAllocateApplicationsView(APITestCase):
         assigned_ids = [app.id for app in context.applications[-10:]]
         reassigned_apps = set(assignments).intersection(assigned_ids)
         assert 0 == len(reassigned_apps)
+
+        
+    def test_allocator_assignment_discount_times_out(self):
+        context = JudgeFeedbackContext(complete=False)
+                         
+        CriterionOptionSpecFactory(
+            criterion__judging_round=context.judging_round,
+            criterion__type="reads",
+            criterion__name="reads",
+            option="",
+            count=4,
+            weight=1)
+        AllocatorFactory(judging_round=context.judging_round,
+                         scenario=context.scenario)
+        old_assigned_apps = context.add_applications(10)
+        new_assigned_apps = context.add_applications(10)
+        old_panel = context.add_panel()
+        new_panel = context.panel
+        now = utc.localize(datetime.utcnow())
+        six_days_ago = now - timedelta(6)
+        for app in old_assigned_apps:
+            apa = ApplicationPanelAssignmentFactory(
+                application=app,
+                panel=old_panel,
+                scenario=context.scenario)
+            apa.created_at = six_days_ago
+            apa.save()
+        jpa = JudgePanelAssignmentFactory(
+            panel=old_panel,
+            judge=context.judge,
+            scenario=context.scenario)
+        jpa.created_at = six_days_ago
+        jpa.save()
+        for app in new_assigned_apps:
+            ApplicationPanelAssignmentFactory(
+                application=app,
+                panel=new_panel,
+                scenario=context.scenario)
+        new_judge = context.add_judge(assigned=False,
+                                      complete=False)
+        new_judge.set_password("password")
+        new_judge.save()
+        with self.login(email=new_judge.email):
+            response = self.client.get(self._url(context.judging_round.id,
+                                                 new_judge.id))
+        assignments = response.json()
+        assigned_ids = [app.id for app in old_assigned_apps]
+        reassigned_apps = set(assignments).intersection(assigned_ids)
+        self.assertEqual(10, len(reassigned_apps))
 
     def test_allocator_does_not_reassign_conflicted_apps_to_same_judge(self):
         context = AnalyzeJudgingContext()
