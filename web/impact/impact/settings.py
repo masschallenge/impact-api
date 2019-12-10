@@ -251,7 +251,7 @@ class Base(Configuration):
 
     AUTHENTICATION_BACKENDS = (
         'oauth2_provider.backends.OAuth2Backend',
-        'graphql_jwt.backends.JSONWebTokenBackend',
+        'impact.graphql.auth.authentication_backend.JWTokenCookieBackend',
         'simpleuser.email_model_backend.EmailModelBackend',
         'django.contrib.auth.backends.ModelBackend',
     )
