@@ -52,6 +52,6 @@ graphql-core==2.1
 sorl-thumbnail==12.4.1
 django-oidc-provider==0.7.0
 django-sitetree==1.13.1
-django-graphql-jwt==0.1.4
+django-graphql-jwt==0.1.10
 
 git+https://github.com/masschallenge/add2cal
