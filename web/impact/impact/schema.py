@@ -6,7 +6,7 @@ from rest_framework.decorators import (
     api_view,
     renderer_classes,
 )
-from rest_framework_swagger.renderers import (
+from drf_yasg.renderers import (
     OpenAPIRenderer,
     SwaggerUIRenderer,
 )

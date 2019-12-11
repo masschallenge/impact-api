@@ -18,8 +18,8 @@ LOG_FORMAT = 'host: localhost  %(name)s[%(process)d]: ' \
                 '%(levelname)s %(message)s'
 
 # Squelch Test DB complaining about timezone support
-warnings.filterwarnings("ignore", category=RemovedInDjango20Warning, 
-    module='django.db.backends.sqlite3.base', lineno=53)
+warnings.filterwarnings("ignore", category=RemovedInDjango20Warning,
+                        module='django.db.backends.sqlite3.base', lineno=53)
 
 
 class Base(Configuration):
@@ -108,7 +108,7 @@ class Base(Configuration):
         'rest_framework',
         'rest_framework.authtoken',
         'oidc_provider',
-        'rest_framework_swagger',
+        'drf_yasg',
         'fluent_pages',
         'impact',
         'graphene_django',
@@ -269,7 +269,6 @@ class Base(Configuration):
         # did not expire
         'JWT_AUTH_COOKIE': os.environ.get('JWT_AUTH_COOKIE', ''),
         'JWT_SECRET_KEY': os.environ.get('JWT_SECRET_KEY', ''),
-        'FIRST_NAME_KEY': 'first_name',
     }
 
     PAYPAL_WPP_USER = ''

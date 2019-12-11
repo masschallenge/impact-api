@@ -11,7 +11,7 @@ from impact.v1.helpers import ORGANIZATION_USER_FIELDS
 from impact.tests.factories import (
     StartupFactory
 )
-import simplejson as json
+import json
 
 
 class TestSchemaEndpoints(APITestCase):
