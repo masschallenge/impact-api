@@ -15,7 +15,7 @@ from accelerator.tests.factories.organization_factory import (
     OrganizationFactory
 )
 from django.contrib.auth.models import Permission
-import simplejson as json
+import json
 
 from impact.tests.factories import (
     UserFactory,
