@@ -140,6 +140,51 @@ EXPERT_CATEGORY_FIELD = {
     },
 }
 
+
+MENTOR_TYPE_FIELD = {
+    "json-schema": {
+        "type": "string"
+    },
+    "GET": {
+        "included": COULD_BE_EXPERT_CHECK,
+        "description": EXPERT_DESCRIPTION,
+    },
+    "PATCH": {
+        "required": False,
+        "allowed": IS_EXPERT_CHECK,
+        "description": ("Allowed only when user_type is 'expert' and "
+                        "Mentor Type is valid"),
+    },
+    "POST": {
+        "required": False,
+        "allowed": IS_EXPERT_CHECK,
+        "description": ("Allowed only when user_type is 'expert' and "
+                        "Mentor Type is valid"),
+    },
+}
+
+JUDGE_TYPE_FIELD = {
+    "json-schema": {
+        "type": "string"
+    },
+    "GET": {
+        "included": COULD_BE_EXPERT_CHECK,
+        "description": EXPERT_DESCRIPTION,
+    },
+    "PATCH": {
+        "required": False,
+        "allowed": IS_EXPERT_CHECK,
+        "description": ("Allowed only when user_type is 'expert' and "
+                        "Judge Type is valid"),
+    },
+    "POST": {
+        "required": False,
+        "allowed": IS_EXPERT_CHECK,
+        "description": ("Allowed only when user_type is 'expert' and "
+                        "Judge Type is valid"),
+    },
+}
+
 MENTORING_SPECIALTIES_FIELD = {
     "json-schema": {
         "type": "array",
@@ -353,6 +398,8 @@ class ProfileHelper(ModelHelper):
         "office_hours_topics",
         "referred_by",
         "speaker_topics",
+        "mentor_type",
+        "judge_type",
     ]
     EXPERT_OPTIONAL_BOOLEAN_KEYS = [
         "judge_interest",
