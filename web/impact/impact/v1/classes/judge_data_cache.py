@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from numpy import matrix
+from numpy import array
 
 
 class JudgeDataCache(object):
@@ -16,7 +16,7 @@ class JudgeDataCache(object):
     def features(self, judge, weights):
         datum = self.data.get(judge.id, {})
         if not datum:
-            return matrix([])
+            return array([])
         keys = weights.keys()
         row = OrderedDict([(key, 0) for key in keys])
         for helper in self.criterion_helpers:
@@ -25,4 +25,4 @@ class JudgeDataCache(object):
             key = (helper.subject, option)
             if key in keys:
                 row[key] = 1
-        return matrix(list(row.values()))
+        return array(list(row.values()))
