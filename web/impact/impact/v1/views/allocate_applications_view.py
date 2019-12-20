@@ -7,7 +7,7 @@ from collections import (
 )
 from numpy import (
     array,
-    matrix,
+    matmul,
 )
 from impact.v1.classes.application_data_cache import ApplicationDataCache
 from impact.v1.classes.criteria_data_cache import CriteriaDataCache
@@ -111,8 +111,8 @@ class AllocateApplicationsView(ImpactView):
         weights = self._criteria_cache.weights
         judge_features = self._judge_cache.features(self.judge, weights)
         needs = self._application_needs()
-        needs_matrix = matrix(needs * array(list(weights.values())))
-        preferences = judge_features * needs_matrix.transpose()
+        needs_matrix = array(needs * array(list(weights.values())))
+        preferences = matmul(judge_features, needs_matrix.transpose())
         choices = self._choose_app_ids(preferences)
         if not choices:
             self.errors.append(NO_APP_LEFT_FOR_JUDGE.format(self.judge.email))
@@ -139,9 +139,10 @@ class AllocateApplicationsView(ImpactView):
                 needs[key] = (
                     self._option_counts(key) -
                     self._sum_judge_data(key, app_data["feedbacks"]) -
-                    self._sum_judge_data(key,
-                                         app_data["assignments"],
-                                         assignment_ages=app_data['assignment_ages']))
+                    self._sum_judge_data(
+                        key,
+                        app_data["assignments"],
+                        assignment_ages=app_data['assignment_ages']))
             else:
                 needs[key] = 0
         return array(list(needs.values()))
@@ -160,7 +161,7 @@ class AllocateApplicationsView(ImpactView):
                 self._option_counts_cache[(criterion, option)] = spec.count
 
     def _sum_judge_data(self, key, judge_ids, assignment_ages=None):
-        assignment_ages = assignment_ages or defaultdict(int)        
+        assignment_ages = assignment_ages or defaultdict(int)
         result = 0
         criterion, option = key
         for judge_id in judge_ids:
@@ -243,4 +244,3 @@ def calc_discount(judge_id, assignment_ages):
     age = assignment_ages[judge_id]
     age_score = (ASSIGNMENT_STALE_SECONDS - age) / ASSIGNMENT_STALE_SECONDS
     return max(0, age_score)
-               

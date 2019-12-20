@@ -340,6 +340,8 @@ class TestUserDetailView(APITestCase):
                 "speaker_topics": speaker_topics,
                 "judge_interest": False,
                 "mentor_interest": True,
+                "mentor_type": "f",
+                "judge_type": "1",
             }
             self.client.patch(url, data)
             user.refresh_from_db()
@@ -356,6 +358,8 @@ class TestUserDetailView(APITestCase):
             assert helper.field_value("speaker_topics") == speaker_topics
             assert helper.field_value("judge_interest") is False
             assert helper.field_value("mentor_interest") is True
+            assert helper.field_value("mentor_type") == "f"
+            assert helper.field_value("judge_type") == "1"
 
     def test_patch_personal_website_url_with_email_and_password_url(self):
         context = UserContext(user_type=ENTREPRENEUR_USER_TYPE)
