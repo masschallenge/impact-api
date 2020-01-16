@@ -12,7 +12,6 @@ from impact.graphql.types.entrepreneur_startup_type import (
 
 
 class EntrepreneurProfileType(DjangoObjectType):
-    current_program = graphene.String()
     image_url = graphene.String()
     title = graphene.String()
     startups = graphene.List(EntrepreneurStartupType)
@@ -27,9 +26,6 @@ class EntrepreneurProfileType(DjangoObjectType):
             'twitter_handle',
             'user',
         )
-
-    def resolve_current_program(self, info, **kwargs):
-        return self.current_program.name
 
     def resolve_image_url(self, info, **kwargs):
         return self.image and self.image.url
