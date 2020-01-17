@@ -23,9 +23,10 @@ from impact.tests.factories import (
 from impact.tests.utils import capture_stderr
 from impact.graphql.query import (
     EXPERT_NOT_FOUND_MESSAGE,
-    ENTREPRENEUR_NOT_FOUND_MESSAGE
+    ENTREPRENEUR_NOT_FOUND_MESSAGE,
+    NON_FINALIST_PROFILE_MESSAGE
 )
-from accelerator.tests.contexts import StartupTeamMemberContext
+from accelerator.tests.contexts import StartupTeamMemberContext, UserRoleContext
 
 MENTEE_FIELDS = """
     startup {
@@ -105,7 +106,7 @@ class TestGraphQL(APITestCase):
             )
 
     def test_query_with_entrepreneur(self):
-        with self.login(email=self.basic_user().email):
+        with self.login(email=self.staff_user().email):
             context = StartupTeamMemberContext(primary_contact=False)
             startup = context.startup
             program = context.program
@@ -337,4 +338,65 @@ class TestGraphQL(APITestCase):
             self.assertEqual(
                 response.json()['data']['entrepreneurProfile'],
                 None
+            )
+
+    def test_non_staff_user_cannot_access_non_finalist_graphql_view(self):
+        with self.login(email=self.basic_user().email):
+            user = EntrepreneurFactory()
+            query = """query {{ entrepreneurProfile(id: {id}) {{ title }} }}""".format(id=user.id)
+
+            with capture_stderr(self.client.post,
+                                self.url,
+                                data={'query': query}) as (response, _):
+                error_messages = [x['message'] for x in response.json()['errors']]
+
+            self.assertIn(NON_FINALIST_PROFILE_MESSAGE, error_messages)
+
+    def test_staff_user_can_access_non_finalist_graphql_view(self):
+        with self.login(email=self.staff_user().email):
+            user = EntrepreneurFactory()
+            query = """
+                        query {{
+                                entrepreneurProfile(id: {id}) {{
+                                    user {{ firstName }}
+                                }}
+                            }}
+                    """.format(id=user.id)
+            response = self.client.post(self.url, data={'query': query})
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                {
+                    'data': {
+                        'entrepreneurProfile': {
+                            'user': {
+                                'firstName': user.first_name
+                            },
+                        }
+                    }
+                }
+            )
+
+    def test_non_staff_user_can_access_finalist_graphql_view(self):
+        with self.login(email=self.basic_user().email):
+            user = EntrepreneurFactory()
+            UserRoleContext(UserRole.FINALIST, user=user)
+            query = """
+                        query {{
+                                entrepreneurProfile(id: {id}) {{
+                                    user {{ firstName }}
+                                }}
+                            }}
+                    """.format(id=user.id)
+            response = self.client.post(self.url, data={'query': query})
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                {
+                    'data': {
+                        'entrepreneurProfile': {
+                            'user': {
+                                'firstName': user.first_name
+                            },
+                        }
+                    }
+                }
             )

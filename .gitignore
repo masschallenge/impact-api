@@ -198,3 +198,6 @@ web/impact/templates/front-end.html
 
 mysql/connection/
 web/impact/static-compiled/
+
+# PyCharm project files
+.idea/*
