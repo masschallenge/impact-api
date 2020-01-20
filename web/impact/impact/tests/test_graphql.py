@@ -129,7 +129,6 @@ class TestGraphQL(APITestCase):
                     entrepreneurProfile(id: {id}) {{
                         title
                         twitterHandle
-                        currentProgram
                         imageUrl
                         linkedInUrl
                         facebookUrl
@@ -173,9 +172,6 @@ class TestGraphQL(APITestCase):
                 ent_profile["facebookUrl"], profile.facebook_url)
             self.assertEqual(
                 ent_profile["twitterHandle"], profile.twitter_handle)
-            self.assertEqual(
-                ent_profile["currentProgram"],
-                profile.current_program.name)
 
             user_resp = ent_profile["user"]
             self.assertEqual(user_resp["id"], str(user.id))
