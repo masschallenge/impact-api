@@ -18,13 +18,17 @@ NON_FINALIST_PROFILE_MESSAGE = 'Sorry, You are not allowed to access this page.'
 
 class Query(graphene.ObjectType):
     expert_profile = graphene.Field(
-        ExpertProfileType, id=graphene.Int())
+        ExpertProfileType, id=graphene.Int(), email=graphene.String())
     entrepreneur_profile = graphene.Field(
         EntrepreneurProfileType, id=graphene.Int())
 
     def resolve_expert_profile(self, info, **kwargs):
         user_id = kwargs.get('id')
-        expert = ExpertProfile.objects.filter(user_id=user_id).first()
+        email = kwargs.get('email', None)
+        if user_id:
+            expert = ExpertProfile.objects.filter(user_id=user_id).first()
+        else:
+            expert = ExpertProfile.objects.filter(user__email=email).first()
 
         if not expert:
             return GraphQLError(EXPERT_NOT_FOUND_MESSAGE)
