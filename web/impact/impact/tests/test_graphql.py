@@ -81,6 +81,7 @@ class TestGraphQL(APITestCase):
                         availableOfficeHours
                         officeHoursUrl
                         programInterests
+                        latestActiveProgramLocation
                     }}
                 }}
             """.format(id=user.id)
@@ -99,7 +100,8 @@ class TestGraphQL(APITestCase):
                                          profile.image.url or ''),
                             'availableOfficeHours': False,
                             'officeHoursUrl': None,
-                            'programInterests': []
+                            'programInterests': [],
+                            'latestActiveProgramLocation': None
                         }
                     }
                 }
@@ -391,6 +393,30 @@ class TestGraphQL(APITestCase):
                         'entrepreneurProfile': {
                             'user': {
                                 'firstName': user.first_name
+                            },
+                        }
+                    }
+                }
+            )
+
+    def test_query_expert_by_email(self):
+        with self.login(email=self.basic_user().email):
+            user = ExpertFactory()
+            query = """
+                query {{
+                    expertProfile(email: "{email}") {{
+                        user {{ firstName }}
+                    }}
+                }}
+            """.format(email=user.email)
+            response = self.client.post(self.url, data={'query': query})
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                {
+                    'data': {
+                        'expertProfile': {
+                            'user': {
+                                'firstName': user.first_name,
                             },
                         }
                     }
