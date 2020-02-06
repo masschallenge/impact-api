@@ -58,9 +58,6 @@ class TestApiRoute(TestCase):
             self.assertIn("short_pitch", response_dict['results'][0].keys())
             for startup in response_dict['results']:
                 self.assertEqual(startup["is_visible"], 1)
-        PermissionFactory.create(codename='change_startup')
-        PermissionFactory.create(codename='delete_startup')
-        view_perm = PermissionFactory.create(codename='view_startup')
 
     def test_api_object_get(self):
         url_name = "object-detail"
@@ -253,14 +250,11 @@ class TestApiRoute(TestCase):
             response = self.get(url_name, **view_kwargs)
             self.response_403(response)
 
-        perm_user = self.make_user(
-            'perm_user@test.com',
-            perms=["mc.view_startup"])
-        perm = Permission.objects.get(codename='change_startup',
-                                      content_type=startup_content_type)
-        view_perm = PermissionFactory.create(codename='view_startup',
+        change_perm = Permission.objects.get(codename='change_startup',
                                              content_type=startup_content_type)
-        perm_user.save()
+        view_perm = Permission.objects.get(codename='view_startup',
+                                           content_type=startup_content_type)
+        perm_user = self.make_user('perm_user@test.com', perms=["mc.view_startup"])
         with self.login(perm_user):
             self.response_403(self.get(url_name, **view_kwargs))
 
@@ -271,10 +265,9 @@ class TestApiRoute(TestCase):
                 "mc.change_startup",
                 "mc.view_startup_stealth_mode_true"
             ])
-        correct_perm_user.user_permissions.add(perm)
+        correct_perm_user.user_permissions.add(change_perm)
         correct_perm_user.user_permissions.add(view_perm)
         correct_perm_user.user_permissions.add(stealth_perm)
-        correct_perm_user.save()
         with self.login(correct_perm_user):
             response = self.get(url_name, **view_kwargs)
             self.response_200(response)
