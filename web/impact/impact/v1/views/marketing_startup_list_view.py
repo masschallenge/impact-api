@@ -33,6 +33,7 @@ from accelerator.models import (
     StartupTeamMember,
 )
 from impact.v1.views.impact_view import ImpactView
+from impact.v1.views.utils import get_image_token
 from impact.v1.views.utils import pad
 
 
@@ -44,20 +45,6 @@ class MarketingStartupListView(ImpactView):
             BADGE_STARTUP_PROFILE, BADGE_STARTUP_LIST_AND_PROFILE)
         self.status_groups = odict()
 
-    def get_image_token(self, name):
-        # Create initialization vector,
-        # servicekey and encryption object for creating image_token
-        #  the service key is a hash of the password from the settings file,
-        # we use the first 32 bytes as 32 is
-        #  a key length restriction.
-        iv = os.urandom(settings.IMAGE_TOKEN_BLOCK_SIZE)
-        servicekey = hashlib.sha256(
-            settings.IMAGE_TOKEN_PASSWORD.encode()).hexdigest()[:32]
-        aes = AES.new(servicekey.encode(), AES.MODE_CBC, iv)
-        raw = pad(name + ":" + str(time())).encode()[:32]
-        # We .decode() return value because json.dumps needs str values, not bytes
-        return base64.urlsafe_b64encode((iv + aes.encrypt(raw))).decode()
-
     def status_dict(self, startup_status):
         return {
             'status_name': startup_status.program_startup_status.startup_status,
@@ -65,7 +52,7 @@ class MarketingStartupListView(ImpactView):
                 startup_status.program_startup_status.badge_image.url
             )
             if startup_status.program_startup_status.badge_image else '',
-            'status_badge_token': self.get_image_token(
+            'status_badge_token': get_image_token(
                 startup_status.program_startup_status.badge_image.name
             ) if startup_status.program_startup_status.badge_image else '',
         }
@@ -100,6 +87,7 @@ class MarketingStartupListView(ImpactView):
         stealth_still_listed = {}
         site = Site.objects.get(name=site_name)
         base_url = ''
+
         for spa in SiteProgramAuthorization.objects.filter(
                 site=site, program__name__in=program_names):
             if spa.startup_profile_base_url:
@@ -143,7 +131,7 @@ class MarketingStartupListView(ImpactView):
                         'profile_url': profile_urls[startup.id],
                         'logo_url': (startup.high_resolution_logo.url if
                                     startup.high_resolution_logo else ''),
-                        'image_token': self.get_image_token(
+                        'image_token': get_image_token(
                             startup.high_resolution_logo.name) if (
                             startup.high_resolution_logo) else '',
                         'statuses': [
