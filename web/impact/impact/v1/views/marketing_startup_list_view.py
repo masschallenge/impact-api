@@ -1,10 +1,6 @@
-import base64
-import hashlib
 import json
 import logging
 
-import os
-import re
 from collections import OrderedDict as odict
 from Cryptodome.Cipher import AES
 from django.conf import settings
@@ -33,7 +29,10 @@ from accelerator.models import (
     StartupTeamMember,
 )
 from impact.v1.views.impact_view import ImpactView
-from impact.v1.views.utils import get_image_token
+from impact.v1.views.utils import (
+    get_image_token,
+    status_dict,
+)
 from impact.v1.views.utils import pad
 
 
@@ -45,17 +44,17 @@ class MarketingStartupListView(ImpactView):
             BADGE_STARTUP_PROFILE, BADGE_STARTUP_LIST_AND_PROFILE)
         self.status_groups = odict()
 
-    def status_dict(self, startup_status):
-        return {
-            'status_name': startup_status.program_startup_status.startup_status,
-            'status_badge_url': (
-                startup_status.program_startup_status.badge_image.url
-            )
-            if startup_status.program_startup_status.badge_image else '',
-            'status_badge_token': get_image_token(
-                startup_status.program_startup_status.badge_image.name
-            ) if startup_status.program_startup_status.badge_image else '',
-        }
+    # def status_dict(self, startup_status):
+    #     return {
+    #         'status_name': startup_status.program_startup_status.startup_status,
+    #         'status_badge_url': (
+    #             startup_status.program_startup_status.badge_image.url
+    #         )
+    #         if startup_status.program_startup_status.badge_image else '',
+    #         'status_badge_token': get_image_token(
+    #             startup_status.program_startup_status.badge_image.name
+    #         ) if startup_status.program_startup_status.badge_image else '',
+    #     }
 
     def status_displayable(self, startup_status):
         pstatus = startup_status.program_startup_status
@@ -112,7 +111,7 @@ class MarketingStartupListView(ImpactView):
                         startups[
                             already_listed_startups[
                                 startup_status.startup.id]]['statuses'].append(
-                            self.status_dict(startup_status))
+                            status_dict(startup_status))
                         self.status_groups[(
                             startup_status.startup_id,
                             startup_status.program_startup_status.status_group
@@ -135,7 +134,7 @@ class MarketingStartupListView(ImpactView):
                             startup.high_resolution_logo.name) if (
                             startup.high_resolution_logo) else '',
                         'statuses': [
-                            self.status_dict(startup_status),
+                            status_dict(startup_status),
                         ] if self.status_displayable(startup_status) else [],
                     })
                     if startups[-1]['statuses']:
@@ -174,7 +173,7 @@ class MarketingStartupListView(ImpactView):
             'program_startup_status',
         ).all():
             startups[already_listed_startups[leftover_startup_status.startup.id]][
-                'statuses'].append(self.status_dict(leftover_startup_status))
+                'statuses'].append(status_dict(leftover_startup_status))
 
         if 'group_by' in list(request.GET):
             key = request.GET.get('group_by').lower()
