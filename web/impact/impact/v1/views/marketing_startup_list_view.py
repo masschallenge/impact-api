@@ -32,6 +32,7 @@ from impact.v1.views.impact_view import ImpactView
 from impact.v1.views.utils import (
     get_image_token,
     status_dict,
+    status_displayable,
 )
 from impact.v1.views.utils import pad
 
@@ -43,27 +44,6 @@ class MarketingStartupListView(ImpactView):
         self.acceptable_badge_display = (
             BADGE_STARTUP_PROFILE, BADGE_STARTUP_LIST_AND_PROFILE)
         self.status_groups = odict()
-
-    # def status_dict(self, startup_status):
-    #     return {
-    #         'status_name': startup_status.program_startup_status.startup_status,
-    #         'status_badge_url': (
-    #             startup_status.program_startup_status.badge_image.url
-    #         )
-    #         if startup_status.program_startup_status.badge_image else '',
-    #         'status_badge_token': get_image_token(
-    #             startup_status.program_startup_status.badge_image.name
-    #         ) if startup_status.program_startup_status.badge_image else '',
-    #     }
-
-    def status_displayable(self, startup_status):
-        pstatus = startup_status.program_startup_status
-        return (
-            not startup_status.program_startup_status.status_group or (
-                startup_status.startup_id,
-                startup_status.program_startup_status.status_group
-            ) not in self.status_groups
-        ) and (pstatus.badge_display in self.acceptable_badge_display)
 
     def get(self, request):
         program_names = request.GET.getlist('program_key')
@@ -107,7 +87,8 @@ class MarketingStartupListView(ImpactView):
 
             if startup.id in already_listed_startups:
                 if is_public[startup.id]:
-                    if self.status_displayable(startup_status):
+                    if status_displayable(startup_status,
+                    self.status_groups, self.acceptable_badge_display):
                         startups[
                             already_listed_startups[
                                 startup_status.startup.id]]['statuses'].append(
@@ -135,7 +116,8 @@ class MarketingStartupListView(ImpactView):
                             startup.high_resolution_logo) else '',
                         'statuses': [
                             status_dict(startup_status),
-                        ] if self.status_displayable(startup_status) else [],
+                        ] if status_displayable(startup_status,
+                        self.status_groups, self.acceptable_badge_display) else [],
                     })
                     if startups[-1]['statuses']:
                         self.status_groups[(
