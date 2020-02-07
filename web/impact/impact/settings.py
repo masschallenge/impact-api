@@ -388,6 +388,8 @@ class Dev(Base):
     DEBUG_TOOLBAR_CONFIG = {
         'SHOW_TOOLBAR_CALLBACK': lambda x: True
     }
+    IMAGE_TOKEN_PASSWORD = 'XXX'
+    IMAGE_TOKEN_BLOCK_SIZE = 16
 
 
 class Test(Base):
