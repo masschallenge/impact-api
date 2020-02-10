@@ -3,12 +3,15 @@ import json
 from django.urls import reverse
 
 from accelerator.models import Criterion
-from impact.v1.views.utils import valid_keys_note
 from impact.tests.api_test_case import APITestCase
+from impact.tests.factories import (
+    CriterionFactory,
+    JudgingRoundFactory,
+)
 from impact.tests.utils import assert_data_is_consistent_with_instance
-from impact.tests.factories import CriterionFactory
-from impact.v1.views import CriterionListView
 from impact.v1.helpers import INVALID_INTEGER_ERROR
+from impact.v1.views import CriterionListView
+from impact.v1.views.utils import valid_keys_note
 
 
 class TestCriterionListView(APITestCase):
@@ -26,9 +29,10 @@ class TestCriterionListView(APITestCase):
                 assert results[criterion.id]['name'] == criterion.name
 
     def test_post_new_object(self):
+        jr = JudgingRoundFactory()
         data = {'name': 'Posted Criterion',
                 'type': 'sans serif',
-                'judging_round_id': 1}
+                'judging_round_id': jr.pk}
         with self.login(email=self.basic_user().email):
             url = reverse(self.view.view_name)
             response = self.client.post(url, data)

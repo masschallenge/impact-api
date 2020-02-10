@@ -172,7 +172,7 @@ class TestMentorProgramOfficeHourListView(APITestCase):
             end_date_time=self._get_office_hour_date(tomorrow_offset, 12))
         response = self._get_response_as_logged_in_user({
             'mentor_id': mentor.id,
-            'upcoming': None})
+            'upcoming': ""})
         self.assertEqual(response.data["count"], 1)
         self.assertEqual(response.data["results"][0]['id'],
                          tomorrow_office_hour.pk)
@@ -193,8 +193,8 @@ class TestMentorProgramOfficeHourListView(APITestCase):
             tomorrow_offset, 15, program)
         params = {
             'mentor_id': mentor.id,
-            'upcoming': None,
-            'my_hours': None,
+            'upcoming': "",
+            'my_hours': "",
         }
         response = self._get_response_as_logged_in_user(params, user)
         self.assertEqual(response.data["count"], 1)
