@@ -53,8 +53,8 @@ class TestOAuthRoutes(TestCase):
             'basic_user@test.com', perms=["mc.view_startup"])
         startup_content_type = ContentType.objects.get(app_label='accelerator',
                                                        model='startup')
-        perm = PermissionFactory.create(content_type=startup_content_type,
-                                        codename='view_startup')
+        perm = Permission.objects.get(content_type=startup_content_type,
+                                      codename='view_startup')
         startup_member_permission, _ = Permission.objects.get_or_create(
             content_type=startup_content_type,
             codename='view_startup_stealth_mode_true',
