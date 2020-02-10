@@ -14,6 +14,7 @@ from impact.tests.factories import (
     IndustryFactory,
     MentoringSpecialtiesFactory,
     ProgramFamilyFactory,
+    ProgramFactory
 )
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import (
@@ -29,6 +30,7 @@ from impact.v1.helpers import (
     UserHelper,
 )
 from impact.v1.views.utils import VALID_KEYS_NOTE
+from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
 from accelerator_abstract.models.base_base_profile import (
     ENTREPRENEUR_USER_TYPE,
     EXPERT_USER_TYPE,
@@ -627,6 +629,36 @@ class TestUserDetailView(APITestCase):
             assert response.status_code == 403
             assert MISSING_PROFILE_ERROR.format(user.id) in response.data
             assert MISSING_SUBJECT_ERROR in response.data
+
+    def test_get_user_latest_active_program_location(self):
+        program = ProgramFactory(
+            program_status=ACTIVE_PROGRAM_STATUS,
+            program_family=ProgramFamilyFactory(),
+        )
+        context = UserContext(user_type=EXPERT_USER_TYPE, program=program)
+        user = context.user
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserDetailView.view_name, args=[user.id])
+            response = self.client.get(url)
+            user_program = user.programrolegrant_set.order_by(
+                '-created_at'
+            ).first().program_role.program
+            program_location = response.data['latest_active_program_location']
+            assert user_program.program_family.name == program_location
+
+    def test_get_user_confirmed_program_families(self):
+        program = ProgramFactory(
+            program_status=ACTIVE_PROGRAM_STATUS,
+            program_family=ProgramFamilyFactory(),
+        )
+        context = UserContext(user_type=EXPERT_USER_TYPE, program=program)
+        user = context.user
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserDetailView.view_name, args=[user.id])
+            response = self.client.get(url)
+            user_program = user.programrolegrant_set.last().program_role.program
+            confirmed_program_families = response.data['confirmed_user_program_families']
+            assert user_program.program_family.name in confirmed_program_families.keys()
 
 
 def _valid_note(messages):
