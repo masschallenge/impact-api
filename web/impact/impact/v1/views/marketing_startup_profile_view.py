@@ -78,7 +78,7 @@ class MarketingStartupProfileView(ImpactView):
             logger.warning(VIDEO_LINK_EMBED_MSG.format(str(e), url))
             return ""
 
-    def format_data(self, startup):
+    def get_public_data(self, startup):
         addition_industry_categories = startup.additional_industries
         self.data = {
             "name": startup.name,
@@ -113,7 +113,7 @@ class MarketingStartupProfileView(ImpactView):
                 DEFAULT_PROFILE_TEXT_COLOR)
         }
 
-    def get_statuses(self, startup, program_key):
+    def get_status(self, startup, program_key):
         statuses = StartupStatus.objects.order_by(
             'program_startup_status__sort_order',
             'program_startup_status__startup_status'). \
@@ -130,7 +130,7 @@ class MarketingStartupProfileView(ImpactView):
                     (startup_status.startup_id,
                     startup_status.program_startup_status.status_group))
 
-    def team_members(self, startup):
+    def get_team_members(self, startup):
         # If this site has access to team members for a program which the
         # startup belongs to, fill them in
         team_members = StartupTeamMember.objects.filter(
@@ -155,7 +155,7 @@ class MarketingStartupProfileView(ImpactView):
                 })
         self.data.update({'team_members': team})
 
-    def get_non_public(self):
+    def get_non_public_data(self):
         self.data = {
             "name": None,
             "is_visible": False,
@@ -194,9 +194,9 @@ class MarketingStartupProfileView(ImpactView):
         is_public = startup.is_visible
 
         if is_public:
-            self.format_data(startup)
-            self.get_statuses(startup, program_key)
-            self.team_members(startup)
+            self.get_public_data(startup)
+            self.get_status(startup, program_key)
+            self.get_team_members(startup)
         else:
-            self.get_non_public()
+            self.get_non_public_data()
         return HttpResponse(json.dumps(self.data), content_type="application/json")
