@@ -6,6 +6,8 @@ from django.core.exceptions import (
     ValidationError,
 )
 from django.core.validators import RegexValidator
+from django.db.models import Subquery, OuterRef
+
 from accelerator.models import (
     EntrepreneurProfile,
     ExpertCategory,
@@ -13,6 +15,14 @@ from accelerator.models import (
     Industry,
     MemberProfile,
     ProgramFamily,
+    Program
+)
+
+from accelerator_abstract.models import (
+    HIDDEN_PROGRAM_STATUS,
+    UPCOMING_PROGRAM_STATUS,
+    ACTIVE_PROGRAM_STATUS,
+    ENDED_PROGRAM_STATUS
 )
 
 from impact.v1.helpers import (
@@ -139,7 +149,6 @@ EXPERT_CATEGORY_FIELD = {
         "description": "Required when user_type is 'expert'",
     },
 }
-
 
 MENTOR_TYPE_FIELD = {
     "json-schema": {
@@ -480,3 +489,54 @@ class ProfileHelper(ModelHelper):
     def is_non_member(self):
         if hasattr(self.subject, "user_type"):
             return self.subject.user_type != MemberProfile.user_type
+
+    @property
+    def confirmed_user_program_families(self):
+        prg = _confirmed_non_future_program_role_grant(self.subject)
+        program_ids = _latest_program_id_foreach_program_family()
+        program_families = list(prg.filter(
+            program_role__program__pk__in=program_ids
+        ).values_list(
+            'program_role__program__program_family__name', 'created_at'))
+        program_families_dict = {}
+        for program_family in program_families:
+            location, created_at = program_family[0], program_family[1]
+            if location in program_families_dict.keys():
+                if created_at > program_families_dict[location]:
+                    program_families_dict[location] = created_at
+            else:
+                program_families_dict[location] = created_at
+        return program_families_dict
+
+    @property
+    def latest_active_program_location(self):
+        prg = _latest_confirmed_non_future_program_role_grant(self.subject)
+        if not prg:
+            return None
+        return prg.program_role.program.program_family.name
+
+
+def _confirmed_non_future_program_role_grant(obj):
+    return obj.user.programrolegrant_set.exclude(
+        program_role__program__program_status__in=[
+            HIDDEN_PROGRAM_STATUS,
+            UPCOMING_PROGRAM_STATUS]
+    ).prefetch_related(
+        'program_role__program',
+        'program_role__program__program_family'
+    )
+
+
+def _latest_confirmed_non_future_program_role_grant(obj):
+    prg = _confirmed_non_future_program_role_grant(obj)
+    return prg.order_by('-created_at').first()
+
+
+def _latest_program_id_foreach_program_family():
+    latest_program_subquery = Program.objects.filter(
+        program_family=OuterRef('pk'),
+        program_status__in=[ACTIVE_PROGRAM_STATUS, ENDED_PROGRAM_STATUS]
+    ).order_by("-created_at").values('pk')[:1]
+    return list(ProgramFamily.objects.annotate(
+        latest_program=Subquery(latest_program_subquery)
+    ).values_list("latest_program", flat=True))
