@@ -11,8 +11,6 @@ from impact.tests.factories import (
     IndustryFactory,
     MemberProfileFactory,
     UserFactory,
-    ProgramRoleFactory,
-    ProgramRoleGrantFactory,
 )
 
 
@@ -22,13 +20,11 @@ class UserContext(object):
                  primary_industry=None,
                  additional_industries=None,
                  functional_expertise=None,
-                 program_families=[],
-                 program=None):
+                 program_families=[]):
         user = UserFactory(date_joined=(timezone.now() + timedelta(-10)))
         self.user = user
         self.program_families = program_families
         self.baseprofile = BaseProfileFactory(user=user, user_type=user_type)
-        self.program = program
         if user_type == "ENTREPRENEUR":
             self.profile = EntrepreneurProfileFactory(
                 user=user,
@@ -48,9 +44,4 @@ class UserContext(object):
         elif user_type == "MEMBER":
             self.profile = MemberProfileFactory(user=self.user)
             user.memberprofile = self.profile
-        if program:
-            self.program_role = ProgramRoleFactory(program=self.program)
-            self.program_role_grant = ProgramRoleGrantFactory(
-                person=self.user,
-                program_role=self.program_role)
         user.save()

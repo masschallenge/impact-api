@@ -14,7 +14,7 @@ from impact.tests.factories import (
     IndustryFactory,
     MentoringSpecialtiesFactory,
     ProgramFamilyFactory,
-    ProgramFactory
+    ProgramRoleGrantFactory,
 )
 from impact.tests.api_test_case import APITestCase
 from impact.tests.utils import (
@@ -631,32 +631,26 @@ class TestUserDetailView(APITestCase):
             assert MISSING_SUBJECT_ERROR in response.data
 
     def test_get_user_latest_active_program_location(self):
-        program = ProgramFactory(
-            program_status=ACTIVE_PROGRAM_STATUS,
-            program_family=ProgramFamilyFactory(),
+        role_grant = ProgramRoleGrantFactory(
+            program_role__program__program_status=ACTIVE_PROGRAM_STATUS
         )
-        context = UserContext(user_type=EXPERT_USER_TYPE, program=program)
-        user = context.user
+        user = role_grant.person
+        user_program = role_grant.program_role.program
         with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             response = self.client.get(url)
-            user_program = user.programrolegrant_set.order_by(
-                '-created_at'
-            ).first().program_role.program
             program_location = response.data['latest_active_program_location']
             assert user_program.program_family.name == program_location
 
     def test_get_user_confirmed_program_families(self):
-        program = ProgramFactory(
-            program_status=ACTIVE_PROGRAM_STATUS,
-            program_family=ProgramFamilyFactory(),
+        role_grant = ProgramRoleGrantFactory(
+            program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
         )
-        context = UserContext(user_type=EXPERT_USER_TYPE, program=program)
-        user = context.user
+        user = role_grant.person
+        user_program = role_grant.program_role.program
         with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             response = self.client.get(url)
-            user_program = user.programrolegrant_set.last().program_role.program
             confirmed_program_families = response.data['confirmed_user_program_families']
             assert user_program.program_family.name in confirmed_program_families.keys()
 
