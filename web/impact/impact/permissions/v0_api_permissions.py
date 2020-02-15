@@ -8,4 +8,4 @@ class V0APIPermissions(BasePermission):
 
     def has_permission(self, request, view):
         return request.user.groups.filter(
-            name=settings.V0_API_GROUP.decode("utf-8")).exists()
+            name=settings.V0_API_GROUP).exists()
