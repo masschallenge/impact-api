@@ -403,27 +403,27 @@ dump-db: mysql-container
 	@gzip $(DB_CACHE_DIR)$(db_name).sql
 	@echo Created $(DB_CACHE_DIR)$(s3_key)
 
-MAX_UPLOAD_SIZE = 160000000
+MAX_UPLOAD_SIZE = 80000000
 
-upload-db: build-aws
+upload-db:
 	@if [ `wc -c < $(gz_file) | tr -d '[:space:]'` -gt $(MAX_UPLOAD_SIZE) ]; \
 	then \
 	  echo Dump file exceeds $(MAX_UPLOAD_SIZE) bytes.; \
 	  echo This may indicate that this dump contains sensitive data; \
-	  false; \
-	fi
-	@echo Uploading $(gz_file) as $(s3_key)
-	@read -r -p "Are you sure? [y/N] " response; \
-	if [[ "$$response" =~ ^([yY][eE][sS]|[yY])+$$ ]]; \
-	then \
-	  echo Uploading $(gz_file) as $(s3_key)...; \
-	  docker run -v $$PWD/$(gz_file):/data/$(notdir $(gz_file)) --rm  \
+	else \
+	  echo Uploading $(gz_file) as $(s3_key); \
+	  read -r -p "Are you sure? [y/N] " response; \
+	  if [[ "$$response" =~ ^([yY][eE][sS]|[yY])+$$ ]]; \
+	  then \
+	    echo Uploading $(gz_file) as $(s3_key)...; \
+		docker run -v $$PWD/$(gz_file):/data/$(notdir $(gz_file)) --rm  \
 		--env-file .dev.env \
 		masschallenge/aws \
 		aws s3 cp $(notdir $(gz_file)) \
-		s3://public-clean-saved-db-states/$(s3_key) --acl public-read; \
-	else \
-	  echo Cancelled upload successfully.; \
+		s3://public-clean-saved-db-states/test-$(s3_key) --acl public-read; \
+	  else \
+	    echo Cancelled upload successfully.; \
+	  fi \
 	fi
 
 build-aws:
