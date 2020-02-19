@@ -403,7 +403,7 @@ dump-db: mysql-container
 	@gzip $(DB_CACHE_DIR)$(db_name).sql
 	@echo Created $(DB_CACHE_DIR)$(s3_key)
 
-MAX_UPLOAD_SIZE = 80000000
+MAX_UPLOAD_SIZE = 160000000
 
 upload-db:
 	@if [ `wc -c < $(gz_file) | tr -d '[:space:]'` -gt $(MAX_UPLOAD_SIZE) ]; \
@@ -420,7 +420,7 @@ upload-db:
 		--env-file .dev.env \
 		masschallenge/aws \
 		aws s3 cp $(notdir $(gz_file)) \
-		s3://public-clean-saved-db-states/test-$(s3_key) --acl public-read; \
+		s3://public-clean-saved-db-states/$(s3_key) --acl public-read; \
 	  else \
 	    echo Cancelled upload successfully.; \
 	  fi \
