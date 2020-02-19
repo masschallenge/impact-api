@@ -403,10 +403,10 @@ dump-db: mysql-container
 	@gzip $(DB_CACHE_DIR)$(db_name).sql
 	@echo Created $(DB_CACHE_DIR)$(s3_key)
 
-MAX_UPLOAD_SIZE = 80000000
+MAX_UPLOAD_SIZE = 160000000
 
 upload-db: build-aws
-	@if [ `wc -c < $(gz_file)` \> $(MAX_UPLOAD_SIZE) ]; \
+	@if [ `wc -c < $(gz_file) | tr -d '[:space:]'` -gt $(MAX_UPLOAD_SIZE) ]; \
 	then \
 	  echo Dump file exceeds $(MAX_UPLOAD_SIZE) bytes.; \
 	  echo This may indicate that this dump contains sensitive data; \
