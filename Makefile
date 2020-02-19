@@ -408,8 +408,8 @@ MAX_UPLOAD_SIZE = 80000000
 upload-db:
 	@if [ `wc -c < $(gz_file) | tr -d '[:space:]'` -gt $(MAX_UPLOAD_SIZE) ]; \
 	then \
-	  echo Dump file exceeds $(MAX_UPLOAD_SIZE) bytes.; \
-	  echo This may indicate that this dump contains sensitive data; \
+	  echo \\nError: Dump file exceeds $(MAX_UPLOAD_SIZE) bytes.; \
+	  echo This may indicate that this dump contains sensitive data \\n; \
 	else \
 	  echo Uploading $(gz_file) as $(s3_key); \
 	  read -r -p "Are you sure? [y/N] " response; \
