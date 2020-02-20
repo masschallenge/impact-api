@@ -18,6 +18,8 @@ from impact.tests.factories import (
     StartupFactory,
 )
 
+from impact.v1.views.user_detail_view import UserDetailView
+
 
 class TestApiRoute(TestCase):
     client_class = APIClient
@@ -376,3 +378,16 @@ class TestApiRoute(TestCase):
             response_dict = json.loads(response.content)
             self.assertIn("is_visible", response_dict.keys())
             self.assertEqual(response_dict["is_visible"], True)
+
+    def test_current_user_can_view_their_user_detail_page(self):
+        url_name = UserDetailView.view_name
+        basic_user = self.make_user('basic_user@test.com')
+        view_kwargs = {"pk": basic_user.id}
+
+        response = self.get(url_name, **view_kwargs)
+        self.response_401(response)
+
+        with self.login(basic_user):
+            response = self.get(url_name, **view_kwargs)
+            self.response_200(response)
+
