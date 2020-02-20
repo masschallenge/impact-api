@@ -47,6 +47,8 @@ class ExpertProfileType(DjangoObjectType):
             'user',
             'functional_expertise',
             'interest_categories',
+            'judge_type',
+            'mentor_type',
         )
 
     def resolve_image_url(self, info, **kwargs):
@@ -77,12 +79,12 @@ class ExpertProfileType(DjangoObjectType):
             program_role__program__end_date__gte=datetime.now()
             ).distinct()
 
-            latest_grant = self.user.programrolegrant_set.filter(	            
-                program_role__user_role__name=UserRole.MENTOR	       
+            latest_grant = self.user.programrolegrant_set.filter(
+                program_role__user_role__name=UserRole.MENTOR
             ).latest('created_at')
-            latest_mentor_program = latest_grant.program_role.program	
+            latest_mentor_program = latest_grant.program_role.program
             user = info.context.user
-            mentor_program = [role_grant.program_role.program for role_grant in role_grants 
+            mentor_program = [role_grant.program_role.program for role_grant in role_grants
                               if role_grant.program_role.program in _get_user_programs(user)]
             if mentor_program or latest_mentor_program:
                 slugs = _get_slugs(self, mentor_program, latest_mentor_program)
