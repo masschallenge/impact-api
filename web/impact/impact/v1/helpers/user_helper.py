@@ -17,6 +17,7 @@ from impact.v1.helpers.model_helper import (
     REQUIRED_STRING_FIELD,
     TWITTER_FIELD,
     OPTIONAL_URL_FIELD,
+    READ_ONLY_OBJECT_FIELD
 )
 from impact.v1.helpers.validators import (
     validate_boolean,
@@ -76,6 +77,8 @@ USER_FIELDS = {
     "personal_website_url": PERSONAL_WEBSITE_URL_FIELD,
     "functional_expertise": MPTT_ARRAY_FIELD,
     "program_families": MPTT_ARRAY_FIELD,
+    "confirmed_user_program_families": READ_ONLY_OBJECT_FIELD,
+    "latest_active_program_location": READ_ONLY_STRING_FIELD,
 }
 
 
