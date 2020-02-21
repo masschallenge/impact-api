@@ -405,7 +405,7 @@ dump-db: mysql-container
 
 MAX_UPLOAD_SIZE = 160000000
 
-upload-db:
+upload-db: build-aws
 	@if [ `wc -c < $(gz_file) | tr -d '[:space:]'` -gt $(MAX_UPLOAD_SIZE) ]; \
 	then \
 	  echo \\nError: Dump file exceeds $(MAX_UPLOAD_SIZE) bytes.; \
