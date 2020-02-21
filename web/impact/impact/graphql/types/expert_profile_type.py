@@ -12,8 +12,6 @@ from accelerator.models import (
 from accelerator_abstract.models import (
     ACTIVE_PROGRAM_STATUS,
     ENDED_PROGRAM_STATUS,
-    HIDDEN_PROGRAM_STATUS,
-    UPCOMING_PROGRAM_STATUS
 )
 from impact.graphql.types import StartupMentorRelationshipType
 from django.db.models import Q
@@ -28,7 +26,6 @@ class ExpertProfileType(DjangoObjectType):
     office_hours_url = graphene.String()
     program_interests = graphene.List(graphene.String)
     available_office_hours = graphene.Boolean()
-    latest_active_program_location = graphene.String()
 
     class Meta:
         model = ExpertProfile
@@ -100,12 +97,6 @@ class ExpertProfileType(DjangoObjectType):
     def resolve_previous_mentees(self, info, **kwargs):
         return _get_mentees(self.user, ENDED_PROGRAM_STATUS)
 
-    def resolve_latest_active_program_location(self, info, **kwargs):
-        prg = _latest_confirmed_non_future_program_role_grant(self)
-        if not prg:
-            return None
-        return prg.program_role.program.program_family.name
-
 
 def _get_slugs(self, mentor_program, latest_mentor_program, **kwargs):
     if mentor_program:
@@ -140,20 +131,3 @@ def _get_mentees(user, program_status):
         status=CONFIRMED_RELATIONSHIP,
         **mentee_filter
     ).order_by('-startup_mentor_tracking__program__start_date')
-
-
-def _confirmed_non_future_program_role_grant(obj):
-    return obj.user.programrolegrant_set.filter(
-        program_role__user_role__name=UserRole.MENTOR).exclude(
-        program_role__program__program_status__in=[
-            HIDDEN_PROGRAM_STATUS,
-            UPCOMING_PROGRAM_STATUS]
-    ).prefetch_related(
-        'program_role__program',
-        'program_role__program__program_family'
-    )
-
-
-def _latest_confirmed_non_future_program_role_grant(obj):
-    prg = _confirmed_non_future_program_role_grant(obj)
-    return prg.order_by('-created_at').first()
