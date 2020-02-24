@@ -1,4 +1,5 @@
 import graphene
+from graphene.types.generic import GenericScalar
 from graphene_django import DjangoObjectType
 from django.utils import timezone
 from datetime import datetime
@@ -25,7 +26,7 @@ class ExpertProfileType(DjangoObjectType):
     office_hours_url = graphene.String()
     program_interests = graphene.List(graphene.String)
     available_office_hours = graphene.Boolean()
-    program_role_grants = graphene.String()
+    program_role_grants = GenericScalar()
 
     class Meta:
         model = ExpertProfile
@@ -98,7 +99,8 @@ class ExpertProfileType(DjangoObjectType):
         return _get_mentees(self.user, ENDED_PROGRAM_STATUS)
 
     def resolve_program_role_grants(self, info, **kwargs):
-        return get_user_prg_by_programfamily(self.user)
+        roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
+        return get_user_prg_by_programfamily(self.user, roles_of_interest)
 
 def _get_slugs(self, mentor_program, latest_mentor_program, **kwargs):
     if mentor_program:

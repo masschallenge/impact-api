@@ -1,7 +1,9 @@
 import graphene
+from graphene.types.generic import GenericScalar
 from graphene_django import DjangoObjectType
 from accelerator.models import (
     EntrepreneurProfile,
+    UserRole,
     Startup,
     StartupTeamMember
 )
@@ -10,11 +12,13 @@ from impact.graphql.types.entrepreneur_startup_type import (
     EntrepreneurStartupType,
 )
 
+from impact.utils import get_user_prg_by_programfamily
 
 class EntrepreneurProfileType(DjangoObjectType):
     image_url = graphene.String()
     title = graphene.String()
     startups = graphene.List(EntrepreneurStartupType)
+    program_role_grants = GenericScalar()
 
     class Meta:
         model = EntrepreneurProfile
@@ -40,3 +44,7 @@ class EntrepreneurProfileType(DjangoObjectType):
         if team_member:
             return team_member.title
         return ""
+
+    def resolve_program_role_grants(self, info, **kwargs):
+        roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
+        return get_user_prg_by_programfamily(self.user, roles_of_interest)
