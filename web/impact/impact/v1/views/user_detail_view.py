@@ -14,6 +14,7 @@ from impact.v1.helpers import (
 )
 from impact.v1.views.base_detail_view import BaseDetailView
 from impact.v1.views.utils import valid_keys_note
+from impact.permissions.v1_api_permissions import UserDetailViewPermission
 
 INVALID_KEYS_ERROR = "Recevied invalid key(s): {invalid_keys}."
 MISSING_PROFILE_ERROR = "User ({}) has no profile"
@@ -26,6 +27,9 @@ class UserDetailView(BaseDetailView):
     view_name = "user_detail"
     helper_class = UserHelper
     actions = ["GET", "PATCH"]
+    permission_classes = (
+        UserDetailViewPermission,
+    )
 
     def __init__(self, *args, **kwargs):
         self.user = None
