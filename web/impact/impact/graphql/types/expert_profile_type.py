@@ -16,8 +16,7 @@ from accelerator_abstract.models import (
 from impact.graphql.types import StartupMentorRelationshipType
 from django.db.models import Q
 
-from impact.utils import compose_filter
-
+from impact.utils import compose_filter, get_user_prg_by_programfamily
 
 class ExpertProfileType(DjangoObjectType):
     current_mentees = graphene.List(StartupMentorRelationshipType)
@@ -26,6 +25,7 @@ class ExpertProfileType(DjangoObjectType):
     office_hours_url = graphene.String()
     program_interests = graphene.List(graphene.String)
     available_office_hours = graphene.Boolean()
+    program_role_grants = graphene.String()
 
     class Meta:
         model = ExpertProfile
@@ -97,6 +97,8 @@ class ExpertProfileType(DjangoObjectType):
     def resolve_previous_mentees(self, info, **kwargs):
         return _get_mentees(self.user, ENDED_PROGRAM_STATUS)
 
+    def resolve_program_role_grants(self, info, **kwargs):
+        return get_user_prg_by_programfamily(self.user)
 
 def _get_slugs(self, mentor_program, latest_mentor_program, **kwargs):
     if mentor_program:

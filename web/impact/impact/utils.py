@@ -66,3 +66,23 @@ def previous_instance(instance, query):
 
 def _find_instance(instance, query, order):
     return type(instance).objects.filter(query).order_by(order).first()
+
+# return a use's program role grants grouped by the program family
+# filter role grants by the provided user role or return
+# all program role grant the user has ever had
+def get_user_prg_by_programfamily(user, user_roles=[]):
+    query = user.programrolegrant_set.filter(
+        program_role__user_role__isnull=False
+    )
+    if user_roles:
+        query = query.filter(
+            program_role__program__program_family__name__in=[user_roles])
+    result = query.values_list(
+        'program_role__name', 'program_role__program__program_family__name')
+    prg_group = {}
+    for prg, pf in result:
+        if prg_group.get(pf):
+            prg_group[pf].append(prg)
+        else:
+            prg_group[pf] = [prg]
+    return prg_group
