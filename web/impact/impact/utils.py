@@ -76,7 +76,7 @@ def get_user_prg_by_programfamily(user, user_roles=[]):
     )
     if user_roles:
         query = query.filter(
-            program_role__program__program_family__name__in=[user_roles])
+            program_role__user_role__name__in=user_roles)
     result = query.values_list(
         'program_role__name', 'program_role__program__program_family__name')
     prg_group = {}
