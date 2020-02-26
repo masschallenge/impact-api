@@ -101,7 +101,6 @@ class ExpertProfileType(DjangoObjectType):
     def resolve_program_role_grants(self, info, **kwargs):
         roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         return get_user_prg_by_programfamily(self.user, roles_of_interest)
-        # return get_user_prg_by_programfamily(self.user)
 
 def _get_slugs(self, mentor_program, latest_mentor_program, **kwargs):
     if mentor_program:
