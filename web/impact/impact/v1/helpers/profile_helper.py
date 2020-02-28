@@ -368,12 +368,12 @@ def validate_home_program_family_id(helper, field, value):
 def latest_distinct_program_families_dict(program_families):
     program_families_dict = {}
     for program_family in program_families:
-        location, created_at = program_family[0], program_family[1]
+        location, created_at, user_created_at = program_family[0], program_family[1], program_family[2]
         if location in program_families_dict.keys():
-            if created_at > program_families_dict[location]:
+            if (created_at or user_created_at) > program_families_dict[location]:
                 program_families_dict[location] = created_at
         else:
-            program_families_dict[location] = created_at
+            program_families_dict[location] = (created_at or user_created_at)
     return program_families_dict
 
 
@@ -509,7 +509,7 @@ class ProfileHelper(ModelHelper):
         program_families = list(prg.filter(
             program_role__program__pk__in=program_ids
         ).values_list(
-            'program_role__program__program_family__name', 'created_at'))
+            'program_role__program__program_family__name', 'created_at', 'person__date_joined'))
         return latest_distinct_program_families_dict(program_families)
 
     @property
