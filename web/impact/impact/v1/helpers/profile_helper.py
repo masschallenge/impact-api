@@ -365,17 +365,17 @@ def validate_home_program_family_id(helper, field, value):
     return validate_object_id(ProgramFamily, helper, field, value)
 
 
-def latest_distinct_program_families_dict(program_families):
-    program_families_dict = {}
+def confirmed_user_program_data(program_families):
+    program_family_to_date_created = {}
     for program_family in program_families:
         location, created_at = program_family[0], program_family[1]
         created_at = created_at or program_family[2]
-        if location in program_families_dict.keys():
-            if created_at > program_families_dict[location]:
-                program_families_dict[location] = created_at
+        if location in program_family_to_date_created.keys():
+            if created_at > program_family_to_date_created[location]:
+                program_family_to_date_created[location] = created_at
         else:
-            program_families_dict[location] = created_at
-    return program_families_dict
+            program_family_to_date_created[location] = created_at
+    return program_family_to_date_created
 
 
 class ProfileHelper(ModelHelper):
@@ -513,10 +513,12 @@ class ProfileHelper(ModelHelper):
             ).values_list(
                 'program_role__program__program_family__name',
                 'created_at',
+                # We include person__date_joined as a
+                # fallback for legacy PRGs with no date
                 'person__date_joined'
             )
         )
-        return latest_distinct_program_families_dict(program_families)
+        return confirmed_user_program_data(program_families)
 
     @property
     def latest_active_program_location(self):

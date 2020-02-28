@@ -662,7 +662,6 @@ class TestUserDetailView(APITestCase):
         role_grant = ProgramRoleGrantFactory(
             program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
             program_role__program__program_family__name="Quigville",
-            created_at=None
         )
         user = role_grant.person
         user_program = role_grant.program_role.program
@@ -671,7 +670,6 @@ class TestUserDetailView(APITestCase):
             person=user,
             program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
             program_role__program__program_family__name="Quigville",
-            created_at=None
         )
 
         role_grant.created_at = None
