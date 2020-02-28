@@ -369,13 +369,12 @@ def latest_distinct_program_families_dict(program_families):
     program_families_dict = {}
     for program_family in program_families:
         location, created_at = program_family[0], program_family[1]
-        user_created_at = program_family[2]
+        created_at = created_at or program_family[2]
         if location in program_families_dict.keys():
-            created_at = (created_at or user_created_at)
             if created_at > program_families_dict[location]:
                 program_families_dict[location] = created_at
         else:
-            program_families_dict[location] = (created_at or user_created_at)
+            program_families_dict[location] = created_at
     return program_families_dict
 
 
