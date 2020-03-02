@@ -396,3 +396,105 @@ class TestGraphQL(APITestCase):
                     }
                 }
             )
+
+    def test_query_program_role_grant_for_entrepreneur_returns_correct_value(self):
+        program = ProgramFactory()
+        alum_role = UserRoleFactory(name=UserRole.ALUM)
+        finalist_role = UserRoleFactory(name=UserRole.FINALIST)
+        alum_program_role = ProgramRoleFactory(program=program,
+                                                user_role=alum_role)
+        finalist_program_role = ProgramRoleFactory(program=program,
+                                                    user_role=finalist_role)
+        user = EntrepreneurFactory()
+        program_role_grant1 = ProgramRoleGrantFactory(
+            person=user,program_role=alum_program_role
+        )
+        program_role_grant2 = ProgramRoleGrantFactory(
+            person=user,program_role=finalist_program_role
+        )
+
+        result = user.programrolegrant_set.filter(
+            program_role__user_role__isnull=False,
+            program_role__user_role__name__in=[UserRole.FINALIST, UserRole.ALUM]
+        ).values_list(
+            'program_role__name', 'program_role__program__program_family__name'
+        )
+        prg_group = {}
+        for prg, pf in result:
+            if prg_group.get(pf):
+                prg_group[pf].append(prg)
+            else:
+                prg_group[pf] = [prg]
+
+
+        query = """
+            query{{
+                entrepreneurProfile(id:{id}) {{
+                    programRoleGrants
+                }}
+            }}
+        """.format(id=user.id)
+
+        with self.login(email=self.basic_user().email):
+            response = self.client.post(self.url, data={'query': query})
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                {
+                    'data': {
+                        'entrepreneurProfile': {
+                            'programRoleGrants': prg_group
+                        }
+                    }
+                }
+            )
+
+    def test_query_program_role_grant_for_expert_returns_correct_value(self):
+        program = ProgramFactory()
+        alum_role = UserRoleFactory(name=UserRole.ALUM)
+        finalist_role = UserRoleFactory(name=UserRole.FINALIST)
+        alum_program_role = ProgramRoleFactory(program=program,
+                                                user_role=alum_role)
+        finalist_program_role = ProgramRoleFactory(program=program,
+                                                    user_role=finalist_role)
+        user = ExpertFactory()
+        program_role_grant1 = ProgramRoleGrantFactory(
+            person=user,program_role=alum_program_role
+        )
+        program_role_grant2 = ProgramRoleGrantFactory(
+            person=user,program_role=finalist_program_role
+        )
+
+        result = user.programrolegrant_set.filter(
+            program_role__user_role__isnull=False,
+            program_role__user_role__name__in=[UserRole.FINALIST, UserRole.ALUM]
+        ).values_list(
+            'program_role__name', 'program_role__program__program_family__name'
+        )
+        prg_group = {}
+        for prg, pf in result:
+            if prg_group.get(pf):
+                prg_group[pf].append(prg)
+            else:
+                prg_group[pf] = [prg]
+
+
+        query = """
+            query{{
+                expertProfile(id:{id}) {{
+                    programRoleGrants
+                }}
+            }}
+        """.format(id=user.id)
+
+        with self.login(email=self.basic_user().email):
+            response = self.client.post(self.url, data={'query': query})
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                {
+                    'data': {
+                        'expertProfile': {
+                            'programRoleGrants': prg_group
+                        }
+                    }
+                }
+            )
