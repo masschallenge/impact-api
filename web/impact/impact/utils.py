@@ -80,9 +80,9 @@ def get_user_prg_by_programfamily(user, user_roles=[]):
     result = query.values_list(
         'program_role__name', 'program_role__program__program_family__name')
     prg_group = {}
-    for prg, pf in result:
-        if prg_group.get(pf):
-            prg_group[pf].append(prg)
+    for program_role_grant, program_family in result:
+        if prg_group.get(program_family):
+            prg_group[program_family].append(program_role_grant)
         else:
-            prg_group[pf] = [prg]
+            prg_group[program_family] = [program_role_grant]
     return prg_group
