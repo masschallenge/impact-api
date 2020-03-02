@@ -1,13 +1,17 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
+
 from django.core.exceptions import (
     ObjectDoesNotExist,
     ValidationError,
 )
 from django.core.validators import RegexValidator
-from django.db.models import Subquery, OuterRef
-
+from django.db.models import (
+    F,
+    OuterRef,
+    Subquery,
+)
 from accelerator.models import (
     EntrepreneurProfile,
     ExpertCategory,
@@ -365,16 +369,19 @@ def validate_home_program_family_id(helper, field, value):
     return validate_object_id(ProgramFamily, helper, field, value)
 
 
-def latest_distinct_program_families_dict(program_families):
-    program_families_dict = {}
-    for program_family in program_families:
-        location, created_at = program_family[0], program_family[1]
-        if location in program_families_dict.keys():
-            if created_at > program_families_dict[location]:
-                program_families_dict[location] = created_at
+def confirmed_user_program_data(program_family_data):
+    program_family_to_date_created = {}
+    for program_family in program_family_data:
+        location = program_family["location"]
+        created_at = program_family["created_at"]
+        # Fall back to user's join date if PRG `created_at` is null
+        created_at = created_at or program_family["date_joined"]
+        if location in program_family_to_date_created.keys():
+            if created_at > program_family_to_date_created[location]:
+                program_family_to_date_created[location] = created_at
         else:
-            program_families_dict[location] = created_at
-    return program_families_dict
+            program_family_to_date_created[location] = created_at
+    return program_family_to_date_created
 
 
 class ProfileHelper(ModelHelper):
@@ -506,11 +513,17 @@ class ProfileHelper(ModelHelper):
     def confirmed_user_program_families(self):
         prg = _confirmed_non_future_program_role_grant(self.subject)
         program_ids = _latest_program_id_foreach_program_family()
-        program_families = list(prg.filter(
-            program_role__program__pk__in=program_ids
-        ).values_list(
-            'program_role__program__program_family__name', 'created_at'))
-        return latest_distinct_program_families_dict(program_families)
+        program_families = list(
+            prg.filter(
+                program_role__program__pk__in=program_ids
+            ).values(
+                'created_at',
+                location=F('program_role__program__program_family__name'),
+                # date_joined is our fallback for legacy PRGs with no date
+                date_joined=F('person__date_joined')
+            )
+        )
+        return confirmed_user_program_data(program_families)
 
     @property
     def latest_active_program_location(self):

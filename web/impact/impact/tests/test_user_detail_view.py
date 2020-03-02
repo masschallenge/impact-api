@@ -651,8 +651,39 @@ class TestUserDetailView(APITestCase):
         with self.login(email=self.basic_user().email):
             url = reverse(UserDetailView.view_name, args=[user.id])
             response = self.client.get(url)
-            confirmed_program_families = response.data['confirmed_user_program_families']
-            assert user_program.program_family.name in confirmed_program_families.keys()
+            confirmed_program_families = response.data[
+                'confirmed_user_program_families'
+            ]
+
+            keys = confirmed_program_families.keys()
+            assert user_program.program_family.name in keys
+
+    def test_get_user_with_no_created_at_in_prgs_handled(self):
+        role_grant = ProgramRoleGrantFactory(
+            program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
+        )
+        user = role_grant.person
+        user_program = role_grant.program_role.program
+
+        role_grant2 = ProgramRoleGrantFactory(
+            person=user,
+            program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
+        )
+
+        role_grant.created_at = None
+        role_grant2.created_at = None
+
+        role_grant.save()
+        role_grant2.save()
+
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserDetailView.view_name, args=[user.id])
+            response = self.client.get(url)
+            confirmed_program_families = response.data[
+                'confirmed_user_program_families'
+            ]
+            keys = confirmed_program_families.keys()
+            assert user_program.program_family.name in keys
 
 
 def _valid_note(messages):
