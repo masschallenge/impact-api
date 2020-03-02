@@ -28,6 +28,8 @@ from impact.graphql.query import (
 )
 from accelerator.tests.contexts import StartupTeamMemberContext, UserRoleContext
 
+from impact.utils import get_user_prg_by_programfamily
+
 MENTEE_FIELDS = """
     startup {
         id
@@ -406,26 +408,12 @@ class TestGraphQL(APITestCase):
         finalist_program_role = ProgramRoleFactory(program=program,
                                                     user_role=finalist_role)
         user = EntrepreneurFactory()
-        program_role_grant1 = ProgramRoleGrantFactory(
-            person=user,program_role=alum_program_role
-        )
-        program_role_grant2 = ProgramRoleGrantFactory(
-            person=user,program_role=finalist_program_role
-        )
+        ProgramRoleGrantFactory( person=user,program_role=alum_program_role)
+        ProgramRoleGrantFactory(person=user,program_role=finalist_program_role)
 
-        result = user.programrolegrant_set.filter(
-            program_role__user_role__isnull=False,
-            program_role__user_role__name__in=[UserRole.FINALIST, UserRole.ALUM]
-        ).values_list(
-            'program_role__name', 'program_role__program__program_family__name'
+        program_role_grants = get_user_prg_by_programfamily(
+           user, [UserRole.FINALIST, UserRole.ALUM]
         )
-        prg_group = {}
-        for prg, pf in result:
-            if prg_group.get(pf):
-                prg_group[pf].append(prg)
-            else:
-                prg_group[pf] = [prg]
-
 
         query = """
             query{{
@@ -442,7 +430,7 @@ class TestGraphQL(APITestCase):
                 {
                     'data': {
                         'entrepreneurProfile': {
-                            'programRoleGrants': prg_group
+                            'programRoleGrants': program_role_grants
                         }
                     }
                 }
@@ -457,25 +445,12 @@ class TestGraphQL(APITestCase):
         finalist_program_role = ProgramRoleFactory(program=program,
                                                     user_role=finalist_role)
         user = ExpertFactory()
-        program_role_grant1 = ProgramRoleGrantFactory(
-            person=user,program_role=alum_program_role
-        )
-        program_role_grant2 = ProgramRoleGrantFactory(
-            person=user,program_role=finalist_program_role
-        )
+        ProgramRoleGrantFactory(person=user,program_role=alum_program_role)
+        ProgramRoleGrantFactory( person=user,program_role=finalist_program_role)
 
-        result = user.programrolegrant_set.filter(
-            program_role__user_role__isnull=False,
-            program_role__user_role__name__in=[UserRole.FINALIST, UserRole.ALUM]
-        ).values_list(
-            'program_role__name', 'program_role__program__program_family__name'
+        program_role_grants = get_user_prg_by_programfamily(
+           user, [UserRole.FINALIST, UserRole.ALUM]
         )
-        prg_group = {}
-        for prg, pf in result:
-            if prg_group.get(pf):
-                prg_group[pf].append(prg)
-            else:
-                prg_group[pf] = [prg]
 
 
         query = """
@@ -493,7 +468,7 @@ class TestGraphQL(APITestCase):
                 {
                     'data': {
                         'expertProfile': {
-                            'programRoleGrants': prg_group
+                            'programRoleGrants': program_role_grants
                         }
                     }
                 }
