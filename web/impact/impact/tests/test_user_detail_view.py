@@ -661,7 +661,6 @@ class TestUserDetailView(APITestCase):
     def test_get_user_with_no_created_at_in_prgs_handled(self):
         role_grant = ProgramRoleGrantFactory(
             program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
-            program_role__program__program_family__name="Quigville",
         )
         user = role_grant.person
         user_program = role_grant.program_role.program
@@ -669,7 +668,6 @@ class TestUserDetailView(APITestCase):
         role_grant2 = ProgramRoleGrantFactory(
             person=user,
             program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
-            program_role__program__program_family__name="Quigville",
         )
 
         role_grant.created_at = None
