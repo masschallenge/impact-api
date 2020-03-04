@@ -68,6 +68,10 @@ class EntrepreneurProfileType(DjangoObjectType):
         startup_prg_roles = get_user_startup_prg_role_by_program_family(
            self.user, startup_roles_of_interest
         )
-        return combine_prg_roles(
+        # print(startup_prg_roles)
+        # print(user_prg_roles)
+        result = combine_prg_roles(
             user_prg_roles=user_prg_roles, startup_prg_roles=startup_prg_roles
         )
+        # print(result)
+        return result

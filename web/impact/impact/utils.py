@@ -133,7 +133,7 @@ O(n)Time/Space; where n is the number of items in the startup_prg_roles
 def combine_prg_roles(user_prg_roles, startup_prg_roles):
     for key, value in startup_prg_roles.items():
         if user_prg_roles.get(key):
-            user_prg_roles[key] = user_prg_roles[key].extend(value)
+            user_prg_roles[key] = user_prg_roles[key] + value
         else:
             user_prg_roles[key] = value
 
