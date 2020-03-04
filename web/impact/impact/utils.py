@@ -67,9 +67,14 @@ def previous_instance(instance, query):
 def _find_instance(instance, query, order):
     return type(instance).objects.filter(query).order_by(order).first()
 
-# return a use's program role grants grouped by the program family
-# filter role grants by the provided user role or return
-# all program role grant the user has ever had
+"""
+return a use's program role grants grouped by the program family
+filter role grants by the provided user role or return
+all program role grant the user has ever had
+
+Time, Space Complexity
+O(n): time and space where n is the number of item in the result list
+"""
 def get_user_prg_by_programfamily(user, user_roles=[]):
     query = user.programrolegrant_set.filter(
         program_role__user_role__isnull=False
@@ -86,3 +91,33 @@ def get_user_prg_by_programfamily(user, user_roles=[]):
         else:
             prg_group[program_family] = [program_role_grant]
     return prg_group
+
+"""
+fetch a the program status for all startup a given user
+belongs to
+
+Time, Space, Query Complexity
+Query: 0(n + 1) where n is the number of startup a user belongs to
+since for every startup in that list we are fetching the program status.
+and the +1 is for the query to fetch all startup for the user
+
+O(nm) for time and space where n is the number of startup and m is
+the number of program_startup_status
+"""
+def get_user_startup_program_status_by_programfamily(user, startup_roles=[]):
+    startups = user.startup_set.all()
+    startup_status_group = {}
+    for startup in startups:
+        query = startup.program_startup_statuses()
+        if startup_roles:
+            query = query.filter(
+                startup_role__name__in=startup_roles
+            )
+        result = query.values_list("startup_status", "program__program_family__name")
+        for startup_status, program_family in result:
+            if startup_status_group.get(program_family):
+                startup_status_group[program_family].append(startup_status)
+            else:
+                startup_status_group[program_family] = [startup_status]
+
+    return startup_status_group

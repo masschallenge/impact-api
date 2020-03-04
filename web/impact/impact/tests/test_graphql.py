@@ -16,6 +16,7 @@ from impact.tests.factories import (
     ProgramRoleFactory,
     StartupMentorRelationshipFactory,
     UserRoleFactory,
+    StartupRoleFactory
     ApplicationFactory,
     ProgramStartupStatusFactory,
     StartupStatusFactory
@@ -403,6 +404,7 @@ class TestGraphQL(APITestCase):
         program = ProgramFactory()
         alum_role = UserRoleFactory(name=UserRole.ALUM)
         finalist_role = UserRoleFactory(name=UserRole.FINALIST)
+        entrant_role = StartupRoleFactory(name=StartupRoleFactory.ENTRANT)
         alum_program_role = ProgramRoleFactory(program=program,
                                                 user_role=alum_role)
         finalist_program_role = ProgramRoleFactory(program=program,
@@ -414,6 +416,11 @@ class TestGraphQL(APITestCase):
         program_role_grants = get_user_prg_by_programfamily(
            user, [UserRole.FINALIST, UserRole.ALUM]
         )
+
+        # to do
+        # create a startup for user
+        # create start up status
+        # create statup program status
 
         query = """
             query{{

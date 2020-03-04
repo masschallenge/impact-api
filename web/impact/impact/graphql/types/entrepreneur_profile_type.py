@@ -12,13 +12,16 @@ from impact.graphql.types.entrepreneur_startup_type import (
     EntrepreneurStartupType,
 )
 
-from impact.utils import get_user_prg_by_programfamily
+from impact.utils import (
+    get_user_startup_program_status_by_programfamily,
+    get_user_prg_by_programfamily
+)
 
 class EntrepreneurProfileType(DjangoObjectType):
     image_url = graphene.String()
     title = graphene.String()
     startups = graphene.List(EntrepreneurStartupType)
-    program_role_grants = GenericScalar()
+    program_role = GenericScalar()
 
     class Meta:
         model = EntrepreneurProfile
@@ -45,6 +48,27 @@ class EntrepreneurProfileType(DjangoObjectType):
             return team_member.title
         return ""
 
-    def resolve_program_role_grants(self, info, **kwargs):
+    """
+    fetch a program role assigned to an user and those assigned to the startups
+    the user belong to
+
+    Time, Space, Query Complexity
+    Query: amount to the query complexity of the two function this method uses
+
+    O(n + m) time and space where n is the time and space of the combine
+    functions in use and m is the number of item in startup_prg_roles dictionary
+    """
+    def program_role(self, info, **kwargs):
         roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-        return get_user_prg_by_programfamily(self.user, roles_of_interest)
+        user_prg_roles = get_user_prg_by_programfamily(
+            self.user, roles_of_interest)
+        startup_prg_roles = get_user_startup_program_status_by_programfamily(
+           self.user
+        )
+        for key, value in startup_prg_roles.items():
+            if user_prg_roles.get(key):
+                user_prg_roles[key] = user_prg_roles[key].extend(value)
+            else:
+                user_prg_roles[key] = value
+
+        return user_prg_roles
