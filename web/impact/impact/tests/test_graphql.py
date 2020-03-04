@@ -563,7 +563,72 @@ class TestGraphQL(APITestCase):
                 {
                     'data': {
                         'expertProfile': {
-                            'programRoless': program_roles
+                            'programRoles': program_roles
+                        }
+                    }
+                }
+            )
+
+    def test_query_prg_roles_for_selected_roles(self):
+
+        # prepare user program role
+        program = ProgramFactory()
+        alum_role = UserRoleFactory(name=UserRole.ALUM)
+        finalist_role = UserRoleFactory(name=UserRole.FINALIST)
+        alum_program_role = ProgramRoleFactory(program=program,
+                                                user_role=alum_role)
+        finalist_program_role = ProgramRoleFactory(program=program,
+                                                    user_role=finalist_role)
+        user = ExpertFactory()
+        ProgramRoleGrantFactory(person=user,program_role=alum_program_role)
+        ProgramRoleGrantFactory( person=user,program_role=finalist_program_role)
+
+        user_prg_roles = get_user_prg_role_by_program_family(
+           user, [UserRole.FINALIST, UserRole.ALUM]
+        )
+
+        # prepare startup program role
+        startup = StartupFactory(user=user)
+        program_startup_status = ProgramStartupStatusFactory(
+            startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
+            program = program
+        )
+        program_startup_status = ProgramStartupStatusFactory(
+            startup_role=StartupRoleFactory(name=StartupRole.FINALIST),
+            program = program
+        )
+
+        program_startup_status = ProgramStartupStatusFactory(
+            startup_role=StartupRoleFactory(name=StartupRole.FINALIST),
+            program = program
+        )
+        startup_status = StartupStatusFactory(
+            startup=startup,
+            program_startup_status=program_startup_status
+        )
+
+        startup_pgr_roles = get_user_startup_prg_role_by_program_family(
+            user, [StartupRole.ENTRANT]
+        )
+        program_roles = combine_prg_roles(user_prg_roles, startup_pgr_roles)
+
+
+        query = """
+            query{{
+                expertProfile(id:{id}) {{
+                    programRoles
+                }}
+            }}
+        """.format(id=user.id)
+
+        with self.login(email=self.basic_user().email):
+            response = self.client.post(self.url, data={'query': query})
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                {
+                    'data': {
+                        'expertProfile': {
+                            'programRoles': program_roles
                         }
                     }
                 }

@@ -7,6 +7,7 @@ from accelerator.models import (
     ExpertProfile,
     UserRole,
     ProgramRole,
+    StartupRole,
     Program,
     CONFIRMED_RELATIONSHIP,
 )
@@ -113,11 +114,13 @@ class ExpertProfileType(DjangoObjectType):
     (see functions for time/space comp analysis for each)
     """
     def resolve_program_roles(self, info, **kwargs):
-        roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         user_prg_roles = get_user_prg_role_by_program_family(
-            self.user, roles_of_interest)
+            self.user, user_roles_of_interest)
+
+        startup_roles_of_interest = [StartupRole.ENTRANT]
         startup_prg_roles = get_user_startup_prg_role_by_program_family(
-           self.user
+           self.user, startup_roles_of_interest
         )
         return combine_prg_roles(
             user_prg_roles=user_prg_roles, startup_prg_roles=startup_prg_roles
@@ -157,4 +160,3 @@ def _get_mentees(user, program_status):
         status=CONFIRMED_RELATIONSHIP,
         **mentee_filter
     ).order_by('-startup_mentor_tracking__program__start_date')
-
