@@ -75,7 +75,7 @@ all program role grant the user has ever had
 Time, Space Complexity
 O(n): time and space where n is the number of item in the result list
 """
-def get_user_prg_by_programfamily(user, user_roles=[]):
+def get_user_prg_role_by_program_family(user, user_roles=[]):
     query = user.programrolegrant_set.filter(
         program_role__user_role__isnull=False
     )
@@ -101,10 +101,10 @@ Query: 0(n + 1) where n is the number of startup a user belongs to
 since for every startup in that list we are fetching the program status.
 and the +1 is for the query to fetch all startup for the user
 
-O(nm) for time and space where n is the number of startup and m is
+O(nm)Time/Space where n is the number of startup and m is
 the number of program_startup_status
 """
-def get_user_startup_program_status_by_programfamily(user, startup_roles=[]):
+def get_user_startup_prg_role_by_program_family(user, startup_roles=[]):
     startups = user.startup_set.all()
     startup_status_group = {}
     for startup in startups:
@@ -121,3 +121,20 @@ def get_user_startup_program_status_by_programfamily(user, startup_roles=[]):
                 startup_status_group[program_family] = [startup_status]
 
     return startup_status_group
+
+"""
+collapse two dictory with list values into one where similar keys values
+in both dictionaries are merged
+
+Time, Space Complexity
+O(n)Time/Space; where n is the number of items in the startup_prg_roles
+
+"""
+def combine_prg_roles(user_prg_roles, startup_prg_roles):
+    for key, value in startup_prg_roles.items():
+        if user_prg_roles.get(key):
+            user_prg_roles[key] = user_prg_roles[key].extend(value)
+        else:
+            user_prg_roles[key] = value
+
+    return user_prg_roles

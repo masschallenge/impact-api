@@ -17,7 +17,10 @@ from accelerator_abstract.models import (
 from impact.graphql.types import StartupMentorRelationshipType
 from django.db.models import Q
 
-from impact.utils import compose_filter, get_user_prg_by_programfamily
+from impact.utils import (
+    get_user_startup_prg_role_by_program_family, combine_prg_roles,
+    compose_filter, get_user_prg_role_by_program_family,
+)
 
 class ExpertProfileType(DjangoObjectType):
     current_mentees = graphene.List(StartupMentorRelationshipType)
@@ -26,7 +29,7 @@ class ExpertProfileType(DjangoObjectType):
     office_hours_url = graphene.String()
     program_interests = graphene.List(graphene.String)
     available_office_hours = graphene.Boolean()
-    program_role_grants = GenericScalar()
+    program_roles = GenericScalar()
 
     class Meta:
         model = ExpertProfile
@@ -98,9 +101,28 @@ class ExpertProfileType(DjangoObjectType):
     def resolve_previous_mentees(self, info, **kwargs):
         return _get_mentees(self.user, ENDED_PROGRAM_STATUS)
 
-    def resolve_program_role_grants(self, info, **kwargs):
+    """
+    fetch a program role assigned to an user and those assigned to the startups
+    the user belong to
+
+    Time, Space, Query Complexity
+    Query: amount to the query complexity of the two helper function that
+    access the DB (see functions for query comp analysis for each)
+
+    Time/Space amount to time and space complexity of the three helper functions
+    (see functions for time/space comp analysis for each)
+    """
+    def resolve_program_roles(self, info, **kwargs):
         roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-        return get_user_prg_by_programfamily(self.user, roles_of_interest)
+        user_prg_roles = get_user_prg_role_by_program_family(
+            self.user, roles_of_interest)
+        startup_prg_roles = get_user_startup_prg_role_by_program_family(
+           self.user
+        )
+        return combine_prg_roles(
+            user_prg_roles=user_prg_roles, startup_prg_roles=startup_prg_roles
+        )
+
 
 def _get_slugs(self, mentor_program, latest_mentor_program, **kwargs):
     if mentor_program:
@@ -135,3 +157,4 @@ def _get_mentees(user, program_status):
         status=CONFIRMED_RELATIONSHIP,
         **mentee_filter
     ).order_by('-startup_mentor_tracking__program__start_date')
+

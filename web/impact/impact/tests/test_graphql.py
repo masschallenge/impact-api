@@ -4,7 +4,7 @@ import json
 from django.urls import reverse
 
 from accelerator.models import (
-    UserRole,
+    UserRole, StartupRole
 )
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
 from impact.tests.api_test_case import APITestCase
@@ -16,10 +16,11 @@ from impact.tests.factories import (
     ProgramRoleFactory,
     StartupMentorRelationshipFactory,
     UserRoleFactory,
-    StartupRoleFactory
+    StartupRoleFactory,
     ApplicationFactory,
     ProgramStartupStatusFactory,
-    StartupStatusFactory
+    StartupStatusFactory,
+    StartupFactory,
 )
 from impact.tests.utils import capture_stderr
 from impact.graphql.query import (
@@ -29,7 +30,10 @@ from impact.graphql.query import (
 )
 from accelerator.tests.contexts import StartupTeamMemberContext, UserRoleContext
 
-from impact.utils import get_user_prg_by_programfamily
+from impact.utils import (
+    get_user_startup_prg_role_by_program_family, combine_prg_roles,
+    get_user_prg_role_by_program_family
+)
 
 MENTEE_FIELDS = """
     startup {
@@ -400,11 +404,11 @@ class TestGraphQL(APITestCase):
                 }
             )
 
-    def test_query_program_role_grant_for_entrepreneur_returns_correct_value(self):
+    def test_query_program_roles_for_entrepreneur_returns_correct_value(self):
+        # prepare user program roles
         program = ProgramFactory()
         alum_role = UserRoleFactory(name=UserRole.ALUM)
         finalist_role = UserRoleFactory(name=UserRole.FINALIST)
-        entrant_role = StartupRoleFactory(name=StartupRoleFactory.ENTRANT)
         alum_program_role = ProgramRoleFactory(program=program,
                                                 user_role=alum_role)
         finalist_program_role = ProgramRoleFactory(program=program,
@@ -413,19 +417,29 @@ class TestGraphQL(APITestCase):
         ProgramRoleGrantFactory( person=user,program_role=alum_program_role)
         ProgramRoleGrantFactory(person=user,program_role=finalist_program_role)
 
-        program_role_grants = get_user_prg_by_programfamily(
+        user_prg_roles = get_user_prg_role_by_program_family(
            user, [UserRole.FINALIST, UserRole.ALUM]
         )
 
-        # to do
-        # create a startup for user
-        # create start up status
-        # create statup program status
+        # prepare startup program role
+        startup = StartupFactory(user=user)
+        program_startup_status = ProgramStartupStatusFactory(
+            startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
+            program = ProgramFactory()
+        )
+        startup_status = StartupStatusFactory(
+            startup=startup,
+            program_startup_status=program_startup_status
+        )
 
+        startup_pgr_roles = get_user_startup_prg_role_by_program_family(
+            user
+        )
+        program_roles = combine_prg_roles(user_prg_roles, startup_pgr_roles)
         query = """
             query{{
                 entrepreneurProfile(id:{id}) {{
-                    programRoleGrants
+                    programRoles
                 }}
             }}
         """.format(id=user.id)
@@ -437,13 +451,15 @@ class TestGraphQL(APITestCase):
                 {
                     'data': {
                         'entrepreneurProfile': {
-                            'programRoleGrants': program_role_grants
+                            'programRoles': program_roles
                         }
                     }
                 }
             )
 
-    def test_query_program_role_grant_for_expert_returns_correct_value(self):
+    def test_query_program_roles_for_expert_returns_correct_value(self):
+
+        # prepare user program role
         program = ProgramFactory()
         alum_role = UserRoleFactory(name=UserRole.ALUM)
         finalist_role = UserRoleFactory(name=UserRole.FINALIST)
@@ -455,15 +471,31 @@ class TestGraphQL(APITestCase):
         ProgramRoleGrantFactory(person=user,program_role=alum_program_role)
         ProgramRoleGrantFactory( person=user,program_role=finalist_program_role)
 
-        program_role_grants = get_user_prg_by_programfamily(
+        user_prg_roles = get_user_prg_role_by_program_family(
            user, [UserRole.FINALIST, UserRole.ALUM]
         )
+
+        # prepare startup program role
+        startup = StartupFactory(user=user)
+        program_startup_status = ProgramStartupStatusFactory(
+            startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
+            program = ProgramFactory()
+        )
+        startup_status = StartupStatusFactory(
+            startup=startup,
+            program_startup_status=program_startup_status
+        )
+
+        startup_pgr_roles = get_user_startup_prg_role_by_program_family(
+            user
+        )
+        program_roles = combine_prg_roles(user_prg_roles, startup_pgr_roles)
 
 
         query = """
             query{{
                 expertProfile(id:{id}) {{
-                    programRoleGrants
+                    programRoles
                 }}
             }}
         """.format(id=user.id)
@@ -475,7 +507,7 @@ class TestGraphQL(APITestCase):
                 {
                     'data': {
                         'expertProfile': {
-                            'programRoleGrants': program_role_grants
+                            'programRoles': program_roles
                         }
                     }
                 }

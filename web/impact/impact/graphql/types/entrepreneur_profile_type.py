@@ -13,15 +13,15 @@ from impact.graphql.types.entrepreneur_startup_type import (
 )
 
 from impact.utils import (
-    get_user_startup_program_status_by_programfamily,
-    get_user_prg_by_programfamily
+    get_user_startup_prg_role_by_program_family, combine_prg_roles,
+    get_user_prg_role_by_program_family
 )
 
 class EntrepreneurProfileType(DjangoObjectType):
     image_url = graphene.String()
     title = graphene.String()
     startups = graphene.List(EntrepreneurStartupType)
-    program_role = GenericScalar()
+    program_roles = GenericScalar()
 
     class Meta:
         model = EntrepreneurProfile
@@ -53,22 +53,20 @@ class EntrepreneurProfileType(DjangoObjectType):
     the user belong to
 
     Time, Space, Query Complexity
-    Query: amount to the query complexity of the two function this method uses
+    Query: amount to the query complexity of the two helper function that
+    access the DB (see functions for query comp analysis for each)
 
-    O(n + m) time and space where n is the time and space of the combine
-    functions in use and m is the number of item in startup_prg_roles dictionary
+    Time/Space amount to time and space complexity of the three helper functions
+    (see functions for time/space comp analysis for each)
     """
-    def program_role(self, info, **kwargs):
+    def resolve_program_roles(self, info, **kwargs):
         roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-        user_prg_roles = get_user_prg_by_programfamily(
+        user_prg_roles = get_user_prg_role_by_program_family(
             self.user, roles_of_interest)
-        startup_prg_roles = get_user_startup_program_status_by_programfamily(
+
+        startup_prg_roles = get_user_startup_prg_role_by_program_family(
            self.user
         )
-        for key, value in startup_prg_roles.items():
-            if user_prg_roles.get(key):
-                user_prg_roles[key] = user_prg_roles[key].extend(value)
-            else:
-                user_prg_roles[key] = value
-
-        return user_prg_roles
+        return combine_prg_roles(
+            user_prg_roles=user_prg_roles, startup_prg_roles=startup_prg_roles
+        )
