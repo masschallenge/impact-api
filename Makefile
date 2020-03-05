@@ -233,6 +233,7 @@ IMPACT_API = ../impact-api
 FRONT_END = ../front-end
 SEMANTIC = ../semantic-ui-theme
 REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(FRONT_END) $(SEMANTIC) $(IMPACT_API) 
+FRONTEND_MAKE = cd $(FRONT_END) && $(MAKE)
 
 # Database migration related targets
 
@@ -294,13 +295,17 @@ stop-frontend:
 # Server and Virtual Machine related targets
 debug ?= 1
 
-run-server: run-server-$(debug)
+export FRONTEND_PATH := $(shell ./frontend_path.sh $(FRONT_END))
+set-frontend-version:
+	@$(FRONTEND_MAKE) get-version
+
+run-server: set-frontend-version run-server-$(debug)
 
 run-server-0: .env initial-db-setup watch-frontend ensure-mysql
-	@docker-compose up
+	@$$FRONTEND_PATH | docker-compose up
 
-run-detached-server: .env initial-db-setup watch-frontend ensure-mysql
-	@docker-compose up -d
+run-detached-server: .env initial-db-setup watch-frontend ensure-mysql set-frontend-version
+	@$$FRONTEND_PATH | docker-compose up -d
 	@docker-compose run --rm web /usr/bin/mysqlwait.sh
 
 run-server-1: run-detached-server watch-frontend ensure-mysql
