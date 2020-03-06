@@ -398,9 +398,10 @@ class TestGraphQL(APITestCase):
                 }
             )
 
-    def test_get_user_confirmed_program_families(self):
+    def test_get_user_confirmed_mentor_program_families(self):
         role_grant = ProgramRoleGrantFactory(
             program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
+            program_role__user_role__name=UserRole.MENTOR,
             person=ExpertFactory(),
         )
         user = role_grant.person
@@ -409,7 +410,7 @@ class TestGraphQL(APITestCase):
             query = """
                 query {{
                     expertProfile(id: {id}) {{
-                        confirmedProgramFamilies
+                        confirmedMentorProgramFamilies
                     }}
                 }}
             """.format(id=user.id)
@@ -419,6 +420,6 @@ class TestGraphQL(APITestCase):
             ent_profile = data["expertProfile"]
 
             self.assertEqual(
-                ent_profile["confirmedProgramFamilies"],
+                ent_profile["confirmedMentorProgramFamilies"],
                 [user_program.program_family.name])
 

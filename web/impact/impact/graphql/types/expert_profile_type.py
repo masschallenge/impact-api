@@ -29,7 +29,7 @@ class ExpertProfileType(DjangoObjectType):
     office_hours_url = graphene.String()
     program_interests = graphene.List(graphene.String)
     available_office_hours = graphene.Boolean()
-    confirmed_program_families = graphene.List(graphene.String)
+    confirmed_mentor_program_families = graphene.List(graphene.String)
 
     class Meta:
         model = ExpertProfile
@@ -101,7 +101,7 @@ class ExpertProfileType(DjangoObjectType):
     def resolve_previous_mentees(self, info, **kwargs):
         return _get_mentees(self.user, ENDED_PROGRAM_STATUS)
 
-    def resolve_confirmed_program_families(self, info, **kwargs):
+    def resolve_confirmed_mentor_program_families(self, info, **kwargs):
         prg = _confirmed_non_future_program_role_grant(self)
         program_ids = _latest_program_id_foreach_program_family()
         return list(prg.filter(
@@ -147,7 +147,8 @@ def _get_mentees(user, program_status):
 
 
 def _confirmed_non_future_program_role_grant(expert_profile):
-    return expert_profile.user.programrolegrant_set.exclude(
+    return expert_profile.user.programrolegrant_set.filter(
+        program_role__user_role__name=UserRole.MENTOR).exclude(
         program_role__program__program_status__in=[
             HIDDEN_PROGRAM_STATUS,
             UPCOMING_PROGRAM_STATUS]
