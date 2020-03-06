@@ -7,14 +7,17 @@ from accelerator.models import (
     UserRole,
     ProgramRole,
     Program,
+    ProgramFamily,
     CONFIRMED_RELATIONSHIP,
 )
 from accelerator_abstract.models import (
     ACTIVE_PROGRAM_STATUS,
     ENDED_PROGRAM_STATUS,
+    HIDDEN_PROGRAM_STATUS,
+    UPCOMING_PROGRAM_STATUS
 )
 from impact.graphql.types import StartupMentorRelationshipType
-from django.db.models import Q
+from django.db.models import Q, Subquery, OuterRef
 
 from impact.utils import compose_filter
 
@@ -26,6 +29,7 @@ class ExpertProfileType(DjangoObjectType):
     office_hours_url = graphene.String()
     program_interests = graphene.List(graphene.String)
     available_office_hours = graphene.Boolean()
+    confirmed_program_families = graphene.List(graphene.String)
 
     class Meta:
         model = ExpertProfile
@@ -97,6 +101,15 @@ class ExpertProfileType(DjangoObjectType):
     def resolve_previous_mentees(self, info, **kwargs):
         return _get_mentees(self.user, ENDED_PROGRAM_STATUS)
 
+    def resolve_confirmed_program_families(self, info, **kwargs):
+        prg = _confirmed_non_future_program_role_grant(self)
+        program_ids = _latest_program_id_foreach_program_family()
+        return list(prg.filter(
+            program_role__program__pk__in=program_ids
+        ).values_list(
+            'program_role__program__program_family__name',
+            flat=True).distinct())
+
 
 def _get_slugs(self, mentor_program, latest_mentor_program, **kwargs):
     if mentor_program:
@@ -131,3 +144,28 @@ def _get_mentees(user, program_status):
         status=CONFIRMED_RELATIONSHIP,
         **mentee_filter
     ).order_by('-startup_mentor_tracking__program__start_date')
+
+
+def _confirmed_non_future_program_role_grant(expert_profile):
+    return expert_profile.user.programrolegrant_set.exclude(
+        program_role__program__program_status__in=[
+            HIDDEN_PROGRAM_STATUS,
+            UPCOMING_PROGRAM_STATUS]
+    ).prefetch_related(
+        'program_role__program',
+        'program_role__program__program_family'
+    )
+
+
+def _program_family__program_subquery():
+    return Program.objects.filter(
+        program_family=OuterRef('pk'),
+        program_status__in=[ACTIVE_PROGRAM_STATUS, ENDED_PROGRAM_STATUS]
+    ).order_by("-created_at").values('pk')[:1]
+
+
+def _latest_program_id_foreach_program_family():
+    latest_program_subquery = _program_family__program_subquery()
+    return list(ProgramFamily.objects.annotate(
+        latest_program=Subquery(latest_program_subquery)
+    ).values_list("latest_program", flat=True))
