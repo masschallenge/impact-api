@@ -6,6 +6,7 @@ from django.urls import reverse
 from accelerator.models import (
     UserRole,
 )
+from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
 from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import (
@@ -396,3 +397,28 @@ class TestGraphQL(APITestCase):
                     }
                 }
             )
+
+    def test_get_user_confirmed_program_families(self):
+        role_grant = ProgramRoleGrantFactory(
+            program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
+            person=ExpertFactory(),
+        )
+        user = role_grant.person
+        user_program = role_grant.program_role.program
+        with self.login(email=self.basic_user().email):
+            query = """
+                query {{
+                    expertProfile(id: {id}) {{
+                        confirmedProgramFamilies
+                    }}
+                }}
+            """.format(id=user.id)
+
+            response = self.client.post(self.url, data={'query': query})
+            data = json.loads(response.content.decode("utf-8"))["data"]
+            ent_profile = data["expertProfile"]
+
+            self.assertEqual(
+                ent_profile["confirmedProgramFamilies"],
+                [user_program.program_family.name])
+
