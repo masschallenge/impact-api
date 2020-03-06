@@ -1,6 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 from django.utils import timezone
+from django.db.models import Q
 from datetime import datetime
 from accelerator.models import (
     ExpertProfile,
@@ -17,9 +18,8 @@ from accelerator_abstract.models import (
     UPCOMING_PROGRAM_STATUS
 )
 from impact.graphql.types import StartupMentorRelationshipType
-from django.db.models import Q, Subquery, OuterRef
-
 from impact.utils import compose_filter
+from impact.v1.helpers.profile_helper import latest_program_id_foreach_program_family
 
 
 class ExpertProfileType(DjangoObjectType):
@@ -103,7 +103,7 @@ class ExpertProfileType(DjangoObjectType):
 
     def resolve_confirmed_mentor_program_families(self, info, **kwargs):
         prg = _confirmed_non_future_program_role_grant(self)
-        program_ids = _latest_program_id_foreach_program_family()
+        program_ids = latest_program_id_foreach_program_family()
         return list(prg.filter(
             program_role__program__pk__in=program_ids
         ).values_list(
@@ -156,17 +156,3 @@ def _confirmed_non_future_program_role_grant(expert_profile):
         'program_role__program',
         'program_role__program__program_family'
     )
-
-
-def _program_family__program_subquery():
-    return Program.objects.filter(
-        program_family=OuterRef('pk'),
-        program_status__in=[ACTIVE_PROGRAM_STATUS, ENDED_PROGRAM_STATUS]
-    ).order_by("-created_at").values('pk')[:1]
-
-
-def _latest_program_id_foreach_program_family():
-    latest_program_subquery = _program_family__program_subquery()
-    return list(ProgramFamily.objects.annotate(
-        latest_program=Subquery(latest_program_subquery)
-    ).values_list("latest_program", flat=True))
