@@ -102,7 +102,7 @@ class ExpertProfileType(DjangoObjectType):
         return _get_mentees(self.user, ENDED_PROGRAM_STATUS)
 
     def resolve_confirmed_mentor_program_families(self, info, **kwargs):
-        program_families = _confirmed_non_future_program_role_grant(self)
+        program_families = _visible_confirmed_mentor_role_grants(self)
         program_ids = latest_program_id_for_each_program_family()
         return program_families.filter(
             program_role__program__pk__in=program_ids
@@ -148,7 +148,7 @@ def _get_mentees(user, program_status):
     ).order_by('-startup_mentor_tracking__program__start_date')
 
 
-def _confirmed_non_future_program_role_grant(expert_profile):
+def _visible_confirmed_mentor_role_grants(expert_profile):
     return expert_profile.user.programrolegrant_set.filter(
         program_role__user_role__name=UserRole.MENTOR).exclude(
         program_role__program__program_status__in=[
