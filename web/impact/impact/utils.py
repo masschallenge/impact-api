@@ -108,13 +108,7 @@ def _get_user_prg_role_by_program_family(user, user_roles=[]):
             program_role__user_role__name__in=user_roles)
     result = query.values_list(
         'program_role__name', 'program_role__program__program_family__name')
-    prg_group = {}
-    for program_role_grant, program_family in result:
-        if prg_group.get(program_family):
-            prg_group[program_family].append(program_role_grant)
-        else:
-            prg_group[program_family] = [program_role_grant]
-    return prg_group
+    return _group_by_program_family(result)
 
 """
 fetch a the program status for all startup a given user
@@ -130,7 +124,7 @@ the number of program_startup_status
 """
 def _get_user_startup_prg_role_by_program_family(user, startup_roles=[]):
     startups = user.startup_set.all()
-    startup_status_group = {}
+
     for startup in startups:
         query = startup.program_startup_statuses()
         if startup_roles:
@@ -138,13 +132,20 @@ def _get_user_startup_prg_role_by_program_family(user, startup_roles=[]):
                 startup_role__name__in=startup_roles
             )
         result = query.values_list("startup_status", "program__program_family__name")
-        for startup_status, program_family in result:
-            if startup_status_group.get(program_family):
-                startup_status_group[program_family].append(startup_status)
-            else:
-                startup_status_group[program_family] = [startup_status]
 
-    return startup_status_group
+    return _group_by_program_family(result)
+
+"""
+O(n)Time/Space where n is the number of items in the array
+"""
+def _group_by_program_family(array):
+    by_program_family = {}
+    for program_role, program_family in array:
+        if by_program_family.get(program_family):
+            by_program_family[program_family].append(program_role)
+        else:
+            by_program_family[program_family] = [program_role]
+    return by_program_family
 
 """
 collapse two dictory with list values into one where similar keys values
