@@ -417,9 +417,24 @@ class TestGraphQL(APITestCase):
 
             response = self.client.post(self.url, data={'query': query})
             data = json.loads(response.content.decode("utf-8"))["data"]
-            ent_profile = data["expertProfile"]
+            expert_profile = data["expertProfile"]
 
             self.assertEqual(
-                ent_profile["confirmedMentorProgramFamilies"],
+                expert_profile["confirmedMentorProgramFamilies"],
                 [user_program.program_family.name])
 
+    def test_get_query_for_user_without_confirmed_mentor_program_families(self):
+        user = ExpertFactory()
+        with self.login(email=self.basic_user().email):
+            query = """
+                query {{
+                    expertProfile(id: {id}) {{
+                        confirmedMentorProgramFamilies
+                    }}
+                }}
+            """.format(id=user.id)
+
+            response = self.client.post(self.url, data={'query': query})
+            data = json.loads(response.content.decode("utf-8"))["data"]
+            expert_profile = data["expertProfile"]
+            self.assertEqual(expert_profile["confirmedMentorProgramFamilies"], [])

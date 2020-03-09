@@ -1,15 +1,15 @@
 import graphene
-from graphene_django import DjangoObjectType
-from django.utils import timezone
-from django.db.models import Q
 from datetime import datetime
+from django.db.models import Q
+from django.utils import timezone
+from graphene_django import DjangoObjectType
 from accelerator.models import (
+    CONFIRMED_RELATIONSHIP,
     ExpertProfile,
-    UserRole,
-    ProgramRole,
     Program,
     ProgramFamily,
-    CONFIRMED_RELATIONSHIP,
+    ProgramRole,
+    UserRole
 )
 from accelerator_abstract.models import (
     ACTIVE_PROGRAM_STATUS,
@@ -19,7 +19,7 @@ from accelerator_abstract.models import (
 )
 from impact.graphql.types import StartupMentorRelationshipType
 from impact.utils import compose_filter
-from impact.v1.helpers.profile_helper import latest_program_id_foreach_program_family
+from impact.v1.helpers.profile_helper import latest_program_id_for_each_program_family
 
 
 class ExpertProfileType(DjangoObjectType):
@@ -102,13 +102,15 @@ class ExpertProfileType(DjangoObjectType):
         return _get_mentees(self.user, ENDED_PROGRAM_STATUS)
 
     def resolve_confirmed_mentor_program_families(self, info, **kwargs):
-        prg = _confirmed_non_future_program_role_grant(self)
-        program_ids = latest_program_id_foreach_program_family()
-        return list(prg.filter(
+        program_families = _confirmed_non_future_program_role_grant(self)
+        program_ids = latest_program_id_for_each_program_family()
+        return program_families.filter(
             program_role__program__pk__in=program_ids
+        ).exclude(
+            program_role__program__program_family__name=self.home_program_family
         ).values_list(
             'program_role__program__program_family__name',
-            flat=True).distinct())
+            flat=True).distinct()
 
 
 def _get_slugs(self, mentor_program, latest_mentor_program, **kwargs):
