@@ -30,10 +30,7 @@ from impact.graphql.query import (
 )
 from accelerator.tests.contexts import StartupTeamMemberContext, UserRoleContext
 
-from impact.utils import (
-    get_user_startup_prg_role_by_program_family, combine_prg_roles,
-    get_user_prg_role_by_program_family
-)
+from impact.utils import get_user_program_roles
 
 MENTEE_FIELDS = """
     startup {
@@ -417,9 +414,7 @@ class TestGraphQL(APITestCase):
         ProgramRoleGrantFactory( person=user,program_role=alum_program_role)
         ProgramRoleGrantFactory(person=user,program_role=finalist_program_role)
 
-        user_prg_roles = get_user_prg_role_by_program_family(
-           user, [UserRole.FINALIST, UserRole.ALUM]
-        )
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
 
         # prepare startup program role
         startup = StartupFactory(user=user)
@@ -432,10 +427,7 @@ class TestGraphQL(APITestCase):
             program_startup_status=program_startup_status
         )
 
-        startup_pgr_roles = get_user_startup_prg_role_by_program_family(
-            user
-        )
-        program_roles = combine_prg_roles(user_prg_roles, startup_pgr_roles)
+        program_roles = get_user_program_roles(user, user_roles_of_interest)
         query = """
             query{{
                 entrepreneurProfile(id:{id}) {{
@@ -471,9 +463,7 @@ class TestGraphQL(APITestCase):
         ProgramRoleGrantFactory(person=user,program_role=alum_program_role)
         ProgramRoleGrantFactory( person=user,program_role=finalist_program_role)
 
-        user_prg_roles = get_user_prg_role_by_program_family(
-           user, [UserRole.FINALIST, UserRole.ALUM]
-        )
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
 
         # prepare startup program role
         startup = StartupFactory(user=user)
@@ -486,11 +476,7 @@ class TestGraphQL(APITestCase):
             program_startup_status=program_startup_status
         )
 
-        startup_pgr_roles = get_user_startup_prg_role_by_program_family(
-            user
-        )
-        program_roles = combine_prg_roles(user_prg_roles, startup_pgr_roles)
-
+        program_roles = get_user_program_roles(user, user_roles_of_interest)
 
         query = """
             query{{
@@ -527,9 +513,7 @@ class TestGraphQL(APITestCase):
         ProgramRoleGrantFactory(person=user,program_role=alum_program_role)
         ProgramRoleGrantFactory( person=user,program_role=finalist_program_role)
 
-        user_prg_roles = get_user_prg_role_by_program_family(
-           user, [UserRole.FINALIST, UserRole.ALUM]
-        )
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
 
         # prepare startup program role
         startup = StartupFactory(user=user)
@@ -542,10 +526,7 @@ class TestGraphQL(APITestCase):
             program_startup_status=program_startup_status
         )
 
-        startup_pgr_roles = get_user_startup_prg_role_by_program_family(
-            user
-        )
-        program_roles = combine_prg_roles(user_prg_roles, startup_pgr_roles)
+        program_roles = get_user_program_roles(user, user_roles_of_interest)
 
 
         query = """
@@ -583,9 +564,8 @@ class TestGraphQL(APITestCase):
         ProgramRoleGrantFactory(person=user,program_role=alum_program_role)
         ProgramRoleGrantFactory( person=user,program_role=finalist_program_role)
 
-        user_prg_roles = get_user_prg_role_by_program_family(
-           user, [UserRole.FINALIST, UserRole.ALUM]
-        )
+
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
 
         # prepare startup program role
         startup = StartupFactory(user=user)
@@ -607,10 +587,10 @@ class TestGraphQL(APITestCase):
             program_startup_status=program_startup_status
         )
 
-        startup_pgr_roles = get_user_startup_prg_role_by_program_family(
-            user, [StartupRole.ENTRANT]
-        )
-        program_roles = combine_prg_roles(user_prg_roles, startup_pgr_roles)
+
+        startup_roles_of_interest = [StartupRole.ENTRANT]
+        program_roles = get_user_program_roles(
+            user, user_roles_of_interest, startup_roles_of_interest)
 
 
         query = """

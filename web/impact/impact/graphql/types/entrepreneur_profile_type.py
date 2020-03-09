@@ -13,10 +13,7 @@ from impact.graphql.types.entrepreneur_startup_type import (
     EntrepreneurStartupType,
 )
 
-from impact.utils import (
-    get_user_startup_prg_role_by_program_family, combine_prg_roles,
-    get_user_prg_role_by_program_family
-)
+from impact.utils import get_user_program_roles
 
 class EntrepreneurProfileType(DjangoObjectType):
     image_url = graphene.String()
@@ -49,29 +46,9 @@ class EntrepreneurProfileType(DjangoObjectType):
             return team_member.title
         return ""
 
-    """
-    fetch a program role assigned to an user and those assigned to the startups
-    the user belong to
 
-    Time, Space, Query Complexity
-    Query: amount to the query complexity of the two helper function that
-    access the DB (see functions for query comp analysis for each)
-
-    Time/Space amount to time and space complexity of the three helper functions
-    (see functions for time/space comp analysis for each)
-    """
     def resolve_program_roles(self, info, **kwargs):
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-        user_prg_roles = get_user_prg_role_by_program_family(
-            self.user, user_roles_of_interest)
         startup_roles_of_interest = [StartupRole.ENTRANT]
-        startup_prg_roles = get_user_startup_prg_role_by_program_family(
-           self.user, startup_roles_of_interest
-        )
-        # print(startup_prg_roles)
-        # print(user_prg_roles)
-        result = combine_prg_roles(
-            user_prg_roles=user_prg_roles, startup_prg_roles=startup_prg_roles
-        )
-        # print(result)
-        return result
+        return get_user_program_roles(
+            self.user, user_roles_of_interest, startup_roles_of_interest)

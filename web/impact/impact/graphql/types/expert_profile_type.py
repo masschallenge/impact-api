@@ -18,10 +18,7 @@ from accelerator_abstract.models import (
 from impact.graphql.types import StartupMentorRelationshipType
 from django.db.models import Q
 
-from impact.utils import (
-    get_user_startup_prg_role_by_program_family, combine_prg_roles,
-    compose_filter, get_user_prg_role_by_program_family,
-)
+from impact.utils import (compose_filter, get_user_program_roles)
 
 class ExpertProfileType(DjangoObjectType):
     current_mentees = graphene.List(StartupMentorRelationshipType)
@@ -115,16 +112,9 @@ class ExpertProfileType(DjangoObjectType):
     """
     def resolve_program_roles(self, info, **kwargs):
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-        user_prg_roles = get_user_prg_role_by_program_family(
-            self.user, user_roles_of_interest)
-
         startup_roles_of_interest = [StartupRole.ENTRANT]
-        startup_prg_roles = get_user_startup_prg_role_by_program_family(
-           self.user, startup_roles_of_interest
-        )
-        return combine_prg_roles(
-            user_prg_roles=user_prg_roles, startup_prg_roles=startup_prg_roles
-        )
+        return get_user_program_roles(
+            self.user, user_roles_of_interest, startup_roles_of_interest)
 
 
 def _get_slugs(self, mentor_program, latest_mentor_program, **kwargs):

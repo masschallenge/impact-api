@@ -67,6 +67,30 @@ def previous_instance(instance, query):
 def _find_instance(instance, query, order):
     return type(instance).objects.filter(query).order_by(order).first()
 
+
+"""
+fetch a program role assigned to an user and those assigned to the startups
+the user belong to
+
+Time, Space, Query Complexity
+Query: amount to the query complexity of the two helper function that
+access the DB (see functions for query comp analysis for each)
+
+Time/Space amount to time and space complexity of the three helper functions
+(see functions for time/space comp analysis for each)
+    """
+def get_user_program_roles(
+    user, user_roles_of_interest=[], startup_roles_of_interest=[]):
+
+        user_prg_roles = _get_user_prg_role_by_program_family(
+            user, user_roles_of_interest)
+        startup_prg_roles = _get_user_startup_prg_role_by_program_family(
+           user, startup_roles_of_interest
+        )
+        return _combine_prg_roles(
+            user_prg_roles=user_prg_roles, startup_prg_roles=startup_prg_roles
+        )
+
 """
 return a use's program role grants grouped by the program family
 filter role grants by the provided user role or return
@@ -75,7 +99,7 @@ all program role grant the user has ever had
 Time, Space Complexity
 O(n): time and space where n is the number of item in the result list
 """
-def get_user_prg_role_by_program_family(user, user_roles=[]):
+def _get_user_prg_role_by_program_family(user, user_roles=[]):
     query = user.programrolegrant_set.filter(
         program_role__user_role__isnull=False
     )
@@ -104,7 +128,7 @@ and the +1 is for the query to fetch all startup for the user
 O(nm)Time/Space where n is the number of startup and m is
 the number of program_startup_status
 """
-def get_user_startup_prg_role_by_program_family(user, startup_roles=[]):
+def _get_user_startup_prg_role_by_program_family(user, startup_roles=[]):
     startups = user.startup_set.all()
     startup_status_group = {}
     for startup in startups:
@@ -130,7 +154,7 @@ Time, Space Complexity
 O(n)Time/Space; where n is the number of items in the startup_prg_roles
 
 """
-def combine_prg_roles(user_prg_roles, startup_prg_roles):
+def _combine_prg_roles(user_prg_roles, startup_prg_roles):
     for key, value in startup_prg_roles.items():
         if user_prg_roles.get(key):
             user_prg_roles[key] = user_prg_roles[key] + value
