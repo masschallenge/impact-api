@@ -52,35 +52,35 @@ class ExpertProfileType(DjangoObjectType):
             'mentor_type',
         )
 
-    def resolve_image_url(self, info, **kwargs):
-        return self.image and self.image.url
+    def resolve_image_url(obj, info, **kwargs):
+        return obj.image and obj.image.url
 
-    def resolve_program_interests(self, info, **kwargs):
-        return self.interest_categories.all().values_list(
+    def resolve_program_interests(obj, info, **kwargs):
+        return obj.interest_categories.all().values_list(
             'program__program_family__name', flat=True).distinct()
 
-    def resolve_available_office_hours(self, info, **kwargs):
+    def resolve_available_office_hours(obj, info, **kwargs):
         user = info.context.user
         filter_kwargs = {
             'finalist__isnull': True,
         }
         now = timezone.now()
-        if not user.is_staff and user != self.user and not user.is_superuser:
+        if not user.is_staff and user != obj.user and not user.is_superuser:
             filter_kwargs['program__in'] = _get_user_programs(user)
         future_datetime_filter = Q(start_date_time__gte=now)
-        return self.user.mentor_officehours.filter(**filter_kwargs).filter(
+        return obj.user.mentor_officehours.filter(**filter_kwargs).filter(
             future_datetime_filter).exists()
 
-    def resolve_office_hours_url(self, info, **kwargs):
-        if self.user.programrolegrant_set.filter(
+    def resolve_office_hours_url(obj, info, **kwargs):
+        if obj.user.programrolegrant_set.filter(
                 program_role__user_role__name=UserRole.MENTOR
         ).exists():
-            role_grants = self.user.programrolegrant_set.filter(
+            role_grants = obj.user.programrolegrant_set.filter(
             program_role__user_role__name=UserRole.MENTOR,
             program_role__program__end_date__gte=datetime.now()
             ).distinct()
 
-            latest_grant = self.user.programrolegrant_set.filter(
+            latest_grant = obj.user.programrolegrant_set.filter(
                 program_role__user_role__name=UserRole.MENTOR
             ).latest('created_at')
             latest_mentor_program = latest_grant.program_role.program
@@ -88,32 +88,32 @@ class ExpertProfileType(DjangoObjectType):
             mentor_program = [role_grant.program_role.program for role_grant in role_grants
                               if role_grant.program_role.program in _get_user_programs(user)]
             if mentor_program or latest_mentor_program:
-                slugs = _get_slugs(self, mentor_program, latest_mentor_program)
+                slugs = _get_slugs(obj, mentor_program, latest_mentor_program)
                 return "/officehours/list/{family_slug}/{program_slug}/".format(
                     family_slug=slugs[0],
                     program_slug=slugs[1]) + (
                     '?mentor_id={mentor_id}'.format(
-                        mentor_id=self.user.id))
+                        mentor_id=obj.user.id))
 
-    def resolve_current_mentees(self, info, **kwargs):
-        return _get_mentees(self.user, ACTIVE_PROGRAM_STATUS)
+    def resolve_current_mentees(obj, info, **kwargs):
+        return _get_mentees(obj.user, ACTIVE_PROGRAM_STATUS)
 
-    def resolve_previous_mentees(self, info, **kwargs):
-        return _get_mentees(self.user, ENDED_PROGRAM_STATUS)
+    def resolve_previous_mentees(obj, info, **kwargs):
+        return _get_mentees(obj.user, ENDED_PROGRAM_STATUS)
 
-    def resolve_confirmed_mentor_program_families(self, info, **kwargs):
-        program_families = _visible_confirmed_mentor_role_grants(self)
+    def resolve_confirmed_mentor_program_families(obj, info, **kwargs):
+        program_families = _visible_confirmed_mentor_role_grants(obj)
         program_ids = latest_program_id_for_each_program_family()
         return program_families.filter(
             program_role__program__pk__in=program_ids
         ).exclude(
-            program_role__program__program_family__name=self.home_program_family
+            program_role__program__program_family__name=obj.home_program_family
         ).values_list(
             'program_role__program__program_family__name',
             flat=True).distinct()
 
 
-def _get_slugs(self, mentor_program, latest_mentor_program, **kwargs):
+def _get_slugs(obj, mentor_program, latest_mentor_program, **kwargs):
     if mentor_program:
         return (
             mentor_program[0].program_family.url_slug,
