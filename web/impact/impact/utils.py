@@ -125,6 +125,7 @@ the number of program_startup_status
 def _get_user_startup_prg_role_by_program_family(user, startup_roles=[]):
     startups = user.startup_set.all()
 
+    result = []
     for startup in startups:
         query = startup.program_startup_statuses()
         if startup_roles:
