@@ -6,6 +6,7 @@ from django.urls import reverse
 from accelerator.models import (
     UserRole, StartupRole
 )
+from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
 from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import (
@@ -613,3 +614,43 @@ class TestGraphQL(APITestCase):
                     }
                 }
             )
+    def test_get_user_confirmed_mentor_program_families(self):
+        role_grant = ProgramRoleGrantFactory(
+            program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
+            program_role__user_role__name=UserRole.MENTOR,
+            person=ExpertFactory(),
+        )
+        user = role_grant.person
+        user_program = role_grant.program_role.program
+        with self.login(email=self.basic_user().email):
+            query = """
+                query {{
+                    expertProfile(id: {id}) {{
+                        confirmedMentorProgramFamilies
+                    }}
+                }}
+            """.format(id=user.id)
+
+            response = self.client.post(self.url, data={'query': query})
+            data = json.loads(response.content.decode("utf-8"))["data"]
+            expert_profile = data["expertProfile"]
+
+            self.assertEqual(
+                expert_profile["confirmedMentorProgramFamilies"],
+                [user_program.program_family.name])
+
+    def test_get_query_for_user_without_confirmed_mentor_program_families(self):
+        user = ExpertFactory()
+        with self.login(email=self.basic_user().email):
+            query = """
+                query {{
+                    expertProfile(id: {id}) {{
+                        confirmedMentorProgramFamilies
+                    }}
+                }}
+            """.format(id=user.id)
+
+            response = self.client.post(self.url, data={'query': query})
+            data = json.loads(response.content.decode("utf-8"))["data"]
+            expert_profile = data["expertProfile"]
+            self.assertEqual(expert_profile["confirmedMentorProgramFamilies"], [])
