@@ -63,15 +63,6 @@ class Base(Configuration):
 
     SLAVE_DATABASES = ['default']
 
-    if os.environ.get('READ_REPLICA_DATABASE_URL'):
-        DATABASES.update(values.DatabaseURLValue(  # pragma: no cover
-            alias='read-replica',
-            environ_name='READ_REPLICA_DATABASE_URL').value)
-
-        SLAVE_DATABASES = ['read-replica']  # pragma: no cover
-
-        DATABASE_ROUTERS = ('multidb.MasterSlaveRouter',)  # pragma: no cover
-
     EMAIL = values.EmailURLValue()
 
     SECRET_KEY = values.Value()
@@ -130,6 +121,20 @@ class Base(Configuration):
         'oauth2_provider.middleware.OAuth2TokenMiddleware',
         'impact.middleware.MethodOverrideMiddleware',
     ]
+
+    if os.environ.get('READ_REPLICA_DATABASE_URL'):
+        DATABASES.update(values.DatabaseURLValue(  # pragma: no cover
+            alias='read-replica',
+            environ_name='READ_REPLICA_DATABASE_URL').value)
+
+        SLAVE_DATABASES = ['read-replica']  # pragma: no cover
+
+        DATABASE_ROUTERS = (  # pragma: no cover
+            'multidb.PinningReplicaRouter',)
+
+        MIDDLEWARE = [  # pragma: no cover
+            'multidb.middleware.PinningRouterMiddleware'] + (
+            MIDDLEWARE)
 
     CACHES = {
         'default': {
