@@ -4,7 +4,8 @@ import json
 from django.urls import reverse
 
 from accelerator.models import (
-    UserRole, StartupRole
+    StartupRole,
+    UserRole
 )
 from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
