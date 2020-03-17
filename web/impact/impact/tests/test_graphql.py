@@ -4,8 +4,10 @@ import json
 from django.urls import reverse
 
 from accelerator.models import (
-    UserRole,
+    StartupRole,
+    UserRole
 )
+from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
 from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import (
@@ -16,9 +18,11 @@ from impact.tests.factories import (
     ProgramRoleFactory,
     StartupMentorRelationshipFactory,
     UserRoleFactory,
+    StartupRoleFactory,
     ApplicationFactory,
     ProgramStartupStatusFactory,
-    StartupStatusFactory
+    StartupStatusFactory,
+    StartupFactory,
 )
 from impact.tests.utils import capture_stderr
 from impact.graphql.query import (
@@ -27,6 +31,8 @@ from impact.graphql.query import (
     NON_FINALIST_PROFILE_MESSAGE
 )
 from accelerator.tests.contexts import StartupTeamMemberContext, UserRoleContext
+
+from impact.utils import get_user_program_roles
 
 MENTEE_FIELDS = """
     startup {
@@ -396,3 +402,256 @@ class TestGraphQL(APITestCase):
                     }
                 }
             )
+
+    def test_query_program_roles_for_entrepreneur_returns_correct_value(self):
+        # prepare user program roles
+        program = ProgramFactory()
+        alum_role = UserRoleFactory(name=UserRole.ALUM)
+        finalist_role = UserRoleFactory(name=UserRole.FINALIST)
+        alum_program_role = ProgramRoleFactory(program=program,
+                                                user_role=alum_role)
+        finalist_program_role = ProgramRoleFactory(program=program,
+                                                    user_role=finalist_role)
+        user = EntrepreneurFactory()
+        ProgramRoleGrantFactory( person=user,program_role=alum_program_role)
+        ProgramRoleGrantFactory(person=user,program_role=finalist_program_role)
+
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
+
+        # prepare startup program role
+        startup = StartupFactory(user=user)
+        program_startup_status = ProgramStartupStatusFactory(
+            startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
+            program = ProgramFactory()
+        )
+        startup_status = StartupStatusFactory(
+            startup=startup,
+            program_startup_status=program_startup_status
+        )
+
+        program_roles = get_user_program_roles(user, user_roles_of_interest)
+        query = """
+            query{{
+                entrepreneurProfile(id:{id}) {{
+                    programRoles
+                }}
+            }}
+        """.format(id=user.id)
+
+        with self.login(email=self.basic_user().email):
+            response = self.client.post(self.url, data={'query': query})
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                {
+                    'data': {
+                        'entrepreneurProfile': {
+                            'programRoles': program_roles
+                        }
+                    }
+                }
+            )
+
+    def test_query_program_roles_for_expert_returns_correct_value(self):
+
+        # prepare user program role
+        program = ProgramFactory()
+        alum_role = UserRoleFactory(name=UserRole.ALUM)
+        finalist_role = UserRoleFactory(name=UserRole.FINALIST)
+        alum_program_role = ProgramRoleFactory(program=program,
+                                                user_role=alum_role)
+        finalist_program_role = ProgramRoleFactory(program=program,
+                                                    user_role=finalist_role)
+        user = ExpertFactory()
+        ProgramRoleGrantFactory(person=user,program_role=alum_program_role)
+        ProgramRoleGrantFactory( person=user,program_role=finalist_program_role)
+
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
+
+        # prepare startup program role
+        startup = StartupFactory(user=user)
+        program_startup_status = ProgramStartupStatusFactory(
+            startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
+            program = ProgramFactory()
+        )
+        startup_status = StartupStatusFactory(
+            startup=startup,
+            program_startup_status=program_startup_status
+        )
+
+        program_roles = get_user_program_roles(user, user_roles_of_interest)
+
+        query = """
+            query{{
+                expertProfile(id:{id}) {{
+                    programRoles
+                }}
+            }}
+        """.format(id=user.id)
+
+        with self.login(email=self.basic_user().email):
+            response = self.client.post(self.url, data={'query': query})
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                {
+                    'data': {
+                        'expertProfile': {
+                            'programRoles': program_roles
+                        }
+                    }
+                }
+            )
+
+    def test_query_program_roles_for_expert_with_same_program(self):
+
+        # prepare user program role
+        program = ProgramFactory()
+        alum_role = UserRoleFactory(name=UserRole.ALUM)
+        finalist_role = UserRoleFactory(name=UserRole.FINALIST)
+        alum_program_role = ProgramRoleFactory(program=program,
+                                                user_role=alum_role)
+        finalist_program_role = ProgramRoleFactory(program=program,
+                                                    user_role=finalist_role)
+        user = ExpertFactory()
+        ProgramRoleGrantFactory(person=user,program_role=alum_program_role)
+        ProgramRoleGrantFactory( person=user,program_role=finalist_program_role)
+
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
+
+        # prepare startup program role
+        startup = StartupFactory(user=user)
+        program_startup_status = ProgramStartupStatusFactory(
+            startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
+            program = program
+        )
+        startup_status = StartupStatusFactory(
+            startup=startup,
+            program_startup_status=program_startup_status
+        )
+
+        program_roles = get_user_program_roles(user, user_roles_of_interest)
+
+
+        query = """
+            query{{
+                expertProfile(id:{id}) {{
+                    programRoles
+                }}
+            }}
+        """.format(id=user.id)
+
+        with self.login(email=self.basic_user().email):
+            response = self.client.post(self.url, data={'query': query})
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                {
+                    'data': {
+                        'expertProfile': {
+                            'programRoles': program_roles
+                        }
+                    }
+                }
+            )
+
+    def test_query_prg_roles_for_selected_roles(self):
+
+        # prepare user program role
+        program = ProgramFactory()
+        alum_role = UserRoleFactory(name=UserRole.ALUM)
+        finalist_role = UserRoleFactory(name=UserRole.FINALIST)
+        alum_program_role = ProgramRoleFactory(program=program,
+                                                user_role=alum_role)
+        finalist_program_role = ProgramRoleFactory(program=program,
+                                                    user_role=finalist_role)
+        user = ExpertFactory()
+        ProgramRoleGrantFactory(person=user,program_role=alum_program_role)
+        ProgramRoleGrantFactory( person=user,program_role=finalist_program_role)
+
+
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
+
+        # prepare startup program role
+        startup = StartupFactory(user=user)
+        program_startup_status = ProgramStartupStatusFactory(
+            startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
+            program = program
+        )
+        program_startup_status = ProgramStartupStatusFactory(
+            startup_role=StartupRoleFactory(name=StartupRole.FINALIST),
+            program = program
+        )
+
+        program_startup_status = ProgramStartupStatusFactory(
+            startup_role=StartupRoleFactory(name=StartupRole.FINALIST),
+            program = program
+        )
+        startup_status = StartupStatusFactory(
+            startup=startup,
+            program_startup_status=program_startup_status
+        )
+
+
+        startup_roles_of_interest = [StartupRole.ENTRANT]
+        program_roles = get_user_program_roles(
+            user, user_roles_of_interest, startup_roles_of_interest)
+
+
+        query = """
+            query{{
+                expertProfile(id:{id}) {{
+                    programRoles
+                }}
+            }}
+        """.format(id=user.id)
+
+        with self.login(email=self.basic_user().email):
+            response = self.client.post(self.url, data={'query': query})
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                {
+                    'data': {
+                        'expertProfile': {
+                            'programRoles': program_roles
+                        }
+                    }
+                }
+            )
+    def test_get_user_confirmed_mentor_program_families(self):
+        role_grant = ProgramRoleGrantFactory(
+            program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
+            program_role__user_role__name=UserRole.MENTOR,
+            person=ExpertFactory(),
+        )
+        user = role_grant.person
+        user_program = role_grant.program_role.program
+        with self.login(email=self.basic_user().email):
+            query = """
+                query {{
+                    expertProfile(id: {id}) {{
+                        confirmedMentorProgramFamilies
+                    }}
+                }}
+            """.format(id=user.id)
+
+            response = self.client.post(self.url, data={'query': query})
+            data = json.loads(response.content.decode("utf-8"))["data"]
+            expert_profile = data["expertProfile"]
+
+            self.assertEqual(
+                expert_profile["confirmedMentorProgramFamilies"],
+                [user_program.program_family.name])
+
+    def test_get_query_for_user_without_confirmed_mentor_program_families(self):
+        user = ExpertFactory()
+        with self.login(email=self.basic_user().email):
+            query = """
+                query {{
+                    expertProfile(id: {id}) {{
+                        confirmedMentorProgramFamilies
+                    }}
+                }}
+            """.format(id=user.id)
+
+            response = self.client.post(self.url, data={'query': query})
+            data = json.loads(response.content.decode("utf-8"))["data"]
+            expert_profile = data["expertProfile"]
+            self.assertEqual(expert_profile["confirmedMentorProgramFamilies"], [])

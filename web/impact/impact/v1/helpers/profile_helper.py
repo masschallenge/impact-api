@@ -512,7 +512,7 @@ class ProfileHelper(ModelHelper):
     @property
     def confirmed_user_program_families(self):
         prg = _confirmed_non_future_program_role_grant(self.subject)
-        program_ids = _latest_program_id_foreach_program_family()
+        program_ids = latest_program_id_for_each_program_family()
         program_families = list(
             prg.filter(
                 program_role__program__pk__in=program_ids
@@ -549,7 +549,7 @@ def _latest_confirmed_non_future_program_role_grant(obj):
     return prg.order_by('-created_at').first()
 
 
-def _latest_program_id_foreach_program_family():
+def latest_program_id_for_each_program_family():
     latest_program_subquery = Program.objects.filter(
         program_family=OuterRef('pk'),
         program_status__in=[ACTIVE_PROGRAM_STATUS, ENDED_PROGRAM_STATUS]
