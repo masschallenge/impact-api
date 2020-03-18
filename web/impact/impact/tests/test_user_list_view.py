@@ -498,7 +498,7 @@ class TestUserListView(APITestCase):
         updated_exactly = _user_for_date(week_ago)
         updated_after = _user_for_date(week_ago + one_day)
         with self.login(email=self.basic_user().email):
-            url = "{base_url}?updated_at.after={datestr}".format(
+            url = "{base_url}?date_modified__gt={datestr}".format(
                 base_url=self.url,
                 datestr=week_ago.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
             response = self.client.get(url)
