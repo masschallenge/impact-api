@@ -134,9 +134,9 @@ class BaseListView(ImpactView):
 
     def _filter_by_date(self, qs):
         updated_at_after = self.request.query_params.get(
-            "updated_at.after", None)
+            "date_modified__gt", None)
         updated_at_before = self.request.query_params.get(
-            "updated_at.before", None)
+            "date_modified__lt", None)
         if updated_at_after or updated_at_before:
             qs = self._apply_filter_by_date(qs,
                                             updated_at_after,
