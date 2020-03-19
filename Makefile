@@ -162,6 +162,15 @@ environment_error_msg = ENVIRONMENT must be \
 
 no_release_error_msg = RELEASE must be set.  E.g., 'make deploy RELEASE=1.2.3.4'
 
+# Repos
+ACCELERATE = ../accelerate
+DJANGO_ACCELERATOR = ../django-accelerator
+IMPACT_API = ../impact-api
+FRONT_END = ../front-end
+SEMANTIC = ../semantic-ui-theme
+REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(FRONT_END) $(SEMANTIC) $(IMPACT_API) 
+FRONTEND_MAKE = cd $(FRONT_END) && $(MAKE)
+
 .PHONY: $(targets) $(deprecated_targets)
 
 
@@ -194,6 +203,7 @@ test: setup
 	docker-compose run --rm web \
 		python3 -Wa manage.py test $$keepdb --configuration=Test $(tests)
 
+export FRONTEND_PATH := $(shell ./external_abs_path.sh $(FRONT_END))
 coverage: coverage-run coverage-report coverage-html-report
 
 coverage-run: .env
@@ -226,13 +236,6 @@ code-check:
 		grep -v "site-packages"
 
 
-# Repos
-ACCELERATE = ../accelerate
-DJANGO_ACCELERATOR = ../django-accelerator
-IMPACT_API = ../impact-api
-FRONT_END = ../front-end
-SEMANTIC = ../semantic-ui-theme
-REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(FRONT_END) $(SEMANTIC) $(IMPACT_API) 
 
 # Database migration related targets
 
@@ -294,12 +297,15 @@ stop-frontend:
 # Server and Virtual Machine related targets
 debug ?= 1
 
-run-server: run-server-$(debug)
+set-frontend-version:
+	@$(FRONTEND_MAKE) get-version
+
+run-server: set-frontend-version run-server-$(debug)
 
 run-server-0: .env initial-db-setup watch-frontend ensure-mysql
 	@docker-compose up
 
-run-detached-server: .env initial-db-setup watch-frontend ensure-mysql
+run-detached-server: .env initial-db-setup watch-frontend ensure-mysql set-frontend-version
 	@docker-compose up -d
 	@docker-compose run --rm web /usr/bin/mysqlwait.sh
 

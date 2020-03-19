@@ -66,3 +66,101 @@ def previous_instance(instance, query):
 
 def _find_instance(instance, query, order):
     return type(instance).objects.filter(query).order_by(order).first()
+
+
+"""
+fetch a program role assigned to an user and those assigned to the startups
+the user belong to
+
+Time, Space, Query Complexity
+Query: amount to the query complexity of the two helper function that
+access the DB (see functions for query comp analysis for each)
+
+Time/Space amount to time and space complexity of the three helper functions
+(see functions for time/space comp analysis for each)
+    """
+def get_user_program_roles(
+    user, user_roles_of_interest=[], startup_roles_of_interest=[]):
+
+        user_prg_roles = _get_user_prg_role_by_program_family(
+            user, user_roles_of_interest)
+        startup_prg_roles = _get_user_startup_prg_role_by_program_family(
+           user, startup_roles_of_interest
+        )
+        return _combine_prg_roles(
+            user_prg_roles=user_prg_roles, startup_prg_roles=startup_prg_roles
+        )
+
+"""
+return a use's program role grants grouped by the program family
+filter role grants by the provided user role or return
+all program role grant the user has ever had
+
+Time, Space Complexity
+O(n): time and space where n is the number of item in the result list
+"""
+def _get_user_prg_role_by_program_family(user, user_roles=[]):
+    query = user.programrolegrant_set.filter(
+        program_role__user_role__isnull=False
+    )
+    if user_roles:
+        query = query.filter(
+            program_role__user_role__name__in=user_roles)
+    result = query.values_list(
+        'program_role__name', 'program_role__program__program_family__name')
+    return _group_by_program_family(result)
+
+"""
+fetch a the program status for all startup a given user
+belongs to
+
+Time, Space, Query Complexity
+Query: 0(n + 1) where n is the number of startup a user belongs to
+since for every startup in that list we are fetching the program status.
+and the +1 is for the query to fetch all startup for the user
+
+O(nm)Time/Space where n is the number of startup and m is
+the number of program_startup_status
+"""
+def _get_user_startup_prg_role_by_program_family(user, startup_roles=[]):
+    startups = user.startup_set.all()
+
+    result = []
+    for startup in startups:
+        query = startup.program_startup_statuses()
+        if startup_roles:
+            query = query.filter(
+                startup_role__name__in=startup_roles
+            )
+        result = query.values_list("startup_status", "program__program_family__name")
+
+    return _group_by_program_family(result)
+
+"""
+O(n)Time/Space where n is the number of items in the array
+"""
+def _group_by_program_family(array):
+    by_program_family = {}
+    for program_role, program_family in array:
+        if by_program_family.get(program_family):
+            by_program_family[program_family].append(program_role)
+        else:
+            by_program_family[program_family] = [program_role]
+    return by_program_family
+
+"""
+collapse two dictory with list values into one where similar keys values
+in both dictionaries are merged
+
+Time, Space Complexity
+O(n)Time/Space; where n is the number of items in the startup_prg_roles
+
+"""
+def _combine_prg_roles(user_prg_roles, startup_prg_roles):
+    for key, value in startup_prg_roles.items():
+        if user_prg_roles.get(key):
+            user_prg_roles[key] = user_prg_roles[key] + value
+        else:
+            user_prg_roles[key] = value
+
+    return user_prg_roles

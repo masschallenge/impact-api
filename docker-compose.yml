@@ -25,6 +25,7 @@ services:
     volumes:
       - ../front-end/dist:/usr/src/app/dist
       - ../front-end/src:/usr/src/app/src
+      - ${FRONTEND_PATH}/.env:/usr/src/app/.env
     ports:
       - "1234:1234"
   # Web python

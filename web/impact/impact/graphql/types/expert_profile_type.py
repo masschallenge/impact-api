@@ -3,12 +3,14 @@ from datetime import datetime
 from django.db.models import Q
 from django.utils import timezone
 from graphene_django import DjangoObjectType
+from graphene.types.generic import GenericScalar
 from accelerator.models import (
     CONFIRMED_RELATIONSHIP,
     ExpertProfile,
     Program,
     ProgramFamily,
     ProgramRole,
+    StartupRole,
     UserRole
 )
 from accelerator_abstract.models import (
@@ -18,7 +20,8 @@ from accelerator_abstract.models import (
     UPCOMING_PROGRAM_STATUS
 )
 from impact.graphql.types import StartupMentorRelationshipType
-from impact.utils import compose_filter
+
+from impact.utils import (compose_filter, get_user_program_roles)
 from impact.v1.helpers.profile_helper import latest_program_id_for_each_program_family
 
 
@@ -29,6 +32,7 @@ class ExpertProfileType(DjangoObjectType):
     office_hours_url = graphene.String()
     program_interests = graphene.List(graphene.String)
     available_office_hours = graphene.Boolean()
+    program_roles = GenericScalar()
     confirmed_mentor_program_families = graphene.List(graphene.String)
 
     class Meta:
@@ -111,6 +115,23 @@ class ExpertProfileType(DjangoObjectType):
         ).values_list(
             'program_role__program__program_family__name',
             flat=True).distinct()
+
+    """
+    fetch a program role assigned to an user and those assigned to the startups
+    the user belong to
+
+    Time, Space, Query Complexity
+    Query: amount to the query complexity of the two helper function that
+    access the DB (see functions for query comp analysis for each)
+
+    Time/Space amount to time and space complexity of the three helper functions
+    (see functions for time/space comp analysis for each)
+    """
+    def resolve_program_roles(self, info, **kwargs):
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
+        startup_roles_of_interest = [StartupRole.ENTRANT]
+        return get_user_program_roles(
+            self.user, user_roles_of_interest, startup_roles_of_interest)
 
 
 def _get_slugs(obj, mentor_program, latest_mentor_program, **kwargs):
