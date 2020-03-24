@@ -520,7 +520,7 @@ class TestUserListView(APITestCase):
             response = self.client.get(url)
             assert not _contains_user(updated_before, response.data)
             assert _contains_user(updated_exactly, response.data)
-            assert _contains_user(updated_after, response.data)        
+            assert _contains_user(updated_after, response.data)
 
 
 def _user_for_date(date):
