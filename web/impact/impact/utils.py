@@ -87,12 +87,15 @@ def get_user_program_and_startup_roles(user,
         startup_prg_roles=startup_prg_roles
     ))
 
+
 def _clean_role_names(role_names):
     return [_clean_role_name(role_name) for role_name in role_names]
+
 
 def _clean_role_name(role_name):
     "Convert to title case and remove parenthesised program abbreviations"
     role_name = role_name.title().split(" (")[0]
+
 
 def _get_user_prg_role_by_program_family(user, user_roles=[]):
     """
@@ -112,6 +115,7 @@ def _get_user_prg_role_by_program_family(user, user_roles=[]):
         'program_role__program__program_family__name')
     return _group_by_program_family(result)
 
+
 def _get_user_startup_prg_role_by_program_family(user,
                                                  startup_roles=[]):
     """
@@ -127,9 +131,11 @@ def _get_user_startup_prg_role_by_program_family(user,
             query = query.filter(
                 startup_role__name__in=startup_roles
             )
-        result = query.values_list("startup_status", "program__program_family__name")
+        result = query.values_list("startup_status",
+                                   "program__program_family__name")
 
     return _group_by_program_family(result)
+
 
 def _group_by_program_family(array):
     by_program_family = {}
@@ -139,6 +145,7 @@ def _group_by_program_family(array):
         else:
             by_program_family[program_family] = [program_role]
     return by_program_family
+
 
 def _combine_prg_roles(user_prg_roles, startup_prg_roles):
     """

@@ -1,14 +1,14 @@
 import graphene
+from graphene_django import DjangoObjectType
+from graphene.types.generic import GenericScalar
+
 from datetime import datetime
 from django.db.models import Q
 from django.utils import timezone
-from graphene_django import DjangoObjectType
-from graphene.types.generic import GenericScalar
 from accelerator.models import (
     CONFIRMED_RELATIONSHIP,
     ExpertProfile,
     Program,
-    ProgramFamily,
     ProgramRole,
     StartupRole,
     UserRole
@@ -25,7 +25,9 @@ from impact.utils import (
     compose_filter,
     get_user_program_and_startup_roles,
 )
-from impact.v1.helpers.profile_helper import latest_program_id_for_each_program_family
+from impact.v1.helpers.profile_helper import (
+    latest_program_id_for_each_program_family,
+)
 
 
 class ExpertProfileType(DjangoObjectType):
@@ -83,8 +85,8 @@ class ExpertProfileType(DjangoObjectType):
                 program_role__user_role__name=UserRole.MENTOR
         ).exists():
             role_grants = obj.user.programrolegrant_set.filter(
-            program_role__user_role__name=UserRole.MENTOR,
-            program_role__program__end_date__gte=datetime.now()
+                program_role__user_role__name=UserRole.MENTOR,
+                program_role__program__end_date__gte=datetime.now()
             ).distinct()
 
             latest_grant = obj.user.programrolegrant_set.filter(
@@ -92,11 +94,14 @@ class ExpertProfileType(DjangoObjectType):
             ).latest('created_at')
             latest_mentor_program = latest_grant.program_role.program
             user = info.context.user
-            mentor_program = [role_grant.program_role.program for role_grant in role_grants
-                              if role_grant.program_role.program in _get_user_programs(user)]
+            mentor_program = [
+                role_grant.program_role.program for role_grant in role_grants
+                if role_grant.program_role.program in _get_user_programs(user)
+            ]
             if mentor_program or latest_mentor_program:
                 slugs = _get_slugs(obj, mentor_program, latest_mentor_program)
-                return "/officehours/list/{family_slug}/{program_slug}/".format(
+                urlpath = "/officehours/list/{family_slug}/{program_slug}/"
+                return urlpath.format(
                     family_slug=slugs[0],
                     program_slug=slugs[1]) + (
                     '?mentor_id={mentor_id}'.format(
@@ -122,10 +127,10 @@ class ExpertProfileType(DjangoObjectType):
     def resolve_program_roles(self, info, **kwargs):
         """
         Returns the program roles and startup roles for this user
-        Note that name is deceptive, since startup roles are included in the 
-        return but not mentioned in the name. This cannot be fixed here 
-        without changing GraphQL queries on the front end. 
-        """        
+        Note that name is deceptive, since startup roles are included in the
+        return but not mentioned in the name. This cannot be fixed here
+        without changing GraphQL queries on the front end.
+        """
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         startup_roles_of_interest = [StartupRole.ENTRANT]
         return get_user_program_and_startup_roles(
@@ -142,6 +147,7 @@ def _get_slugs(obj, mentor_program, latest_mentor_program, **kwargs):
             latest_mentor_program.program_family.url_slug,
             latest_mentor_program.url_slug,
         )
+
 
 def _get_user_programs(user):
     # todo: refactor this and move it to a sensible place

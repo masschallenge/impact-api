@@ -11,18 +11,18 @@ from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
 from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import (
-    EntrepreneurFactory,
+    ApplicationFactory,
     ExpertFactory,
     ProgramFactory,
-    ProgramRoleGrantFactory,
     ProgramRoleFactory,
-    StartupMentorRelationshipFactory,
-    UserRoleFactory,
-    StartupRoleFactory,
-    ApplicationFactory,
+    ProgramRoleGrantFactory,
     ProgramStartupStatusFactory,
-    StartupStatusFactory,
     StartupFactory,
+    StartupMentorRelationshipFactory,
+    StartupRoleFactory,
+    StartupStatusFactory,
+    UserRoleFactory,
+    EntrepreneurFactory,
 )
 from impact.tests.utils import capture_stderr
 from impact.graphql.query import (
@@ -30,7 +30,10 @@ from impact.graphql.query import (
     ENTREPRENEUR_NOT_FOUND_MESSAGE,
     NON_FINALIST_PROFILE_MESSAGE
 )
-from accelerator.tests.contexts import StartupTeamMemberContext, UserRoleContext
+from accelerator.tests.contexts import (
+    StartupTeamMemberContext,
+    UserRoleContext,
+)
 
 from impact.utils import get_user_program_and_startup_roles
 
@@ -343,14 +346,16 @@ class TestGraphQL(APITestCase):
             )
 
     def test_non_staff_user_cannot_access_non_finalist_graphql_view(self):
+        query_string = "query {{ entrepreneurProfile(id: {id}) {{ title }} }}"
         with self.login(email=self.basic_user().email):
             user = EntrepreneurFactory()
-            query = """query {{ entrepreneurProfile(id: {id}) {{ title }} }}""".format(id=user.id)
+            query = query_string.format(id=user.id)
 
             with capture_stderr(self.client.post,
                                 self.url,
                                 data={'query': query}) as (response, _):
-                error_messages = [x['message'] for x in response.json()['errors']]
+                error_messages = [x['message']
+                                  for x in response.json()['errors']]
 
             self.assertIn(NON_FINALIST_PROFILE_MESSAGE, error_messages)
 
@@ -409,12 +414,13 @@ class TestGraphQL(APITestCase):
         alum_role = UserRoleFactory(name=UserRole.ALUM)
         finalist_role = UserRoleFactory(name=UserRole.FINALIST)
         alum_program_role = ProgramRoleFactory(program=program,
-                                                user_role=alum_role)
+                                               user_role=alum_role)
         finalist_program_role = ProgramRoleFactory(program=program,
-                                                    user_role=finalist_role)
+                                                   user_role=finalist_role)
         user = EntrepreneurFactory()
-        ProgramRoleGrantFactory( person=user,program_role=alum_program_role)
-        ProgramRoleGrantFactory(person=user,program_role=finalist_program_role)
+        ProgramRoleGrantFactory(person=user, program_role=alum_program_role)
+        ProgramRoleGrantFactory(person=user,
+                                program_role=finalist_program_role)
 
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
 
@@ -422,14 +428,16 @@ class TestGraphQL(APITestCase):
         startup = StartupFactory(user=user)
         program_startup_status = ProgramStartupStatusFactory(
             startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
-            program = ProgramFactory()
+            program=ProgramFactory()
         )
-        startup_status = StartupStatusFactory(
+        StartupStatusFactory(
             startup=startup,
             program_startup_status=program_startup_status
         )
 
-        program_roles = get_user_program_and_startup_roles(user, user_roles_of_interest)
+        program_roles = get_user_program_and_startup_roles(
+            user,
+            user_roles_of_interest)
         query = """
             query{{
                 entrepreneurProfile(id:{id}) {{
@@ -458,12 +466,13 @@ class TestGraphQL(APITestCase):
         alum_role = UserRoleFactory(name=UserRole.ALUM)
         finalist_role = UserRoleFactory(name=UserRole.FINALIST)
         alum_program_role = ProgramRoleFactory(program=program,
-                                                user_role=alum_role)
+                                               user_role=alum_role)
         finalist_program_role = ProgramRoleFactory(program=program,
-                                                    user_role=finalist_role)
+                                                   user_role=finalist_role)
         user = ExpertFactory()
-        ProgramRoleGrantFactory(person=user,program_role=alum_program_role)
-        ProgramRoleGrantFactory( person=user,program_role=finalist_program_role)
+        ProgramRoleGrantFactory(person=user, program_role=alum_program_role)
+        ProgramRoleGrantFactory(person=user,
+                                program_role=finalist_program_role)
 
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
 
@@ -471,14 +480,14 @@ class TestGraphQL(APITestCase):
         startup = StartupFactory(user=user)
         program_startup_status = ProgramStartupStatusFactory(
             startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
-            program = ProgramFactory()
+            program=ProgramFactory()
         )
-        startup_status = StartupStatusFactory(
-            startup=startup,
-            program_startup_status=program_startup_status
-        )
+        StartupStatusFactory(startup=startup,
+                             program_startup_status=program_startup_status)
 
-        program_roles = get_user_program_and_startup_roles(user, user_roles_of_interest)
+        program_roles = get_user_program_and_startup_roles(
+            user,
+            user_roles_of_interest)
 
         query = """
             query{{
@@ -508,12 +517,14 @@ class TestGraphQL(APITestCase):
         alum_role = UserRoleFactory(name=UserRole.ALUM)
         finalist_role = UserRoleFactory(name=UserRole.FINALIST)
         alum_program_role = ProgramRoleFactory(program=program,
-                                                user_role=alum_role)
+                                               user_role=alum_role)
         finalist_program_role = ProgramRoleFactory(program=program,
-                                                    user_role=finalist_role)
+                                                   user_role=finalist_role)
         user = ExpertFactory()
-        ProgramRoleGrantFactory(person=user,program_role=alum_program_role)
-        ProgramRoleGrantFactory( person=user,program_role=finalist_program_role)
+        ProgramRoleGrantFactory(person=user,
+                                program_role=alum_program_role)
+        ProgramRoleGrantFactory(person=user,
+                                program_role=finalist_program_role)
 
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
 
@@ -521,15 +532,15 @@ class TestGraphQL(APITestCase):
         startup = StartupFactory(user=user)
         program_startup_status = ProgramStartupStatusFactory(
             startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
-            program = program
+            program=program
         )
-        startup_status = StartupStatusFactory(
+        StartupStatusFactory(
             startup=startup,
             program_startup_status=program_startup_status
         )
-
-        program_roles = get_user_program_and_startup_roles(user, user_roles_of_interest)
-
+        program_roles = get_user_program_and_startup_roles(
+            user,
+            user_roles_of_interest)
 
         query = """
             query{{
@@ -559,13 +570,14 @@ class TestGraphQL(APITestCase):
         alum_role = UserRoleFactory(name=UserRole.ALUM)
         finalist_role = UserRoleFactory(name=UserRole.FINALIST)
         alum_program_role = ProgramRoleFactory(program=program,
-                                                user_role=alum_role)
+                                               user_role=alum_role)
         finalist_program_role = ProgramRoleFactory(program=program,
-                                                    user_role=finalist_role)
+                                                   user_role=finalist_role)
         user = ExpertFactory()
-        ProgramRoleGrantFactory(person=user,program_role=alum_program_role)
-        ProgramRoleGrantFactory( person=user,program_role=finalist_program_role)
-
+        ProgramRoleGrantFactory(person=user,
+                                program_role=alum_program_role)
+        ProgramRoleGrantFactory(person=user,
+                                program_role=finalist_program_role)
 
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
 
@@ -573,27 +585,24 @@ class TestGraphQL(APITestCase):
         startup = StartupFactory(user=user)
         program_startup_status = ProgramStartupStatusFactory(
             startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
-            program = program
+            program=program
         )
         program_startup_status = ProgramStartupStatusFactory(
             startup_role=StartupRoleFactory(name=StartupRole.FINALIST),
-            program = program
+            program=program
         )
 
         program_startup_status = ProgramStartupStatusFactory(
             startup_role=StartupRoleFactory(name=StartupRole.FINALIST),
-            program = program
+            program=program
         )
-        startup_status = StartupStatusFactory(
+        StartupStatusFactory(
             startup=startup,
             program_startup_status=program_startup_status
         )
-
-
         startup_roles_of_interest = [StartupRole.ENTRANT]
         program_roles = get_user_program_and_startup_roles(
             user, user_roles_of_interest, startup_roles_of_interest)
-
 
         query = """
             query{{
@@ -615,6 +624,7 @@ class TestGraphQL(APITestCase):
                     }
                 }
             )
+
     def test_get_user_confirmed_mentor_program_families(self):
         role_grant = ProgramRoleGrantFactory(
             program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
@@ -640,7 +650,7 @@ class TestGraphQL(APITestCase):
                 expert_profile["confirmedMentorProgramFamilies"],
                 [user_program.program_family.name])
 
-    def test_get_query_for_user_without_confirmed_mentor_program_families(self):
+    def test_query_for_user_without_confirmed_mentor_program_families(self):
         user = ExpertFactory()
         with self.login(email=self.basic_user().email):
             query = """
@@ -654,4 +664,5 @@ class TestGraphQL(APITestCase):
             response = self.client.post(self.url, data={'query': query})
             data = json.loads(response.content.decode("utf-8"))["data"]
             expert_profile = data["expertProfile"]
-            self.assertEqual(expert_profile["confirmedMentorProgramFamilies"], [])
+            self.assertEqual(expert_profile["confirmedMentorProgramFamilies"],
+                             [])
