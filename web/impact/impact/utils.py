@@ -70,9 +70,9 @@ def _find_instance(instance, query, order):
 
 def get_user_program_and_startup_roles(user,
                                        user_roles_of_interest=[],
-                                       startup_roles_of_interest=[]):        
+                                       startup_roles_of_interest=[]):
     """
-    Fetch program roles for the user and startup roles for 
+    Fetch program roles for the user and startup roles for
     any startups the user belongs to
     NOTE: the name is deceptive
     """
@@ -82,9 +82,17 @@ def get_user_program_and_startup_roles(user,
     startup_prg_roles = _get_user_startup_prg_role_by_program_family(
         user, startup_roles_of_interest
     )
-    return _combine_prg_roles(
-        user_prg_roles=user_prg_roles, startup_prg_roles=startup_prg_roles
-    )
+    return _clean_role_names(_combine_prg_roles(
+        user_prg_roles=user_prg_roles,
+        startup_prg_roles=startup_prg_roles
+    ))
+
+def _clean_role_names(role_names):
+    return [_clean_role_name(role_name) for role_name in role_names]
+
+def _clean_role_name(role_name):
+    "Convert to title case and remove parenthesised program abbreviations"
+    role_name = role_name.title().split(" (")[0]
 
 def _get_user_prg_role_by_program_family(user, user_roles=[]):
     """
@@ -92,7 +100,7 @@ def _get_user_prg_role_by_program_family(user, user_roles=[]):
     Filter role grants by the provided user role or return
     all program role grants the user has ever had
     """
-    
+
     query = user.programrolegrant_set.filter(
         program_role__user_role__isnull=False
     )
@@ -109,7 +117,7 @@ def _get_user_startup_prg_role_by_program_family(user,
     """
     Fetch the program status for all startups a given user belongs to
     """
-    
+
     startups = user.startup_set.all()
 
     result = []
@@ -134,10 +142,10 @@ def _group_by_program_family(array):
 
 def _combine_prg_roles(user_prg_roles, startup_prg_roles):
     """
-    Collapse two dictionaries with list values into one by merging 
+    Collapse two dictionaries with list values into one by merging
     lists having the same key
     """
-    
+
     for key, value in startup_prg_roles.items():
         if user_prg_roles.get(key):
             user_prg_roles[key] = user_prg_roles[key] + value
