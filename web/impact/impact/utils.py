@@ -68,12 +68,13 @@ def _find_instance(instance, query, order):
     return type(instance).objects.filter(query).order_by(order).first()
 
 
-def get_user_program_roles(user,
-                           user_roles_of_interest=[],
-                           startup_roles_of_interest=[]):        
+def get_user_program_and_startup_roles(user,
+                                       user_roles_of_interest=[],
+                                       startup_roles_of_interest=[]):        
     """
     Fetch program roles for the user and startup roles for 
     any startups the user belongs to
+    NOTE: the name is deceptive
     """
 
     user_prg_roles = _get_user_prg_role_by_program_family(

@@ -32,7 +32,7 @@ from impact.graphql.query import (
 )
 from accelerator.tests.contexts import StartupTeamMemberContext, UserRoleContext
 
-from impact.utils import get_user_program_roles
+from impact.utils import get_user_program_and_startup_roles
 
 MENTEE_FIELDS = """
     startup {
@@ -429,7 +429,7 @@ class TestGraphQL(APITestCase):
             program_startup_status=program_startup_status
         )
 
-        program_roles = get_user_program_roles(user, user_roles_of_interest)
+        program_roles = get_user_program_and_startup_roles(user, user_roles_of_interest)
         query = """
             query{{
                 entrepreneurProfile(id:{id}) {{
@@ -478,7 +478,7 @@ class TestGraphQL(APITestCase):
             program_startup_status=program_startup_status
         )
 
-        program_roles = get_user_program_roles(user, user_roles_of_interest)
+        program_roles = get_user_program_and_startup_roles(user, user_roles_of_interest)
 
         query = """
             query{{
@@ -528,7 +528,7 @@ class TestGraphQL(APITestCase):
             program_startup_status=program_startup_status
         )
 
-        program_roles = get_user_program_roles(user, user_roles_of_interest)
+        program_roles = get_user_program_and_startup_roles(user, user_roles_of_interest)
 
 
         query = """
@@ -591,7 +591,7 @@ class TestGraphQL(APITestCase):
 
 
         startup_roles_of_interest = [StartupRole.ENTRANT]
-        program_roles = get_user_program_roles(
+        program_roles = get_user_program_and_startup_roles(
             user, user_roles_of_interest, startup_roles_of_interest)
 
 
