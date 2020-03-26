@@ -408,32 +408,11 @@ class TestGraphQL(APITestCase):
                 }
             )
 
+        
+        
     def test_query_program_roles_for_entrepreneur_returns_correct_value(self):
-        # prepare user program roles
-        program = ProgramFactory()
-        alum_role = UserRoleFactory(name=UserRole.ALUM)
-        finalist_role = UserRoleFactory(name=UserRole.FINALIST)
-        alum_program_role = ProgramRoleFactory(program=program,
-                                               user_role=alum_role)
-        finalist_program_role = ProgramRoleFactory(program=program,
-                                                   user_role=finalist_role)
-        user = EntrepreneurFactory()
-        ProgramRoleGrantFactory(person=user, program_role=alum_program_role)
-        ProgramRoleGrantFactory(person=user,
-                                program_role=finalist_program_role)
-
+        user = _user_with_roles()
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-
-        # prepare startup program role
-        startup = StartupFactory(user=user)
-        program_startup_status = ProgramStartupStatusFactory(
-            startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
-            program=ProgramFactory()
-        )
-        StartupStatusFactory(
-            startup=startup,
-            program_startup_status=program_startup_status
-        )
 
         program_roles = get_user_program_and_startup_roles(
             user,
@@ -445,46 +424,18 @@ class TestGraphQL(APITestCase):
                 }}
             }}
         """.format(id=user.id)
-
-        with self.login(email=self.basic_user().email):
-            response = self.client.post(self.url, data={'query': query})
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                {
+        expected_json = {
                     'data': {
                         'entrepreneurProfile': {
                             'programRoles': program_roles
                         }
                     }
                 }
-            )
-
+        self._assert_response_equals_json(query, expected_json)
+        
     def test_query_program_roles_for_expert_returns_correct_value(self):
-
-        # prepare user program role
-        program = ProgramFactory()
-        alum_role = UserRoleFactory(name=UserRole.ALUM)
-        finalist_role = UserRoleFactory(name=UserRole.FINALIST)
-        alum_program_role = ProgramRoleFactory(program=program,
-                                               user_role=alum_role)
-        finalist_program_role = ProgramRoleFactory(program=program,
-                                                   user_role=finalist_role)
-        user = ExpertFactory()
-        ProgramRoleGrantFactory(person=user, program_role=alum_program_role)
-        ProgramRoleGrantFactory(person=user,
-                                program_role=finalist_program_role)
-
+        user = _user_with_roles(ExpertFactory)
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-
-        # prepare startup program role
-        startup = StartupFactory(user=user)
-        program_startup_status = ProgramStartupStatusFactory(
-            startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
-            program=ProgramFactory()
-        )
-        StartupStatusFactory(startup=startup,
-                             program_startup_status=program_startup_status)
-
         program_roles = get_user_program_and_startup_roles(
             user,
             user_roles_of_interest)
@@ -496,48 +447,18 @@ class TestGraphQL(APITestCase):
                 }}
             }}
         """.format(id=user.id)
-
-        with self.login(email=self.basic_user().email):
-            response = self.client.post(self.url, data={'query': query})
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                {
+        expected_json = {
                     'data': {
                         'expertProfile': {
                             'programRoles': program_roles
                         }
                     }
                 }
-            )
+        self._assert_response_equals_json(query, expected_json)
 
     def test_query_program_roles_for_expert_with_same_program(self):
-
-        # prepare user program role
-        program = ProgramFactory()
-        alum_role = UserRoleFactory(name=UserRole.ALUM)
-        finalist_role = UserRoleFactory(name=UserRole.FINALIST)
-        alum_program_role = ProgramRoleFactory(program=program,
-                                               user_role=alum_role)
-        finalist_program_role = ProgramRoleFactory(program=program,
-                                                   user_role=finalist_role)
-        user = ExpertFactory()
-        ProgramRoleGrantFactory(person=user,
-                                program_role=alum_program_role)
-        ProgramRoleGrantFactory(person=user,
-                                program_role=finalist_program_role)
-
+        user = _user_with_roles(user_factory=ExpertFactory)
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-
-        # prepare startup program role
-        startup = StartupFactory(user=user)
-        program_startup_status = ProgramStartupStatusFactory(
-            startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
-            program=program
-        )
-        StartupStatusFactory(
-            startup=startup,
-            program_startup_status=program_startup_status
-        )
         program_roles = get_user_program_and_startup_roles(
             user,
             user_roles_of_interest)
@@ -549,57 +470,23 @@ class TestGraphQL(APITestCase):
                 }}
             }}
         """.format(id=user.id)
-
-        with self.login(email=self.basic_user().email):
-            response = self.client.post(self.url, data={'query': query})
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                {
+        expected_json = {
                     'data': {
                         'expertProfile': {
                             'programRoles': program_roles
                         }
                     }
                 }
-            )
+        self._assert_response_equals_json(query, expected_json)
 
     def test_query_prg_roles_for_selected_roles(self):
-
-        # prepare user program role
-        program = ProgramFactory()
-        alum_role = UserRoleFactory(name=UserRole.ALUM)
-        finalist_role = UserRoleFactory(name=UserRole.FINALIST)
-        alum_program_role = ProgramRoleFactory(program=program,
-                                               user_role=alum_role)
-        finalist_program_role = ProgramRoleFactory(program=program,
-                                                   user_role=finalist_role)
-        user = ExpertFactory()
-        ProgramRoleGrantFactory(person=user,
-                                program_role=alum_program_role)
-        ProgramRoleGrantFactory(person=user,
-                                program_role=finalist_program_role)
-
+        user = _user_with_roles(user_factory=ExpertFactory,
+                                startup_roles=[StartupRole.ENTRANT,
+                                               StartupRole.FINALIST,
+                                               StartupRole.FINALIST,
+                                               StartupRole.ENTRANT]
+        )
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-
-        # prepare startup program role
-        startup = StartupFactory(user=user)
-        program_startup_status = ProgramStartupStatusFactory(
-            startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
-            program=program
-        )
-        program_startup_status = ProgramStartupStatusFactory(
-            startup_role=StartupRoleFactory(name=StartupRole.FINALIST),
-            program=program
-        )
-
-        program_startup_status = ProgramStartupStatusFactory(
-            startup_role=StartupRoleFactory(name=StartupRole.FINALIST),
-            program=program
-        )
-        StartupStatusFactory(
-            startup=startup,
-            program_startup_status=program_startup_status
-        )
         startup_roles_of_interest = [StartupRole.ENTRANT]
         program_roles = get_user_program_and_startup_roles(
             user, user_roles_of_interest, startup_roles_of_interest)
@@ -611,20 +498,16 @@ class TestGraphQL(APITestCase):
                 }}
             }}
         """.format(id=user.id)
-
-        with self.login(email=self.basic_user().email):
-            response = self.client.post(self.url, data={'query': query})
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                {
-                    'data': {
-                        'expertProfile': {
-                            'programRoles': program_roles
-                        }
-                    }
+        expected_json = {
+            'data': {
+                'expertProfile': {
+                    'programRoles': program_roles
                 }
-            )
-
+            }
+        }
+        
+        self._assert_response_equals_json(query, expected_json)        
+        
     def test_get_user_confirmed_mentor_program_families(self):
         role_grant = ProgramRoleGrantFactory(
             program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
@@ -666,3 +549,32 @@ class TestGraphQL(APITestCase):
             expert_profile = data["expertProfile"]
             self.assertEqual(expert_profile["confirmedMentorProgramFamilies"],
                              [])
+
+
+    def _assert_response_equals_json(self, query, expected_json):
+        with self.login(email=self.basic_user().email):
+            response = self.client.post(self.url, data={'query': query})
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                expected_json
+            )
+            
+def _user_with_roles(user_factory=EntrepreneurFactory,
+                     user_roles=None,
+                     startup_roles=None):
+    program = ProgramFactory()
+    user = user_factory()
+    user_roles = user_roles or [UserRole.ALUM,
+                                UserRole.FINALIST]
+    startup_roles = startup_roles or [StartupRole.ENTRANT]
+    for user_role in user_roles:
+        ProgramRoleGrantFactory(person=user,
+                                program_role__program=program,
+                                program_role__user_role__name=user_role)
+    for startup_role in startup_roles:        
+        StartupStatusFactory(
+            startup__user=user,
+            program_startup_status__startup_role__name = startup_role
+        )   
+    return user
+            
