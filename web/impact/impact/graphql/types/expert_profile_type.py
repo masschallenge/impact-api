@@ -21,7 +21,10 @@ from accelerator_abstract.models import (
 )
 from impact.graphql.types import StartupMentorRelationshipType
 
-from impact.utils import (compose_filter, get_user_program_roles)
+from impact.utils import (
+    compose_filter,
+    get_user_program_roles,
+)
 from impact.v1.helpers.profile_helper import latest_program_id_for_each_program_family
 
 
@@ -116,18 +119,13 @@ class ExpertProfileType(DjangoObjectType):
             'program_role__program__program_family__name',
             flat=True).distinct()
 
-    """
-    fetch a program role assigned to an user and those assigned to the startups
-    the user belong to
-
-    Time, Space, Query Complexity
-    Query: amount to the query complexity of the two helper function that
-    access the DB (see functions for query comp analysis for each)
-
-    Time/Space amount to time and space complexity of the three helper functions
-    (see functions for time/space comp analysis for each)
-    """
     def resolve_program_roles(self, info, **kwargs):
+    """
+    Returns the program roles and startup roles for this user
+    Note that name is deceptive, since startup roles are included in the 
+    return but not mentioned in the name. This cannot be fixed here 
+    without changing GraphQL queries on the front end. 
+    """        
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         startup_roles_of_interest = [StartupRole.ENTRANT]
         return get_user_program_roles(
