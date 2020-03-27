@@ -10,6 +10,7 @@ from accelerator.models import (
 from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
 from impact.tests.api_test_case import APITestCase
+from impact.tests.contexts import UserContext
 from impact.tests.factories import (
     ApplicationFactory,
     ExpertFactory,
@@ -406,9 +407,11 @@ class TestGraphQL(APITestCase):
                 }
             )
 
+    
     def test_query_program_roles_for_entrepreneur_returns_correct_value(self):
-        user = _user_with_roles()
-        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]        
+        user = UserContext(
+            program_role_names=user_roles_of_interest).user
 
         program_roles = get_user_program_and_startup_roles(
             user,
@@ -430,8 +433,11 @@ class TestGraphQL(APITestCase):
         self._assert_response_equals_json(query, expected_json)
 
     def test_query_program_roles_for_expert_returns_correct_value(self):
-        user = _user_with_roles(ExpertFactory)
-        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]        
+        user = UserContext(
+            user_type="EXPERT",
+            program_role_names=user_roles_of_interest).user
+
         program_roles = get_user_program_and_startup_roles(
             user,
             user_roles_of_interest)
@@ -476,8 +482,10 @@ class TestGraphQL(APITestCase):
         self.assertIn([normalized_role_name], program_roles.values())
 
     def test_query_program_roles_for_expert_with_same_program(self):
-        user = _user_with_roles(user_factory=ExpertFactory)
-        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]        
+        user = UserContext(
+            user_type="EXPERT",
+            program_role_names=user_roles_of_interest).user
         program_roles = get_user_program_and_startup_roles(
             user,
             user_roles_of_interest)
@@ -499,13 +507,16 @@ class TestGraphQL(APITestCase):
         self._assert_response_equals_json(query, expected_json)
 
     def test_query_prg_roles_for_selected_roles(self):
-        user = _user_with_roles(user_factory=ExpertFactory,
-                                startup_roles=[StartupRole.ENTRANT,
-                                               StartupRole.FINALIST,
-                                               StartupRole.FINALIST,
-                                               StartupRole.ENTRANT])
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         startup_roles_of_interest = [StartupRole.ENTRANT]
+        startup_status_names=[StartupRole.ENTRANT,
+                       StartupRole.FINALIST,
+                       StartupRole.FINALIST,
+                       StartupRole.ENTRANT]        
+        user = UserContext(
+            user_type="EXPERT",
+            program_role_names=user_roles_of_interest,
+            startup_status_names=startup_status_names).user
         program_roles = get_user_program_and_startup_roles(
             user, user_roles_of_interest, startup_roles_of_interest)
 
@@ -575,23 +586,3 @@ class TestGraphQL(APITestCase):
                 str(response.content, encoding='utf8'),
                 expected_json
             )
-
-
-def _user_with_roles(user_factory=EntrepreneurFactory,
-                     user_roles=None,
-                     startup_roles=None):
-    program = ProgramFactory()
-    user = user_factory()
-    user_roles = user_roles or [UserRole.ALUM,
-                                UserRole.FINALIST]
-    startup_roles = startup_roles or [StartupRole.ENTRANT]
-    for user_role in user_roles:
-        ProgramRoleGrantFactory(person=user,
-                                program_role__program=program,
-                                program_role__user_role__name=user_role)
-    for startup_role in startup_roles:
-        StartupStatusFactory(
-            startup__user=user,
-            program_startup_status__startup_role__name=startup_role
-        )
-    return user
