@@ -17,9 +17,7 @@ from impact.tests.factories import (
     ProgramRoleFactory,
     ProgramRoleGrantFactory,
     ProgramStartupStatusFactory,
-    StartupFactory,
     StartupMentorRelationshipFactory,
-    StartupRoleFactory,
     StartupStatusFactory,
     UserRoleFactory,
     EntrepreneurFactory,
@@ -408,8 +406,6 @@ class TestGraphQL(APITestCase):
                 }
             )
 
-        
-        
     def test_query_program_roles_for_entrepreneur_returns_correct_value(self):
         user = _user_with_roles()
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
@@ -432,7 +428,7 @@ class TestGraphQL(APITestCase):
                     }
                 }
         self._assert_response_equals_json(query, expected_json)
-        
+
     def test_query_program_roles_for_expert_returns_correct_value(self):
         user = _user_with_roles(ExpertFactory)
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
@@ -455,6 +451,29 @@ class TestGraphQL(APITestCase):
                     }
                 }
         self._assert_response_equals_json(query, expected_json)
+
+    def test_query_program_roles_program_role_names_are_normalized(self):
+        program_role_name = "BEST IN SHOW (BOS)"
+        user_role_name = UserRole.FINALIST
+        user = ExpertFactory()
+        ProgramRoleGrantFactory(
+            person=user,
+            program_role__name=program_role_name,
+            program_role__user_role__name=user_role_name)
+        query = """
+            query{{
+                expertProfile(id:{id}) {{
+                    programRoles
+                }}
+            }}
+        """.format(id=user.id)
+        with self.login(email=self.basic_user().email):
+            response = self.client.post(self.url, data={'query': query})
+
+        normalized_role_name = program_role_name.title().split(" (")[0]
+        response_dict = json.loads(response.content)
+        program_roles = response_dict['data']['expertProfile']['programRoles']
+        self.assertIn([normalized_role_name], program_roles.values())
 
     def test_query_program_roles_for_expert_with_same_program(self):
         user = _user_with_roles(user_factory=ExpertFactory)
@@ -484,8 +503,7 @@ class TestGraphQL(APITestCase):
                                 startup_roles=[StartupRole.ENTRANT,
                                                StartupRole.FINALIST,
                                                StartupRole.FINALIST,
-                                               StartupRole.ENTRANT]
-        )
+                                               StartupRole.ENTRANT])
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         startup_roles_of_interest = [StartupRole.ENTRANT]
         program_roles = get_user_program_and_startup_roles(
@@ -505,9 +523,9 @@ class TestGraphQL(APITestCase):
                 }
             }
         }
-        
-        self._assert_response_equals_json(query, expected_json)        
-        
+
+        self._assert_response_equals_json(query, expected_json)
+
     def test_get_user_confirmed_mentor_program_families(self):
         role_grant = ProgramRoleGrantFactory(
             program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
@@ -550,7 +568,6 @@ class TestGraphQL(APITestCase):
             self.assertEqual(expert_profile["confirmedMentorProgramFamilies"],
                              [])
 
-
     def _assert_response_equals_json(self, query, expected_json):
         with self.login(email=self.basic_user().email):
             response = self.client.post(self.url, data={'query': query})
@@ -558,7 +575,8 @@ class TestGraphQL(APITestCase):
                 str(response.content, encoding='utf8'),
                 expected_json
             )
-            
+
+
 def _user_with_roles(user_factory=EntrepreneurFactory,
                      user_roles=None,
                      startup_roles=None):
@@ -571,10 +589,9 @@ def _user_with_roles(user_factory=EntrepreneurFactory,
         ProgramRoleGrantFactory(person=user,
                                 program_role__program=program,
                                 program_role__user_role__name=user_role)
-    for startup_role in startup_roles:        
+    for startup_role in startup_roles:
         StartupStatusFactory(
             startup__user=user,
-            program_startup_status__startup_role__name = startup_role
-        )   
+            program_startup_status__startup_role__name=startup_role
+        )
     return user
-            

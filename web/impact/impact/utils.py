@@ -89,12 +89,13 @@ def get_user_program_and_startup_roles(user,
 
 
 def _clean_role_names(role_names):
-    return [_clean_role_name(role_name) for role_name in role_names]
+    return {key: list(map(_clean_role_name, val))
+            for key, val in role_names.items()}
 
 
 def _clean_role_name(role_name):
     "Convert to title case and remove parenthesised program abbreviations"
-    role_name = role_name.title().split(" (")[0]
+    return role_name.title().split(" (")[0]
 
 
 def _get_user_prg_role_by_program_family(user, user_roles=[]):
@@ -103,7 +104,6 @@ def _get_user_prg_role_by_program_family(user, user_roles=[]):
     Filter role grants by the provided user role or return
     all program role grants the user has ever had
     """
-
     query = user.programrolegrant_set.filter(
         program_role__user_role__isnull=False
     )
