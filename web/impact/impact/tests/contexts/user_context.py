@@ -29,7 +29,8 @@ class UserContext(object):
         self.program_families = program_families or []
         self.program_role_names = program_role_names or []
         self.startup_status_names = startup_status_names or []
-        self.baseprofile = BaseProfileFactory(user=self.user, user_type=user_type)
+        self.baseprofile = BaseProfileFactory(user=self.user,
+                                              user_type=user_type)
         if user_type == "ENTREPRENEUR":
             self.profile = EntrepreneurProfileFactory(
                 user=self.user,
@@ -53,11 +54,9 @@ class UserContext(object):
         self.program_role_grants = [
             ProgramRoleGrantFactory(person=self.user,
                                     program_role__user_role__name=role_name)
-            for role_name in self.program_role_names]        
+            for role_name in self.program_role_names]
         self.startup_role_grants = [
             StartupStatusFactory(
                 startup__user=self.user,
                 program_startup_status__startup_role__name=status_name)
             for status_name in self.startup_status_names]
-
-        

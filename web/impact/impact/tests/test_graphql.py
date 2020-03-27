@@ -407,9 +407,8 @@ class TestGraphQL(APITestCase):
                 }
             )
 
-    
     def test_query_program_roles_for_entrepreneur_returns_correct_value(self):
-        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]        
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         user = UserContext(
             program_role_names=user_roles_of_interest).user
 
@@ -433,7 +432,7 @@ class TestGraphQL(APITestCase):
         self._assert_response_equals_json(query, expected_json)
 
     def test_query_program_roles_for_expert_returns_correct_value(self):
-        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]        
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         user = UserContext(
             user_type="EXPERT",
             program_role_names=user_roles_of_interest).user
@@ -482,7 +481,7 @@ class TestGraphQL(APITestCase):
         self.assertIn([normalized_role_name], program_roles.values())
 
     def test_query_program_roles_for_expert_with_same_program(self):
-        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]        
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         user = UserContext(
             user_type="EXPERT",
             program_role_names=user_roles_of_interest).user
@@ -509,10 +508,10 @@ class TestGraphQL(APITestCase):
     def test_query_prg_roles_for_selected_roles(self):
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         startup_roles_of_interest = [StartupRole.ENTRANT]
-        startup_status_names=[StartupRole.ENTRANT,
-                       StartupRole.FINALIST,
-                       StartupRole.FINALIST,
-                       StartupRole.ENTRANT]        
+        startup_status_names = [StartupRole.ENTRANT,
+                                StartupRole.FINALIST,
+                                StartupRole.FINALIST,
+                                StartupRole.ENTRANT]
         user = UserContext(
             user_type="EXPERT",
             program_role_names=user_roles_of_interest,
