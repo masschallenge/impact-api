@@ -80,8 +80,8 @@ class ExpertProfileType(DjangoObjectType):
                 program_role__user_role__name=UserRole.MENTOR
         ).exists():
             role_grants = obj.user.programrolegrant_set.filter(
-            program_role__user_role__name=UserRole.MENTOR,
-            program_role__program__end_date__gte=datetime.now()
+                program_role__user_role__name=UserRole.MENTOR,
+                program_role__program__end_date__gte=datetime.now()
             ).distinct()
 
             latest_grant = obj.user.programrolegrant_set.filter(
@@ -127,16 +127,10 @@ class ExpertProfileType(DjangoObjectType):
     Time/Space amount to time and space complexity of the three helper functions
     (see functions for time/space comp analysis for each)
     """
+
     def resolve_program_roles(self, info, **kwargs):
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-        startup_roles_of_interest = [
-            StartupRole.ENTRANT,
-            StartupRole.GOLD_WINNER,
-            StartupRole.SILVER_WINNER,
-            StartupRole.PLATINUM_WINNER,
-            StartupRole.DIAMOND_WINNER,
-            StartupRole.IN_KIND_WINNER,
-            StartupRole.SILVER_WINNER]
+        startup_roles_of_interest = [StartupRole.ENTRANT]
         return get_user_program_roles(
             self.user, user_roles_of_interest, startup_roles_of_interest)
 
@@ -148,9 +142,10 @@ def _get_slugs(obj, mentor_program, latest_mentor_program, **kwargs):
             mentor_program[0].url_slug,
         )
     return (
-            latest_mentor_program.program_family.url_slug,
-            latest_mentor_program.url_slug,
-        )
+        latest_mentor_program.program_family.url_slug,
+        latest_mentor_program.url_slug,
+    )
+
 
 def _get_user_programs(user):
     # todo: refactor this and move it to a sensible place
