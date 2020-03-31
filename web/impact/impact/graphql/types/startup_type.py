@@ -13,6 +13,7 @@ class StartupType(DjangoObjectType):
     name = graphene.String()
     high_resolution_logo = graphene.String()
     program = graphene.Field(ProgramType)
+    program_startup_status = graphene.List(graphene.String)
 
     class Meta:
         model = Startup
@@ -27,3 +28,8 @@ class StartupType(DjangoObjectType):
     def resolve_high_resolution_logo(self, info, **kwargs):
         if self.high_resolution_logo:
             return self.high_resolution_logo.url
+
+    def resolve_program_startup_status(self, info, **kwargs):
+        return self.program_startup_statuses().filter(
+            startupstatus__startup=self).values_list(
+                'startup_status', flat=True).distinct()
