@@ -16,7 +16,6 @@ from impact.graphql.types.entrepreneur_startup_type import (
 from impact.utils import get_user_program_and_startup_roles
 
 
-
 class EntrepreneurProfileType(DjangoObjectType):
     image_url = graphene.String()
     title = graphene.String()

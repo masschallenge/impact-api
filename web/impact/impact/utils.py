@@ -1,10 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from accelerator.models import (
-    StartupRole
-)
-
 from datetime import datetime
 import dateutil.parser
 from pytz import utc
@@ -146,6 +142,7 @@ def _group_by_program_family(array):
         else:
             by_program_family[program_family] = [program_role]
     return by_program_family
+
 
 def _combine_prg_roles(user_prg_roles, startup_prg_roles):
     """
