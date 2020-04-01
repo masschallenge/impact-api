@@ -42,8 +42,6 @@ def parse_date(date_str):
 def get_profile(user):
     try:
         user_type = user.baseprofile.user_type
-        print(">>>>------------------")
-        print(user_type)
         if user_type == "ENTREPRENEUR":
             return user.entrepreneurprofile
         if user_type == "EXPERT":
@@ -93,13 +91,9 @@ def get_user_program_roles(
 
     user_prg_roles = _get_user_prg_role_by_program_family(
         user, user_roles_of_interest)
-    print('asddfasdfasdf')
-    print(user_prg_roles)
     startup_prg_roles = _get_user_startup_prg_role_by_program_family(
         user, startup_roles_of_interest
     )
-    print('basdbfasbdfba')
-    print(startup_prg_roles)
     return _combine_prg_roles(
         user_prg_roles=user_prg_roles, startup_prg_roles=startup_prg_roles
     )
@@ -147,7 +141,7 @@ def _get_user_startup_prg_role_by_program_family(user, startup_roles=[]):
         query = startup.program_startup_statuses()
         if startup_roles:
             query = query.filter(Q(startup_role__name__in=startup_roles) | Q(
-                startup_status__contains=StartupRole.WINNER))
+                startup_status__in=startup_roles))
         result = query.values_list(
             "startup_status", "program__program_family__name")
     return _group_by_program_family(result)
