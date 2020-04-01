@@ -194,7 +194,8 @@ class TestGraphQL(APITestCase):
             self.assertEqual(
                 startup_response["shortPitch"], startup.short_pitch)
             self.assertEqual(
-                startup_response["programStartupStatus"], [StartupRole.GOLD_WINNER])
+                startup_response["programStartupStatus"],
+                [StartupRole.GOLD_WINNER])
             self.assertEqual(
                 startup_response["highResolutionLogo"],
                 startup.high_resolution_logo.url
