@@ -13,7 +13,8 @@ from impact.graphql.types.entrepreneur_startup_type import (
     EntrepreneurStartupType,
 )
 
-from impact.utils import get_user_program_roles
+from impact.utils import get_user_program_and_startup_roles
+
 
 
 class EntrepreneurProfileType(DjangoObjectType):
@@ -58,5 +59,5 @@ class EntrepreneurProfileType(DjangoObjectType):
             StartupRole.IN_KIND_WINNER,
             StartupRole.SILVER_WINNER,
         ]
-        return get_user_program_roles(
+        return get_user_program_and_startup_roles(
             self.user, user_roles_of_interest, startup_roles_of_interest)
