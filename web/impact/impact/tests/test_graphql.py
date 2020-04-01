@@ -121,6 +121,7 @@ class TestGraphQL(APITestCase):
 
             ApplicationFactory(cycle=context.cycle, startup=startup)
             ps = ProgramStartupStatusFactory(
+                startup_status=StartupRole.GOLD_WINNER,
                 program=program,
                 startup_list_tab_id='finalists')
             StartupStatusFactory(
@@ -153,6 +154,7 @@ class TestGraphQL(APITestCase):
                             name
                             shortPitch
                             highResolutionLogo
+                            programStartupStatus
                             program {{
                                 year
                                 family
@@ -166,7 +168,6 @@ class TestGraphQL(APITestCase):
             ent_profile = data["entrepreneurProfile"]
 
             self.assertEqual(ent_profile["title"], member.title)
-
             self.assertEqual(
                 ent_profile["imageUrl"],
                 profile.image.url if profile.image else "")
@@ -192,6 +193,8 @@ class TestGraphQL(APITestCase):
             self.assertEqual(startup_response["name"], startup.name)
             self.assertEqual(
                 startup_response["shortPitch"], startup.short_pitch)
+            self.assertEqual(
+                startup_response["programStartupStatus"], [StartupRole.GOLD_WINNER])
             self.assertEqual(
                 startup_response["highResolutionLogo"],
                 startup.high_resolution_logo.url
@@ -219,12 +222,12 @@ class TestGraphQL(APITestCase):
         family_slug = mentor_program.program_family.url_slug
         program_slug = mentor_program.url_slug
         office_hours_url = (
-                        "/officehours/list/{family_slug}/{program_slug}/"
-                        .format(
-                            family_slug=family_slug,
-                            program_slug=program_slug) + (
-                            '?mentor_id={mentor_id}'.format(
-                                mentor_id=confirmed.id)))
+            "/officehours/list/{family_slug}/{program_slug}/"
+            .format(
+                family_slug=family_slug,
+                program_slug=program_slug) + (
+                '?mentor_id={mentor_id}'.format(
+                    mentor_id=confirmed.id)))
 
         query = """
             query {{
@@ -423,12 +426,12 @@ class TestGraphQL(APITestCase):
             }}
         """.format(id=user.id)
         expected_json = {
-                    'data': {
-                        'entrepreneurProfile': {
-                            'programRoles': program_roles
-                        }
-                    }
+            'data': {
+                'entrepreneurProfile': {
+                    'programRoles': program_roles
                 }
+            }
+        }
         self._assert_response_equals_json(query, expected_json)
 
     def test_query_program_roles_for_expert_returns_correct_value(self):
@@ -449,12 +452,12 @@ class TestGraphQL(APITestCase):
             }}
         """.format(id=user.id)
         expected_json = {
-                    'data': {
-                        'expertProfile': {
-                            'programRoles': program_roles
-                        }
-                    }
+            'data': {
+                'expertProfile': {
+                    'programRoles': program_roles
                 }
+            }
+        }
         self._assert_response_equals_json(query, expected_json)
 
     def test_query_program_roles_program_role_names_are_normalized(self):
@@ -497,12 +500,12 @@ class TestGraphQL(APITestCase):
             }}
         """.format(id=user.id)
         expected_json = {
-                    'data': {
-                        'expertProfile': {
-                            'programRoles': program_roles
-                        }
-                    }
+            'data': {
+                'expertProfile': {
+                    'programRoles': program_roles
                 }
+            }
+        }
         self._assert_response_equals_json(query, expected_json)
 
     def test_query_prg_roles_for_selected_roles(self):
