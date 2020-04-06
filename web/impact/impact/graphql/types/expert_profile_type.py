@@ -132,15 +132,8 @@ class ExpertProfileType(DjangoObjectType):
         without changing GraphQL queries on the front end.
         """
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-        startup_roles_of_interest = [
-            StartupRole.ENTRANT,
-            StartupRole.WINNER,
-            StartupRole.GOLD_WINNER,
-            StartupRole.SILVER_WINNER,
-            StartupRole.PLATINUM_WINNER,
-            StartupRole.IN_KIND_WINNER,
-            StartupRole.SILVER_WINNER,
-        ]
+        startup_roles_of_interest = [StartupRole.ENTRANT]
+        startup_roles_of_interest += StartupRole.WINNER_STARTUP_ROLES
         return get_user_program_and_startup_roles(
             self.user, user_roles_of_interest, startup_roles_of_interest)
 

@@ -30,6 +30,5 @@ class StartupType(DjangoObjectType):
             return self.high_resolution_logo.url
 
     def resolve_program_startup_status(self, info, **kwargs):
-        return self.program_startup_statuses().filter(
-            startupstatus__startup=self).values_list(
-                'startup_status', flat=True).distinct()
+        return self.program_startup_statuses().values_list(
+            'startup_status', flat=True).distinct()
