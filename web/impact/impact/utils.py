@@ -4,7 +4,10 @@
 from datetime import datetime
 import dateutil.parser
 from pytz import utc
-
+from accelerator.models import (
+    Startup,
+    StartupTeamMember
+)
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 
@@ -123,6 +126,8 @@ def _get_user_startup_prg_role_by_program_family(user,
     """
     startups = user.startup_set.all()
     result = []
+    if not startups:
+        startups = _get_startups_if_teammember(user)
     for startup in startups:
         query = startup.program_startup_statuses()
         if startup_roles:
@@ -132,6 +137,12 @@ def _get_user_startup_prg_role_by_program_family(user,
                                    "program__program_family__name")
 
     return _group_by_program_family(result)
+
+
+def _get_startups_if_teammember(user):
+    ids = StartupTeamMember.objects.filter(user=user).values_list(
+        'startup', flat=True).distinct()
+    return Startup.objects.filter(id__in=ids)
 
 
 def _group_by_program_family(array):
