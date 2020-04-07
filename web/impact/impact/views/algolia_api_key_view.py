@@ -41,7 +41,7 @@ IS_TEAM_MEMBER_FILTER = 'is_team_member:true'
 HAS_FINALIST_ROLE_FILTER = 'has_a_finalist_role:true'
 IS_ACTIVE_FILTER = 'is_active:true'
 IS_FINALIST = 'is_finalist:true'
-IS_NOT_MEMBER_FILTER = 'is_of_the_member_achetype:false'
+IS_NOT_MEMBER_FILTER = 'NOT type:member'
 
 
 class AlgoliaApiKeyView(APIView):
