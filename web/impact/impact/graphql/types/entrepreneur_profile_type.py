@@ -13,7 +13,8 @@ from impact.graphql.types.entrepreneur_startup_type import (
     EntrepreneurStartupType,
 )
 
-from impact.utils import get_user_program_roles
+from impact.utils import get_user_program_and_startup_roles
+
 
 class EntrepreneurProfileType(DjangoObjectType):
     image_url = graphene.String()
@@ -46,9 +47,8 @@ class EntrepreneurProfileType(DjangoObjectType):
             return team_member.title
         return ""
 
-
     def resolve_program_roles(self, info, **kwargs):
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         startup_roles_of_interest = [StartupRole.ENTRANT]
-        return get_user_program_roles(
+        return get_user_program_and_startup_roles(
             self.user, user_roles_of_interest, startup_roles_of_interest)

@@ -10,19 +10,18 @@ from accelerator.models import (
 from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
 from impact.tests.api_test_case import APITestCase
+from impact.tests.contexts import UserContext
 from impact.tests.factories import (
-    EntrepreneurFactory,
+    ApplicationFactory,
     ExpertFactory,
     ProgramFactory,
-    ProgramRoleGrantFactory,
     ProgramRoleFactory,
-    StartupMentorRelationshipFactory,
-    UserRoleFactory,
-    StartupRoleFactory,
-    ApplicationFactory,
+    ProgramRoleGrantFactory,
     ProgramStartupStatusFactory,
+    StartupMentorRelationshipFactory,
     StartupStatusFactory,
-    StartupFactory,
+    UserRoleFactory,
+    EntrepreneurFactory,
 )
 from impact.tests.utils import capture_stderr
 from impact.graphql.query import (
@@ -30,9 +29,12 @@ from impact.graphql.query import (
     ENTREPRENEUR_NOT_FOUND_MESSAGE,
     NON_FINALIST_PROFILE_MESSAGE
 )
-from accelerator.tests.contexts import StartupTeamMemberContext, UserRoleContext
+from accelerator.tests.contexts import (
+    StartupTeamMemberContext,
+    UserRoleContext,
+)
 
-from impact.utils import get_user_program_roles
+from impact.utils import get_user_program_and_startup_roles
 
 MENTEE_FIELDS = """
     startup {
@@ -343,14 +345,16 @@ class TestGraphQL(APITestCase):
             )
 
     def test_non_staff_user_cannot_access_non_finalist_graphql_view(self):
+        query_string = "query {{ entrepreneurProfile(id: {id}) {{ title }} }}"
         with self.login(email=self.basic_user().email):
             user = EntrepreneurFactory()
-            query = """query {{ entrepreneurProfile(id: {id}) {{ title }} }}""".format(id=user.id)
+            query = query_string.format(id=user.id)
 
             with capture_stderr(self.client.post,
                                 self.url,
                                 data={'query': query}) as (response, _):
-                error_messages = [x['message'] for x in response.json()['errors']]
+                error_messages = [x['message']
+                                  for x in response.json()['errors']]
 
             self.assertIn(NON_FINALIST_PROFILE_MESSAGE, error_messages)
 
@@ -404,32 +408,13 @@ class TestGraphQL(APITestCase):
             )
 
     def test_query_program_roles_for_entrepreneur_returns_correct_value(self):
-        # prepare user program roles
-        program = ProgramFactory()
-        alum_role = UserRoleFactory(name=UserRole.ALUM)
-        finalist_role = UserRoleFactory(name=UserRole.FINALIST)
-        alum_program_role = ProgramRoleFactory(program=program,
-                                                user_role=alum_role)
-        finalist_program_role = ProgramRoleFactory(program=program,
-                                                    user_role=finalist_role)
-        user = EntrepreneurFactory()
-        ProgramRoleGrantFactory( person=user,program_role=alum_program_role)
-        ProgramRoleGrantFactory(person=user,program_role=finalist_program_role)
-
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
+        user = UserContext(
+            program_role_names=user_roles_of_interest).user
 
-        # prepare startup program role
-        startup = StartupFactory(user=user)
-        program_startup_status = ProgramStartupStatusFactory(
-            startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
-            program = ProgramFactory()
-        )
-        startup_status = StartupStatusFactory(
-            startup=startup,
-            program_startup_status=program_startup_status
-        )
-
-        program_roles = get_user_program_roles(user, user_roles_of_interest)
+        program_roles = get_user_program_and_startup_roles(
+            user,
+            user_roles_of_interest)
         query = """
             query{{
                 entrepreneurProfile(id:{id}) {{
@@ -437,48 +422,24 @@ class TestGraphQL(APITestCase):
                 }}
             }}
         """.format(id=user.id)
-
-        with self.login(email=self.basic_user().email):
-            response = self.client.post(self.url, data={'query': query})
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                {
+        expected_json = {
                     'data': {
                         'entrepreneurProfile': {
                             'programRoles': program_roles
                         }
                     }
                 }
-            )
+        self._assert_response_equals_json(query, expected_json)
 
     def test_query_program_roles_for_expert_returns_correct_value(self):
-
-        # prepare user program role
-        program = ProgramFactory()
-        alum_role = UserRoleFactory(name=UserRole.ALUM)
-        finalist_role = UserRoleFactory(name=UserRole.FINALIST)
-        alum_program_role = ProgramRoleFactory(program=program,
-                                                user_role=alum_role)
-        finalist_program_role = ProgramRoleFactory(program=program,
-                                                    user_role=finalist_role)
-        user = ExpertFactory()
-        ProgramRoleGrantFactory(person=user,program_role=alum_program_role)
-        ProgramRoleGrantFactory( person=user,program_role=finalist_program_role)
-
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
+        user = UserContext(
+            user_type="EXPERT",
+            program_role_names=user_roles_of_interest).user
 
-        # prepare startup program role
-        startup = StartupFactory(user=user)
-        program_startup_status = ProgramStartupStatusFactory(
-            startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
-            program = ProgramFactory()
-        )
-        startup_status = StartupStatusFactory(
-            startup=startup,
-            program_startup_status=program_startup_status
-        )
-
-        program_roles = get_user_program_roles(user, user_roles_of_interest)
+        program_roles = get_user_program_and_startup_roles(
+            user,
+            user_roles_of_interest)
 
         query = """
             query{{
@@ -487,49 +448,46 @@ class TestGraphQL(APITestCase):
                 }}
             }}
         """.format(id=user.id)
-
-        with self.login(email=self.basic_user().email):
-            response = self.client.post(self.url, data={'query': query})
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                {
+        expected_json = {
                     'data': {
                         'expertProfile': {
                             'programRoles': program_roles
                         }
                     }
                 }
-            )
+        self._assert_response_equals_json(query, expected_json)
+
+    def test_query_program_roles_program_role_names_are_normalized(self):
+        program_role_name = "BEST IN SHOW (BOS)"
+        user_role_name = UserRole.FINALIST
+        user = ExpertFactory()
+        ProgramRoleGrantFactory(
+            person=user,
+            program_role__name=program_role_name,
+            program_role__user_role__name=user_role_name)
+        query = """
+            query{{
+                expertProfile(id:{id}) {{
+                    programRoles
+                }}
+            }}
+        """.format(id=user.id)
+        with self.login(email=self.basic_user().email):
+            response = self.client.post(self.url, data={'query': query})
+
+        normalized_role_name = program_role_name.title().split(" (")[0]
+        response_dict = json.loads(response.content)
+        program_roles = response_dict['data']['expertProfile']['programRoles']
+        self.assertIn([normalized_role_name], program_roles.values())
 
     def test_query_program_roles_for_expert_with_same_program(self):
-
-        # prepare user program role
-        program = ProgramFactory()
-        alum_role = UserRoleFactory(name=UserRole.ALUM)
-        finalist_role = UserRoleFactory(name=UserRole.FINALIST)
-        alum_program_role = ProgramRoleFactory(program=program,
-                                                user_role=alum_role)
-        finalist_program_role = ProgramRoleFactory(program=program,
-                                                    user_role=finalist_role)
-        user = ExpertFactory()
-        ProgramRoleGrantFactory(person=user,program_role=alum_program_role)
-        ProgramRoleGrantFactory( person=user,program_role=finalist_program_role)
-
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-
-        # prepare startup program role
-        startup = StartupFactory(user=user)
-        program_startup_status = ProgramStartupStatusFactory(
-            startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
-            program = program
-        )
-        startup_status = StartupStatusFactory(
-            startup=startup,
-            program_startup_status=program_startup_status
-        )
-
-        program_roles = get_user_program_roles(user, user_roles_of_interest)
-
+        user = UserContext(
+            user_type="EXPERT",
+            program_role_names=user_roles_of_interest).user
+        program_roles = get_user_program_and_startup_roles(
+            user,
+            user_roles_of_interest)
 
         query = """
             query{{
@@ -538,62 +496,28 @@ class TestGraphQL(APITestCase):
                 }}
             }}
         """.format(id=user.id)
-
-        with self.login(email=self.basic_user().email):
-            response = self.client.post(self.url, data={'query': query})
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                {
+        expected_json = {
                     'data': {
                         'expertProfile': {
                             'programRoles': program_roles
                         }
                     }
                 }
-            )
+        self._assert_response_equals_json(query, expected_json)
 
     def test_query_prg_roles_for_selected_roles(self):
-
-        # prepare user program role
-        program = ProgramFactory()
-        alum_role = UserRoleFactory(name=UserRole.ALUM)
-        finalist_role = UserRoleFactory(name=UserRole.FINALIST)
-        alum_program_role = ProgramRoleFactory(program=program,
-                                                user_role=alum_role)
-        finalist_program_role = ProgramRoleFactory(program=program,
-                                                    user_role=finalist_role)
-        user = ExpertFactory()
-        ProgramRoleGrantFactory(person=user,program_role=alum_program_role)
-        ProgramRoleGrantFactory( person=user,program_role=finalist_program_role)
-
-
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-
-        # prepare startup program role
-        startup = StartupFactory(user=user)
-        program_startup_status = ProgramStartupStatusFactory(
-            startup_role=StartupRoleFactory(name=StartupRole.ENTRANT),
-            program = program
-        )
-        program_startup_status = ProgramStartupStatusFactory(
-            startup_role=StartupRoleFactory(name=StartupRole.FINALIST),
-            program = program
-        )
-
-        program_startup_status = ProgramStartupStatusFactory(
-            startup_role=StartupRoleFactory(name=StartupRole.FINALIST),
-            program = program
-        )
-        startup_status = StartupStatusFactory(
-            startup=startup,
-            program_startup_status=program_startup_status
-        )
-
-
         startup_roles_of_interest = [StartupRole.ENTRANT]
-        program_roles = get_user_program_roles(
+        startup_status_names = [StartupRole.ENTRANT,
+                                StartupRole.FINALIST,
+                                StartupRole.FINALIST,
+                                StartupRole.ENTRANT]
+        user = UserContext(
+            user_type="EXPERT",
+            program_role_names=user_roles_of_interest,
+            startup_status_names=startup_status_names).user
+        program_roles = get_user_program_and_startup_roles(
             user, user_roles_of_interest, startup_roles_of_interest)
-
 
         query = """
             query{{
@@ -602,19 +526,16 @@ class TestGraphQL(APITestCase):
                 }}
             }}
         """.format(id=user.id)
-
-        with self.login(email=self.basic_user().email):
-            response = self.client.post(self.url, data={'query': query})
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                {
-                    'data': {
-                        'expertProfile': {
-                            'programRoles': program_roles
-                        }
-                    }
+        expected_json = {
+            'data': {
+                'expertProfile': {
+                    'programRoles': program_roles
                 }
-            )
+            }
+        }
+
+        self._assert_response_equals_json(query, expected_json)
+
     def test_get_user_confirmed_mentor_program_families(self):
         role_grant = ProgramRoleGrantFactory(
             program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
@@ -640,7 +561,7 @@ class TestGraphQL(APITestCase):
                 expert_profile["confirmedMentorProgramFamilies"],
                 [user_program.program_family.name])
 
-    def test_get_query_for_user_without_confirmed_mentor_program_families(self):
+    def test_query_for_user_without_confirmed_mentor_program_families(self):
         user = ExpertFactory()
         with self.login(email=self.basic_user().email):
             query = """
@@ -654,4 +575,13 @@ class TestGraphQL(APITestCase):
             response = self.client.post(self.url, data={'query': query})
             data = json.loads(response.content.decode("utf-8"))["data"]
             expert_profile = data["expertProfile"]
-            self.assertEqual(expert_profile["confirmedMentorProgramFamilies"], [])
+            self.assertEqual(expert_profile["confirmedMentorProgramFamilies"],
+                             [])
+
+    def _assert_response_equals_json(self, query, expected_json):
+        with self.login(email=self.basic_user().email):
+            response = self.client.post(self.url, data={'query': query})
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                expected_json
+            )
