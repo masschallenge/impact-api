@@ -361,7 +361,9 @@ class Base(Configuration):
             },
         }
     }
-
+    NO_REPLY_EMAIL = "noreply@masschallenge.org"
+    BCC_EMAIL = "systemlogbcc@masschallenge.org"
+    EMAIL_BACKEND = "mc.email_backends.AccelerateEmailBackend"
 
 class Dev(Base):
     DEBUG = True
