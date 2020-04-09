@@ -50,5 +50,6 @@ class EntrepreneurProfileType(DjangoObjectType):
     def resolve_program_roles(self, info, **kwargs):
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         startup_roles_of_interest = [StartupRole.ENTRANT]
+        startup_roles_of_interest += StartupRole.WINNER_STARTUP_ROLES
         return get_user_program_and_startup_roles(
             self.user, user_roles_of_interest, startup_roles_of_interest)
