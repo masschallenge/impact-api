@@ -133,6 +133,7 @@ class ExpertProfileType(DjangoObjectType):
         """
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         startup_roles_of_interest = [StartupRole.ENTRANT]
+        startup_roles_of_interest += StartupRole.WINNER_STARTUP_ROLES
         return get_user_program_and_startup_roles(
             self.user, user_roles_of_interest, startup_roles_of_interest)
 
@@ -144,9 +145,9 @@ def _get_slugs(obj, mentor_program, latest_mentor_program, **kwargs):
             mentor_program[0].url_slug,
         )
     return (
-            latest_mentor_program.program_family.url_slug,
-            latest_mentor_program.url_slug,
-        )
+        latest_mentor_program.program_family.url_slug,
+        latest_mentor_program.url_slug,
+    )
 
 
 def _get_user_programs(user):

@@ -4,9 +4,13 @@
 from datetime import datetime
 import dateutil.parser
 from pytz import utc
-
+from accelerator.models import (
+    Startup,
+    StartupTeamMember
+)
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+
 from django.utils.formats import get_format
 
 DAWN_OF_TIME = utc.localize(datetime.strptime(
@@ -108,8 +112,7 @@ def _get_user_prg_role_by_program_family(user, user_roles=[]):
         program_role__user_role__isnull=False
     )
     if user_roles:
-        query = query.filter(
-            program_role__user_role__name__in=user_roles)
+        query = query.filter(program_role__user_role__name__in=user_roles)
     result = query.values_list(
         'program_role__name',
         'program_role__program__program_family__name')
@@ -121,20 +124,25 @@ def _get_user_startup_prg_role_by_program_family(user,
     """
     Fetch the program status for all startups a given user belongs to
     """
-
     startups = user.startup_set.all()
-
     result = []
+    if not startups:
+        startups = _get_startups_if_teammember(user)
     for startup in startups:
         query = startup.program_startup_statuses()
         if startup_roles:
-            query = query.filter(
-                startup_role__name__in=startup_roles
-            )
+            query = query.filter(Q(startup_role__name__in=startup_roles) | Q(
+                startup_status__in=startup_roles))
         result = query.values_list("startup_status",
                                    "program__program_family__name")
 
     return _group_by_program_family(result)
+
+
+def _get_startups_if_teammember(user):
+    ids = StartupTeamMember.objects.filter(user=user).values_list(
+        'startup', flat=True).distinct()
+    return Startup.objects.filter(id__in=ids)
 
 
 def _group_by_program_family(array):
