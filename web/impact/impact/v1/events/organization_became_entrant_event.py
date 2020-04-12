@@ -52,7 +52,7 @@ class OrganizationBecameEntrantEvent(BaseHistoryEvent):
         self._cycle = self.application.cycle
         self.program_data = program_data
         self.startup_status = StartupStatus.objects.filter(
-            program_startup_status__startup_role__name=StartupRole.ENTRANT,
+            program_startup_status__startup_role=StartupRole.ENTRANT,
             program_startup_status__program__cycle=self._cycle,
             startup=self.startup).order_by("created_at").first()
 

@@ -165,7 +165,7 @@ class TestOrganizationHistoryView(APITestCase):
         startup_status = StartupStatusFactory(
             startup=startup,
             program_startup_status__program=program,
-            program_startup_status__startup_role__name=StartupRole.ENTRANT)
+            program_startup_status__startup_role=StartupRole.ENTRANT)
         startup_status.created_at = days_from_now(-1)
         startup_status.save()
         with self.login(email=self.basic_user().email):
@@ -300,7 +300,7 @@ class TestOrganizationHistoryView(APITestCase):
     def test_startup_became_finalist(self):
         startup = StartupFactory()
         startup_status = StartupStatusFactory(
-            program_startup_status__startup_role__name=StartupRole.FINALIST,
+            program_startup_status__startup_role=StartupRole.FINALIST,
             startup=startup)
         program = startup_status.program_startup_status.program
         with self.login(email=self.basic_user().email):
@@ -320,7 +320,7 @@ class TestOrganizationHistoryView(APITestCase):
         startup = StartupFactory()
         start_date = days_from_now(10)
         startup_status = StartupStatusFactory(
-            program_startup_status__startup_role__name=StartupRole.FINALIST,
+            program_startup_status__startup_role=StartupRole.FINALIST,
             program_startup_status__program__start_date=start_date,
             startup=startup)
         startup_status.created_at = None
@@ -337,7 +337,7 @@ class TestOrganizationHistoryView(APITestCase):
     def test_startup_became_winner(self):
         startup = StartupFactory()
         startup_status = StartupStatusFactory(
-            program_startup_status__startup_role__name=StartupRole.GOLD_WINNER,
+            program_startup_status__startup_role=StartupRole.GOLD_WINNER,
             startup=startup)
         role = startup_status.program_startup_status.startup_role
         with self.login(email=self.basic_user().email):
@@ -353,7 +353,7 @@ class TestOrganizationHistoryView(APITestCase):
         startup = StartupFactory()
         end_date = days_from_now(-10)
         startup_status = StartupStatusFactory(
-            program_startup_status__startup_role__name=StartupRole.GOLD_WINNER,
+            program_startup_status__startup_role=StartupRole.GOLD_WINNER,
             program_startup_status__program__end_date=end_date,
             startup=startup)
         startup_status.created_at = None

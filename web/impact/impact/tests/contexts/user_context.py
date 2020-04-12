@@ -58,5 +58,5 @@ class UserContext(object):
         self.startup_role_grants = [
             StartupStatusFactory(
                 startup__user=self.user,
-                program_startup_status__startup_role__name=status_name)
+                program_startup_status__startup_role=status_name)
             for status_name in self.startup_status_names]
