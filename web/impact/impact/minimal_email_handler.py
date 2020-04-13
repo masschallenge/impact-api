@@ -6,7 +6,8 @@ class MinimalEmailHandler:
     A simplistic outgoing email handler, to consolidate outgoing
     mail sending needs of impact-api calls
     attachment, if any, should be a triple of (filename, content, filetype)
-    attach_alternative, if any , should be 
+    attach_alternative, if any, should be a tuple of (attachment_text, MIME_type)
+      (generally used for html version of the email)
     '''
     def __init__(self,
                  to,
