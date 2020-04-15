@@ -3,16 +3,24 @@
 import json
 from django.urls import reverse
 
-from accelerator.models import (
-    StartupRole,
-    UserRole
+from accelerator.models import StartupRole, UserRole
+from accelerator.tests.contexts import (
+    StartupTeamMemberContext,
+    UserRoleContext
 )
+from accelerator.tests.contexts.context_utils import get_user_role_by_name
 from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
+from impact.graphql.query import (
+    ENTREPRENEUR_NOT_FOUND_MESSAGE,
+    EXPERT_NOT_FOUND_MESSAGE,
+    NOT_ALLOWED_ACCESS_MESSAGE
+)
 from impact.tests.api_test_case import APITestCase
 from impact.tests.contexts import UserContext
 from impact.tests.factories import (
     ApplicationFactory,
+    EntrepreneurFactory,
     ExpertFactory,
     ProgramFactory,
     ProgramRoleFactory,
@@ -20,20 +28,9 @@ from impact.tests.factories import (
     ProgramStartupStatusFactory,
     StartupMentorRelationshipFactory,
     StartupStatusFactory,
-    UserRoleFactory,
-    EntrepreneurFactory,
+    UserRoleFactory
 )
 from impact.tests.utils import capture_stderr
-from impact.graphql.query import (
-    EXPERT_NOT_FOUND_MESSAGE,
-    ENTREPRENEUR_NOT_FOUND_MESSAGE,
-    NON_FINALIST_PROFILE_MESSAGE
-)
-from accelerator.tests.contexts import (
-    StartupTeamMemberContext,
-    UserRoleContext,
-)
-
 from impact.utils import get_user_program_and_startup_roles
 
 MENTEE_FIELDS = """
@@ -58,13 +55,7 @@ class TestGraphQL(APITestCase):
         user = ExpertFactory()
         query = """query {{ expertProfile(id: {id}) {{ title }} }}
             """.format(id=user.id)
-
-        with capture_stderr(self.client.post,
-                            self.url,
-                            data={'query': query}) as (response, _):
-            error_messages = [x['message'] for x in response.json()['errors']]
-
-        self.assertIn(NOT_LOGGED_IN_MSG, error_messages)
+        self._assert_error_in_response(query, NOT_LOGGED_IN_MSG)
 
     def test_anonymous_user_can_access_auth_graphql_view(self):
         query = """mutation {
@@ -314,17 +305,7 @@ class TestGraphQL(APITestCase):
                 }}
             """.format(id=user.id)
 
-            with capture_stderr(self.client.post,
-                                self.url,
-                                data={'query': query}) as (response, _):
-                error_messages = [x['message'] for x in
-                                  response.json()['errors']]
-
-            self.assertIn(EXPERT_NOT_FOUND_MESSAGE, error_messages)
-            self.assertEqual(
-                response.json()['data']['expertProfile'],
-                None
-            )
+            self._assert_error_in_response(query, EXPERT_NOT_FOUND_MESSAGE)
 
     def test_query_with_non_existent_entrepreneur_id(self):
         with self.login(email=self.basic_user().email):
@@ -336,17 +317,8 @@ class TestGraphQL(APITestCase):
                 }}
             """.format(id=0)
 
-            with capture_stderr(self.client.post,
-                                self.url,
-                                data={'query': query}) as (response, _):
-                error_messages = [x['message'] for x in
-                                  response.json()['errors']]
-
-            self.assertIn(ENTREPRENEUR_NOT_FOUND_MESSAGE, error_messages)
-            self.assertEqual(
-                response.json()['data']['entrepreneurProfile'],
-                None
-            )
+            self._assert_error_in_response(
+                query, ENTREPRENEUR_NOT_FOUND_MESSAGE)
 
     def test_non_staff_user_cannot_access_non_finalist_graphql_view(self):
         query_string = "query {{ entrepreneurProfile(id: {id}) {{ title }} }}"
@@ -354,13 +326,7 @@ class TestGraphQL(APITestCase):
             user = EntrepreneurFactory()
             query = query_string.format(id=user.id)
 
-            with capture_stderr(self.client.post,
-                                self.url,
-                                data={'query': query}) as (response, _):
-                error_messages = [x['message']
-                                  for x in response.json()['errors']]
-
-            self.assertIn(NON_FINALIST_PROFILE_MESSAGE, error_messages)
+            self._assert_error_in_response(query, NOT_ALLOWED_ACCESS_MESSAGE)
 
     def test_staff_user_can_access_non_finalist_graphql_view(self):
         with self.login(email=self.staff_user().email):
@@ -387,31 +353,30 @@ class TestGraphQL(APITestCase):
             )
 
     def test_non_staff_user_can_access_finalist_graphql_view(self):
-        with self.login(email=self.basic_user().email):
-            user = EntrepreneurFactory()
-            UserRoleContext(UserRole.FINALIST, user=user)
-            query = """
-                        query {{
-                                entrepreneurProfile(id: {id}) {{
-                                    user {{ firstName }}
-                                }}
-                            }}
-                    """.format(id=user.id)
-            response = self.client.post(self.url, data={'query': query})
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                {
-                    'data': {
-                        'entrepreneurProfile': {
-                            'user': {
-                                'firstName': user.first_name
-                            },
-                        }
+        current_user = self._expert_user(UserRole.MENTOR)
+        user = EntrepreneurFactory()
+        UserRoleContext(UserRole.FINALIST, user=user)
+        query = """
+            query {{
+                entrepreneurProfile(id: {id}) {{
+                    user {{ firstName }}
+                }}
+            }}
+        """.format(id=user.id)
+        expected_json = {
+                'data': {
+                    'entrepreneurProfile': {
+                        'user': {
+                            'firstName': user.first_name
+                        },
                     }
                 }
-            )
+            }
+        self._assert_response_equals_json(
+            query, expected_json, email=current_user.email)
 
     def test_query_program_roles_for_entrepreneur_returns_correct_value(self):
+        current_user = self._expert_user(UserRole.AIR)
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         user = UserContext(
             program_role_names=user_roles_of_interest).user
@@ -433,7 +398,8 @@ class TestGraphQL(APITestCase):
                 }
             }
         }
-        self._assert_response_equals_json(query, expected_json)
+        self._assert_response_equals_json(
+            query, expected_json, email=current_user.email)
 
     def test_query_program_roles_for_expert_returns_correct_value(self):
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
@@ -582,10 +548,98 @@ class TestGraphQL(APITestCase):
             self.assertEqual(expert_profile["confirmedMentorProgramFamilies"],
                              [])
 
-    def _assert_response_equals_json(self, query, expected_json):
-        with self.login(email=self.basic_user().email):
+    def test_judge_cannot_view_entrepreneur_mentor_profile(self):
+        judge = self._expert_user(UserRole.JUDGE)
+        with self.login(email=judge.email):
+            user = EntrepreneurFactory()
+            UserRoleContext(UserRole.MENTOR, user=user)
+            query = """
+                query{{
+                entrepreneurProfile(id:{id}) {{
+                    programRoles
+                }}
+            }}
+            """.format(id=user.id)
+
+            self._assert_error_in_response(query, NOT_ALLOWED_ACCESS_MESSAGE)
+
+    def test_user_without_role_can_view_staff_entrepreneur_profile(self):
+        current_user = self._expert_user()
+        user = EntrepreneurFactory()
+        UserRoleContext(UserRole.STAFF, user=user)
+        query = """
+            query{{
+                entrepreneurProfile(id:{id}) {{
+                    user{{lastName}}
+                }}
+            }}
+        """.format(id=user.id)
+        expected_json = {
+            'data': {
+                'entrepreneurProfile': {
+                    'user': {
+                        'lastName': user.last_name
+                    }
+                }
+            }
+        }
+        self._assert_response_equals_json(
+            query, expected_json, email=current_user.email)
+
+    def test_allowed_user_can_view_mentor_entrepreneur_profile(self):
+        allowed_user_roles = [
+            UserRole.FINALIST,
+            UserRole.AIR,
+            UserRole.MENTOR,
+            UserRole.PARTNER,
+            UserRole.ALUM
+        ]
+        for role in allowed_user_roles:
+            current_user = self._expert_user(role)
+            user = EntrepreneurFactory()
+            UserRoleContext(UserRole.MENTOR, user=user)
+            query = """
+                query{{
+                    entrepreneurProfile(id:{id}) {{
+                        user{{lastName}}
+                    }}
+                }}
+            """.format(id=user.id)
+            expected_json = {
+                'data': {
+                    'entrepreneurProfile': {
+                        'user': {
+                            'lastName': user.last_name
+                        }
+                    }
+                }
+            }
+            self._assert_response_equals_json(
+                query, expected_json, email=current_user.email)
+
+    def _assert_response_equals_json(self, query, expected_json, email=None):
+        with self.login(email=email or self.basic_user().email):
             response = self.client.post(self.url, data={'query': query})
             self.assertJSONEqual(
                 str(response.content, encoding='utf8'),
                 expected_json
             )
+
+    def _assert_error_in_response(self, query, error_message):
+        with capture_stderr(self.client.post,
+                            self.url,
+                            data={'query': query}) as (response, _):
+            error_messages = [x['message']
+                              for x in response.json()['errors']]
+        self.assertIn(error_message, error_messages)
+
+    def _expert_user(self, role=None):
+        user = ExpertFactory()
+        if role:
+            user_role = get_user_role_by_name(role)
+            program_role = ProgramRoleFactory.create(user_role=user_role)
+            ProgramRoleGrantFactory.create(person=user,
+                                           program_role=program_role)
+        user.set_password('password')
+        user.save()
+        return user
