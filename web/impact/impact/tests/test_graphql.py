@@ -510,35 +510,40 @@ class TestGraphQL(APITestCase):
         self._assert_response_equals_json(query, expected_json)
 
     def test_query_prg_roles_for_selected_roles(self):
-        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-        startup_roles_of_interest = [StartupRole.ENTRANT]
-        startup_status_names = [StartupRole.ENTRANT,
-                                StartupRole.FINALIST,
-                                StartupRole.FINALIST,
-                                StartupRole.ENTRANT]
-        user = UserContext(
-            user_type="EXPERT",
-            program_role_names=user_roles_of_interest,
-            startup_status_names=startup_status_names).user
-        program_roles = get_user_program_and_startup_roles(
-            user, user_roles_of_interest, startup_roles_of_interest)
+        with self.login(email=self.staff_user().email):
+            user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
+            startup_roles_of_interest = [StartupRole.ENTRANT]
+            startup_status_names = [StartupRole.ENTRANT,
+                                    StartupRole.FINALIST,
+                                    StartupRole.FINALIST,
+                                    StartupRole.ENTRANT]
+            user = UserContext(
+                user_type="EXPERT",
+                program_role_names=user_roles_of_interest,
+                startup_status_names=startup_status_names).user
+            program_roles = get_user_program_and_startup_roles(
+                user, user_roles_of_interest, startup_roles_of_interest)
 
-        query = """
-            query{{
-                expertProfile(id:{id}) {{
-                    programRoles
+            query = """
+                query{{
+                    expertProfile(id:{id}) {{
+                        programRoles
+                    }}
                 }}
-            }}
-        """.format(id=user.id)
-        expected_json = {
-            'data': {
-                'expertProfile': {
-                    'programRoles': program_roles
+            """.format(id=user.id)
+            expected_json = {
+                'data': {
+                    'expertProfile': {
+                        'programRoles': program_roles
+                    }
                 }
             }
-        }
+            response = self.client.post(self.url, data={'query': query})
 
-        self._assert_response_equals_json(query, expected_json)
+            self.assertJSONEqual(
+                str(response.content, encoding='utf8'),
+                expected_json
+            )
 
     def test_get_user_confirmed_mentor_program_families(self):
         role_grant = ProgramRoleGrantFactory(

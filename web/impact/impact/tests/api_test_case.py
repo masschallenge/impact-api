@@ -51,6 +51,8 @@ class APITestCase(TestCase):
         clearance = ClearanceFactory(
             level=CLEARANCE_LEVEL_STAFF,
             user=user)
+        clearance.user.is_staff = True
+        clearance.user.save()
         return clearance.user
 
     def global_operations_manager(self, program_family):
