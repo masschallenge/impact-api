@@ -7,7 +7,7 @@ DEFAULT_PARAM_KEYS = ("to",
                       "subject",
                       "body")
 
-DEFAULT_PARAM_VALS = (["a@b.com"],
+DEFAULT_PARAM_VALS = (["a@example.com"],
                       "TEST SUBJECT",
                       "TEST BODY")
                       
@@ -20,13 +20,13 @@ class TestMinimalEmailHandler(TestCase):
 
     def test_email_with_sender_specified_is_sent(self):
         params = email_params(DEFAULT_PARAM_KEYS + ("from_email",),
-                              DEFAULT_PARAM_VALS + ("c@d.com",))
+                              DEFAULT_PARAM_VALS + ("c@example.com",))
         email = send_email(params)
         self._assert_email_matches_expected_values(email, params)
 
     def test_email_with_bcc_specified(self):
         params = email_params(DEFAULT_PARAM_KEYS + ("bcc",),
-                              DEFAULT_PARAM_VALS + (["e@f.com"],))
+                              DEFAULT_PARAM_VALS + (["e@example.com"],))
         email = send_email(params)        
         self._assert_email_matches_expected_values(email, params)
 
