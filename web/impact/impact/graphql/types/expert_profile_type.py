@@ -19,6 +19,7 @@ from accelerator_abstract.models import (
     HIDDEN_PROGRAM_STATUS,
     UPCOMING_PROGRAM_STATUS
 )
+from accelerator_abstract.models.base_user_utils import is_employee
 from impact.graphql.types import StartupMentorRelationshipType
 
 from impact.utils import (
@@ -133,7 +134,7 @@ class ExpertProfileType(DjangoObjectType):
         """
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         startup_roles_of_interest = StartupRole.WINNER_STARTUP_ROLES
-        if info.context.user.is_staff:
+        if is_employee(info.context.user):
             startup_roles_of_interest += [StartupRole.ENTRANT]
         return get_user_program_and_startup_roles(
             self.user, user_roles_of_interest, startup_roles_of_interest)

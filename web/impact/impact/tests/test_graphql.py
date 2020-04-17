@@ -78,40 +78,36 @@ class TestGraphQL(APITestCase):
         self.assertNotIn(NOT_LOGGED_IN_MSG, error_messages)
 
     def test_query_with_expert(self):
-        with self.login(email=self.basic_user().email):
-            user = ExpertFactory()
-            query = """
-                query {{
-                    expertProfile(id: {id}) {{
-                        user {{ firstName }}
-                        bio
-                        imageUrl
-                        availableOfficeHours
-                        officeHoursUrl
-                        programInterests
-                    }}
+        user = ExpertFactory()
+        query = """
+            query {{
+                expertProfile(id: {id}) {{
+                    user {{ firstName }}
+                    bio
+                    imageUrl
+                    availableOfficeHours
+                    officeHoursUrl
+                    programInterests
                 }}
-            """.format(id=user.id)
-            response = self.client.post(self.url, data={'query': query})
-            profile = user.expertprofile
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                {
-                    'data': {
-                        'expertProfile': {
-                            'user': {
-                                'firstName': user.first_name,
-                            },
-                            'bio': profile.bio,
-                            'imageUrl': (profile.image and
-                                         profile.image.url or ''),
-                            'availableOfficeHours': False,
-                            'officeHoursUrl': None,
-                            'programInterests': [],
-                        }
-                    }
+            }}
+        """.format(id=user.id)
+        profile = user.expertprofile
+        expected_json = {
+            'data': {
+                'expertProfile': {
+                    'user': {
+                        'firstName': user.first_name,
+                    },
+                    'bio': profile.bio,
+                    'imageUrl': (profile.image and
+                                 profile.image.url or ''),
+                    'availableOfficeHours': False,
+                    'officeHoursUrl': None,
+                    'programInterests': [],
                 }
-            )
+            }
+        }
+        self._assert_response_equals_json(query, expected_json)
 
     def test_query_with_entrepreneur(self):
         with self.login(email=self.staff_user().email):
@@ -239,68 +235,61 @@ class TestGraphQL(APITestCase):
             }}
         """.format(id=confirmed.id)
 
-        with self.login(email=self.basic_user().email):
-            response = self.client.post(self.url, data={'query': query})
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                {
-                    'data': {
-                        'expertProfile': {
-                            'user': {
-                                'firstName': confirmed.first_name,
-                            },
-                            'officeHoursUrl': office_hours_url
-                        }
-                    }
+        expected_json = {
+            'data': {
+                'expertProfile': {
+                    'user': {
+                        'firstName': confirmed.first_name,
+                    },
+                    'officeHoursUrl': office_hours_url
                 }
-            )
+            }
+        }
+
+        self._assert_response_equals_json(query, expected_json)
 
     def test_requested_fields_for_startup_mentor_relationship_type(self):
-        with self.login(email=self.basic_user().email):
-            mentor = ExpertFactory()
-            relationship = StartupMentorRelationshipFactory(mentor=mentor)
-            startup = relationship.startup_mentor_tracking.startup
-            program = relationship.startup_mentor_tracking.program
-            query = """
-                query {{
-                    expertProfile(id: {id}) {{
-                        currentMentees {{
-                            {MENTEE_FIELDS}
-                        }}
-                        previousMentees {{
-                            {MENTEE_FIELDS}
-                        }}
+        mentor = ExpertFactory()
+        relationship = StartupMentorRelationshipFactory(mentor=mentor)
+        startup = relationship.startup_mentor_tracking.startup
+        program = relationship.startup_mentor_tracking.program
+        query = """
+            query {{
+                expertProfile(id: {id}) {{
+                    currentMentees {{
+                        {MENTEE_FIELDS}
+                    }}
+                    previousMentees {{
+                        {MENTEE_FIELDS}
                     }}
                 }}
-            """.format(id=relationship.mentor.id,
-                       MENTEE_FIELDS=MENTEE_FIELDS)
-            response = self.client.post(self.url, data={'query': query})
-            self.assertEqual(
-                json.loads(response.content.decode("utf-8")),
-                {
-                    'data': {
-                        'expertProfile': {
-                            'currentMentees': [{
-                                'startup': {
-                                    'id': str(startup.id),
-                                    'name': startup.name,
-                                    'highResolutionLogo':
-                                        (startup.high_resolution_logo and
-                                            startup.high_resolution_logo.url or
-                                            None),
-                                    'shortPitch': startup.short_pitch,
-                                },
-                                'program': {
-                                        'family':
-                                            program.program_family.name,
-                                        'year': str(program.start_date.year),
-                                },
-                            }],
-                            'previousMentees': []
-                        }
-                    }
+            }}
+        """.format(id=relationship.mentor.id,
+                   MENTEE_FIELDS=MENTEE_FIELDS)
+        expected_json = {
+            'data': {
+                'expertProfile': {
+                    'currentMentees': [{
+                        'startup': {
+                            'id': str(startup.id),
+                            'name': startup.name,
+                            'highResolutionLogo':
+                            (startup.high_resolution_logo and
+                             startup.high_resolution_logo.url or
+                             None),
+                                'shortPitch': startup.short_pitch,
+                        },
+                        'program': {
+                            'family':
+                            program.program_family.name,
+                            'year': str(program.start_date.year),
+                        },
+                    }],
+                    'previousMentees': []
                 }
-            )
+            }
+        }
+        self._assert_response_equals_json(query, expected_json)
 
     def test_query_with_non_expert_user_id(self):
         with self.login(email=self.basic_user().email):
@@ -363,53 +352,47 @@ class TestGraphQL(APITestCase):
             self.assertIn(NON_FINALIST_PROFILE_MESSAGE, error_messages)
 
     def test_staff_user_can_access_non_finalist_graphql_view(self):
-        with self.login(email=self.staff_user().email):
-            user = EntrepreneurFactory()
-            query = """
-                        query {{
-                                entrepreneurProfile(id: {id}) {{
-                                    user {{ firstName }}
-                                }}
+        user = EntrepreneurFactory()
+        query = """
+                    query {{
+                            entrepreneurProfile(id: {id}) {{
+                                user {{ firstName }}
                             }}
-                    """.format(id=user.id)
-            response = self.client.post(self.url, data={'query': query})
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                {
-                    'data': {
-                        'entrepreneurProfile': {
-                            'user': {
-                                'firstName': user.first_name
-                            },
-                        }
-                    }
+                        }}
+                """.format(id=user.id)
+        response = self.client.post(self.url, data={'query': query})
+        expected_json = {
+            'data': {
+                'entrepreneurProfile': {
+                    'user': {
+                        'firstName': user.first_name
+                    },
                 }
-            )
+            }
+        }
+        self._assert_response_equals_json(query, expected_json, True)
 
     def test_non_staff_user_can_access_finalist_graphql_view(self):
-        with self.login(email=self.basic_user().email):
-            user = EntrepreneurFactory()
-            UserRoleContext(UserRole.FINALIST, user=user)
-            query = """
-                        query {{
-                                entrepreneurProfile(id: {id}) {{
-                                    user {{ firstName }}
-                                }}
+        user = EntrepreneurFactory()
+        UserRoleContext(UserRole.FINALIST, user=user)
+        query = """
+                    query {{
+                            entrepreneurProfile(id: {id}) {{
+                                user {{ firstName }}
                             }}
-                    """.format(id=user.id)
-            response = self.client.post(self.url, data={'query': query})
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                {
-                    'data': {
-                        'entrepreneurProfile': {
-                            'user': {
-                                'firstName': user.first_name
-                            },
-                        }
-                    }
+                        }}
+                """.format(id=user.id)
+        response = self.client.post(self.url, data={'query': query})
+        expected_json = {
+            'data': {
+                'entrepreneurProfile': {
+                    'user': {
+                        'firstName': user.first_name
+                    },
                 }
-            )
+            }
+        }
+        self._assert_response_equals_json(query, expected_json)
 
     def test_query_program_roles_for_entrepreneur_returns_correct_value(self):
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
@@ -509,41 +492,35 @@ class TestGraphQL(APITestCase):
         }
         self._assert_response_equals_json(query, expected_json)
 
-    def test_query_prg_roles_for_selected_roles(self):
-        with self.login(email=self.staff_user().email):
-            user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-            startup_roles_of_interest = [StartupRole.ENTRANT]
-            startup_status_names = [StartupRole.ENTRANT,
-                                    StartupRole.FINALIST,
-                                    StartupRole.FINALIST,
-                                    StartupRole.ENTRANT]
-            user = UserContext(
-                user_type="EXPERT",
-                program_role_names=user_roles_of_interest,
-                startup_status_names=startup_status_names).user
-            program_roles = get_user_program_and_startup_roles(
-                user, user_roles_of_interest, startup_roles_of_interest)
+    def test_query_for_prg_roles_as_staff_user(self):
+        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
+        startup_roles_of_interest = [StartupRole.ENTRANT]
+        startup_status_names = [StartupRole.ENTRANT,
+                                StartupRole.FINALIST,
+                                StartupRole.FINALIST,
+                                StartupRole.ENTRANT]
+        user = UserContext(
+            user_type="EXPERT",
+            program_role_names=user_roles_of_interest,
+            startup_status_names=startup_status_names).user
+        program_roles = get_user_program_and_startup_roles(
+            user, user_roles_of_interest, startup_roles_of_interest)
 
-            query = """
-                query{{
-                    expertProfile(id:{id}) {{
-                        programRoles
-                    }}
+        query = """
+            query{{
+                expertProfile(id:{id}) {{
+                    programRoles
                 }}
-            """.format(id=user.id)
-            expected_json = {
-                'data': {
-                    'expertProfile': {
-                        'programRoles': program_roles
-                    }
+            }}
+        """.format(id=user.id)
+        expected_json = {
+            'data': {
+                'expertProfile': {
+                    'programRoles': program_roles
                 }
             }
-            response = self.client.post(self.url, data={'query': query})
-
-            self.assertJSONEqual(
-                str(response.content, encoding='utf8'),
-                expected_json
-            )
+        }
+        self._assert_response_equals_json(query, expected_json, True)
 
     def test_get_user_confirmed_mentor_program_families(self):
         role_grant = ProgramRoleGrantFactory(
@@ -587,8 +564,12 @@ class TestGraphQL(APITestCase):
             self.assertEqual(expert_profile["confirmedMentorProgramFamilies"],
                              [])
 
-    def _assert_response_equals_json(self, query, expected_json):
-        with self.login(email=self.basic_user().email):
+    def _assert_response_equals_json(self, query, expected_json, is_staff=False):
+        if is_staff:
+            user = self.staff_user()
+        else:
+            user = self.basic_user()
+        with self.login(email=user.email):
             response = self.client.post(self.url, data={'query': query})
             self.assertJSONEqual(
                 str(response.content, encoding='utf8'),
