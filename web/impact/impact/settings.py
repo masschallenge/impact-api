@@ -363,7 +363,7 @@ class Base(Configuration):
     }
     NO_REPLY_EMAIL = "noreply@masschallenge.org"
     BCC_EMAIL = "systemlogbcc@masschallenge.org"
-    EMAIL_BACKEND = "impact.email_backends.ImpactEmailBackend"
+    EMAIL_BACKEND = "impact.impact_email_backend.ImpactEmailBackend"
     SES_CONFIGURATION_SET = None
 
 class Dev(Base):
