@@ -360,7 +360,6 @@ class TestGraphQL(APITestCase):
                             }}
                         }}
                 """.format(id=user.id)
-        response = self.client.post(self.url, data={'query': query})
         expected_json = {
             'data': {
                 'entrepreneurProfile': {
@@ -382,7 +381,6 @@ class TestGraphQL(APITestCase):
                             }}
                         }}
                 """.format(id=user.id)
-        response = self.client.post(self.url, data={'query': query})
         expected_json = {
             'data': {
                 'entrepreneurProfile': {
@@ -564,7 +562,8 @@ class TestGraphQL(APITestCase):
             self.assertEqual(expert_profile["confirmedMentorProgramFamilies"],
                              [])
 
-    def _assert_response_equals_json(self, query, expected_json, is_staff=False):
+    def _assert_response_equals_json(self, query, expected_json,
+                                     is_staff=False):
         if is_staff:
             user = self.staff_user()
         else:
