@@ -1,7 +1,5 @@
 from mock import patch
-from django.core import mail
 from django.test import TestCase
-from django.urls import reverse
 
 from impact.minimal_email_handler import MinimalEmailHandler
 
@@ -11,6 +9,7 @@ ADD_LOGGING_HEADERS = ".".join(["impact",
                                 "impact_email_backend",
                                 "ImpactEmailBackend",
                                 "_add_logging_headers"])
+
 
 class TestEmailBackend(TestCase):
 
@@ -28,7 +27,6 @@ class TestEmailBackend(TestCase):
                                 "subject",
                                 "body").send()
             self.assertTrue(mocked_backend.called)
- 
 
     @patch(ADD_LOGGING_HEADERS)
     @patch("django.core.mail.backends.smtp.EmailBackend.send_messages")
@@ -44,7 +42,7 @@ class TestEmailBackend(TestCase):
                                 "subject",
                                 "body").send()
             self.assertTrue(mock_add_logging_headers.called)
-           
+
     @patch(ADD_LOGGING_HEADERS)
     @patch("django.core.mail.backends.smtp.EmailBackend.send_messages")
     def test_email_does_not_contain_header_if_ses_config_not_set(
@@ -59,5 +57,3 @@ class TestEmailBackend(TestCase):
                                 "subject",
                                 "body").send()
             self.assertFalse(mock_add_logging_headers.called)
-
-        

@@ -366,6 +366,7 @@ class Base(Configuration):
     EMAIL_BACKEND = "impact.impact_email_backend.ImpactEmailBackend"
     SES_CONFIGURATION_SET = None
 
+
 class Dev(Base):
     DEBUG = True
 
