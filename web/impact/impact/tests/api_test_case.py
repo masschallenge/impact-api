@@ -95,3 +95,10 @@ class APITestCase(TestCase):
             for key, params in expected_options.items():
                 self.assertIn(key, options)
                 self.assertEqual(options[key], params)
+
+    def basic_user_without_api_groups(self):
+        user = self.make_user('basic_user_no_api_groups@test.com',
+                              perms=["mc.view_startup"])
+        user.set_password('password')
+        user.save()
+        return user
