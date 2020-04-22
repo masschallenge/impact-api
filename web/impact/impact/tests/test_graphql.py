@@ -562,8 +562,11 @@ class TestGraphQL(APITestCase):
             self.assertEqual(expert_profile["confirmedMentorProgramFamilies"],
                              [])
 
-    def _assert_response_equals_json(self, query, expected_json,
-                                     is_staff=False):
+    def _assert_response_equals_json(
+            self,
+            query,
+            expected_json,
+            is_staff=False):
         if is_staff:
             user = self.staff_user()
         else:

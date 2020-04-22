@@ -1,6 +1,4 @@
 import graphene
-from graphene_django import DjangoObjectType
-from graphene.types.generic import GenericScalar
 
 from datetime import datetime
 from django.db.models import Q
@@ -10,8 +8,11 @@ from accelerator.models import (
     ExpertProfile,
     Program,
     ProgramRole,
-    StartupRole,
     UserRole
+)
+
+from impact.graphql.types import (
+    BaseUserProfileType,
 )
 from accelerator_abstract.models import (
     ACTIVE_PROGRAM_STATUS,
@@ -19,26 +20,23 @@ from accelerator_abstract.models import (
     HIDDEN_PROGRAM_STATUS,
     UPCOMING_PROGRAM_STATUS
 )
-from accelerator_abstract.models.base_user_utils import is_employee
 from impact.graphql.types import StartupMentorRelationshipType
 
 from impact.utils import (
     compose_filter,
-    get_user_program_and_startup_roles,
 )
 from impact.v1.helpers.profile_helper import (
     latest_program_id_for_each_program_family,
 )
 
 
-class ExpertProfileType(DjangoObjectType):
+class ExpertProfileType(BaseUserProfileType):
     current_mentees = graphene.List(StartupMentorRelationshipType)
     previous_mentees = graphene.List(StartupMentorRelationshipType)
     image_url = graphene.String()
     office_hours_url = graphene.String()
     program_interests = graphene.List(graphene.String)
     available_office_hours = graphene.Boolean()
-    program_roles = GenericScalar()
     confirmed_mentor_program_families = graphene.List(graphene.String)
 
     class Meta:
@@ -124,20 +122,6 @@ class ExpertProfileType(DjangoObjectType):
         ).values_list(
             'program_role__program__program_family__name',
             flat=True).distinct()
-
-    def resolve_program_roles(self, info, **kwargs):
-        """
-        Returns the program roles and startup roles for this user
-        Note that name is deceptive, since startup roles are included in the
-        return but not mentioned in the name. This cannot be fixed here
-        without changing GraphQL queries on the front end.
-        """
-        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-        startup_roles_of_interest = StartupRole.WINNER_STARTUP_ROLES
-        if is_employee(info.context.user):
-            startup_roles_of_interest += [StartupRole.ENTRANT]
-        return get_user_program_and_startup_roles(
-            self.user, user_roles_of_interest, startup_roles_of_interest)
 
 
 def _get_slugs(obj, mentor_program, latest_mentor_program, **kwargs):
