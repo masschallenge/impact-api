@@ -1,0 +1,52 @@
+{% load static from staticfiles %}
+<html>
+<head>
+
+</head>
+<body>
+<p>Hi {{ mentor_first_name }},</p>
+
+<p>
+    Thanks for confirming your mentorship commitments for the upcoming accelerator season – we’re excited to have you on
+    board! Based on what you selected on Accelerate, you are confirmed for:
+</p>
+
+{% for program in confirmed_programs %}
+    <p>{{ program.name }}</p>
+    <p>Program dates: {{ program.start_date|date:"d M, Y" }} - {{ program.end_date|date:"d M, Y" }}</p>
+{% endfor %}
+
+<p>
+    If you need to change your commitments, please reach out to your community manager or through our website
+    <a href="https://masschallenge.org/contact"></a>masschallenge.org/contact.
+</p>
+
+Be on the lookout for more communications from us over the next few weeks with key dates and events for you to join! In
+the meantime, here are some ways you can start prepping for the summer ahead:
+<ul>
+    <li>
+        Update your <a href="">Accelerate profile</a> so the incoming class of startups has the most up-to-date
+        information on you and
+        your expertise. It also helps us optimize mentor & startup matching.
+    </li>
+
+    <l>
+        Review the <a href="">Expert Agreement</a> to refresh on the expectations and responsibilities of being a
+        MassChallenge Mentor.
+    </l>
+</ul>
+
+<p>
+    We’re really excited to have you with us this year – thanks for all you for our startups & for the MassChallenge
+    community! If you have any questions, reach out to your community manager listed above.
+</p>
+
+<p>Here’s to a great accelerator season ahead.</p>
+
+<p>
+    Thanks, <br>
+    The MassChallenge Team
+</p>
+
+</body>
+</html>
