@@ -9,6 +9,7 @@ from impact.graphql.types import (
     EntrepreneurProfileType,
     ExpertProfileType
 )
+
 from impact.permissions.graphql_permissions import (
     can_view_entrepreneur_profile
 )
@@ -16,11 +17,6 @@ from impact.permissions.graphql_permissions import (
 ENTREPRENEUR_NOT_FOUND_MESSAGE = 'Entrepreneur matching the id does not exist.'
 EXPERT_NOT_FOUND_MESSAGE = 'Expert matching the id does not exist.'
 NOT_ALLOWED_ACCESS_MESSAGE = 'Sorry, You are not allowed to access this page.'
-
-
-def has_permission(profile_user, roles):
-    return profile_user.programrolegrant_set.filter(
-        program_role__user_role__name__in=roles).exists()
 
 
 class Query(graphene.ObjectType):

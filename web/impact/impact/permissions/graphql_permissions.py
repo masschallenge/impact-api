@@ -1,6 +1,4 @@
 from accelerator.models import (
-    EntrepreneurProfile,
-    ExpertProfile,
     UserRole,
 )
 from accelerator_abstract.models.base_user_utils import is_employee
