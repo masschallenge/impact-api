@@ -687,8 +687,8 @@ class TestGraphQL(APITestCase):
                 user_role=user_role,
                 program__program_status=program_status or ACTIVE_PROGRAM_STATUS
             )
-            ProgramRoleGrantFactory.create(person=user,
-                                           program_role=program_role)
+            ProgramRoleGrantFactory(person=user,
+                                    program_role=program_role)
         user.set_password('password')
         user.save()
         return user
