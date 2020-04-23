@@ -9,7 +9,10 @@ from accelerator.tests.contexts import (
     UserRoleContext
 )
 from accelerator.tests.contexts.context_utils import get_user_role_by_name
-from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
+from accelerator.models import (
+    ACTIVE_PROGRAM_STATUS,
+    ENDED_PROGRAM_STATUS
+)
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
 from impact.graphql.query import (
     ENTREPRENEUR_NOT_FOUND_MESSAGE,
@@ -214,12 +217,12 @@ class TestGraphQL(APITestCase):
         family_slug = mentor_program.program_family.url_slug
         program_slug = mentor_program.url_slug
         office_hours_url = (
-            "/officehours/list/{family_slug}/{program_slug}/"
-            .format(
-                family_slug=family_slug,
-                program_slug=program_slug) + (
-                '?mentor_id={mentor_id}'.format(
-                    mentor_id=confirmed.id)))
+                "/officehours/list/{family_slug}/{program_slug}/"
+                .format(
+                    family_slug=family_slug,
+                    program_slug=program_slug) + (
+                    '?mentor_id={mentor_id}'.format(
+                        mentor_id=confirmed.id)))
 
         query = """
             query {{
@@ -277,14 +280,14 @@ class TestGraphQL(APITestCase):
                                     'name': startup.name,
                                     'highResolutionLogo':
                                         (startup.high_resolution_logo and
-                                            startup.high_resolution_logo.url or
-                                            None),
+                                         startup.high_resolution_logo.url or
+                                         None),
                                     'shortPitch': startup.short_pitch,
                                 },
                                 'program': {
-                                        'family':
-                                            program.program_family.name,
-                                        'year': str(program.start_date.year),
+                                    'family':
+                                        program.program_family.name,
+                                    'year': str(program.start_date.year),
                                 },
                             }],
                             'previousMentees': []
@@ -364,14 +367,14 @@ class TestGraphQL(APITestCase):
             }}
         """.format(id=user.id)
         expected_json = {
-                'data': {
-                    'entrepreneurProfile': {
-                        'user': {
-                            'firstName': user.first_name
-                        },
-                    }
+            'data': {
+                'entrepreneurProfile': {
+                    'user': {
+                        'firstName': user.first_name
+                    },
                 }
             }
+        }
         self._assert_response_equals_json(
             query, expected_json, email=current_user.email)
 
@@ -617,6 +620,49 @@ class TestGraphQL(APITestCase):
             self._assert_response_equals_json(
                 query, expected_json, email=current_user.email)
 
+    def test_user_cannot_view_profile_with_non_current_allowed_roles(self):
+        allowed_user = self._expert_user(UserRole.FINALIST)
+        with self.login(email=allowed_user.email):
+            user = EntrepreneurFactory()
+            UserRoleContext(
+                UserRole.MENTOR,
+                user=user,
+                program=ProgramFactory(program_status=ENDED_PROGRAM_STATUS))
+            query = """
+                        query{{
+                        entrepreneurProfile(id:{id}) {{
+                            programRoles
+                        }}
+                    }}
+                    """.format(id=user.id)
+
+            self._assert_error_in_response(query, NOT_ALLOWED_ACCESS_MESSAGE)
+
+    def test_allowed_user_with_non_current_user_role_cannot_view_profile(self):
+        allowed_user_roles = [
+            UserRole.FINALIST,
+            UserRole.AIR,
+            UserRole.MENTOR,
+            UserRole.PARTNER,
+            UserRole.ALUM
+        ]
+        for role in allowed_user_roles:
+            current_user = self._expert_user(
+                role,
+                program_status=ENDED_PROGRAM_STATUS)
+            with self.login(email=current_user.email):
+                user = EntrepreneurFactory()
+                UserRoleContext(UserRole.MENTOR, user=user)
+                query = """
+                            query{{
+                                entrepreneurProfile(id:{id}) {{
+                                    user{{lastName}}
+                                }}
+                            }}
+                        """.format(id=user.id)
+                self._assert_error_in_response(query,
+                                               NOT_ALLOWED_ACCESS_MESSAGE)
+
     def _assert_response_equals_json(self, query, expected_json, email=None):
         with self.login(email=email or self.basic_user().email):
             response = self.client.post(self.url, data={'query': query})
@@ -633,11 +679,14 @@ class TestGraphQL(APITestCase):
                               for x in response.json()['errors']]
         self.assertIn(error_message, error_messages)
 
-    def _expert_user(self, role=None):
+    def _expert_user(self, role=None, program_status=None):
         user = ExpertFactory()
         if role:
             user_role = get_user_role_by_name(role)
-            program_role = ProgramRoleFactory.create(user_role=user_role)
+            program_role = ProgramRoleFactory.create(
+                user_role=user_role,
+                program__program_status=program_status or ACTIVE_PROGRAM_STATUS
+            )
             ProgramRoleGrantFactory.create(person=user,
                                            program_role=program_role)
         user.set_password('password')
