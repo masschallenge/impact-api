@@ -1,26 +1,21 @@
 import graphene
-from graphene.types.generic import GenericScalar
-from graphene_django import DjangoObjectType
 from accelerator.models import (
     EntrepreneurProfile,
-    UserRole,
     Startup,
-    StartupRole,
     StartupTeamMember
 )
-
+from impact.graphql.types import (
+    BaseUserProfileType,
+)
 from impact.graphql.types.entrepreneur_startup_type import (
     EntrepreneurStartupType,
 )
 
-from impact.utils import get_user_program_and_startup_roles
 
-
-class EntrepreneurProfileType(DjangoObjectType):
+class EntrepreneurProfileType(BaseUserProfileType):
     image_url = graphene.String()
     title = graphene.String()
     startups = graphene.List(EntrepreneurStartupType)
-    program_roles = GenericScalar()
 
     class Meta:
         model = EntrepreneurProfile
@@ -46,10 +41,3 @@ class EntrepreneurProfileType(DjangoObjectType):
         if team_member:
             return team_member.title
         return ""
-
-    def resolve_program_roles(self, info, **kwargs):
-        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-        startup_roles_of_interest = [StartupRole.ENTRANT]
-        startup_roles_of_interest += StartupRole.WINNER_STARTUP_ROLES
-        return get_user_program_and_startup_roles(
-            self.user, user_roles_of_interest, startup_roles_of_interest)
