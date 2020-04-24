@@ -551,25 +551,133 @@ class TestGraphQL(APITestCase):
             self.assertEqual(expert_profile["confirmedMentorProgramFamilies"],
                              [])
 
-    def test_judge_cannot_view_entrepreneur_mentor_profile(self):
-        judge = self._expert_user(UserRole.JUDGE)
-        with self.login(email=judge.email):
+    def test_user_cannot_view_profile_with_non_current_allowed_roles(self):
+        allowed_user = self._expert_user(UserRole.FINALIST)
+        with self.login(email=allowed_user.email):
             user = EntrepreneurFactory()
-            UserRoleContext(UserRole.MENTOR, user=user)
+            UserRoleContext(
+                UserRole.MENTOR,
+                user=user,
+                program=ProgramFactory(program_status=ENDED_PROGRAM_STATUS))
             query = """
-                query{{
-                entrepreneurProfile(id:{id}) {{
-                    programRoles
-                }}
-            }}
-            """.format(id=user.id)
+                        query{{
+                            entrepreneurProfile(id:{id}) {{
+                                programRoles
+                            }}
+                        }}
+                    """.format(id=user.id)
 
             self._assert_error_in_response(query, NOT_ALLOWED_ACCESS_MESSAGE)
 
-    def test_user_without_role_can_view_staff_entrepreneur_profile(self):
-        current_user = self._expert_user()
+    def test_allowed_user_with_non_current_user_role_cannot_view_profile(self):
+        current_user = self._expert_user(
+            UserRole.FINALIST,
+            program_status=ENDED_PROGRAM_STATUS)
+        with self.login(email=current_user.email):
+            user = EntrepreneurFactory()
+            UserRoleContext(UserRole.MENTOR, user=user)
+            query = """
+                        query{{
+                            entrepreneurProfile(id:{id}) {{
+                                user{{lastName}}
+                            }}
+                        }}
+                    """.format(id=user.id)
+            self._assert_error_in_response(query, NOT_ALLOWED_ACCESS_MESSAGE)
+
+    def test_current_finalist_can_view_current_finalist_profile(self):
+        self._assert_expert_can_view_profile(UserRole.FINALIST,
+                                             UserRole.FINALIST)
+
+    def test_current_finalist_can_view_current_staff_profile(self):
+        self._assert_expert_can_view_profile(UserRole.FINALIST, UserRole.STAFF)
+
+    def test_current_finalist_can_view_current_alum_profile(self):
+        self._assert_expert_can_view_profile(UserRole.FINALIST, UserRole.ALUM)
+
+    def test_current_finalist_can_view_current_mentor_profile(self):
+        self._assert_expert_can_view_profile(UserRole.FINALIST,
+                                             UserRole.MENTOR)
+
+    def test_current_alum_in_residence_can_view_current_finalist_profile(self):
+        self._assert_expert_can_view_profile(UserRole.AIR, UserRole.FINALIST)
+
+    def test_current_alum_in_residence_can_view_current_staff_profile(self):
+        self._assert_expert_can_view_profile(UserRole.AIR, UserRole.STAFF)
+
+    def test_current_alum_in_residence_can_view_current_alum_profile(self):
+        self._assert_expert_can_view_profile(UserRole.AIR, UserRole.ALUM)
+
+    def test_current_alum_in_residence_can_view_current_mentor_profile(self):
+        self._assert_expert_can_view_profile(UserRole.AIR, UserRole.MENTOR)
+
+    def test_current_mentor_can_view_current_finalist_profile(self):
+        self._assert_expert_can_view_profile(UserRole.MENTOR,
+                                             UserRole.FINALIST)
+
+    def test_current_mentor_can_view_current_staff_profile(self):
+        self._assert_expert_can_view_profile(UserRole.MENTOR, UserRole.STAFF)
+
+    def test_current_mentor_can_view_current_alum_profile(self):
+        self._assert_expert_can_view_profile(UserRole.MENTOR, UserRole.ALUM)
+
+    def test_current_mentor_can_view_current_mentor_profile(self):
+        self._assert_expert_can_view_profile(UserRole.MENTOR, UserRole.MENTOR)
+
+    def test_current_partner_can_view_current_finalist_profile(self):
+        self._assert_expert_can_view_profile(UserRole.PARTNER,
+                                             UserRole.FINALIST)
+
+    def test_current_partner_can_view_current_staff_profile(self):
+        self._assert_expert_can_view_profile(UserRole.PARTNER, UserRole.STAFF)
+
+    def test_current_partner_can_view_current_alum_profile(self):
+        self._assert_expert_can_view_profile(UserRole.PARTNER, UserRole.ALUM)
+
+    def test_current_partner_can_view_current_mentor_profile(self):
+        self._assert_expert_can_view_profile(UserRole.PARTNER, UserRole.MENTOR)
+
+    def test_current_alum_can_view_current_finalist_profile(self):
+        self._assert_expert_can_view_profile(UserRole.ALUM, UserRole.FINALIST)
+
+    def test_current_alum_can_view_current_staff_profile(self):
+        self._assert_expert_can_view_profile(UserRole.ALUM, UserRole.STAFF)
+
+    def test_current_alum_can_view_current_alum_profile(self):
+        self._assert_expert_can_view_profile(UserRole.ALUM, UserRole.ALUM)
+
+    def test_current_alum_can_view_current_mentor_profile(self):
+        self._assert_expert_can_view_profile(UserRole.ALUM, UserRole.MENTOR)
+
+    def test_current_judge_can_view_current_finalist_profile(self):
+        self._assert_expert_can_view_profile(UserRole.JUDGE, UserRole.FINALIST)
+
+    def test_current_judge_can_view_current_staff_profile(self):
+        self._assert_expert_can_view_profile(UserRole.JUDGE, UserRole.STAFF)
+
+    def test_current_judge_can_view_current_alum_profile(self):
+        self._assert_expert_can_view_profile(UserRole.JUDGE, UserRole.ALUM)
+
+    def test_user_with_no_role_can_view_current_staff_profile(self):
+        self._assert_expert_can_view_profile(None, UserRole.STAFF)
+
+    def test_user_with_no_role_cannot_view_current_finalist_profile(self):
+        self._assert_expert_cannot_view_profile(None, UserRole.FINALIST)
+
+    def test_user_with_no_role_can_view_current_alum_profile(self):
+        self._assert_expert_cannot_view_profile(None, UserRole.ALUM)
+
+    def test_user_with_no_role_can_view_current_mentor_profile(self):
+        self._assert_expert_cannot_view_profile(None, UserRole.MENTOR)
+
+    def test_current_judge_cannot_view_mentor_profile(self):
+        self._assert_expert_cannot_view_profile(UserRole.JUDGE,
+                                                UserRole.MENTOR)
+
+    def _assert_expert_can_view_profile(self, expert_role, profile_user_role):
+        current_user = self._expert_user(expert_role)
         user = EntrepreneurFactory()
-        UserRoleContext(UserRole.STAFF, user=user)
+        UserRoleContext(profile_user_role, user=user)
         query = """
             query{{
                 entrepreneurProfile(id:{id}) {{
@@ -589,45 +697,11 @@ class TestGraphQL(APITestCase):
         self._assert_response_equals_json(
             query, expected_json, email=current_user.email)
 
-    def test_allowed_user_can_view_mentor_entrepreneur_profile(self):
-        allowed_user_roles = [
-            UserRole.FINALIST,
-            UserRole.AIR,
-            UserRole.MENTOR,
-            UserRole.PARTNER,
-            UserRole.ALUM
-        ]
-        for role in allowed_user_roles:
-            current_user = self._expert_user(role)
+    def _assert_expert_cannot_view_profile(self, user_role, profile_user_role):
+        current_user = self._expert_user(user_role)
+        with self.login(email=current_user.email):
             user = EntrepreneurFactory()
-            UserRoleContext(UserRole.MENTOR, user=user)
-            query = """
-                query{{
-                    entrepreneurProfile(id:{id}) {{
-                        user{{lastName}}
-                    }}
-                }}
-            """.format(id=user.id)
-            expected_json = {
-                'data': {
-                    'entrepreneurProfile': {
-                        'user': {
-                            'lastName': user.last_name
-                        }
-                    }
-                }
-            }
-            self._assert_response_equals_json(
-                query, expected_json, email=current_user.email)
-
-    def test_user_cannot_view_profile_with_non_current_allowed_roles(self):
-        allowed_user = self._expert_user(UserRole.FINALIST)
-        with self.login(email=allowed_user.email):
-            user = EntrepreneurFactory()
-            UserRoleContext(
-                UserRole.MENTOR,
-                user=user,
-                program=ProgramFactory(program_status=ENDED_PROGRAM_STATUS))
+            UserRoleContext(profile_user_role, user=user)
             query = """
                         query{{
                         entrepreneurProfile(id:{id}) {{
@@ -635,33 +709,7 @@ class TestGraphQL(APITestCase):
                         }}
                     }}
                     """.format(id=user.id)
-
             self._assert_error_in_response(query, NOT_ALLOWED_ACCESS_MESSAGE)
-
-    def test_allowed_user_with_non_current_user_role_cannot_view_profile(self):
-        allowed_user_roles = [
-            UserRole.FINALIST,
-            UserRole.AIR,
-            UserRole.MENTOR,
-            UserRole.PARTNER,
-            UserRole.ALUM
-        ]
-        for role in allowed_user_roles:
-            current_user = self._expert_user(
-                role,
-                program_status=ENDED_PROGRAM_STATUS)
-            with self.login(email=current_user.email):
-                user = EntrepreneurFactory()
-                UserRoleContext(UserRole.MENTOR, user=user)
-                query = """
-                            query{{
-                                entrepreneurProfile(id:{id}) {{
-                                    user{{lastName}}
-                                }}
-                            }}
-                        """.format(id=user.id)
-                self._assert_error_in_response(query,
-                                               NOT_ALLOWED_ACCESS_MESSAGE)
 
     def _assert_response_equals_json(self, query, expected_json, email=None):
         with self.login(email=email or self.basic_user().email):
