@@ -1,17 +1,18 @@
 import graphene
-from graphene_django import DjangoObjectType
 from accelerator.models import (
     EntrepreneurProfile,
     Startup,
     StartupTeamMember
 )
-
+from impact.graphql.types import (
+    BaseUserProfileType,
+)
 from impact.graphql.types.entrepreneur_startup_type import (
     EntrepreneurStartupType,
 )
 
 
-class EntrepreneurProfileType(DjangoObjectType):
+class EntrepreneurProfileType(BaseUserProfileType):
     image_url = graphene.String()
     title = graphene.String()
     startups = graphene.List(EntrepreneurStartupType)
