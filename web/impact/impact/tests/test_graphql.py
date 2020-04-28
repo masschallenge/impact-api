@@ -3,16 +3,27 @@
 import json
 from django.urls import reverse
 
-from accelerator.models import (
-    StartupRole,
-    UserRole
+from accelerator.models import StartupRole, UserRole
+from accelerator.tests.contexts import (
+    StartupTeamMemberContext,
+    UserRoleContext
 )
-from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
+from accelerator.tests.contexts.context_utils import get_user_role_by_name
+from accelerator.models import (
+    ACTIVE_PROGRAM_STATUS,
+    ENDED_PROGRAM_STATUS
+)
 from impact.graphql.middleware import NOT_LOGGED_IN_MSG
+from impact.graphql.query import (
+    ENTREPRENEUR_NOT_FOUND_MESSAGE,
+    EXPERT_NOT_FOUND_MESSAGE,
+    NOT_ALLOWED_ACCESS_MESSAGE
+)
 from impact.tests.api_test_case import APITestCase
 from impact.tests.contexts import UserContext
 from impact.tests.factories import (
     ApplicationFactory,
+    EntrepreneurFactory,
     ExpertFactory,
     ProgramFactory,
     ProgramRoleFactory,
@@ -20,20 +31,9 @@ from impact.tests.factories import (
     ProgramStartupStatusFactory,
     StartupMentorRelationshipFactory,
     StartupStatusFactory,
-    UserRoleFactory,
-    EntrepreneurFactory,
+    UserRoleFactory
 )
 from impact.tests.utils import capture_stderr
-from impact.graphql.query import (
-    EXPERT_NOT_FOUND_MESSAGE,
-    ENTREPRENEUR_NOT_FOUND_MESSAGE,
-    NON_FINALIST_PROFILE_MESSAGE
-)
-from accelerator.tests.contexts import (
-    StartupTeamMemberContext,
-    UserRoleContext,
-)
-
 from impact.utils import get_user_program_and_startup_roles
 
 MENTEE_FIELDS = """
@@ -58,13 +58,7 @@ class TestGraphQL(APITestCase):
         user = ExpertFactory()
         query = """query {{ expertProfile(id: {id}) {{ title }} }}
             """.format(id=user.id)
-
-        with capture_stderr(self.client.post,
-                            self.url,
-                            data={'query': query}) as (response, _):
-            error_messages = [x['message'] for x in response.json()['errors']]
-
-        self.assertIn(NOT_LOGGED_IN_MSG, error_messages)
+        self._assert_error_in_response(query, NOT_LOGGED_IN_MSG)
 
     def test_anonymous_user_can_access_auth_graphql_view(self):
         query = """mutation {
@@ -219,12 +213,12 @@ class TestGraphQL(APITestCase):
         family_slug = mentor_program.program_family.url_slug
         program_slug = mentor_program.url_slug
         office_hours_url = (
-            "/officehours/list/{family_slug}/{program_slug}/"
-            .format(
-                family_slug=family_slug,
-                program_slug=program_slug) + (
-                '?mentor_id={mentor_id}'.format(
-                    mentor_id=confirmed.id)))
+                "/officehours/list/{family_slug}/{program_slug}/"
+                .format(
+                    family_slug=family_slug,
+                    program_slug=program_slug) + (
+                    '?mentor_id={mentor_id}'.format(
+                        mentor_id=confirmed.id)))
 
         query = """
             query {{
@@ -303,17 +297,7 @@ class TestGraphQL(APITestCase):
                 }}
             """.format(id=user.id)
 
-            with capture_stderr(self.client.post,
-                                self.url,
-                                data={'query': query}) as (response, _):
-                error_messages = [x['message'] for x in
-                                  response.json()['errors']]
-
-            self.assertIn(EXPERT_NOT_FOUND_MESSAGE, error_messages)
-            self.assertEqual(
-                response.json()['data']['expertProfile'],
-                None
-            )
+            self._assert_error_in_response(query, EXPERT_NOT_FOUND_MESSAGE)
 
     def test_query_with_non_existent_entrepreneur_id(self):
         with self.login(email=self.basic_user().email):
@@ -325,17 +309,8 @@ class TestGraphQL(APITestCase):
                 }}
             """.format(id=0)
 
-            with capture_stderr(self.client.post,
-                                self.url,
-                                data={'query': query}) as (response, _):
-                error_messages = [x['message'] for x in
-                                  response.json()['errors']]
-
-            self.assertIn(ENTREPRENEUR_NOT_FOUND_MESSAGE, error_messages)
-            self.assertEqual(
-                response.json()['data']['entrepreneurProfile'],
-                None
-            )
+            self._assert_error_in_response(
+                query, ENTREPRENEUR_NOT_FOUND_MESSAGE)
 
     def test_non_staff_user_cannot_access_non_finalist_graphql_view(self):
         query_string = "query {{ entrepreneurProfile(id: {id}) {{ title }} }}"
@@ -343,13 +318,7 @@ class TestGraphQL(APITestCase):
             user = EntrepreneurFactory()
             query = query_string.format(id=user.id)
 
-            with capture_stderr(self.client.post,
-                                self.url,
-                                data={'query': query}) as (response, _):
-                error_messages = [x['message']
-                                  for x in response.json()['errors']]
-
-            self.assertIn(NON_FINALIST_PROFILE_MESSAGE, error_messages)
+            self._assert_error_in_response(query, NOT_ALLOWED_ACCESS_MESSAGE)
 
     def test_staff_user_can_access_non_finalist_graphql_view(self):
         user = EntrepreneurFactory()
@@ -372,15 +341,16 @@ class TestGraphQL(APITestCase):
         self._assert_response_equals_json(query, expected_json, True)
 
     def test_non_staff_user_can_access_finalist_graphql_view(self):
+        current_user = self._expert_user(UserRole.MENTOR)
         user = EntrepreneurFactory()
         UserRoleContext(UserRole.FINALIST, user=user)
         query = """
-                    query {{
-                            entrepreneurProfile(id: {id}) {{
-                                user {{ firstName }}
-                            }}
-                        }}
-                """.format(id=user.id)
+            query {{
+                entrepreneurProfile(id: {id}) {{
+                    user {{ firstName }}
+                }}
+            }}
+        """.format(id=user.id)
         expected_json = {
             'data': {
                 'entrepreneurProfile': {
@@ -390,9 +360,11 @@ class TestGraphQL(APITestCase):
                 }
             }
         }
-        self._assert_response_equals_json(query, expected_json)
+        self._assert_response_equals_json(
+            query, expected_json, email=current_user.email)
 
     def test_query_program_roles_for_entrepreneur_returns_correct_value(self):
+        current_user = self._expert_user(UserRole.AIR)
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         user = UserContext(
             program_role_names=user_roles_of_interest).user
@@ -414,7 +386,8 @@ class TestGraphQL(APITestCase):
                 }
             }
         }
-        self._assert_response_equals_json(query, expected_json)
+        self._assert_response_equals_json(
+            query, expected_json, email=current_user.email)
 
     def test_query_program_roles_for_expert_returns_correct_value(self):
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
@@ -562,18 +535,201 @@ class TestGraphQL(APITestCase):
             self.assertEqual(expert_profile["confirmedMentorProgramFamilies"],
                              [])
 
+    def test_user_cannot_view_profile_with_non_current_allowed_roles(self):
+        allowed_user = self._expert_user(UserRole.FINALIST)
+        with self.login(email=allowed_user.email):
+            user = EntrepreneurFactory()
+            UserRoleContext(
+                UserRole.MENTOR,
+                user=user,
+                program=ProgramFactory(program_status=ENDED_PROGRAM_STATUS))
+            query = """
+                        query{{
+                            entrepreneurProfile(id:{id}) {{
+                                programRoles
+                            }}
+                        }}
+                    """.format(id=user.id)
+
+            self._assert_error_in_response(query, NOT_ALLOWED_ACCESS_MESSAGE)
+
+    def test_allowed_user_with_non_current_user_role_cannot_view_profile(self):
+        current_user = self._expert_user(
+            UserRole.FINALIST,
+            program_status=ENDED_PROGRAM_STATUS)
+        with self.login(email=current_user.email):
+            user = EntrepreneurFactory()
+            UserRoleContext(UserRole.MENTOR, user=user)
+            query = """
+                        query{{
+                            entrepreneurProfile(id:{id}) {{
+                                user{{lastName}}
+                            }}
+                        }}
+                    """.format(id=user.id)
+            self._assert_error_in_response(query, NOT_ALLOWED_ACCESS_MESSAGE)
+
+    def test_current_finalist_can_view_current_finalist_profile(self):
+        self._assert_expert_can_view_profile(UserRole.FINALIST,
+                                             UserRole.FINALIST)
+
+    def test_current_finalist_can_view_current_staff_profile(self):
+        self._assert_expert_can_view_profile(UserRole.FINALIST, UserRole.STAFF)
+
+    def test_current_finalist_can_view_current_alum_profile(self):
+        self._assert_expert_can_view_profile(UserRole.FINALIST, UserRole.ALUM)
+
+    def test_current_finalist_can_view_current_mentor_profile(self):
+        self._assert_expert_can_view_profile(UserRole.FINALIST,
+                                             UserRole.MENTOR)
+
+    def test_current_alum_in_residence_can_view_current_finalist_profile(self):
+        self._assert_expert_can_view_profile(UserRole.AIR, UserRole.FINALIST)
+
+    def test_current_alum_in_residence_can_view_current_staff_profile(self):
+        self._assert_expert_can_view_profile(UserRole.AIR, UserRole.STAFF)
+
+    def test_current_alum_in_residence_can_view_current_alum_profile(self):
+        self._assert_expert_can_view_profile(UserRole.AIR, UserRole.ALUM)
+
+    def test_current_alum_in_residence_can_view_current_mentor_profile(self):
+        self._assert_expert_can_view_profile(UserRole.AIR, UserRole.MENTOR)
+
+    def test_current_mentor_can_view_current_finalist_profile(self):
+        self._assert_expert_can_view_profile(UserRole.MENTOR,
+                                             UserRole.FINALIST)
+
+    def test_current_mentor_can_view_current_staff_profile(self):
+        self._assert_expert_can_view_profile(UserRole.MENTOR, UserRole.STAFF)
+
+    def test_current_mentor_can_view_current_alum_profile(self):
+        self._assert_expert_can_view_profile(UserRole.MENTOR, UserRole.ALUM)
+
+    def test_current_mentor_can_view_current_mentor_profile(self):
+        self._assert_expert_can_view_profile(UserRole.MENTOR, UserRole.MENTOR)
+
+    def test_current_partner_can_view_current_finalist_profile(self):
+        self._assert_expert_can_view_profile(UserRole.PARTNER,
+                                             UserRole.FINALIST)
+
+    def test_current_partner_can_view_current_staff_profile(self):
+        self._assert_expert_can_view_profile(UserRole.PARTNER, UserRole.STAFF)
+
+    def test_current_partner_can_view_current_alum_profile(self):
+        self._assert_expert_can_view_profile(UserRole.PARTNER, UserRole.ALUM)
+
+    def test_current_partner_can_view_current_mentor_profile(self):
+        self._assert_expert_can_view_profile(UserRole.PARTNER, UserRole.MENTOR)
+
+    def test_current_alum_can_view_current_finalist_profile(self):
+        self._assert_expert_can_view_profile(UserRole.ALUM, UserRole.FINALIST)
+
+    def test_current_alum_can_view_current_staff_profile(self):
+        self._assert_expert_can_view_profile(UserRole.ALUM, UserRole.STAFF)
+
+    def test_current_alum_can_view_current_alum_profile(self):
+        self._assert_expert_can_view_profile(UserRole.ALUM, UserRole.ALUM)
+
+    def test_current_alum_can_view_current_mentor_profile(self):
+        self._assert_expert_can_view_profile(UserRole.ALUM, UserRole.MENTOR)
+
+    def test_current_judge_can_view_current_finalist_profile(self):
+        self._assert_expert_can_view_profile(UserRole.JUDGE, UserRole.FINALIST)
+
+    def test_current_judge_can_view_current_staff_profile(self):
+        self._assert_expert_can_view_profile(UserRole.JUDGE, UserRole.STAFF)
+
+    def test_current_judge_can_view_current_alum_profile(self):
+        self._assert_expert_can_view_profile(UserRole.JUDGE, UserRole.ALUM)
+
+    def test_user_with_no_role_can_view_current_staff_profile(self):
+        self._assert_expert_can_view_profile(None, UserRole.STAFF)
+
+    def test_user_with_no_role_cannot_view_current_finalist_profile(self):
+        self._assert_expert_cannot_view_profile(None, UserRole.FINALIST)
+
+    def test_user_with_no_role_can_view_current_alum_profile(self):
+        self._assert_expert_cannot_view_profile(None, UserRole.ALUM)
+
+    def test_user_with_no_role_can_view_current_mentor_profile(self):
+        self._assert_expert_cannot_view_profile(None, UserRole.MENTOR)
+
+    def test_current_judge_cannot_view_mentor_profile(self):
+        self._assert_expert_cannot_view_profile(UserRole.JUDGE,
+                                                UserRole.MENTOR)
+
+    def _assert_expert_can_view_profile(self, expert_role, profile_user_role):
+        current_user = self._expert_user(expert_role)
+        user = EntrepreneurFactory()
+        UserRoleContext(profile_user_role, user=user)
+        query = """
+            query{{
+                entrepreneurProfile(id:{id}) {{
+                    user{{lastName}}
+                }}
+            }}
+        """.format(id=user.id)
+        expected_json = {
+            'data': {
+                'entrepreneurProfile': {
+                    'user': {
+                        'lastName': user.last_name
+                    }
+                }
+            }
+        }
+        self._assert_response_equals_json(
+            query, expected_json, email=current_user.email)
+
+    def _assert_expert_cannot_view_profile(self, user_role, profile_user_role):
+        current_user = self._expert_user(user_role)
+        with self.login(email=current_user.email):
+            user = EntrepreneurFactory()
+            UserRoleContext(profile_user_role, user=user)
+            query = """
+                        query{{
+                        entrepreneurProfile(id:{id}) {{
+                            programRoles
+                        }}
+                    }}
+                    """.format(id=user.id)
+            self._assert_error_in_response(query, NOT_ALLOWED_ACCESS_MESSAGE)
+
     def _assert_response_equals_json(
             self,
             query,
             expected_json,
-            is_staff=False):
+            is_staff=False,
+            email=None):
         if is_staff:
             user = self.staff_user()
         else:
             user = self.basic_user()
-        with self.login(email=user.email):
+        with self.login(email=email or user.email):
             response = self.client.post(self.url, data={'query': query})
             self.assertJSONEqual(
                 str(response.content, encoding='utf8'),
                 expected_json
             )
+
+    def _assert_error_in_response(self, query, error_message):
+        with capture_stderr(self.client.post,
+                            self.url,
+                            data={'query': query}) as (response, _):
+            error_messages = [x['message']
+                              for x in response.json()['errors']]
+        self.assertIn(error_message, error_messages)
+
+    def _expert_user(self, role=None, program_status=None):
+        user = ExpertFactory()
+        if role:
+            user_role = get_user_role_by_name(role)
+            program_role = ProgramRoleFactory.create(
+                user_role=user_role,
+                program__program_status=program_status or ACTIVE_PROGRAM_STATUS
+            )
+            ProgramRoleGrantFactory(person=user,
+                                    program_role=program_role)
+        user.set_password('password')
+        user.save()
+        return user
