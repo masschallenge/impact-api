@@ -1,5 +1,4 @@
-from unittest.mock import patch
-
+from django.core import mail
 from django.urls import reverse
 
 from accelerator.tests.contexts.context_utils import get_user_role_by_name
@@ -13,9 +12,10 @@ from accelerator.tests.factories import (
 
 from impact.tests.api_test_case import APITestCase
 from impact.v1.views import UserProgramConfirmationDetailView
-from impact.v1.views.user_program_confirmation_detail_view import INVALID_INPUT_ERROR
-
-IMPACT_BACKEND_PATH = 'impact.impact_email_backend.ImpactEmailBackend'
+from impact.v1.views.user_program_confirmation_detail_view import (
+    INVALID_INPUT_ERROR,
+    SUBJECT
+)
 
 
 class TestUserConfirmParticipationView(APITestCase):
@@ -125,20 +125,15 @@ class TestUserConfirmParticipationView(APITestCase):
             }
             self.assertEqual(response.data, expected)
 
-    @patch("django.core.mail.backends.smtp.EmailBackend.send_messages")
-    def test_email_is_sent_after_confirming_participation(
-            self,
-            mocked_backend):
+    def test_email_is_sent_after_confirming_participation(self):
         user = self.basic_user()
-        with self.settings(
-                EMAIL_BACKEND=IMPACT_BACKEND_PATH):
-            with self.login(email=user.email):
-                url = reverse(UserProgramConfirmationDetailView.view_name,
-                              args=[user.pk])
-                self.client.post(url, {
-                    'confirmed': [self.program.pk],
-                })
-            self.assertTrue(mocked_backend.called)
+        with self.login(email=user.email):
+            url = reverse(UserProgramConfirmationDetailView.view_name,
+                          args=[user.pk])
+            self.client.post(url, {
+                'confirmed': [self.program.pk],
+            })
+        self.assertEqual(mail.outbox[0].subject, SUBJECT)
 
 
 def _get_user_programs_for_role(user, role):
