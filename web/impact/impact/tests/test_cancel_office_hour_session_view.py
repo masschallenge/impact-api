@@ -89,7 +89,7 @@ class TestCancelOfficeHourSession(APITestCase):
             expected = get_ui_notification(context, staff=True)
             self.assertEqual(response.data['detail'], expected)
 
-    def test_email_is_sent_mentor_when_admin_cancels_unreserved_session(self):
+    def test_mentor_receives_email_when_admin_cancels_unreserved_session(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         with self.login(email=self.staff_user().email):
             self.client.post(self.url, {
@@ -127,6 +127,17 @@ class TestCancelOfficeHourSession(APITestCase):
                 'message': message
             })
             self.assertIn(message, mail.outbox[0].alternatives[0][0])
+
+    def test_mentor_received_email_when_they_cancel_their_session(self):
+        mentor = self._expert_user(UserRole.MENTOR)
+        office_hour = MentorProgramOfficeHourFactory(
+            mentor=mentor, finalist=None
+        )
+        with self.login(email=mentor.email):
+            self.client.post(self.url, {
+                'id': office_hour.id,
+            })
+            self.assertEqual(mail.outbox[0].to, [mentor.email])
 
     def _expert_user(self, role):
         user = UserRoleContext(role).user
