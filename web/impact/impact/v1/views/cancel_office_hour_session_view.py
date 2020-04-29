@@ -1,14 +1,15 @@
-from django.contrib.sites.models import Site
 from pytz import timezone
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.sites.models import Site
 from django.template import loader
+
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from accelerator.models import MentorProgramOfficeHour, Location
+from accelerator.models import Location, MentorProgramOfficeHour
 from impact.minimal_email_handler import MinimalEmailHandler
 from impact.permissions.v1_api_permissions import OfficeHourPermission
 from impact.v1.views.impact_view import ImpactView
