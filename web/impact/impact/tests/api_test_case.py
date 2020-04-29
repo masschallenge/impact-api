@@ -49,7 +49,7 @@ class APITestCase(TestCase):
 
     def staff_user(self):
         user = self.make_user('basic_user{}@test.com'.format(self._user_count))
-        self._user_count += 1        
+        self._user_count += 1
         clearance = ClearanceFactory(
             level=CLEARANCE_LEVEL_STAFF,
             user=user)
