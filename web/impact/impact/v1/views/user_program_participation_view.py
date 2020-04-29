@@ -30,8 +30,16 @@ def extract_values(request, key):
         raise ParseError(INVALID_INPUT_ERROR.format(key))
 
 
-class UserProgramConfirmationDetailView(BaseDetailView):
-    view_name = "user_program_confirmation_detail"
+class MentorParticipationView(BaseDetailView):
+    """
+        MentorParticipationView inherits a get method from BaseDetailView
+        which is implemented in UserProgramConfirmationHelper
+        Parameters:
+        pk (int): represents user ID
+        Returns:
+        dict of confirmed and deferred program IDs
+    """
+    view_name = "mentor_participation_view"
     helper_class = UserProgramConfirmationHelper
     permission_classes = (UserDetailViewPermission,)
 

@@ -35,7 +35,7 @@ from impact.v1.views import (
     UserHistoryView,
     UserListView,
     UserOrganizationsView,
-    UserProgramConfirmationDetailView,
+    MentorParticipationView,
 )
 
 v1_urlpatterns = [
@@ -142,6 +142,6 @@ v1_urlpatterns = [
         UserOrganizationsView.as_view(),
         name=UserOrganizationsView.view_name),
     url(r"^user/(?P<pk>[0-9]+)/program_confirmation/$",
-        UserProgramConfirmationDetailView.as_view(),
-        name=UserProgramConfirmationDetailView.view_name),
+        MentorParticipationView.as_view(),
+        name=MentorParticipationView.view_name),
 ]

@@ -66,6 +66,6 @@ from impact.v1.views.user_organizations_view import UserOrganizationsView
 from impact.v1.views.mentor_program_office_hour_list_view import (
     MentorProgramOfficeHourListView,
 )
-from impact.v1.views.user_program_confirmation_detail_view import (
-    UserProgramConfirmationDetailView
+from impact.v1.views.user_program_participation_view import (
+    MentorParticipationView
 )
