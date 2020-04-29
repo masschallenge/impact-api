@@ -5,6 +5,7 @@ from impact.v1.views import (
     AnalyzeJudgingRoundView,
     ApplicationDetailView,
     ApplicationListView,
+    CancelOfficeHourSessionView,
     CloneCriteriaView,
     CreditCodeDetailView,
     CreditCodeListView,
@@ -140,4 +141,7 @@ v1_urlpatterns = [
     url(r"^user/(?P<pk>[0-9]+)/organizations/$",
         UserOrganizationsView.as_view(),
         name=UserOrganizationsView.view_name),
+    url(r"^cancel_office_hour_session/$",
+        CancelOfficeHourSessionView.as_view(),
+        name=CancelOfficeHourSessionView.view_name),
 ]
