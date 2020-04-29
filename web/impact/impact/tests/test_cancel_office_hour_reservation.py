@@ -92,11 +92,11 @@ class TestCancelOfficeHourReservationView(APITestCase):
         return response
 
     def assert_notified(self, user, message=""):
-        self.assertGreater(len(mail.outbox), 0, msg="Outgoing mail empty")
-        email = mail.outbox[-1]
-        self.assertContains(email.to, user.email)
+        emails = [email for email in mail.outbox if user.email in email.to]
+        self.assertGreater(len(emails), 0)
+        email = emails[0]
         if message:
-            self.assertContains(email.body, message)
+            self.assertIn(message, email.body)
 
     def assert_not_notified(self, user):
         if mail.outbox:
