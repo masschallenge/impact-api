@@ -8,19 +8,28 @@ if [ ! -n "$tag" ]; then
     export TAG=$(docker run --tty=false --rm  -v$pwd:/app  -i semantic-release -- semantic-release version --noop | grep "Current version: " | cut -d ' ' -f 3 | sed -e "s/\r//")
 else
     echo "You passed in '$tag' as the custom tag"
-    # TR == test release
-    echo "Renaming as 'TR-$tag' to avoid potential conflicts."
+    echo "Renaming as 'TR-$tag' (Test Release) to avoid potential conflicts."
     export TAG="TR-$tag"
 fi
 
-echo $TAG
+export VTAG="v{$TAG}"
+echo $VTAG
 
-git tag "v${TAG}"
-git push --tags
-cd ../django-accelerator && git tag "v${TAG}"
-git push --tags 
-cd ../accelerate && git tag "v${TAG}"
-git push --tags
-cd ../front-end && git tag "v${TAG}"
+
+# Tag all four repos and push tags to origin
+
+git tag $VTAG
 git push --tags
 
+cd ../django-accelerator && git tag $VTAG && git push --tags
+cd ../front-end && git tag $VTAG && git push --tags
+
+# In accelerate, we also update the impact-api submodule version
+cd ../accelerate
+cd mcproject/api/
+# impact-api $VTAG was pushed above; fetch, checkout, and update .gitmodules
+git fetch && git checkout $VTAG
+cd ../..
+git add .gitmodules && git commit -m "Updated submodule to $VTAG"
+git tag $VTAG
+git push --tags
