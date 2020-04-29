@@ -74,11 +74,13 @@ class CancelOfficeHourSessionView(ImpactView):
         if user == office_hour.mentor:
             if office_hour.finalist:
                 raise PermissionDenied(PERMISSION_DENIED)
+            self.handle_notification(office_hour, shared_context, 'You have')
             ui_notification = get_ui_notification(shared_context)
             office_hour.delete()
             return ui_notification
         else:
-            self.handle_notification(office_hour, shared_context)
+            self.handle_notification(
+                office_hour, shared_context, 'MassChallenge has')
             ui_notification = get_ui_notification(shared_context, staff=True)
             office_hour.delete()
             return ui_notification
@@ -119,13 +121,13 @@ class CancelOfficeHourSessionView(ImpactView):
             }
         return addressee_dict
 
-    def handle_notification(self, office_hour, context):
+    def handle_notification(self, office_hour, context, cancelled_by):
         for addressee in ['mentor', 'finalist']:
             addressee_info = self.get_addressee_info(
                 office_hour, context['mentor_name']).get(addressee, None)
             if addressee_info:
                 local_context = {
-                    'cancelled_by': 'MassChallenge has',
+                    'cancelled_by': cancelled_by,
                     'hours_with': addressee_info['hours_with'],
                     'dashboard_username': addressee_info['to_addrs'][0],
                 }
