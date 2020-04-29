@@ -1,6 +1,5 @@
 from pytz import timezone
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.template import loader
 
@@ -15,8 +14,10 @@ from accelerator.models import MentorProgramOfficeHour
 User = get_user_model()
 
 mentor_template_name = "cancel_office_hour_reservation_email_to_mentor.html"
-finalist_template_name = "cancel_office_hour_reservation_email_to_finalist.html"
+finalist_template_name = ("cancel_office_hour_reservation_email_to_finalist."
+                          "html")
 SUBJECT_LINE = "MassChallenge | Cancelled Office Hours with {} {}"
+
 
 class CancelOfficeHourReservationView(ImpactView):
     view_name = "cancel_office_hours_reservation"
@@ -41,7 +42,7 @@ class CancelOfficeHourReservationView(ImpactView):
                                                    message,
                                                    office_hour.finalist,
                                                    finalist_template_name))
-            _cancel_reservation(office_hour)            
+            _cancel_reservation(office_hour)
             success = True
         return Response({"success": success})
 
@@ -80,9 +81,11 @@ def prepare_email_notification(office_hour,
             "subject": subject,
             "body": body}
 
+
 def _localize_start_time(office_hour):
     tz = timezone(office_hour.location.timezone)
     return office_hour.start_date_time.astimezone(tz)
+
 
 def _template_path(template_name):
     return "emails/{}".format(template_name)
