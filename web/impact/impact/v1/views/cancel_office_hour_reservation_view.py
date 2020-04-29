@@ -70,7 +70,8 @@ def prepare_email_notification(office_hour,
     office_hour_date_time = _localize_start_time(office_hour)
     template_context = {"recipient": recipient,
                         "office_hour_date_time": office_hour_date_time,
-                        "cancelling_party": requesting_user}
+                        "cancelling_party": requesting_user,
+                        "custom_message": message}
 
     subject = SUBJECT_LINE.format(counterpart.first_name,
                                   counterpart.last_name)

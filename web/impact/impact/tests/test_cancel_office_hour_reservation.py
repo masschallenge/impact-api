@@ -30,7 +30,7 @@ class TestCancelOfficeHourReservationView(APITestCase):
         self.assert_notified(office_hour.mentor)
 
     def test_notification_includes_submitted_message(self):
-        cancellation_message = "I'm sorry I had to cancel"
+        cancellation_message = "Sorry I had to cancel"
         office_hour = MentorProgramOfficeHourFactory()
         self._submit_cancellation(office_hour,
                                   user=office_hour.finalist,
