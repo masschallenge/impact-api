@@ -1,9 +1,5 @@
-FROM python:3.7-slim-buster
-RUN apt update
-RUN apt install -y git
-RUN pip install python-semantic-release==5.2.0 
+FROM 997386117669.dkr.ecr.us-east-1.amazonaws.com/semantic-release:py3
 RUN git config --global user.email semantic-release@masschallenge.org
 RUN mkdir /app
 WORKDIR /app
 ADD setup.cfg .
-
