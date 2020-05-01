@@ -507,6 +507,21 @@ class TestUserListView(APITestCase):
             assert _contains_user(updated_exactly, response.data)
             assert _contains_user(updated_after, response.data)
 
+    def test_updated_at_filter_when_same_day(self):
+        now = datetime.datetime.now(pytz.utc)
+        fifteen_minutes = datetime.timedelta(minutes=15)
+        updated_before = _user_for_date(now - fifteen_minutes)
+        updated_after = _user_for_date(now + fifteen_minutes)
+        updated_exactly = _user_for_date(now)
+        with self.login(email=self.basic_user().email):
+            url = "{base_url}?updated_at.after={datestr}".format(
+                base_url=self.url,
+                datestr=now.strftime("%Y-%m-%dT%H:%M:%S.%fZ"))
+            response = self.client.get(url)
+            assert not _contains_user(updated_before, response.data)
+            assert _contains_user(updated_exactly, response.data)
+            assert _contains_user(updated_after, response.data)
+
 
 def _user_for_date(date):
     user = UserContext().user
