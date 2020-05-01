@@ -129,7 +129,7 @@ https://mike.tig.as/blog/2010/09/14/pdb/
 
 
 #### Supervisor Mode
-At times, you may want to see the gunicorn + supervisor
+At times, you may want to see the waitress + supervisor
 server as is being run in production. This mode also shows
 a more detailed output of the docker-compose up command 
 that is executed in the background.
