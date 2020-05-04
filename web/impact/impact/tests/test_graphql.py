@@ -268,14 +268,14 @@ class TestGraphQL(APITestCase):
                             'id': str(startup.id),
                             'name': startup.name,
                             'highResolutionLogo':
-                            (startup.high_resolution_logo and
-                             startup.high_resolution_logo.url or
-                             None),
-                                'shortPitch': startup.short_pitch,
+                                (startup.high_resolution_logo and
+                                 startup.high_resolution_logo.url or
+                                 None),
+                            'shortPitch': startup.short_pitch,
                         },
                         'program': {
                             'family':
-                            program.program_family.name,
+                                program.program_family.name,
                             'year': str(program.start_date.year),
                         },
                     }],
@@ -341,7 +341,7 @@ class TestGraphQL(APITestCase):
         self._assert_response_equals_json(query, expected_json, True)
 
     def test_non_staff_user_can_access_finalist_graphql_view(self):
-        current_user = self._expert_user(UserRole.MENTOR)
+        current_user = expert_user(UserRole.MENTOR)
         user = EntrepreneurFactory()
         UserRoleContext(UserRole.FINALIST, user=user)
         query = """
@@ -364,7 +364,7 @@ class TestGraphQL(APITestCase):
             query, expected_json, email=current_user.email)
 
     def test_query_program_roles_for_entrepreneur_returns_correct_value(self):
-        current_user = self._expert_user(UserRole.AIR)
+        current_user = expert_user(UserRole.AIR)
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
         user = UserContext(
             program_role_names=user_roles_of_interest).user
@@ -536,7 +536,7 @@ class TestGraphQL(APITestCase):
                              [])
 
     def test_user_cannot_view_profile_with_non_current_allowed_roles(self):
-        allowed_user = self._expert_user(UserRole.FINALIST)
+        allowed_user = expert_user(UserRole.FINALIST)
         with self.login(email=allowed_user.email):
             user = EntrepreneurFactory()
             UserRoleContext(
@@ -554,7 +554,7 @@ class TestGraphQL(APITestCase):
             self._assert_error_in_response(query, NOT_ALLOWED_ACCESS_MESSAGE)
 
     def test_allowed_user_with_non_current_user_role_cannot_view_profile(self):
-        current_user = self._expert_user(
+        current_user = expert_user(
             UserRole.FINALIST,
             program_status=ENDED_PROGRAM_STATUS)
         with self.login(email=current_user.email):
@@ -659,7 +659,7 @@ class TestGraphQL(APITestCase):
                                                 UserRole.MENTOR)
 
     def _assert_expert_can_view_profile(self, expert_role, profile_user_role):
-        current_user = self._expert_user(expert_role)
+        current_user = expert_user(expert_role)
         user = EntrepreneurFactory()
         UserRoleContext(profile_user_role, user=user)
         query = """
@@ -682,7 +682,7 @@ class TestGraphQL(APITestCase):
             query, expected_json, email=current_user.email)
 
     def _assert_expert_cannot_view_profile(self, user_role, profile_user_role):
-        current_user = self._expert_user(user_role)
+        current_user = expert_user(user_role)
         with self.login(email=current_user.email):
             user = EntrepreneurFactory()
             UserRoleContext(profile_user_role, user=user)
@@ -720,16 +720,17 @@ class TestGraphQL(APITestCase):
                               for x in response.json()['errors']]
         self.assertIn(error_message, error_messages)
 
-    def _expert_user(self, role=None, program_status=None):
-        user = ExpertFactory()
-        if role:
-            user_role = get_user_role_by_name(role)
-            program_role = ProgramRoleFactory.create(
-                user_role=user_role,
-                program__program_status=program_status or ACTIVE_PROGRAM_STATUS
-            )
-            ProgramRoleGrantFactory(person=user,
-                                    program_role=program_role)
-        user.set_password('password')
-        user.save()
-        return user
+
+def expert_user(role=None, program_status=None):
+    user = ExpertFactory()
+    if role:
+        user_role = get_user_role_by_name(role)
+        program_role = ProgramRoleFactory.create(
+            user_role=user_role,
+            program__program_status=program_status or ACTIVE_PROGRAM_STATUS
+        )
+        ProgramRoleGrantFactory(person=user,
+                                program_role=program_role)
+    user.set_password('password')
+    user.save()
+    return user
