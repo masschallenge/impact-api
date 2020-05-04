@@ -10,12 +10,9 @@ from accelerator.models import (
     ProgramRole
 )
 from impact.minimal_email_handler import MinimalEmailHandler
-from impact.permissions.v1_api_permissions import UserDetailViewPermission
-from impact.v1.helpers import UserProgramConfirmationHelper
-from impact.v1.views.user_detail_view import (
-    BaseDetailView,
-    NO_USER_ERROR
-)
+from impact.permissions.v1_api_permissions import IsExpertUser
+from impact.v1.views import ImpactView
+from impact.v1.views.user_detail_view import NO_USER_ERROR
 
 User = get_user_model()
 
@@ -30,18 +27,9 @@ def extract_values(request, key):
         raise ParseError(INVALID_INPUT_ERROR.format(key))
 
 
-class MentorParticipationView(BaseDetailView):
-    """
-        MentorParticipationView inherits a get method from BaseDetailView
-        which is implemented in UserProgramConfirmationHelper
-        Parameters:
-        pk (int): represents user ID
-        Returns:
-        dict of confirmed and deferred program IDs
-    """
+class ExpertParticipationView(ImpactView):
     view_name = "mentor_participation_view"
-    helper_class = UserProgramConfirmationHelper
-    permission_classes = (UserDetailViewPermission,)
+    permission_classes = (IsExpertUser,)
 
     def __init__(self, *args, **kwargs):
         self.user = None
@@ -74,21 +62,24 @@ class MentorParticipationView(BaseDetailView):
         self.delete_program_role_grants(program_ids, delete_roles)
         self.add_program_role_grants(program_ids, add_roles)
 
-    def post(self, request, pk):
-        self.user = User.objects.filter(pk=pk).first()
+    def post(self, request):
+        user_id = request.user.id
+        self.user = User.objects.filter(pk=user_id).first()
         if not self.user:
-            return Response(status=404, data=NO_USER_ERROR.format(pk))
+            return Response(status=404, data=NO_USER_ERROR.format(user_id))
         deferred_programs = extract_values(request, 'deferred')
         confirmed_programs = extract_values(request, 'confirmed')
-
+        success = False
         if deferred_programs:
             self.update_user_confirmation(
                 UserRole.MENTOR, UserRole.DEFERRED_MENTOR, deferred_programs)
+            success = True
         if confirmed_programs:
             self.update_user_confirmation(
                 UserRole.DEFERRED_MENTOR, UserRole.MENTOR, confirmed_programs)
             self.send_email(confirmed_programs)
-        return Response({'success': True})
+            success = True
+        return Response({'success': success})
 
     def send_email(self, confirmed_programs):
         program_data = self.user.programrolegrant_set.filter(
