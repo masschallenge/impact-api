@@ -22,7 +22,8 @@ class V1APIPermissions(BasePermission):
 
     def has_permission(self, request, view):
         return (is_employee(request.user) or
-                request.user.groups.filter(name=settings.V1_API_GROUP).exists())
+                request.user.groups.filter(
+                    name=settings.V1_API_GROUP).exists())
 
 
 class UserDetailViewPermission(V1APIPermissions):
@@ -33,4 +34,5 @@ class UserDetailViewPermission(V1APIPermissions):
 
 class IsExpertUser(IsAuthenticated):
     def has_permission(self, request, view):
-        return super().has_permission(request, view) and is_expert(request.user)
+        return (super().has_permission(request, view) and
+                is_expert(request.user))
