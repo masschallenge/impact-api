@@ -27,7 +27,7 @@ def extract_values(request, key):
         raise ParseError(INVALID_INPUT_ERROR.format(key))
 
 
-class ExpertParticipationView(ImpactView):
+class MentorParticipationView(ImpactView):
     view_name = "mentor_participation_view"
     permission_classes = (IsExpertUser,)
 

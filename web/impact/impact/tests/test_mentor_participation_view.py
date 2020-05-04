@@ -11,15 +11,15 @@ from accelerator.tests.factories import (
 
 from impact.tests.api_test_case import APITestCase
 from impact.tests.test_graphql import expert_user
-from impact.v1.views import ExpertParticipationView
-from impact.v1.views.user_program_participation_view import (
+from impact.v1.views import MentorParticipationView
+from impact.v1.views.mentor_participation_view import (
     INVALID_INPUT_ERROR,
     SUBJECT
 )
 
 
-class TestExpertParticipationView(APITestCase):
-    url = reverse(ExpertParticipationView.view_name)
+class TestMentorParticipationView(APITestCase):
+    url = reverse(MentorParticipationView.view_name)
 
     def setUp(self):
         self.program = ProgramFactory()
