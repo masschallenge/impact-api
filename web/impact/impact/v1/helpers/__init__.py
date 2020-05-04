@@ -104,6 +104,3 @@ from impact.v1.helpers.judging_round_helper import (
 from impact.v1.helpers.mentor_program_office_hour_helper import (
     MentorProgramOfficeHourHelper,
 )
-from impact.v1.helpers.user_program_confirmation_helper import (
-    UserProgramConfirmationHelper
-)
