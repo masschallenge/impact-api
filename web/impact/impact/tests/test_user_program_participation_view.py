@@ -7,18 +7,20 @@ from accelerator.tests.factories import (
     ProgramFactory,
     ProgramRoleFactory,
     ProgramRoleGrantFactory,
-    UserFactory,
 )
 
 from impact.tests.api_test_case import APITestCase
-from impact.v1.views import MentorParticipationView
+from impact.tests.test_graphql import expert_user
+from impact.v1.views import ExpertParticipationView
 from impact.v1.views.user_program_participation_view import (
     INVALID_INPUT_ERROR,
     SUBJECT
 )
 
 
-class TestUserConfirmParticipationView(APITestCase):
+class TestExpertParticipationView(APITestCase):
+    url = reverse(ExpertParticipationView.view_name)
+
     def setUp(self):
         self.program = ProgramFactory()
         ProgramRoleFactory(
@@ -30,28 +32,10 @@ class TestUserConfirmParticipationView(APITestCase):
             program=self.program
         )
 
-    def test_user_get_program_participation_status(self):
-        user = self.basic_user()
-        deferred_program = _create_program_role_grant_for_role(
-            UserRole.DEFERRED_MENTOR, user).program_role.program
-        confirmed_program = _create_program_role_grant_for_role(
-            UserRole.MENTOR, user).program_role.program
+    def test_expert_post_confirmed_participation(self):
+        user = expert_user()
         with self.login(email=user.email):
-            url = reverse(MentorParticipationView.view_name,
-                          args=[user.pk])
-            response = self.client.get(url)
-            expected = {
-                'confirmed': [confirmed_program.pk],
-                'deferred': [deferred_program.pk],
-            }
-            self.assertEqual(response.data['program_participation'], expected)
-
-    def test_user_post_confirmed_participation(self):
-        user = self.basic_user()
-        with self.login(email=user.email):
-            url = reverse(MentorParticipationView.view_name,
-                          args=[user.pk])
-            self.client.post(url, {
+            self.client.post(self.url, {
                 'confirmed': [self.program.pk, ],
             })
             expected = _get_user_programs_for_role(
@@ -59,11 +43,9 @@ class TestUserConfirmParticipationView(APITestCase):
             self.assertIn(self.program.pk, expected)
 
     def test_user_post_deferred_participation(self):
-        user = self.basic_user()
+        user = expert_user()
         with self.login(email=user.email):
-            url = reverse(MentorParticipationView.view_name,
-                          args=[user.pk])
-            self.client.post(url, {
+            self.client.post(self.url, {
                 'deferred': [self.program.pk],
             })
             expected = _get_user_programs_for_role(
@@ -71,53 +53,35 @@ class TestUserConfirmParticipationView(APITestCase):
             self.assertIn(self.program.pk, expected)
 
     def test_confirming_program_removes_deferred_status(self):
-        user = self.basic_user()
+        user = expert_user()
         _create_program_role_grant_for_role(
             UserRole.DEFERRED_MENTOR, user, self.program)
         with self.login(email=user.email):
-            url = reverse(MentorParticipationView.view_name,
-                          args=[user.pk])
-            self.client.post(url, {
+            self.client.post(self.url, {
                 'confirmed': [self.program.pk],
             })
-            response = self.client.get(url)
-            expected = {
-                'deferred': [],
-                'confirmed': [self.program.pk]
-            }
-            self.assertEqual(response.data['program_participation'], expected)
+            deferred_count = user.programrolegrant_set.filter(
+                program_role__user_role__name=UserRole.DEFERRED_MENTOR,
+            ).count()
+            self.assertEqual(deferred_count, 0)
 
     def test_deferring_program_removes_confirmed_status(self):
-        user = self.basic_user()
+        user = expert_user()
         _create_program_role_grant_for_role(
             UserRole.MENTOR, user, self.program)
         with self.login(email=user.email):
-            url = reverse(MentorParticipationView.view_name,
-                          args=[user.pk])
-            self.client.post(url, {
+            self.client.post(self.url, {
                 'deferred': [self.program.pk],
             })
-            response = self.client.get(url)
-            expected = {
-                'deferred': [self.program.pk],
-                'confirmed': []
-            }
-            self.assertEqual(response.data['program_participation'], expected)
-
-    def test_only_owner_can_access_participation_view(self):
-        non_owner_user = UserFactory()
-        with self.login(email=self.basic_user_without_api_groups().email):
-            url = reverse(MentorParticipationView.view_name,
-                          args=[non_owner_user.pk])
-            response = self.client.get(url)
-            self.assertEqual(response.status_code, 403)
+            confirmed_count = user.programrolegrant_set.filter(
+                program_role__user_role__name=UserRole.MENTOR,
+            ).count()
+            self.assertEqual(confirmed_count, 0)
 
     def test_cannot_post_invalid_input(self):
-        user = self.basic_user()
+        user = expert_user()
         with self.login(email=user.email):
-            url = reverse(MentorParticipationView.view_name,
-                          args=[user.pk])
-            response = self.client.post(url, {
+            response = self.client.post(self.url, {
                 'deferred': ["test"],
             })
             expected = {
@@ -126,14 +90,22 @@ class TestUserConfirmParticipationView(APITestCase):
             self.assertEqual(response.data, expected)
 
     def test_email_is_sent_after_confirming_participation(self):
-        user = self.basic_user()
+        user = expert_user()
         with self.login(email=user.email):
-            url = reverse(MentorParticipationView.view_name,
-                          args=[user.pk])
-            self.client.post(url, {
+            self.client.post(self.url, {
                 'confirmed': [self.program.pk],
             })
         self.assertEqual(mail.outbox[0].subject, SUBJECT)
+
+    def test_non_expert_cannot_post_participation(self):
+        with self.login(email=self.basic_user().email):
+            response = self.client.post(self.url, {
+                'deferred': [0],
+            })
+            expected = {
+                'detail': 'You do not have permission to perform this action.',
+            }
+            self.assertEqual(response.data, expected)
 
 
 def _get_user_programs_for_role(user, role):
