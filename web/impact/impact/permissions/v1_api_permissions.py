@@ -1,8 +1,12 @@
-from accelerator_abstract.models.base_user_utils import is_employee
+from accelerator_abstract.models.base_user_utils import (
+    is_employee,
+    is_expert,
+)
 from impact.permissions import (
     settings,
     BasePermission,
 )
+from rest_framework.permissions import IsAuthenticated
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 
@@ -18,10 +22,17 @@ class V1APIPermissions(BasePermission):
 
     def has_permission(self, request, view):
         return (is_employee(request.user) or
-                request.user.groups.filter(name=settings.V1_API_GROUP).exists())
+                request.user.groups.filter(
+                    name=settings.V1_API_GROUP).exists())
 
 
 class UserDetailViewPermission(V1APIPermissions):
     def has_permission(self, request, view):
         return (super().has_permission(request, view) or
                 can_view_user_details_page(request))
+
+
+class IsExpertUser(IsAuthenticated):
+    def has_permission(self, request, view):
+        return (super().has_permission(request, view) and
+                is_expert(request.user))
