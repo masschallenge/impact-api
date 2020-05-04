@@ -58,7 +58,7 @@ class ExpertParticipationView(ImpactView):
             program_role__user_role__name=user_role
         ).delete()
 
-    def update_user_confirmation(self, delete_roles, add_roles, program_ids):
+    def handle_user_confirmation(self, delete_roles, add_roles, program_ids):
         self.delete_program_role_grants(program_ids, delete_roles)
         self.add_program_role_grants(program_ids, add_roles)
 
@@ -71,11 +71,11 @@ class ExpertParticipationView(ImpactView):
         confirmed_programs = extract_values(request, 'confirmed')
         success = False
         if deferred_programs:
-            self.update_user_confirmation(
+            self.handle_user_confirmation(
                 UserRole.MENTOR, UserRole.DEFERRED_MENTOR, deferred_programs)
             success = True
         if confirmed_programs:
-            self.update_user_confirmation(
+            self.handle_user_confirmation(
                 UserRole.DEFERRED_MENTOR, UserRole.MENTOR, confirmed_programs)
             self.send_email(confirmed_programs)
             success = True
