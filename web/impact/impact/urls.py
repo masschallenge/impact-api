@@ -133,7 +133,7 @@ urls = [
     url(r'^$', IndexView.as_view()),
 ]
 
-# use staticfiles with gunicorn (not recommneded!)
+# use staticfiles with waitress (not recommneded!)
 # TODO: switch to a real static file handler
 urls += (
     static(settings.STATIC_URL, document_root=settings.STATIC_ROOT))
@@ -142,8 +142,8 @@ if settings.DEBUG:
     import debug_toolbar  # pragma: no cover
 
     urls += [  # pragma: no cover
-                url(r"^__debug__/", include(debug_toolbar.urls)),
-                # pragma: no cover
-            ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+        url(r"^__debug__/", include(debug_toolbar.urls)),
+        # pragma: no cover
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns = urls
