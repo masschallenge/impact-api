@@ -1,3 +1,8 @@
+from pytz import timezone
+
+from django.http import Http404
+from django.shortcuts import get_object_or_404
+
 from django.core import mail
 from django.urls import reverse
 
@@ -8,11 +13,12 @@ from accelerator.tests.utils import days_from_now
 from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import MentorProgramOfficeHourFactory
 from impact.v1.views.cancel_office_hour_session_view import (
-    CancelOfficeHourSessionView,
-    get_office_hour_shared_context,
-    get_ui_notification,
-    MentorProgramOfficeHour,
+    DEFAULT_TIMEZONE,
+    MENTOR_NOTIFICATION,
     PERMISSION_DENIED,
+    STAFF_NOTIFICATION,
+    CancelOfficeHourSessionView,
+    MentorProgramOfficeHour,
 )
 
 
@@ -38,12 +44,10 @@ class TestCancelOfficeHourSession(APITestCase):
             start_date_time=days_from_now(-3),
             mentor=mentor, finalist=None)
         with self.login(email=mentor.email):
-            response = self.client.post(self.url, {
+            self.client.post(self.url, {
                 'id': office_hour.id,
             })
-            context = get_office_hour_shared_context(office_hour)
-            expected = get_ui_notification(context)
-            self.assertEqual(response.data['detail'], expected)
+            self.assert_office_hour_session_was_cancelled(office_hour)
 
     def test_mentor_cancel_their_own_unreserved_session_ui_notification(self):
         mentor = self._expert_user(UserRole.MENTOR)
@@ -53,9 +57,9 @@ class TestCancelOfficeHourSession(APITestCase):
             response = self.client.post(self.url, {
                 'id': office_hour.id,
             })
-            context = get_office_hour_shared_context(office_hour)
-            expected = get_ui_notification(context)
-            self.assertEqual(response.data['detail'], expected)
+            self.assert_mentor_cancel_reservation_ui_notification(
+                office_hour, response
+            )
 
     def test_mentor_cannot_cancel_their_own_reserved_office_hour(self):
         mentor = self._expert_user(UserRole.MENTOR)
@@ -82,12 +86,10 @@ class TestCancelOfficeHourSession(APITestCase):
     def test_staff_can_cancel_unreserved_office_hour(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         with self.login(email=self.staff_user().email):
-            response = self.client.post(self.url, {
+            self.client.post(self.url, {
                 'id': office_hour.id,
             })
-            context = get_office_hour_shared_context(office_hour)
-            expected = get_ui_notification(context, staff=True)
-            self.assertEqual(response.data['detail'], expected)
+            self.assert_office_hour_session_was_cancelled(office_hour)
 
     def test_mentor_receives_email_when_admin_cancels_unreserved_session(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
@@ -100,12 +102,10 @@ class TestCancelOfficeHourSession(APITestCase):
     def test_staff_can_cancel_reserved_office_hour(self):
         office_hour = MentorProgramOfficeHourFactory()
         with self.login(email=self.staff_user().email):
-            response = self.client.post(self.url, {
+            self.client.post(self.url, {
                 'id': office_hour.id,
             })
-            context = get_office_hour_shared_context(office_hour)
-            expected = get_ui_notification(context, staff=True)
-            self.assertEqual(response.data['detail'], expected)
+            self.assert_office_hour_session_was_cancelled(office_hour)
 
     def test_mail_is_sent_to_attendees_on_reserved_session_cancellation(self):
         office_hour = MentorProgramOfficeHourFactory()
@@ -138,6 +138,45 @@ class TestCancelOfficeHourSession(APITestCase):
                 'id': office_hour.id,
             })
             self.assertEqual(mail.outbox[0].to, [mentor.email])
+
+    def test_staff_cancel_office_hour_session_ui_notification(self):
+        office_hour = MentorProgramOfficeHourFactory()
+        with self.login(email=self.staff_user().email):
+            response = self.client.post(self.url, {
+                'id': office_hour.id,
+            })
+            self.assert_staff_cancel_reservation_ui_notification(
+                office_hour, response
+            )
+
+    def assert_office_hour_session_was_cancelled(self, office_hour):
+        with self.assertRaises(Http404):
+            get_object_or_404(MentorProgramOfficeHour, pk=office_hour.id)
+
+    def assert_mentor_cancel_reservation_ui_notification(
+            self, office_hour, response):
+        context = self._get_office_hour_context(office_hour)
+        self.assertEqual(response.data['detail'], MENTOR_NOTIFICATION.format(
+            **context))
+
+    def assert_staff_cancel_reservation_ui_notification(self,
+                                                        office_hour, response):
+        context = self._get_office_hour_context(office_hour)
+        self.assertEqual(response.data['detail'], STAFF_NOTIFICATION.format(
+            **context))
+
+    def _get_office_hour_context(self, office_hour):
+        tz = timezone(office_hour.location.timezone or DEFAULT_TIMEZONE)
+        start_date_time = office_hour.start_date_time
+        date = start_date_time.astimezone(tz).strftime('%A, %d %B, %Y')
+        start_time = start_date_time.astimezone(tz).strftime('%I:%M%p')
+        end_time = office_hour.end_date_time.astimezone(tz).strftime('%I:%M%p')
+        return {
+            'date': date,
+            'start_time': start_time,
+            'end_time': end_time,
+            'mentor_name': office_hour.mentor.get_profile().full_name(),
+        }
 
     def _expert_user(self, role):
         user = UserRoleContext(role).user

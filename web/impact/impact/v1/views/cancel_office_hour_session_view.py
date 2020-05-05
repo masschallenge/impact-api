@@ -2,14 +2,13 @@ from pytz import timezone
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.sites.models import Site
 from django.template import loader
 
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
-from accelerator.models import Location, MentorProgramOfficeHour
+from accelerator.models import MentorProgramOfficeHour
 from impact.minimal_email_handler import MinimalEmailHandler
 from impact.permissions.v1_api_permissions import OfficeHourPermission
 from impact.v1.views.impact_view import ImpactView
@@ -19,29 +18,23 @@ User = get_user_model()
 DEFAULT_TIMEZONE = 'UTC'
 SUBJECT = '[Office Hours] Canceled: {date}, {start_time}'
 
-STAFF_NOTIFICATION = 'Canceled office hours on behalf of {} at {} - {} on {}'
-MENTOR_NOTIFICATION = 'Canceled office hours at {} - {} on {}'
+STAFF_NOTIFICATION = 'Canceled office hours on behalf of ' \
+                     '{mentor_name} at {start_time} - {end_time} on {date}'
+MENTOR_NOTIFICATION = 'Canceled office hours at {start_time} - ' \
+                      '{end_time} on {date}'
 PERMISSION_DENIED = 'Office hour session could not be canceled. ' \
                     'You do not have permission to cancel that session'
 
 
 def get_office_hours_list_url(family_slug, program_slug):
-    site_url = Site.objects.get_current()
-    return 'https://{}/officehours/list/{}/{}'.format(
-        site_url, family_slug, program_slug)
-
-
-def default_timezone(program_family):
-    location = Location.objects.filter(
-        programfamilylocation__primary=True,
-        programfamilylocation__program_family=program_family).exists()
-    return location.timezone if location else DEFAULT_TIMEZONE
+    site_url = 'accelerate.masschallenge.org'
+    return f'https://{site_url}/officehours/list/{family_slug}/{program_slug}'
 
 
 def get_office_hour_shared_context(office_hour, message=None):
     family_slug = office_hour.program.program_family.url_slug
     program_slug = office_hour.program.url_slug
-    tz = timezone(default_timezone(office_hour.program.program_family))
+    tz = timezone(office_hour.location.timezone or DEFAULT_TIMEZONE)
     date = office_hour.start_date_time.astimezone(tz).strftime('%A, %d %B, %Y')
     start_time = office_hour.start_date_time.astimezone(tz).strftime('%I:%M%p')
     end_time = office_hour.end_date_time.astimezone(tz).strftime('%I:%M%p')
@@ -59,11 +52,8 @@ def get_office_hour_shared_context(office_hour, message=None):
 
 def get_ui_notification(context, staff=False):
     if staff:
-        return STAFF_NOTIFICATION.format(
-            context['mentor_name'], context['start_time'],
-            context['end_time'], context['date'])
-    return MENTOR_NOTIFICATION.format(
-        context['start_time'], context['end_time'], context['date'])
+        return STAFF_NOTIFICATION.format(**context)
+    return MENTOR_NOTIFICATION.format(**context)
 
 
 class CancelOfficeHourSessionView(ImpactView):

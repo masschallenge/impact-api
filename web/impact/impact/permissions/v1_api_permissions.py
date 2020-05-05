@@ -36,7 +36,7 @@ class OfficeHourPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         return is_employee(request.user) or obj.mentor == request.user
 
-      
+
 class IsExpertUser(IsAuthenticated):
     def has_permission(self, request, view):
         return (super().has_permission(request, view) and
