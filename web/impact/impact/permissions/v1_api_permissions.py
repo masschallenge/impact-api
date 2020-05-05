@@ -1,8 +1,12 @@
-from accelerator_abstract.models.base_user_utils import is_employee
+from accelerator_abstract.models.base_user_utils import (
+    is_employee,
+    is_expert,
+)
 from impact.permissions import (
     settings,
     BasePermission,
 )
+from rest_framework.permissions import IsAuthenticated
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 
@@ -31,3 +35,9 @@ class UserDetailViewPermission(V1APIPermissions):
 class OfficeHourPermission(BasePermission):
     def has_object_permission(self, request, view, obj):
         return is_employee(request.user) or obj.mentor == request.user
+
+      
+class IsExpertUser(IsAuthenticated):
+    def has_permission(self, request, view):
+        return (super().has_permission(request, view) and
+                is_expert(request.user))

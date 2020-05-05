@@ -35,7 +35,8 @@ from impact.v1.views import (
     UserDetailView,
     UserHistoryView,
     UserListView,
-    UserOrganizationsView
+    UserOrganizationsView,
+    MentorParticipationView,
 )
 
 v1_urlpatterns = [
@@ -144,4 +145,7 @@ v1_urlpatterns = [
     url(r"^cancel_office_hour_session/$",
         CancelOfficeHourSessionView.as_view(),
         name=CancelOfficeHourSessionView.view_name),
+    url(r"^expert/program-confirmation/$",
+        MentorParticipationView.as_view(),
+        name=MentorParticipationView.view_name),
 ]
