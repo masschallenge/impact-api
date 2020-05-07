@@ -102,10 +102,11 @@ on which the Django project is running (service "web"), run `make bash-shell`.
 If you need to write out data from a local impact-api instance to your host
 machine's drive, the directory `/wwwroot` on the docker 
 container is mapped to `impact-api/web/impact` on your host machine. If you are
-working in a django shell, creating a filehandle `f = open("/wwwroot/foo.txt", "w")`
-will allow you to write out data to your host machine. 
-Similarly, to test a script or data file locally, place it in `impact-api/web/impact` 
-to make it available on the impact-api docker container. 
+working in a Django shell on the impact-api container, creating a filehandle 
+`f = open("/wwwroot/foo.txt", "w")`will allow you to write out data to 
+an accessible location on your host machine. Similarly, to test a script or data 
+file locally, place it in `impact-api/web/impact` to make it available on the 
+impact-api docker container. 
 
 
 ### Running A Web Server In Supervisor/Debug Mode
