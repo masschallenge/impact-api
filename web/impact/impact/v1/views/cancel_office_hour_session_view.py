@@ -5,7 +5,6 @@ from django.contrib.auth import get_user_model
 from django.template import loader
 
 from rest_framework.exceptions import PermissionDenied
-from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 
 from accelerator.models import MentorProgramOfficeHour
@@ -18,17 +17,21 @@ User = get_user_model()
 DEFAULT_TIMEZONE = 'UTC'
 SUBJECT = '[Office Hours] Canceled: {date}, {start_time}'
 
-STAFF_NOTIFICATION = 'Canceled office hours on behalf of ' \
-                     '{mentor_name} at {start_time} - {end_time} on {date}'
-MENTOR_NOTIFICATION = 'Canceled office hours at {start_time} - ' \
-                      '{end_time} on {date}'
-PERMISSION_DENIED = 'Office hour session could not be canceled. ' \
-                    'You do not have permission to cancel that session'
+STAFF_NOTIFICATION = ('Canceled office hours on behalf of '
+                      '{mentor_name} at {start_time} - {end_time} on {date}')
+MENTOR_NOTIFICATION = ('Canceled office hours at {start_time} - '
+                       '{end_time} on {date}')
+PERMISSION_DENIED = ('Office hour session could not be canceled. '
+                     'You do not have permission to cancel that session')
+OFFICE_HOUR_SESSION_404 = ('The office hour session you are trying to cancel '
+                           'doesn\'t exist')
 
 
 def get_office_hours_list_url(family_slug, program_slug):
     site_url = 'accelerate.masschallenge.org'
-    return f'https://{site_url}/officehours/list/{family_slug}/{program_slug}'
+    return 'https://{}/officehours/list/{}/{}'.format(
+        site_url, family_slug, program_slug
+    )
 
 
 def get_office_hour_shared_context(office_hour, message=None):
@@ -76,23 +79,13 @@ class CancelOfficeHourSessionView(ImpactView):
             office_hour.delete()
             return ui_notification
 
-    def send_email(self, context, to_addr):
-        html_email = loader.render_to_string(
-            'emails/cancel_office_hour_session_email.html',
-            context
-        )
-        MinimalEmailHandler(
-            to=to_addr,
-            subject=SUBJECT.format(**context),
-            body=None,
-            from_email=settings.NO_REPLY_EMAIL,
-            attach_alternative=[html_email, 'text/html'],
-        ).send()
-
     def post(self, request):
         message = request.data.get('message', None)
         id = request.data.get('id', None)
-        office_hour = get_object_or_404(MentorProgramOfficeHour, id=id)
+        try:
+            office_hour = MentorProgramOfficeHour.objects.get(pk=id)
+        except MentorProgramOfficeHour.DoesNotExist:
+            return Response({'detail': OFFICE_HOUR_SESSION_404})
         self.check_object_permissions(request, office_hour)
         response_detail = self.cancel_office_hour_session(
             office_hour, request.user, message)
@@ -107,7 +100,7 @@ class CancelOfficeHourSessionView(ImpactView):
             addressee_dict['mentor']['hours_with'] = ' with {}'.format(
                 office_hour.finalist.get_profile().full_name())
             addressee_dict['finalist'] = {
-                'hours_with': f' with {mentor_name}',
+                'hours_with': ' with {}'.format(mentor_name),
                 'to_addrs': [office_hour.finalist.email]
             }
         return addressee_dict
@@ -124,3 +117,16 @@ class CancelOfficeHourSessionView(ImpactView):
                 }
                 local_context.update(context)
                 self.send_email(local_context, addressee_info['to_addrs'])
+
+    def send_email(self, context, to_addr):
+        html_email = loader.render_to_string(
+            'emails/cancel_office_hour_session_email.html',
+            context
+        )
+        MinimalEmailHandler(
+            to=to_addr,
+            subject=SUBJECT.format(**context),
+            body=None,
+            from_email=settings.NO_REPLY_EMAIL,
+            attach_alternative=[html_email, 'text/html'],
+        ).send()
