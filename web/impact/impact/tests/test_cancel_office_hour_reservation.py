@@ -83,7 +83,10 @@ class TestCancelOfficeHourReservationView(APITestCase):
         self.assert_not_notified(office_hour.mentor)
 
     def _submit_cancellation(self, office_hour, user, message=""):
-        with self.login(email=self.basic_user().email):
+        user.set_password("password")
+        user.save()
+
+        with self.login(email=user.email):
             url = reverse(CancelOfficeHourReservationView.view_name)
             data = {"office_hour_id": office_hour.id,
                     "user_id": user.id,

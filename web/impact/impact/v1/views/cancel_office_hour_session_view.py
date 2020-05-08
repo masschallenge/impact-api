@@ -9,7 +9,7 @@ from rest_framework.response import Response
 
 from accelerator.models import MentorProgramOfficeHour
 from impact.minimal_email_handler import MinimalEmailHandler
-from impact.permissions.v1_api_permissions import OfficeHourPermission
+from impact.permissions.v1_api_permissions import OfficeHourMentorPermission
 from impact.v1.views.impact_view import ImpactView
 
 User = get_user_model()
@@ -60,7 +60,7 @@ def get_ui_notification(context, staff=False):
 
 
 class CancelOfficeHourSessionView(ImpactView):
-    permission_classes = (OfficeHourPermission,)
+    permission_classes = (OfficeHourMentorPermission,)
     view_name = 'cancel_office_hour_session_view'
 
     def cancel_office_hour_session(self, office_hour, user, message):
