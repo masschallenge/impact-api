@@ -7,7 +7,7 @@ from accelerator.models import (
     EntrepreneurProfile,
     ExpertProfile,
 )
-from .utils import get_profile
+from ...utils import get_profile
 from .model_helper import (
     BOOLEAN_FIELD,
     REQUIRED_EMAIL_FIELD,

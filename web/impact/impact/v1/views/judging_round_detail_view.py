@@ -1,8 +1,8 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from .v1.helpers import JudgingRoundHelper
-from .v1.views.base_detail_view import BaseDetailView
+from ..helpers import JudgingRoundHelper
+from .base_detail_view import BaseDetailView
 
 
 class JudgingRoundDetailView(BaseDetailView):

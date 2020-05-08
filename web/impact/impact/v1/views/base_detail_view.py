@@ -4,8 +4,8 @@
 from abc import ABCMeta
 from rest_framework.response import Response
 
-from .v1.helpers import json_object
-from .v1.views import ImpactView
+from ..helpers import json_object
+from .import ImpactView
 
 
 class BaseDetailView(ImpactView):

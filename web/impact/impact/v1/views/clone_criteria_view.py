@@ -3,12 +3,12 @@
 from rest_framework.response import Response
 
 from accelerator.models import JudgingRound
-from .v1.views.impact_view import ImpactView
-from .v1.helpers import (
+from .impact_view import ImpactView
+from ..helpers import (
     CriterionHelper,
     CriterionOptionSpecHelper,
 )
-from .permissions import global_operations_manager_check
+from ...permissions import global_operations_manager_check
 
 ROUND_DOES_NOT_EXIST_ERROR = "Judging Round {} does not exist"
 SOURCE_JUDGING_ROUND_KEY = 'source_judging_round_id'

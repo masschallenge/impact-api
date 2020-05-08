@@ -6,8 +6,8 @@ from accelerator.models import (
     JudgingRound,
 )
 from rest_framework.response import Response
-from .v1.views.impact_view import ImpactView
-from .v1.helpers.model_helper import READ_ONLY_INTEGER_FIELD
+from .impact_view import ImpactView
+from ..helpers.model_helper import READ_ONLY_INTEGER_FIELD
 
 
 JUDGING_ROUND_CRITERIA_HEADER_FIELDS = {

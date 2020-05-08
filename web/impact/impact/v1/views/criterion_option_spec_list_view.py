@@ -1,9 +1,9 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from .v1.views.post_mixin import PostMixin
-from .v1.views.base_list_view import BaseListView
-from .v1.helpers import CriterionOptionSpecHelper
+from .post_mixin import PostMixin
+from .base_list_view import BaseListView
+from ..helpers import CriterionOptionSpecHelper
 
 
 class CriterionOptionSpecListView(BaseListView,

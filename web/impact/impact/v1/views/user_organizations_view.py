@@ -9,12 +9,12 @@ from accelerator.models import (
     PartnerTeamMember,
     StartupTeamMember,
 )
-from .v1.views.impact_view import ImpactView
-from .v1.views.utils import (
+from .impact_view import ImpactView
+from .utils import (
     coalesce_dictionaries,
     map_data,
 )
-from .v1.helpers import ORGANIZATION_USER_FIELDS
+from ..helpers import ORGANIZATION_USER_FIELDS
 
 
 class UserOrganizationsView(ImpactView):

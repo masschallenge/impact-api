@@ -2,12 +2,12 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from accelerator.models import Organization
-from .v1.helpers import (
+from ..helpers import (
     COULD_BE_STARTUP_CHECK,
     IS_STARTUP_CHECK,
     OrganizationHelper,
 )
-from .v1.views.base_detail_view import BaseDetailView
+from .base_detail_view import BaseDetailView
 
 
 class OrganizationDetailView(BaseDetailView):

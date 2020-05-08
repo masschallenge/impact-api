@@ -2,4 +2,4 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 
-from .api_data.api_data import APIData
+from .api_data import APIData

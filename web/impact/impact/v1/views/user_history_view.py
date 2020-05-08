@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from django.contrib.auth import get_user_model
-from .v1.views.base_history_view import BaseHistoryView
+from .base_history_view import BaseHistoryView
 from .v1.events import (
     UserBecameConfirmedJudgeEvent,
     UserBecameConfirmedMentorEvent,

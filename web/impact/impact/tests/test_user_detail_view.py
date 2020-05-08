@@ -23,8 +23,8 @@ from .tests.utils import (
     assert_fields_not_required,
     assert_fields_required,
 )
-from .utils import get_profile
-from .v1.helpers import (
+from ...utils import get_profile
+from ..v1.helpers import (
     INVALID_ID_ERROR,
     MISSING_SUBJECT_ERROR,
     UserHelper,

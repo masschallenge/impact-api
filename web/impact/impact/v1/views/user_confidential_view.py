@@ -1,15 +1,15 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from .permissions import (
+from ...permissions import (
     V1ConfidentialAPIPermissions,
 )
-from .v1.helpers import (
+from ..helpers import (
     PK_FIELD,
     UserHelper,
     OPTIONAL_STRING_FIELD,
 )
-from .v1.views.base_detail_view import BaseDetailView
+from .base_detail_view import BaseDetailView
 
 
 class UserConfidentialView(BaseDetailView):

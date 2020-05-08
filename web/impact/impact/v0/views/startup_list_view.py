@@ -11,10 +11,9 @@ from accelerator.models import (
     Startup,
     StartupStatus,
 )
-from .permissions import (
+from ...permissions import (
     V0APIPermissions,
 )
-from .utils import compose_filter
 from ..api_data.startup_list_data import StartupListData
 from .utils import (
     BADGE_DISPLAYS,
@@ -22,6 +21,7 @@ from .utils import (
     logo_url,
     status_description,
 )
+from ...utils import compose_filter
 
 
 STARTUP_TO_LIST_TAB_ID = [

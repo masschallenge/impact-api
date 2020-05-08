@@ -1,8 +1,8 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from .v1.helpers import ProgramFamilyHelper
-from .v1.views.base_detail_view import BaseDetailView
+from ..helpers import ProgramFamilyHelper
+from .base_detail_view import BaseDetailView
 
 
 class ProgramFamilyDetailView(BaseDetailView):

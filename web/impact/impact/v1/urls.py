@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from .v1.views import (
+from .views import (
     AllocateApplicationsView,
     AnalyzeJudgingRoundView,
     ApplicationDetailView,

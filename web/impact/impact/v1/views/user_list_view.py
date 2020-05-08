@@ -11,7 +11,7 @@ from accelerator.models import (
     MemberProfile,
 )
 from .utils import parse_date
-from .v1.helpers import (
+from ..helpers import (
     COULD_BE_EXPERT_CHECK,
     COULD_BE_NON_MEMBER_CHECK,
     IS_EXPERT_CHECK,
@@ -23,9 +23,9 @@ from .v1.helpers import (
     validate_choices,
     valid_keys,
 )
-from .v1.views.utils import valid_keys_note
-from .v1.views.base_list_view import BaseListView
-from .v1.views.post_mixin import PostMixin
+from .utils import valid_keys_note
+from .base_list_view import BaseListView
+from .post_mixin import PostMixin
 
 EMAIL_EXISTS_ERROR = "User with email {} already exists"
 UNSUPPORTED_KEY_ERROR = "'{key}' is not supported for {type}"

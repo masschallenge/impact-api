@@ -7,8 +7,8 @@ from accelerator.models import (
     ONLINE_JUDGING_ROUND_TYPE,
 )
 
-from .v1.views.base_list_view import BaseListView
-from .v1.helpers import JudgingRoundHelper
+from .base_list_view import BaseListView
+from ..helpers import JudgingRoundHelper
 
 INVALID_ROUND_TYPE_ERROR = ("Invalid value '{}' for round_type. "
                             "Use 'Online' or 'In-Person'.")

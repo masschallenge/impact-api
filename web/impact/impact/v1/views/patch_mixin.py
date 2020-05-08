@@ -1,5 +1,5 @@
 from rest_framework.response import Response
-from .v1.views.utils import valid_keys_note
+from .utils import valid_keys_note
 
 NO_OBJECT_ERROR = "Unable to find object for id {}"
 
