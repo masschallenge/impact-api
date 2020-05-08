@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 from accelerator.models import CriterionOptionSpec
 
-from impact.v1.helpers.model_helper import (
+from .v1.helpers.model_helper import (
     ModelHelper,
     OPTIONAL_FLOAT_FIELD,
     OPTIONAL_INTEGER_FIELD,
@@ -10,8 +10,8 @@ from impact.v1.helpers.model_helper import (
     REQUIRED_INTEGER_FIELD,
     REQUIRED_STRING_FIELD,
 )
-from impact.v1.helpers.criterion_helper import CriterionHelper
-from impact.v1.helpers.validators import (
+from .v1.helpers.criterion_helper import CriterionHelper
+from .v1.helpers.validators import (
     validate_string,
     validate_integer,
     validate_float,

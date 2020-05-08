@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from accelerator.models import UserRole
-from impact.v1.events.base_user_became_mentor_event import (
+from .v1.events.base_user_became_mentor_event import (
     BaseUserBecameMentorEvent,
 )
 

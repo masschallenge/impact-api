@@ -8,9 +8,9 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from accelerator.models import MentorProgramOfficeHour
-from impact.minimal_email_handler import MinimalEmailHandler
-from impact.permissions.v1_api_permissions import OfficeHourPermission
-from impact.v1.views.impact_view import ImpactView
+from .minimal_email_handler import MinimalEmailHandler
+from .permissions.v1_api_permissions import OfficeHourPermission
+from .v1.views.impact_view import ImpactView
 
 User = get_user_model()
 

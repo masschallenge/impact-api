@@ -2,9 +2,9 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from accelerator.models import StartupRole
-from impact.utils import compose_filter
-from impact.v1.events.base_history_event import BaseHistoryEvent
-from impact.v1.helpers import (
+from .utils import compose_filter
+from .v1.events.base_history_event import BaseHistoryEvent
+from .v1.helpers import (
     OPTIONAL_INTEGER_FIELD,
     OPTIONAL_STRING_FIELD,
 )

@@ -4,18 +4,18 @@
 from django.conf import settings
 from django.urls import reverse
 
-from impact.tests.factories import (
+from .tests.factories import (
     IndustryFactory,
     ProgramFactory,
     StartupFactory,
     StartupStatusFactory,
     StartupTeamMemberFactory,
 )
-from impact.tests.contexts import UserContext
-from impact.tests.utils import match_errors
-from impact.tests.api_test_case import APITestCase
-from impact.v0.views.startup_detail_view import EMPTY_DETAIL_RESULT
-from impact.v0.views.utils import BADGE_DISPLAYS
+from .tests.contexts import UserContext
+from .tests.utils import match_errors
+from .tests.api_test_case import APITestCase
+from .v0.views.startup_detail_view import EMPTY_DETAIL_RESULT
+from .v0.views.utils import BADGE_DISPLAYS
 
 
 EMPTY_RESPONSE = {'startups': []}

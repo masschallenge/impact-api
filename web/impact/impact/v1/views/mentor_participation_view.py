@@ -9,10 +9,10 @@ from accelerator.models import (
     ProgramRoleGrant,
     ProgramRole
 )
-from impact.minimal_email_handler import MinimalEmailHandler
-from impact.permissions.v1_api_permissions import IsExpertUser
-from impact.v1.views import ImpactView
-from impact.v1.views.user_detail_view import NO_USER_ERROR
+from .minimal_email_handler import MinimalEmailHandler
+from .permissions.v1_api_permissions import IsExpertUser
+from .v1.views import ImpactView
+from .v1.views.user_detail_view import NO_USER_ERROR
 
 User = get_user_model()
 

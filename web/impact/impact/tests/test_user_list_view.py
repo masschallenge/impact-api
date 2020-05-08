@@ -14,15 +14,15 @@ from accelerator.models import (
     ExpertProfile,
     MemberProfile,
 )
-from impact.tests.api_test_case import APITestCase
-from impact.tests.contexts import UserContext
-from impact.tests.factories import (
+from .tests.api_test_case import APITestCase
+from .tests.contexts import UserContext
+from .tests.factories import (
     ExpertCategoryFactory,
     IndustryFactory,
     ProgramFamilyFactory,
     StartupTeamMemberFactory,
 )
-from impact.tests.test_user_detail_view import (
+from .tests.test_user_detail_view import (
     ENTREPRENEUR_GET_FIELDS,
     EXPERT_GET_FIELDS,
     EXPERT_WRITE_FIELDS,
@@ -30,30 +30,30 @@ from impact.tests.test_user_detail_view import (
     NON_MEMBER_MUTABLE_FIELDS,
     WRITE_ONCE_FIELDS,
 )
-from impact.tests.utils import (
+from .tests.utils import (
     assert_fields,
     assert_fields_not_required,
     assert_fields_required,
 )
-from impact.utils import (
+from .utils import (
     get_profile,
     override_updated_at,
 )
 
-from impact.v1.helpers.validators import (
+from .v1.helpers.validators import (
     format_choices,
     INVALID_CHOICE_ERROR,
     INVALID_URL_ERROR,
 )
 
-from impact.v1.views.base_list_view import (
+from .v1.views.base_list_view import (
     DEFAULT_MAX_LIMIT,
     GREATER_THAN_MAX_LIMIT_ERROR,
     KWARG_VALUE_NOT_INTEGER_ERROR,
     KWARG_VALUE_IS_NON_POSITIVE_ERROR,
     KWARG_VALUE_IS_NEGATIVE_ERROR,
 )
-from impact.v1.views.user_list_view import (
+from .v1.views.user_list_view import (
     EMAIL_EXISTS_ERROR,
     UNSUPPORTED_KEY_ERROR,
     UserListView,

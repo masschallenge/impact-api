@@ -1,8 +1,8 @@
-from impact.tests.api_test_case import APITestCase
-from impact.tests.utils import assert_data_is_consistent_with_instance
-from impact.tests.factories import CriterionFactory
-from impact.v1.views import CriterionDetailView
-from impact.v1.views.utils import valid_keys_note
+from .tests.api_test_case import APITestCase
+from .tests.utils import assert_data_is_consistent_with_instance
+from .tests.factories import CriterionFactory
+from .v1.views import CriterionDetailView
+from .v1.views.utils import valid_keys_note
 from django.urls import reverse
 
 

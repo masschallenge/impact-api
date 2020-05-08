@@ -1,7 +1,7 @@
 from accelerator.models import (
     Startup,
 )
-from impact.graphql.types import (
+from .graphql.types import (
     StartupType,
 )
 

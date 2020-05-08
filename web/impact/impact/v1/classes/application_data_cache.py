@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 from pytz import utc
 
-from impact.v1.classes.utils import collect_pairs
+from .v1.classes.utils import collect_pairs
 from accelerator.models import (
     ApplicationPanelAssignment,
     JUDGING_FEEDBACK_STATUS_COMPLETE,

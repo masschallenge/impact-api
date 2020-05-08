@@ -23,10 +23,10 @@ from accelerator_abstract.models import (
     UPCOMING_PROGRAM_STATUS,
     ENDED_PROGRAM_STATUS
 )
-from impact.tests.api_test_case import APITestCase
-from impact.tests.factories import UserFactory
-from impact.views import AlgoliaApiKeyView
-from impact.views.algolia_api_key_view import (
+from .tests.api_test_case import APITestCase
+from .tests.factories import UserFactory
+from .views import AlgoliaApiKeyView
+from .views.algolia_api_key_view import (
     IS_ACTIVE_FILTER,
     IS_FINALIST
 )

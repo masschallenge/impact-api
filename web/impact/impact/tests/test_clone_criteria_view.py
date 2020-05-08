@@ -3,8 +3,8 @@
 
 from django.urls import reverse
 
-from impact.tests.api_test_case import APITestCase
-from impact.v1.views import (
+from .tests.api_test_case import APITestCase
+from .v1.views import (
     CloneCriteriaView,
     SOURCE_JUDGING_ROUND_KEY,
     TARGET_JUDGING_ROUND_KEY,
@@ -16,7 +16,7 @@ from accelerator.tests.factories import (
     CriterionOptionSpecFactory,
     JudgingRoundFactory,
 )
-from impact.tests.utils import assert_fields
+from .tests.utils import assert_fields
 
 class TestCloneCriteriaView(APITestCase):
     def test_global_operations_manager_permission_required(self):

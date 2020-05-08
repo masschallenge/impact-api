@@ -12,20 +12,20 @@ from django.db.models import (
     F,
     Sum,
 )
-from impact.v1.helpers.criterion_option_spec_helper import (
+from .v1.helpers.criterion_option_spec_helper import (
     CriterionOptionSpecHelper,
 )
-from impact.v1.helpers.criterion_helper import CriterionHelper
-from impact.v1.helpers.judge_gender_criterion_helper import (
+from .v1.helpers.criterion_helper import CriterionHelper
+from .v1.helpers.judge_gender_criterion_helper import (
     JudgeGenderCriterionHelper,
 )
-from impact.v1.helpers.judge_role_criterion_helper import (
+from .v1.helpers.judge_role_criterion_helper import (
     JudgeRoleCriterionHelper,
 )
-from impact.v1.helpers.matching_industry_criterion_helper import (
+from .v1.helpers.matching_industry_criterion_helper import (
     MatchingIndustryCriterionHelper,
 )
-from impact.v1.helpers.matching_program_criterion_helper import (
+from .v1.helpers.matching_program_criterion_helper import (
     MatchingProgramCriterionHelper,
 )
 

@@ -1,8 +1,8 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from impact.tests.api_test_case import APITestCase
-from impact.tests.factories import PartnerFactory
+from .tests.api_test_case import APITestCase
+from .tests.factories import PartnerFactory
 
 
 class TestPartner(APITestCase):

@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from impact.v0.views import (
+from .v0.views import (
     MentorsProxyView,
     StartupListView,
     StartupDetailView,

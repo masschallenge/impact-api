@@ -3,8 +3,8 @@
 
 from test_plus.test import TestCase
 
-from impact.tests.factories import StartupFactory
-from impact.v0.views.utils import (
+from .tests.factories import StartupFactory
+from .v0.views.utils import (
     logo_url,
     pad_slash,
 )

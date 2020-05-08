@@ -3,7 +3,7 @@
 
 import re
 from accelerator.models import ProgramFamily
-from impact.v1.helpers.model_helper import (
+from .v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     ModelHelper,
     OPTIONAL_STRING_FIELD,

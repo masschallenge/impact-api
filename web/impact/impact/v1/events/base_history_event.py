@@ -5,7 +5,7 @@ from abc import (
     ABCMeta,
     abstractmethod,
 )
-from impact.v1.helpers import (
+from .v1.helpers import (
     OPTIONAL_STRING_FIELD,
 )
 

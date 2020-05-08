@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from impact.api_data import APIData
+from .api_data import APIData
 
 
 class StartupDetailData(APIData):

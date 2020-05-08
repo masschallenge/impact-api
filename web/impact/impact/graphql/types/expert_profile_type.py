@@ -11,7 +11,7 @@ from accelerator.models import (
     UserRole
 )
 
-from impact.graphql.types import (
+from .graphql.types import (
     BaseUserProfileType,
 )
 from accelerator_abstract.models import (
@@ -20,12 +20,12 @@ from accelerator_abstract.models import (
     HIDDEN_PROGRAM_STATUS,
     UPCOMING_PROGRAM_STATUS
 )
-from impact.graphql.types import StartupMentorRelationshipType
+from .graphql.types import StartupMentorRelationshipType
 
-from impact.utils import (
+from .utils import (
     compose_filter,
 )
-from impact.v1.helpers.profile_helper import (
+from .v1.helpers.profile_helper import (
     latest_program_id_for_each_program_family,
 )
 

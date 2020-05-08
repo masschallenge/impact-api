@@ -7,8 +7,8 @@ from accelerator.models import (
     EntrepreneurProfile,
     ExpertProfile,
 )
-from impact.utils import get_profile
-from impact.v1.helpers.model_helper import (
+from .utils import get_profile
+from .v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     REQUIRED_EMAIL_FIELD,
     ModelHelper,
@@ -19,12 +19,12 @@ from impact.v1.helpers.model_helper import (
     OPTIONAL_URL_FIELD,
     READ_ONLY_OBJECT_FIELD
 )
-from impact.v1.helpers.validators import (
+from .v1.helpers.validators import (
     validate_boolean,
     validate_email_address,
     validate_string,
 )
-from impact.v1.helpers.profile_helper import (
+from .v1.helpers.profile_helper import (
     EXPERT_BOOLEAN_FIELD,
     EXPERT_CATEGORY_FIELD,
     EXPERT_INDUSTRY_FIELD,

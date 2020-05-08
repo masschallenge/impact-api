@@ -8,12 +8,12 @@ from abc import (
 from datetime import datetime
 from pytz import utc
 from django.db.models import Q
-from impact.utils import (
+from .utils import (
     compose_filter,
     next_instance,
 )
-from impact.v1.events.base_history_event import BaseHistoryEvent
-from impact.v1.helpers import (
+from .v1.events.base_history_event import BaseHistoryEvent
+from .v1.helpers import (
     OPTIONAL_INTEGER_FIELD,
     OPTIONAL_STRING_FIELD,
 )

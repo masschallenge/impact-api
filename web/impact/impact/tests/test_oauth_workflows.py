@@ -13,7 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 from oauth2_provider.models import get_application_model
 from test_plus.test import TestCase
 
-from impact.tests.factories import (
+from .tests.factories import (
     PermissionFactory,
     UserFactory,
 )

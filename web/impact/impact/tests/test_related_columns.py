@@ -12,7 +12,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from test_plus.test import TestCase
 
-from impact.tests.factories import (
+from .tests.factories import (
     ContentTypeFactory,
     PermissionFactory,
     StartupTeamMemberFactory,

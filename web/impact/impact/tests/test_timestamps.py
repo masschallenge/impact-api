@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from test_plus.test import TestCase
-from impact.tests.factories import (
+from .tests.factories import (
     FunctionalExpertiseFactory,
     IndustryFactory,
     StartupProgramInterestFactory,

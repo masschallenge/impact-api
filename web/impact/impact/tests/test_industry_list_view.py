@@ -5,11 +5,11 @@ import json
 from jsonschema import Draft4Validator
 
 from django.urls import reverse
-from impact.tests.factories import IndustryFactory
-from impact.tests.api_test_case import APITestCase
-from impact.tests.utils import assert_fields
-from impact.v1.helpers import MPTT_FIELDS
-from impact.v1.views import IndustryListView
+from .tests.factories import IndustryFactory
+from .tests.api_test_case import APITestCase
+from .tests.utils import assert_fields
+from .v1.helpers import MPTT_FIELDS
+from .v1.views import IndustryListView
 
 
 class TestIndustryListView(APITestCase):

@@ -5,10 +5,10 @@ from django.db.models import Value as V
 from django.db.models.functions import Concat
 
 from accelerator.models import UserRole
-from impact.v1.helpers import (
+from .v1.helpers import (
     MentorProgramOfficeHourHelper,
 )
-from impact.v1.views.base_list_view import BaseListView
+from .v1.views.base_list_view import BaseListView
 
 ID_FIELDS = ['mentor_id', 'finalist_id']
 NAME_FIELDS = ['mentor_name', 'finalist_name']

@@ -9,10 +9,10 @@ from accelerator.tests.factories import (
     ProgramRoleGrantFactory,
 )
 
-from impact.tests.api_test_case import APITestCase
-from impact.tests.test_graphql import expert_user
-from impact.v1.views import MentorParticipationView
-from impact.v1.views.mentor_participation_view import (
+from .tests.api_test_case import APITestCase
+from .tests.test_graphql import expert_user
+from .v1.views import MentorParticipationView
+from .v1.views.mentor_participation_view import (
     INVALID_INPUT_ERROR,
     SUBJECT
 )

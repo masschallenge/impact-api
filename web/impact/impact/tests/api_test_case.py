@@ -14,7 +14,7 @@ from accelerator_abstract.models.base_clearance import (
     CLEARANCE_LEVEL_GLOBAL_MANAGER,
     CLEARANCE_LEVEL_STAFF
 )
-from impact.tests.factories import (
+from .tests.factories import (
     ClearanceFactory,
     UserFactory,
 )

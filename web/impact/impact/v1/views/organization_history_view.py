@@ -1,10 +1,10 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from impact.v1.views.base_history_view import BaseHistoryView
+from .v1.views.base_history_view import BaseHistoryView
 
 from accelerator.models import Organization
-from impact.v1.events import (
+from .v1.events import (
     OrganizationBecameEntrantEvent,
     OrganizationBecameFinalistEvent,
     OrganizationBecameWinnerEvent,

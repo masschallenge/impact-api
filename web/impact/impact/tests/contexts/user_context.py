@@ -4,7 +4,7 @@ from datetime import timedelta
 
 from django.utils import timezone
 
-from impact.tests.factories import (
+from .tests.factories import (
     BaseProfileFactory,
     EntrepreneurProfileFactory,
     ExpertProfileFactory,

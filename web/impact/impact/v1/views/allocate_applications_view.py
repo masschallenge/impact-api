@@ -9,9 +9,9 @@ from numpy import (
     array,
     matmul,
 )
-from impact.v1.classes.application_data_cache import ApplicationDataCache
-from impact.v1.classes.criteria_data_cache import CriteriaDataCache
-from impact.v1.classes.judge_data_cache import JudgeDataCache
+from .v1.classes.application_data_cache import ApplicationDataCache
+from .v1.classes.criteria_data_cache import CriteriaDataCache
+from .v1.classes.judge_data_cache import JudgeDataCache
 from accelerator.models import (
     ACTIVE_PANEL_STATUS,
     Allocator,
@@ -25,12 +25,12 @@ from accelerator.models import (
     User,
 )
 from rest_framework.response import Response
-from impact.v1.helpers import CriterionHelper
-from impact.v1.views.impact_view import ImpactView
-from impact.permissions import (
+from .v1.helpers import CriterionHelper
+from .v1.views.impact_view import ImpactView
+from .permissions import (
     AllocateApplicationsPermissions,
 )
-from impact.v1.classes.option_analysis import feedbacks_for_judging_round
+from .v1.classes.option_analysis import feedbacks_for_judging_round
 
 ALREADY_ASSIGNED_ERROR = "{judge} is already assigned to {count} applications"
 JUDGING_ROUND_INACTIVE_ERROR = "Judging round {} is not active"

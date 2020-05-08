@@ -7,9 +7,9 @@ from django.http import HttpResponse
 from django.conf import settings
 
 from django.contrib.auth.models import Group
-from impact.tests.api_test_case import APITestCase
-from impact.tests.utils import match_errors
-from impact.v0.views import MentorsProxyView
+from .tests.api_test_case import APITestCase
+from .tests.utils import match_errors
+from .v0.views import MentorsProxyView
 
 
 class TestMentorsProxyView(APITestCase):

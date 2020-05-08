@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from accelerator.models import Application
-from impact.v1.helpers.model_helper import (
+from .v1.helpers.model_helper import (
     ModelHelper,
     OPTIONAL_INTEGER_FIELD,
     OPTIONAL_STRING_FIELD,

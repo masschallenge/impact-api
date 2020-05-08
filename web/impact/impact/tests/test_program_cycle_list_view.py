@@ -5,13 +5,13 @@ import json
 from jsonschema import Draft4Validator
 
 from django.urls import reverse
-from impact.tests.factories import ProgramCycleFactory
-from impact.tests.api_test_case import APITestCase
-from impact.tests.test_program_cycle_detail_view import (
+from .tests.factories import ProgramCycleFactory
+from .tests.api_test_case import APITestCase
+from .tests.test_program_cycle_detail_view import (
     PROGRAM_CYCLE_GET_FIELDS,
 )
-from impact.tests.utils import assert_fields
-from impact.v1.views import ProgramCycleListView
+from .tests.utils import assert_fields
+from .v1.views import ProgramCycleListView
 
 
 class TestProgramCycleListView(APITestCase):

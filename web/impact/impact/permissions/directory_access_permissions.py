@@ -1,4 +1,4 @@
-from impact.permissions import BasePermission
+from .permissions import BasePermission
 from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
 from accelerator.models import UserRole
 from accelerator_abstract.models.base_user_utils import is_employee

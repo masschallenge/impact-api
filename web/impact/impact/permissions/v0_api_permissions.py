@@ -1,4 +1,4 @@
-from impact.permissions import (
+from .permissions import (
     settings,
     BasePermission)
 

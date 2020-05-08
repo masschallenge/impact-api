@@ -7,7 +7,7 @@ from accelerator.models import (
     StartupProgramInterest,
 )
 from django.db.models import F
-from impact.v1.helpers.matching_criterion_helper import MatchingCriterionHelper
+from .v1.helpers.matching_criterion_helper import MatchingCriterionHelper
 
 
 class MatchingProgramCriterionHelper(MatchingCriterionHelper):

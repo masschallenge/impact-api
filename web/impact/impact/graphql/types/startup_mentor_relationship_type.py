@@ -2,8 +2,8 @@ import graphene
 from graphene_django import DjangoObjectType
 
 from accelerator.models import StartupMentorRelationship
-from impact.graphql.types.program_type import ProgramType
-from impact.graphql.types.expert_startup_type import ExpertStartupType
+from .graphql.types.program_type import ProgramType
+from .graphql.types.expert_startup_type import ExpertStartupType
 
 
 class StartupMentorRelationshipType(DjangoObjectType):

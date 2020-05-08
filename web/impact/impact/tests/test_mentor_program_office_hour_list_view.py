@@ -22,13 +22,13 @@ from accelerator.tests.factories import (
     ProgramRoleGrantFactory,
 )
 
-from impact.tests.factories import MentorProgramOfficeHourFactory
-from impact.tests.api_test_case import APITestCase
-from impact.v1.helpers.mentor_program_office_hour_helper import (
+from .tests.factories import MentorProgramOfficeHourFactory
+from .tests.api_test_case import APITestCase
+from .v1.helpers.mentor_program_office_hour_helper import (
     OFFFICE_HOUR_FIELDS,
 )
-from impact.tests.utils import assert_fields
-from impact.v1.views import MentorProgramOfficeHourListView
+from .tests.utils import assert_fields
+from .v1.views import MentorProgramOfficeHourListView
 
 USER_OFFICE_HOUR_COUNT = 3
 NON_USER_OFFICE_HOUR_COUNT = 4

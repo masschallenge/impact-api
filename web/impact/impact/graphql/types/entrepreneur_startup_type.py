@@ -4,7 +4,7 @@ from accelerator.models import (
     StartupStatus,
     Startup,
 )
-from impact.graphql.types import (
+from .graphql.types import (
     StartupType,
     ProgramType,
 )

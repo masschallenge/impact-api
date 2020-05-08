@@ -11,18 +11,18 @@ from accelerator.models import (
 
 )
 from rest_framework.response import Response
-from impact.v1.views import (
+from .v1.views import (
     find_criterion_helpers,
     ImpactView,
 )
-from impact.v1.classes.option_analysis import OptionAnalysis
-from impact.v1.helpers.model_helper import (
+from .v1.classes.option_analysis import OptionAnalysis
+from .v1.helpers.model_helper import (
     READ_ONLY_ID_FIELD,
     READ_ONLY_INTEGER_FIELD,
     READ_ONLY_OBJECT_FIELD,
     READ_ONLY_STRING_FIELD,
 )
-from impact.permissions import global_operations_manager_check
+from .permissions import global_operations_manager_check
 
 ANALYZE_JUDGING_ROUND_FIELDS = {
     "criterion_option_spec_id": READ_ONLY_ID_FIELD,

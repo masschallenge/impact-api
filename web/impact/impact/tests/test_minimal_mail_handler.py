@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.core import mail
-from impact.minimal_email_handler import MinimalEmailHandler
+from .minimal_email_handler import MinimalEmailHandler
 
 
 DEFAULT_PARAM_KEYS = ("to",

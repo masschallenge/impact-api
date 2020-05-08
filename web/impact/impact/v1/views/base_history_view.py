@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from rest_framework.response import Response
-from impact.v1.views.impact_view import ImpactView
+from .v1.views.impact_view import ImpactView
 
 
 class BaseHistoryView(ImpactView):

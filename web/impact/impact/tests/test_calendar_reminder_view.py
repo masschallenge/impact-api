@@ -4,9 +4,9 @@
 from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from add2cal import Add2Cal
-from impact.tests.api_test_case import APITestCase
+from .tests.api_test_case import APITestCase
 
-from impact.tests.factories import UserFactory
+from .tests.factories import UserFactory
 
 User = get_user_model()  # pylint: disable=invalid-name
 

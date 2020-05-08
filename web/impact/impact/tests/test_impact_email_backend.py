@@ -1,7 +1,7 @@
 from mock import patch
 from django.test import TestCase
 
-from impact.minimal_email_handler import MinimalEmailHandler
+from .minimal_email_handler import MinimalEmailHandler
 
 
 IMPACT_BACKEND_PATH = 'impact.impact_email_backend.ImpactEmailBackend'

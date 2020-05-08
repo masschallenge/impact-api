@@ -8,17 +8,17 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework.test import APIClient
 from test_plus.test import TestCase
 
-from impact.tests.factories import (
+from .tests.factories import (
     ProgramRoleFactory,
     StartupStatusFactory,
     UserFactory,
 )
-from impact.tests.factories import (
+from .tests.factories import (
     PermissionFactory,
     StartupFactory,
 )
 
-from impact.v1.views.user_detail_view import UserDetailView
+from .v1.views.user_detail_view import UserDetailView
 
 
 class TestApiRoute(TestCase):

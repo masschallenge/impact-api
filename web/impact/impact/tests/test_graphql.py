@@ -13,15 +13,15 @@ from accelerator.models import (
     ACTIVE_PROGRAM_STATUS,
     ENDED_PROGRAM_STATUS
 )
-from impact.graphql.middleware import NOT_LOGGED_IN_MSG
-from impact.graphql.query import (
+from .graphql.middleware import NOT_LOGGED_IN_MSG
+from .graphql.query import (
     ENTREPRENEUR_NOT_FOUND_MESSAGE,
     EXPERT_NOT_FOUND_MESSAGE,
     NOT_ALLOWED_ACCESS_MESSAGE
 )
-from impact.tests.api_test_case import APITestCase
-from impact.tests.contexts import UserContext
-from impact.tests.factories import (
+from .tests.api_test_case import APITestCase
+from .tests.contexts import UserContext
+from .tests.factories import (
     ApplicationFactory,
     EntrepreneurFactory,
     ExpertFactory,
@@ -33,8 +33,8 @@ from impact.tests.factories import (
     StartupStatusFactory,
     UserRoleFactory
 )
-from impact.tests.utils import capture_stderr
-from impact.utils import get_user_program_and_startup_roles
+from .tests.utils import capture_stderr
+from .utils import get_user_program_and_startup_roles
 
 MENTEE_FIELDS = """
     startup {

@@ -3,9 +3,9 @@
 
 from django.urls import reverse
 
-from impact.v0.api_data.startup_list_data import StartupListData as Data
-from impact.tests.api_test_case import APITestCase
-from impact.tests.factories import (
+from .v0.api_data.startup_list_data import StartupListData as Data
+from .tests.api_test_case import APITestCase
+from .tests.factories import (
     IndustryFactory,
     ProgramFactory,
     ProgramStartupStatusFactory,
@@ -13,8 +13,8 @@ from impact.tests.factories import (
     StartupFactory,
     StartupStatusFactory,
 )
-from impact.tests.utils import match_errors
-from impact.v0.views.utils import BADGE_DISPLAYS
+from .tests.utils import match_errors
+from .v0.views.utils import BADGE_DISPLAYS
 
 TEST_BADGE_DISPLAY = BADGE_DISPLAYS[0]
 EMPTY_RESPONSE = {'startups': []}

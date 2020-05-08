@@ -3,12 +3,12 @@
 
 from abc import ABCMeta
 from rest_framework.views import APIView
-from impact.permissions import V1APIPermissions
-from impact.v1.helpers import (
+from .permissions import V1APIPermissions
+from .v1.helpers import (
     json_object,
     json_simple_list,
 )
-from impact.v1.metadata import ImpactMetadata
+from .v1.metadata import ImpactMetadata
 
 INVALID_KEY_ERROR = "'{}' is not a valid key."
 

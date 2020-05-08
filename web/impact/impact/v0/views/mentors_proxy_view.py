@@ -6,7 +6,7 @@ from django.conf import settings
 from rest_framework.response import Response
 from rest_framework_proxy.views import ProxyView
 
-from impact.permissions import (
+from .permissions import (
     V0APIPermissions,
 )
 

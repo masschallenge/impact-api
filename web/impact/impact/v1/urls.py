@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from impact.v1.views import (
+from .v1.views import (
     AllocateApplicationsView,
     AnalyzeJudgingRoundView,
     ApplicationDetailView,

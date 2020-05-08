@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from test_plus.test import TestCase
 
-from impact.tests.factories import UserFactory
+from .tests.factories import UserFactory
 from simpleuser.tests.factories.user_factory import VALID_PASSWORD
 
 User = get_user_model()  # pylint: disable=invalid-name

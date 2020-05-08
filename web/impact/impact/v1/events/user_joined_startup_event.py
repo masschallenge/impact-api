@@ -5,10 +5,10 @@ from datetime import datetime
 from pytz import utc
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from impact.utils import (
+from .utils import (
     next_instance,
 )
-from impact.v1.events.base_history_event import BaseHistoryEvent
+from .v1.events.base_history_event import BaseHistoryEvent
 
 User = get_user_model()
 

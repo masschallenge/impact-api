@@ -31,8 +31,8 @@ from accelerator.tests.contexts import (
     AnalyzeJudgingContext,
     JudgeFeedbackContext,
 )
-from impact.tests.api_test_case import APITestCase
-from impact.v1.views import (
+from .tests.api_test_case import APITestCase
+from .v1.views import (
     ALREADY_ASSIGNED_ERROR,
     AllocateApplicationsView,
     JUDGING_ROUND_INACTIVE_ERROR,

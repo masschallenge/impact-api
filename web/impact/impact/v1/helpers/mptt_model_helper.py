@@ -1,4 +1,4 @@
-from impact.v1.helpers.model_helper import (
+from .v1.helpers.model_helper import (
     json_object,
     ModelHelper,
     PK_FIELD,

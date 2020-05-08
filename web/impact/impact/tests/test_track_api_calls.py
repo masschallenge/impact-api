@@ -1,6 +1,6 @@
 from mock import patch
 
-from impact.tests.api_test_case import APITestCase
+from .tests.api_test_case import APITestCase
 
 
 class TestTrackAPICalls(APITestCase):

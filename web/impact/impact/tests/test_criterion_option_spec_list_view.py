@@ -1,15 +1,15 @@
 import json
 from accelerator.models import CriterionOptionSpec
 
-from impact.v1.views.utils import valid_keys_note
-from impact.v1.helpers.validators import INVALID_INTEGER_ERROR
-from impact.tests.api_test_case import APITestCase
-from impact.tests.utils import assert_data_is_consistent_with_instance
-from impact.tests.factories import (
+from .v1.views.utils import valid_keys_note
+from .v1.helpers.validators import INVALID_INTEGER_ERROR
+from .tests.api_test_case import APITestCase
+from .tests.utils import assert_data_is_consistent_with_instance
+from .tests.factories import (
     CriterionOptionSpecFactory,
     CriterionFactory,
 )
-from impact.v1.views import CriterionOptionSpecListView
+from .v1.views import CriterionOptionSpecListView
 from django.urls import reverse
 
 

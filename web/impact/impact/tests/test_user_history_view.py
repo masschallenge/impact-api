@@ -8,8 +8,8 @@ from django.utils import timezone
 from jsonschema import Draft4Validator
 
 from accelerator.models import UserRole
-from impact.tests.api_test_case import APITestCase
-from impact.tests.factories import (
+from .tests.api_test_case import APITestCase
+from .tests.factories import (
     JudgingRoundFactory,
     NewsletterReceiptFactory,
     ProgramCycleFactory,
@@ -17,12 +17,12 @@ from impact.tests.factories import (
     StartupTeamMemberFactory,
     UserFactory,
 )
-from impact.tests.utils import (
+from .tests.utils import (
     assert_fields,
     days_from_now,
     find_events,
 )
-from impact.v1.events import (
+from .v1.events import (
     UserBecameConfirmedJudgeEvent,
     UserBecameConfirmedMentorEvent,
     UserBecameDesiredJudgeEvent,
@@ -32,7 +32,7 @@ from impact.v1.events import (
     UserJoinedStartupEvent,
     UserReceivedNewsletterEvent,
 )
-from impact.v1.views import UserHistoryView
+from .v1.views import UserHistoryView
 
 
 class TestUserHistoryView(APITestCase):

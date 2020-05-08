@@ -11,12 +11,12 @@ from accelerator.models import (
     Startup,
     StartupStatus,
 )
-from impact.permissions import (
+from .permissions import (
     V0APIPermissions,
 )
-from impact.utils import compose_filter
-from impact.v0.api_data.startup_list_data import StartupListData
-from impact.v0.views.utils import (
+from .utils import compose_filter
+from .v0.api_data.startup_list_data import StartupListData
+from .v0.views.utils import (
     BADGE_DISPLAYS,
     base_program_url,
     logo_url,

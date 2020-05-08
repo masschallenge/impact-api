@@ -3,18 +3,18 @@
 
 from django.urls import reverse
 
-from impact.tests.factories import (
+from .tests.factories import (
     IndustryFactory,
     OrganizationFactory,
     PartnerFactory,
     StartupFactory,
 )
-from impact.tests.utils import (
+from .tests.utils import (
     assert_fields,
     assert_fields_missing,
 )
-from impact.tests.api_test_case import APITestCase
-from impact.v1.views import OrganizationDetailView
+from .tests.api_test_case import APITestCase
+from .v1.views import OrganizationDetailView
 
 SHARED_GET_FIELDS = [
     "id",

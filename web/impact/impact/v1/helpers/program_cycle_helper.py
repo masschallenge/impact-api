@@ -1,5 +1,5 @@
 from accelerator.models import ProgramCycle
-from impact.v1.helpers.model_helper import (
+from .v1.helpers.model_helper import (
     BOOLEAN_FIELD,
     ModelHelper,
     OPTIONAL_STRING_FIELD,

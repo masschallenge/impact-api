@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate
 from django.http import JsonResponse
 from django.utils.deprecation import MiddlewareMixin
 
-from impact.graphql.auth.utils import get_jwt_cookie
+from .graphql.auth.utils import get_jwt_cookie
 
 
 class CookieJSONWebTokenMiddleware(JSONWebTokenMiddleware, MiddlewareMixin):

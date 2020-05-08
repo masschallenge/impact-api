@@ -6,10 +6,10 @@ from jsonschema import Draft4Validator
 
 from django.urls import reverse
 
-from impact.tests.factories import ProgramCycleFactory
-from impact.tests.api_test_case import APITestCase
-from impact.tests.utils import assert_fields
-from impact.v1.views import ProgramCycleDetailView
+from .tests.factories import ProgramCycleFactory
+from .tests.api_test_case import APITestCase
+from .tests.utils import assert_fields
+from .v1.views import ProgramCycleDetailView
 
 PROGRAM_CYCLE_GET_FIELDS = [
     "id",

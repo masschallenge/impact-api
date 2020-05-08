@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from test_plus.test import TestCase
-from impact.urls import schema_router
+from .urls import schema_router
 from django.apps import apps
 from rest_framework.test import APIClient
 from django.contrib.contenttypes.models import ContentType
@@ -17,13 +17,13 @@ from accelerator.tests.factories.organization_factory import (
 from django.contrib.auth.models import Permission
 import json
 
-from impact.tests.factories import (
+from .tests.factories import (
     UserFactory,
     StartupStatusFactory
 )
-from impact.tests.factories import PermissionFactory
+from .tests.factories import PermissionFactory
 from accelerator.models import Startup
-from impact.views.general_view_set import (
+from .views.general_view_set import (
     MODELS_TO_EXCLUDE_FROM_URL_BINDING
 )
 

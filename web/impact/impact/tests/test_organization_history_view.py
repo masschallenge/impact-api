@@ -10,7 +10,7 @@ from accelerator.models import (
     SUBMITTED_APP_STATUS,
     StartupRole,
 )
-from impact.tests.factories import (
+from .tests.factories import (
     ApplicationFactory,
     OrganizationFactory,
     PartnerFactory,
@@ -21,20 +21,20 @@ from impact.tests.factories import (
     StartupStatusFactory,
 )
 
-from impact.tests.api_test_case import APITestCase
-from impact.tests.utils import (
+from .tests.api_test_case import APITestCase
+from .tests.utils import (
     assert_fields,
     days_from_now,
     find_events,
 )
-from impact.utils import DAWN_OF_TIME
-from impact.v1.events import (
+from .utils import DAWN_OF_TIME
+from .v1.events import (
     OrganizationBecameEntrantEvent,
     OrganizationBecameFinalistEvent,
     OrganizationBecameWinnerEvent,
     OrganizationCreatedEvent,
 )
-from impact.v1.views import OrganizationHistoryView
+from .v1.views import OrganizationHistoryView
 
 
 class TestOrganizationHistoryView(APITestCase):

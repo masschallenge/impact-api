@@ -4,7 +4,7 @@
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 
-from impact.v1.helpers import (
+from .v1.helpers import (
     COULD_BE_EXPERT_CHECK,
     COULD_BE_NON_MEMBER_CHECK,
     IS_EXPERT_CHECK,
@@ -12,9 +12,9 @@ from impact.v1.helpers import (
     UserHelper,
     valid_keys,
 )
-from impact.v1.views.base_detail_view import BaseDetailView
-from impact.v1.views.utils import valid_keys_note
-from impact.permissions.v1_api_permissions import UserDetailViewPermission
+from .v1.views.base_detail_view import BaseDetailView
+from .v1.views.utils import valid_keys_note
+from .permissions.v1_api_permissions import UserDetailViewPermission
 
 INVALID_KEYS_ERROR = "Recevied invalid key(s): {invalid_keys}."
 MISSING_PROFILE_ERROR = "User ({}) has no profile"
