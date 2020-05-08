@@ -29,7 +29,7 @@ from accelerator_abstract.models import (
     ENDED_PROGRAM_STATUS
 )
 
-from .v1.helpers import (
+from .import (
     BOOLEAN_FIELD,
     INVALID_URL_ERROR,
     MPTT_TYPE,

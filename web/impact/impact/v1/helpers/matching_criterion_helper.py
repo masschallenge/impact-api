@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 from collections import defaultdict
-from .v1.helpers.criterion_helper import CriterionHelper
+from .criterion_helper import CriterionHelper
 
 
 class MatchingCriterionHelper(CriterionHelper):

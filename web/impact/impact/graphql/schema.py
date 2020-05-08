@@ -4,7 +4,7 @@ import graphql_jwt
 from . import query
 
 
-class Query(impact.graphql.query.Query, graphene.ObjectType):
+class Query(query.Query, graphene.ObjectType):
     pass
 
 

@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from accelerator.models import JudgingRound
-from .v1.helpers.model_helper import (
+from .model_helper import (
     BOOLEAN_FIELD,
     OPTIONAL_INTEGER_FIELD,
     ModelHelper,

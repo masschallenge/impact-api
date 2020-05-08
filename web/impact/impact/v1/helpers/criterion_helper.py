@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from accelerator.models import Criterion
-from .v1.helpers.model_helper import (
+from .model_helper import (
     REQUIRED_INTEGER_FIELD,
     ModelHelper,
     PK_FIELD,

@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from accelerator.models import FunctionalExpertise
-from .v1.helpers.mptt_model_helper import MPTTModelHelper
+from .mptt_model_helper import MPTTModelHelper
 
 
 class FunctionalExpertiseHelper(MPTTModelHelper):

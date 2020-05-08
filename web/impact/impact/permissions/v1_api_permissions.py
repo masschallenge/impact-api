@@ -2,7 +2,7 @@ from accelerator_abstract.models.base_user_utils import (
     is_employee,
     is_expert,
 )
-from .permissions import (
+from . import (
     settings,
     BasePermission,
 )

@@ -9,8 +9,7 @@ from .types import (
     EntrepreneurProfileType,
     ExpertProfileType
 )
-
-from .permissions.graphql_permissions import can_view_entrepreneur_profile
+from ..permissions.graphql_permissions import can_view_entrepreneur_profile
 
 
 ENTREPRENEUR_NOT_FOUND_MESSAGE = 'Entrepreneur matching the id does not exist.'

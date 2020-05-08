@@ -6,7 +6,7 @@ from accelerator.models import (
     Industry,
     Startup,
 )
-from .v1.helpers.matching_criterion_helper import MatchingCriterionHelper
+from .matching_criterion_helper import MatchingCriterionHelper
 
 
 class MatchingIndustryCriterionHelper(MatchingCriterionHelper):

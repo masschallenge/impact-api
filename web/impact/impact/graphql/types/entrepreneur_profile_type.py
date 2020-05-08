@@ -4,7 +4,7 @@ from accelerator.models import (
     Startup,
     StartupTeamMember
 )
-from .graphql.types import BaseUserProfileType
+from . import BaseUserProfileType
 from .entrepreneur_startup_type import EntrepreneurStartupType
 
 

@@ -4,7 +4,7 @@ from accelerator.models import (
     StartupStatus,
     Startup,
 )
-from .graphql.types import (
+from . import (
     StartupType,
     ProgramType,
 )

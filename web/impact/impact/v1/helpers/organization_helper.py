@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from accelerator.models import Organization
-from .v1.helpers.model_helper import (
+from .model_helper import (
     BOOLEAN_FIELD,
     EMAIL_FIELD,
     INTEGER_ARRAY_FIELD,
@@ -19,7 +19,7 @@ from .v1.helpers.model_helper import (
     merge_fields,
     serialize_list_field,
 )
-from .v1.helpers import (
+from .import (
     IndustryHelper,
     MPTT_TYPE,
 )

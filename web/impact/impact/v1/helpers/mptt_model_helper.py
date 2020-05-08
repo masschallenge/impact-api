@@ -1,4 +1,4 @@
-from .v1.helpers.model_helper import (
+from .model_helper import (
     json_object,
     ModelHelper,
     PK_FIELD,

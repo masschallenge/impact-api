@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from .v0.views import (
+from .views import (
     MentorsProxyView,
     StartupListView,
     StartupDetailView,

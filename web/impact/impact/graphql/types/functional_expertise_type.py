@@ -5,4 +5,4 @@ from accelerator.models.functional_expertise import FunctionalExpertise
 class FunctionalExpertiseType(DjangoObjectType):
     class Meta:
         model = FunctionalExpertise
-        only_fields = ('name')
+        only_fields = ('name',)

@@ -2,7 +2,7 @@
 # Copyright (c) 2019 MassChallenge, Inc.
 
 from accelerator.models import MentorProgramOfficeHour
-from .v1.helpers.model_helper import (
+from .model_helper import (
     ModelHelper,
     BOOLEAN_FIELD,
     OPTIONAL_INTEGER_FIELD,

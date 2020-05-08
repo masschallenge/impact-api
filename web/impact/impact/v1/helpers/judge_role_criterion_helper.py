@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from .v1.helpers.judge_criterion_helper import JudgeCriterionHelper
+from .judge_criterion_helper import JudgeCriterionHelper
 from django.db.models import F
 
 

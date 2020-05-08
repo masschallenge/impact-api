@@ -1,4 +1,4 @@
-from .permissions import (
+from . import (
     settings,
     BasePermission)
 

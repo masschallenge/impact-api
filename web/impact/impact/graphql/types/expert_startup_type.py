@@ -1,9 +1,5 @@
-from accelerator.models import (
-    Startup,
-)
-from .graphql.types import (
-    StartupType,
-)
+from accelerator.models import Startup
+from . import StartupType
 
 
 class ExpertStartupType(StartupType):

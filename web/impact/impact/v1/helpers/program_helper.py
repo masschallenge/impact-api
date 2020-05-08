@@ -1,5 +1,5 @@
 from accelerator.models import Program
-from .v1.helpers.model_helper import (
+from .model_helper import (
     ModelHelper,
     OPTIONAL_FLOAT_FIELD,
     OPTIONAL_INTEGER_FIELD,

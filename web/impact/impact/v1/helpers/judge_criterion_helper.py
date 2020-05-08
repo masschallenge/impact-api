@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from django.db.models import F
-from .v1.helpers.criterion_helper import CriterionHelper
+from .criterion_helper import CriterionHelper
 
 
 class JudgeCriterionHelper(CriterionHelper):
