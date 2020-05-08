@@ -7,9 +7,7 @@ from accelerator.models import (
     UserRole
 )
 from accelerator_abstract.models.base_user_utils import is_employee
-from impact.utils import (
-    get_user_program_and_startup_roles,
-)
+from ...utils import get_user_program_and_startup_roles
 
 
 class BaseUserProfileType(DjangoObjectType):

@@ -1,6 +1,6 @@
 from django.utils.deprecation import MiddlewareMixin
 
-from impact.graphql.utils.response_error import ResponseError
+from .utils.response_error import ResponseError
 
 
 NOT_LOGGED_IN_MSG = 'User Not Logged in!'

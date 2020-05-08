@@ -5,7 +5,7 @@ from graphene_django.views import GraphQLView
 from graphql.error import GraphQLSyntaxError
 from graphql.error.located_error import GraphQLLocatedError
 from graphql.error import format_error as format_graphql_error
-from impact.graphql.utils.response_error import ResponseError
+from .response_error import ResponseError
 
 
 def format_response_error(error: ResponseError):

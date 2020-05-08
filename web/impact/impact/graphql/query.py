@@ -5,14 +5,13 @@ from accelerator.models import (
     EntrepreneurProfile,
     ExpertProfile
 )
-from impact.graphql.types import (
+from .types import (
     EntrepreneurProfileType,
     ExpertProfileType
 )
 
-from impact.permissions.graphql_permissions import (
-    can_view_entrepreneur_profile
-)
+from .permissions.graphql_permissions import can_view_entrepreneur_profile
+
 
 ENTREPRENEUR_NOT_FOUND_MESSAGE = 'Entrepreneur matching the id does not exist.'
 EXPERT_NOT_FOUND_MESSAGE = 'Expert matching the id does not exist.'

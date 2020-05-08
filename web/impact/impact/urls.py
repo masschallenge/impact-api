@@ -12,7 +12,7 @@ from django.contrib import admin
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 from drf_auto_endpoint.router import router as schema_router
-from impact.graphql.utils.custom_error_view import SafeGraphQLView
+from .graphql.utils.custom_error_view import SafeGraphQLView
 from rest_framework import routers
 from rest_framework_jwt.views import (
     obtain_jwt_token,
@@ -20,16 +20,16 @@ from rest_framework_jwt.views import (
     verify_jwt_token,
 )
 
-from impact.graphql.middleware import IsAuthenticatedMiddleware
-from impact.graphql.schema import (
+from .graphql.middleware import IsAuthenticatedMiddleware
+from .graphql.schema import (
     auth_schema,
     schema,
 )
-from impact.model_utils import model_name_to_snake
-from impact.schema import schema_view
-from impact.v0.urls import v0_urlpatterns
-from impact.v1.urls import v1_urlpatterns
-from impact.views import (
+from .model_utils import model_name_to_snake
+from .schema import schema_view
+from .v0.urls import v0_urlpatterns
+from .v1.urls import v1_urlpatterns
+from .views import (
     CalendarReminderView,
     AlgoliaApiKeyView,
     GeneralViewSet,

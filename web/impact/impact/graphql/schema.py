@@ -1,7 +1,7 @@
 import graphene
 import graphql_jwt
 
-import impact.graphql.query
+from . import query
 
 
 class Query(impact.graphql.query.Query, graphene.ObjectType):

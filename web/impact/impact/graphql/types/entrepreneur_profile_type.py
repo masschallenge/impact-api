@@ -4,12 +4,8 @@ from accelerator.models import (
     Startup,
     StartupTeamMember
 )
-from impact.graphql.types import (
-    BaseUserProfileType,
-)
-from impact.graphql.types.entrepreneur_startup_type import (
-    EntrepreneurStartupType,
-)
+from impact.graphql.types import BaseUserProfileType
+from .entrepreneur_startup_type import EntrepreneurStartupType
 
 
 class EntrepreneurProfileType(BaseUserProfileType):

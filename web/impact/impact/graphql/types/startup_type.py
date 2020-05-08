@@ -1,12 +1,8 @@
 import graphene
 from graphene_django import DjangoObjectType
 
-from accelerator.models import (
-    Startup,
-)
-from impact.graphql.types import (
-    ProgramType
-)
+from accelerator.models import Startup
+from . import ProgramType
 
 
 class StartupType(DjangoObjectType):
