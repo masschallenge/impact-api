@@ -7,9 +7,9 @@ from rest_framework import viewsets
 from rest_framework import permissions
 
 from ..model_utils import snake_to_model_name
-from ...permissions import DynamicModelPermissions
-from .serializers import GeneralSerializer
-from .utils import model_name_case
+from ..permissions import DynamicModelPermissions
+from ..serializers import GeneralSerializer
+from ..utils import model_name_case
 
 
 MODELS_TO_EXCLUDE_FROM_URL_BINDING = ["JobPosting"]
