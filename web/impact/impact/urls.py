@@ -97,7 +97,6 @@ urls = [
     url(r'^api/accelerator/', include(schema_router.urls),
         name='api-root'),
     url(r'^sso/', include(sso_urlpatterns)),
-    url(r'^admin/', admin.site.urls),
     url(r'^accounts/', include(account_urlpatterns)),
     url(r'^graphql/$',
         csrf_exempt(SafeGraphQLView.as_view(
@@ -111,8 +110,7 @@ urls = [
             graphiql=settings.DEBUG,
             schema=auth_schema)),
         name="graphql-auth"),
-    url(r'^oauth/',
-        include('oauth2_provider.urls', namespace='oauth2_provider')),
+    # url(r'^oauth/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     url(r'^schema/$', schema_view, name='schema'),
     url(r'^directory/(?:.*)$', TemplateView.as_view(
         template_name='front-end.html'),
@@ -129,21 +127,11 @@ urls = [
     url(r'^startups/$', TemplateView.as_view(
         template_name='front-end.html'),
         name="startup_directory"),
-    url(r'^openid/', include('oidc_provider.urls', namespace='oidc_provider')),
     url(r'^$', IndexView.as_view()),
 ]
 
-# use staticfiles with waitress (not recommneded!)
-# TODO: switch to a real static file handler
-urls += (
-    static(settings.STATIC_URL, document_root=settings.STATIC_ROOT))
+urls += (static(settings.STATIC_URL, document_root=settings.STATIC_ROOT))
 if settings.DEBUG:
-    # add debug toolbar
-    import debug_toolbar  # pragma: no cover
-
-    urls += [  # pragma: no cover
-        url(r"^__debug__/", include(debug_toolbar.urls)),
-        # pragma: no cover
-    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urls += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 urlpatterns = urls
