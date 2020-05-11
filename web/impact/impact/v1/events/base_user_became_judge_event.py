@@ -5,10 +5,10 @@ from abc import (
     ABCMeta,
     abstractmethod,
 )
-from .v1.events.base_user_role_grant_event import (
+from .base_user_role_grant_event import (
     BaseUserRoleGrantEvent,
 )
-from .v1.helpers import (
+from ..helpers import (
     OPTIONAL_INTEGER_FIELD,
     OPTIONAL_STRING_FIELD,
 )

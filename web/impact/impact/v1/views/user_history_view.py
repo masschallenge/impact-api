@@ -3,7 +3,7 @@
 
 from django.contrib.auth import get_user_model
 from .base_history_view import BaseHistoryView
-from .v1.events import (
+from ..events import (
     UserBecameConfirmedJudgeEvent,
     UserBecameConfirmedMentorEvent,
     UserBecameDesiredJudgeEvent,

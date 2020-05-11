@@ -10,13 +10,13 @@ from accelerator.models import (
     StartupRole,
     StartupStatus,
 )
-from .utils import (
+from ...utils import (
     DAWN_OF_TIME,
     next_instance,
     previous_instance,
 )
-from .v1.events.base_history_event import BaseHistoryEvent
-from .v1.helpers import (
+from .base_history_event import BaseHistoryEvent
+from ..helpers import (
     OPTIONAL_INTEGER_FIELD,
     OPTIONAL_STRING_FIELD,
 )

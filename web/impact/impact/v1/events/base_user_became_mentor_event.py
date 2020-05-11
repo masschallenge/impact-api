@@ -1,9 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from .v1.events.base_user_role_grant_event import (
-    BaseUserRoleGrantEvent,
-)
+from .base_user_role_grant_event import BaseUserRoleGrantEvent
 
 
 class BaseUserBecameMentorEvent(BaseUserRoleGrantEvent):

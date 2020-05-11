@@ -9,9 +9,9 @@ from accelerator.models import (
     ProgramRoleGrant,
     ProgramRole
 )
-from .minimal_email_handler import MinimalEmailHandler
+from ...minimal_email_handler import MinimalEmailHandler
 from ...permissions.v1_api_permissions import IsExpertUser
-from .import ImpactView
+from . import ImpactView
 from .user_detail_view import NO_USER_ERROR
 
 User = get_user_model()

@@ -10,7 +10,7 @@ from accelerator.models import (
     ExpertProfile,
     MemberProfile,
 )
-from .utils import parse_date
+from ...utils import parse_date
 from ..helpers import (
     COULD_BE_EXPERT_CHECK,
     COULD_BE_NON_MEMBER_CHECK,

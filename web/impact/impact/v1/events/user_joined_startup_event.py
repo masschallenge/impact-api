@@ -5,10 +5,8 @@ from datetime import datetime
 from pytz import utc
 from django.contrib.auth import get_user_model
 from django.db.models import Q
-from .utils import (
-    next_instance,
-)
-from .v1.events.base_history_event import BaseHistoryEvent
+from ...utils import next_instance
+from .base_history_event import BaseHistoryEvent
 
 User = get_user_model()
 

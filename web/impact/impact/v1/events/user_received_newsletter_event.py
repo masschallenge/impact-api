@@ -2,8 +2,8 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from django.contrib.auth import get_user_model
-from .v1.events.base_history_event import BaseHistoryEvent
-from .v1.helpers import (
+from .base_history_event import BaseHistoryEvent
+from ..helpers import (
     EMAIL_FIELD,
     OPTIONAL_STRING_FIELD,
 )

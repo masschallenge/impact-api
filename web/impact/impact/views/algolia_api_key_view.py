@@ -33,7 +33,7 @@ from accelerator_abstract.models.base_permission_checks import (
     base_accelerator_check
 )
 
-from .permissions import DirectoryAccessPermissions
+from ..permissions import DirectoryAccessPermissions
 
 IS_CONFIRMED_MENTOR_FILTER = "is_confirmed_mentor:true"
 CONFIRMED_MENTOR_IN_PROGRAM_FILTER = 'confirmed_mentor_programs:"{program}"'

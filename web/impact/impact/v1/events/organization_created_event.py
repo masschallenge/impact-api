@@ -4,12 +4,12 @@
 from datetime import datetime
 from pytz import utc
 from django.db.models import Q
-from .utils import (
+from ...utils import (
     DAWN_OF_TIME,
     next_instance,
     previous_instance,
 )
-from .v1.events.base_history_event import BaseHistoryEvent
+from .base_history_event import BaseHistoryEvent
 
 
 class OrganizationCreatedEvent(BaseHistoryEvent):
