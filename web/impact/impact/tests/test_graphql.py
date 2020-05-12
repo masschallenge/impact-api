@@ -658,7 +658,7 @@ class TestGraphQL(APITestCase):
         self._assert_expert_cannot_view_profile(UserRole.JUDGE,
                                                 UserRole.MENTOR)
 
-    def test_loggedin_user_data_is_returned_on_missing_id(self):
+    def test_loggedin_expert_data_is_returned_on_missing_id(self):
         user = expert_user(UserRole.MENTOR)
         query = """
             query{{
@@ -666,7 +666,7 @@ class TestGraphQL(APITestCase):
                     user{{lastName}}
                 }}
             }}
-        """.format(id=user.id)
+        """.format()
         expected_json = {
             'data': {
                 'expertProfile': {
@@ -677,6 +677,37 @@ class TestGraphQL(APITestCase):
             }
         }
         self._assert_response_equals_json(query, expected_json, email=user.email)
+
+    def test_loggedin_entrepnur_data_is_returned_on_missing_id(self):
+        user = EntrepreneurFactory()
+        user_role = get_user_role_by_name(UserRole.FINALIST)
+        program_role = ProgramRoleFactory.create(
+            user_role=user_role,
+            program__program_status=ACTIVE_PROGRAM_STATUS
+        )
+        ProgramRoleGrantFactory(person=user,
+                                program_role=program_role)
+        user.set_password('password')
+        user.save()
+        query = """
+            query{{
+                entrepreneurProfile {{
+                    user{{lastName}}
+                }}
+            }}
+        """.format()
+        expected_json = {
+            'data': {
+                'entrepreneurProfile': {
+                    'user': {
+                        'lastName': user.last_name
+                    }
+                }
+            }
+        }
+
+        self._assert_response_equals_json(
+            query, expected_json, email=user.email)
 
 
 
