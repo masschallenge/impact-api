@@ -12,6 +12,7 @@ SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 DEFAULT_PERMISSION_DENIED_DETAIL = ("You do not have permission to perform "
                                     "this action.")
 
+
 def can_view_user_details_page(request):
     user_id = request.parser_context['kwargs'].get('pk', '')
     if user_id and request.method in SAFE_METHODS:
@@ -35,7 +36,7 @@ class UserDetailViewPermission(V1APIPermissions):
 
 class OfficeHourMentorPermission(BasePermission):
     # User has permission to act as mentor on this office hour
-    
+
     def has_object_permission(self, request, view, office_hour):
         return (is_employee(request.user) or
                 office_hour.mentor == request.user)
@@ -43,11 +44,11 @@ class OfficeHourMentorPermission(BasePermission):
 
 class OfficeHourFinalistPermission(BasePermission):
     # User has permission to act as finalist on this office hour
-    
+
     def has_object_permission(self, request, view, office_hour):
         return (is_employee(request.user) or
                 office_hour.finalist == request.user)
-    
+
 
 class IsExpertUser(IsAuthenticated):
     def has_permission(self, request, view):
