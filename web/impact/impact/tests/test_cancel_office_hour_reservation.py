@@ -4,9 +4,16 @@ from django.urls import reverse
 from accelerator.tests.factories import (
     MentorProgramOfficeHourFactory,
 )
-
+from impact.permissions.v1_api_permissions import (
+    DEFAULT_PERMISSION_DENIED_DETAIL,
+)
 from impact.tests.api_test_case import APITestCase
-from impact.v1.views import CancelOfficeHourReservationView
+from impact.v1.views import (
+    CancelOfficeHourReservationView,
+    NO_SUCH_RESERVATION,
+    NO_SUCH_OFFICE_HOUR,
+    SUCCESS_NOTIFICATION,
+)
 
 
 class TestCancelOfficeHourReservationView(APITestCase):
@@ -74,8 +81,8 @@ class TestCancelOfficeHourReservationView(APITestCase):
 
     def test_user_attempts_to_cancel_non_existent_reservation(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
-        self._submit_cancellation(office_hour, user=self.make_user())
-        # assert what?
+        response = self._submit_cancellation(office_hour, user=self.make_user())
+        self.assert_ui_notification(response, DEFAULT_PERMISSION_DENIED_DETAIL)
 
     def test_user_cancels_non_existent_reservation_no_notification(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
@@ -118,3 +125,6 @@ class TestCancelOfficeHourReservationView(APITestCase):
                          old_finalist,
                          msg="Reservation was cancelled")
 
+    def assert_ui_notification(self, response, notification):
+        self.assertEqual(response.json()['detail'], notification)
+    

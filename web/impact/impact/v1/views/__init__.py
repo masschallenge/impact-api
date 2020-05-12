@@ -15,6 +15,9 @@ from impact.v1.views.analyze_judging_round_view import AnalyzeJudgingRoundView
 from impact.v1.views.base_list_view import INVALID_IS_ACTIVE_ERROR
 from impact.v1.views.cancel_office_hour_reservation_view import (
     CancelOfficeHourReservationView,
+    NO_SUCH_RESERVATION,
+    NO_SUCH_OFFICE_HOUR,
+    SUCCESS_NOTIFICATION,    
 )
 from impact.v1.views.clone_criteria_view import (
     CloneCriteriaView,
