@@ -658,6 +658,29 @@ class TestGraphQL(APITestCase):
         self._assert_expert_cannot_view_profile(UserRole.JUDGE,
                                                 UserRole.MENTOR)
 
+    def test_loggedin_user_data_is_returned_on_missing_id(self):
+        user = expert_user(UserRole.MENTOR)
+        query = """
+            query{{
+                expertProfile {{
+                    user{{lastName}}
+                }}
+            }}
+        """.format(id=user.id)
+        expected_json = {
+            'data': {
+                'expertProfile': {
+                    'user': {
+                        'lastName': user.last_name
+                    }
+                }
+            }
+        }
+        self._assert_response_equals_json(query, expected_json, email=user.email)
+
+
+
+
     def _assert_expert_can_view_profile(self, expert_role, profile_user_role):
         current_user = expert_user(expert_role)
         user = EntrepreneurFactory()
