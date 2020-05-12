@@ -160,5 +160,3 @@ class TestCancelOfficeHourReservationView(APITestCase):
                          old_finalist,
                          msg="Reservation was cancelled")
 
-    def assert_ui_notification(self, response, notification):
-        self.assertEqual(response.json()['detail'], notification)

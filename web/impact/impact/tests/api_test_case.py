@@ -97,3 +97,6 @@ class APITestCase(TestCase):
             for key, params in expected_options.items():
                 self.assertIn(key, options)
                 self.assertEqual(options[key], params)
+ 
+    def assert_ui_notification(self, response, notification):
+        self.assertEqual(response.data()['detail'], notification)
