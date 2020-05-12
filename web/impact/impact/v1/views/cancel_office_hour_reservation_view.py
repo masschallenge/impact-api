@@ -76,7 +76,7 @@ class CancelOfficeHourReservationView(ImpactView):
                                    template_name):
         template_path = _template_path(template_name)
         office_hour_date_time = _localize_start_time(self.office_hour)
-        cancelling_party = _cancelling_party_name(self.user)
+        cancelling_party = self._cancelling_party_name()
         template_context = {"recipient": recipient,
                             "counterpart": counterpart,                            
                             "office_hour_date_time": office_hour_date_time,
@@ -91,11 +91,11 @@ class CancelOfficeHourReservationView(ImpactView):
                 "body": body}
 
 
-def _cancelling_party_name(self, user):
-    if is_employee(user):
-        return "MassChallenge Staff"
-    else:
-        return user.full_name()
+    def _cancelling_party_name(self):
+        if is_employee(self.user):
+            return "MassChallenge Staff"
+        else:
+            return self.user.full_name()
     
 def _send_email(email_details):
     email_handler(**email_details).send()
