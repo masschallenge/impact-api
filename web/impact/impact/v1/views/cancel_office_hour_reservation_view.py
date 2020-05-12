@@ -19,7 +19,10 @@ mentor_template_name = "cancel_office_hour_reservation_email_to_mentor.html"
 finalist_template_name = ("cancel_office_hour_reservation_email_to_finalist."
                           "html")
 SUBJECT_LINE = "MassChallenge | Cancelled Office Hours with {} {}"
-
+NO_SUCH_RESERVATION = "That session is not reserved."
+NO_SUCH_OFFICE_HOUR = "The specified office hour was not found."
+SUCCESS_NOTIFICATION = ("Canceled reservation for {finalist_name} with "
+                        "{mentor_name} on {date}")
 
 class CancelOfficeHourReservationView(ImpactView):
     permission_classes = (OfficeHourFinalistPermission, )
@@ -37,23 +40,40 @@ class CancelOfficeHourReservationView(ImpactView):
     def post(self, request):
         self._extract_posted_data(request.data, self.posted_fields)
         self.user = request.user
-        self.office_hour = MentorProgramOfficeHour.objects.get(
-            pk=self.office_hour_id)
-        success = False
-        if self._can_cancel():
-            _send_email(self.prepare_email_notification(self.office_hour.mentor,
-                                                        self.office_hour.finalist,
-                                                        mentor_template_name))
-            _send_email(self.prepare_email_notification(self.office_hour.finalist,
-                                                        self.office_hour.mentor,
-                                                        finalist_template_name))
-            self._cancel_reservation()
-            success = True
-        return Response({"success": success})
+        self.office_hour = MentorProgramOfficeHour.objects.filter(
+                pk=self.office_hour_id).first()
+        self.check_object_permissions(request, self.office_hour)
+        can_cancel, detail = self.check_can_cancel()
+        if can_cancel:
+            self.process_cancellation()
+        return Response({"success": can_cancel,
+                         "detail": detail})
 
+    def check_can_cancel(self):
+        if self.office_hour is None:
+            return False, NO_SUCH_OFFICE_HOUR
+        elif self.office_hour.finalist is None:
+            return False, NO_SUCH_RESERVATION
+        else:
+            return True, _formatted_success_notification(self.office_hour)
+    
+    def process_cancellation(self):
+        _send_email(self.prepare_email_notification(self.office_hour.mentor,
+                                                    self.office_hour.finalist,
+                                                    mentor_template_name))
+        _send_email(self.prepare_email_notification(self.office_hour.finalist,
+                                                    self.office_hour.mentor,
+                                                    finalist_template_name))
+        self._cancel_reservation()
+
+
+    def _cancel_reservation(self):
+        self.office_hour.finalist = None
+        self.office_hour.save()
+        
     def prepare_email_notification(self,
                                    recipient,
-                                   counterpart,                                   
+                                   counterpart,
                                    template_name):
         template_path = _template_path(template_name)
         office_hour_date_time = _localize_start_time(self.office_hour)
@@ -69,21 +89,9 @@ class CancelOfficeHourReservationView(ImpactView):
                 "subject": subject,
                 "body": body}
 
-    def _can_cancel(self):
-        return (self.office_hour.finalist is not None and
-                (is_employee(self.user) or
-                 self.user == self.office_hour.finalist))
-
-    
-    def _cancel_reservation(self):
-        self.office_hour.finalist = None
-        self.office_hour.save()
 
 def _send_email(email_details):
     email_handler(**email_details).send()
-
-
-
 
 def _localize_start_time(office_hour):
     tz = timezone(office_hour.location.timezone)
@@ -92,3 +100,11 @@ def _localize_start_time(office_hour):
 
 def _template_path(template_name):
     return "emails/{}".format(template_name)
+
+def _formatted_success_notification(office_hour):
+    finalist_name = office_hour.finalist.full_name()
+    mentor_name = office_hour.mentor.full_name()
+    date = _localize_start_time(office_hour).strftime("%b %d at %I:%M %p")
+    return SUCCESS_NOTIFICATION.format(finalist_name=finalist_name,
+                                       mentor_name=mentor_name,
+                                       date=date)

@@ -23,8 +23,8 @@ MENTOR_NOTIFICATION = ('Canceled office hours at {start_time} - '
                        '{end_time} on {date}')
 PERMISSION_DENIED = ('Office hour session could not be canceled. '
                      'You do not have permission to cancel that session')
-OFFICE_HOUR_SESSION_404 = ('The office hour session you are trying to cancel '
-                           'doesn\'t exist')
+OFFICE_HOUR_SESSION_404 = ("The office hour session you are trying to cancel "
+                           "doesn't exist")
 
 
 def get_office_hours_list_url(family_slug, program_slug):

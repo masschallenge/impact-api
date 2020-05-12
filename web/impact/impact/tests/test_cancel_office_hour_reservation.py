@@ -62,24 +62,24 @@ class TestCancelOfficeHourReservationView(APITestCase):
         '''A non-staff user attempting to cancel someone else's reservation
         should fail'''
         office_hour = MentorProgramOfficeHourFactory()
-        self._submit_cancellation(office_hour, user=self.basic_user())
+        self._submit_cancellation(office_hour, user=self.make_user())
         self.assert_reservation_not_cancelled(office_hour)
 
     def test_non_staff_user_not_finalist_no_notification(self):
         '''A non-staff user attempting to cancel someone else's reservation
         should not receive a notification'''
         office_hour = MentorProgramOfficeHourFactory()
-        self._submit_cancellation(office_hour, user=self.basic_user())
+        self._submit_cancellation(office_hour, user=self.make_user())
         self.assert_not_notified(office_hour.mentor)
 
     def test_user_attempts_to_cancel_non_existent_reservation(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
-        self._submit_cancellation(office_hour, user=self.basic_user())
+        self._submit_cancellation(office_hour, user=self.make_user())
         # assert what?
 
     def test_user_cancels_non_existent_reservation_no_notification(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
-        self._submit_cancellation(office_hour, user=self.basic_user())
+        self._submit_cancellation(office_hour, user=self.make_user())
         self.assert_not_notified(office_hour.mentor)
 
     def _submit_cancellation(self, office_hour, user, message=""):
@@ -117,3 +117,4 @@ class TestCancelOfficeHourReservationView(APITestCase):
         self.assertEqual(office_hour.finalist,
                          old_finalist,
                          msg="Reservation was cancelled")
+
