@@ -26,6 +26,8 @@ class MentorProgramOfficeHourListView(BaseListView):
             return qs
         if 'my_hours' in self.request.query_params.keys():
             qs = self._filter_by_user_open_hours(qs)
+        if 'finalist_hours_all' in self.request.query_params.keys():
+            qs = self._filter_by_user_all_hours(qs)
         if 'upcoming' in self.request.query_params.keys():
             today = datetime.utcnow()
             qs = qs.filter(start_date_time__gte=today)
@@ -43,6 +45,14 @@ class MentorProgramOfficeHourListView(BaseListView):
             program_role__user_role__name__in=roles).values_list(
                 'program_role__program_id', flat=True)
         qs = qs.filter(program_id__in=program_ids, finalist__isnull=True)
+        return qs
+
+    def _filter_by_user_all_hours(self, qs):
+        roles = UserRole.FINALIST_USER_ROLES
+        program_ids = self.request.user.programrolegrant_set.filter(
+            program_role__user_role__name__in=roles).values_list(
+                'program_role__program_id', flat=True)
+        qs = qs.filter(program_id__in=program_ids)
         return qs
 
     def _filter_by_id(self, id_field, qs):
