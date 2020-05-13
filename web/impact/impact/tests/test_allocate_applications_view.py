@@ -144,10 +144,9 @@ class TestAllocateApplicationsView(APITestCase):
         reassigned_apps = set(assignments).intersection(assigned_ids)
         assert 0 == len(reassigned_apps)
 
-        
     def test_allocator_assignment_discount_times_out(self):
         context = JudgeFeedbackContext(complete=False)
-                         
+
         CriterionOptionSpecFactory(
             criterion__judging_round=context.judging_round,
             criterion__type="reads",

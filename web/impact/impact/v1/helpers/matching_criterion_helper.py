@@ -1,6 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 from collections import defaultdict
+
 from .criterion_helper import CriterionHelper
 
 
@@ -15,7 +16,7 @@ class MatchingCriterionHelper(CriterionHelper):
     different "options", since there are no distinct options.
     '''
     cache_key = ""
-    
+
     def __init__(self, subject):
         super().__init__(subject)
         self._app_ids_to_targets = {}

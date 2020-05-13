@@ -220,7 +220,6 @@ class Base(Configuration):
         }
     }
 
-    # settings.py
     REST_PROXY = {
         'HOST': os.environ.get('ACCELERATE_SITE_URL',
                                'https://accelerate.masschallenge.org'),
@@ -232,7 +231,6 @@ class Base(Configuration):
         },
         'VERIFY_SSL': False,
     }
-
 
     AUTHENTICATION_BACKENDS = (
         'oauth2_provider.backends.OAuth2Backend',

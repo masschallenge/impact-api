@@ -56,6 +56,6 @@ class ApplicationDataCache(object):
                 "application_id",
                 "panel__judgepanelassignment__judge_id",
                 "created_at")
-        for app_id, judge_id, created_at in assignment_ages:
-            app_ages_dict[app_id][judge_id] = (now - created_at).total_seconds()
+        for app_id, judge_id, created in assignment_ages:
+            app_ages_dict[app_id][judge_id] = (now - created).total_seconds()
         return app_ages_dict

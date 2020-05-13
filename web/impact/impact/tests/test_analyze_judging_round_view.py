@@ -221,7 +221,7 @@ class TestAnalyzeJudgingRoundView(APITestCase):
             response = self.client.get(url)
             results = response.data["results"]
             for result in results:
-                assert result["needy_apps"] == 0    
+                assert result["needy_apps"] == 0
 
 
 def _industry_options(context):

@@ -256,7 +256,8 @@ class TestApiRoute(TestCase):
                                              content_type=startup_content_type)
         view_perm = Permission.objects.get(codename='view_startup',
                                            content_type=startup_content_type)
-        perm_user = self.make_user('perm_user@test.com', perms=["mc.view_startup"])
+        perm_user = self.make_user('perm_user@test.com',
+                                   perms=["mc.view_startup"])
         with self.login(perm_user):
             self.response_403(self.get(url_name, **view_kwargs))
 
@@ -390,4 +391,3 @@ class TestApiRoute(TestCase):
         with self.login(basic_user):
             response = self.get(url_name, **view_kwargs)
             self.response_200(response)
-
