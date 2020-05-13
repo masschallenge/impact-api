@@ -25,7 +25,7 @@ API_GROUPS = [settings.V0_API_GROUP, settings.V1_API_GROUP]
 
 class APITestCase(TestCase):
     SOME_SITE_NAME = "somesite.com"
-
+    _user_count = 0
     client_class = APIClient
     user_factory = UserFactory
 
@@ -38,8 +38,9 @@ class APITestCase(TestCase):
         [Group.objects.get(name=name).delete() for name in API_GROUPS]
 
     def basic_user(self):
-        user = self.make_user('basic_user@test.com',
+        user = self.make_user('basic_user{}@test.com'.format(self._user_count),
                               perms=["mc.view_startup"])
+        self._user_count += 1
         for group in Group.objects.filter(name__in=API_GROUPS):
             user.groups.add(group)
         user.set_password('password')
@@ -47,7 +48,8 @@ class APITestCase(TestCase):
         return user
 
     def staff_user(self):
-        user = self.make_user('basic_user@test.com')
+        user = self.make_user('basic_user{}@test.com'.format(self._user_count))
+        self._user_count += 1
         clearance = ClearanceFactory(
             level=CLEARANCE_LEVEL_STAFF,
             user=user)
@@ -95,3 +97,6 @@ class APITestCase(TestCase):
             for key, params in expected_options.items():
                 self.assertIn(key, options)
                 self.assertEqual(options[key], params)
+
+    def assert_ui_notification(self, response, notification):
+        self.assertEqual(response.data['detail'], notification)

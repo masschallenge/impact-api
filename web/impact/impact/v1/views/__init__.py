@@ -13,6 +13,13 @@ from .allocate_applications_view import (
 )
 from .analyze_judging_round_view import AnalyzeJudgingRoundView
 from .base_list_view import INVALID_IS_ACTIVE_ERROR
+from .cancel_office_hour_reservation_view import (
+    CancelOfficeHourReservationView,
+    formatted_success_notification,
+    NO_SUCH_RESERVATION,
+    NO_SUCH_OFFICE_HOUR,
+    SUCCESS_NOTIFICATION,
+)
 from .clone_criteria_view import (
     CloneCriteriaView,
     SOURCE_JUDGING_ROUND_KEY,
