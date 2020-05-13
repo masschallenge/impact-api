@@ -9,6 +9,8 @@ from impact.permissions import (
 from rest_framework.permissions import IsAuthenticated
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
+DEFAULT_PERMISSION_DENIED_DETAIL = ("You do not have permission to perform "
+                                    "this action.")
 
 
 def can_view_user_details_page(request):
@@ -30,6 +32,22 @@ class UserDetailViewPermission(V1APIPermissions):
     def has_permission(self, request, view):
         return (super().has_permission(request, view) or
                 can_view_user_details_page(request))
+
+
+class OfficeHourMentorPermission(BasePermission):
+    # User has permission to act as mentor on this office hour
+
+    def has_object_permission(self, request, view, office_hour):
+        return (is_employee(request.user) or
+                office_hour.mentor == request.user)
+
+
+class OfficeHourFinalistPermission(BasePermission):
+    # User has permission to act as finalist on this office hour
+
+    def has_object_permission(self, request, view, office_hour):
+        return (is_employee(request.user) or
+                office_hour.finalist == request.user)
 
 
 class IsExpertUser(IsAuthenticated):

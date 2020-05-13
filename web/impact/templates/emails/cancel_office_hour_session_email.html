@@ -1,0 +1,22 @@
+{% load static from staticfiles %}
+<html>
+<body>
+<p>{{ cancelled_by }} canceled your office hours session{{ hours_with }}.</p>
+<p>When: {{ date }}, {{ start_time }} (CANCELED)</p>
+<p>Where: {{ location }}</p>
+{% if message %}
+    <p>Message: {{ message }}</p>
+{% endif %}
+<p>You may check the status of your schedule at any time by visiting your Dashboard:</p>
+{{ dashboard_url }} (log in using: {{ dashboard_username }}).
+<p>If you have questions, don't hesitate to contact us at any time via</p>
+<a href="https://masschallenge.org/contact">
+    https://masschallenge.org/contact</a>
+
+<p>- The MassChallenge Team <br>
+    {{ phone }}<br>
+    <br>
+    www.masschallenge.org
+</p>
+</body>
+</html>
