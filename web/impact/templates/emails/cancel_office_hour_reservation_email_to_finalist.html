@@ -1,0 +1,17 @@
+Hi {{ recipient.first_name }},
+
+Your upcoming office hour session at {{ office_hour_date_time | date:"h:m" }} on
+{{ office_hour_date_time | date }} with {{ counterpart.full_name }} was cancelled by
+{{ cancelling_party }}.
+To schedule a new time with this or any available mentor, visit
+https://accelerate.masschallenge.org/newofficehours
+
+
+{% if custom_message %}
+  Note from {{ cancelling_party }}:
+  {{ custom_message }}
+{% endif %}
+
+
+Thanks,
+The MassChallenge Team
