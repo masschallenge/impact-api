@@ -4,6 +4,7 @@ from graphene.types.generic import GenericScalar
 from accelerator.models import (
     BaseProfile,
     StartupRole,
+    UserRole
 )
 from accelerator_abstract.models.base_user_utils import is_employee
 from impact.utils import (
