@@ -13,7 +13,6 @@ from impact.utils import (
 
 class BaseUserProfileType(DjangoObjectType):
     program_roles = GenericScalar()
-    program_role_grants = GenericScalar()
 
     class Meta:
         model = BaseProfile
