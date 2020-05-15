@@ -49,7 +49,6 @@ MENTEE_FIELDS = """
     }
 """
 
-
 class TestGraphQL(APITestCase):
     url = reverse('graphql')
     auth_url = reverse('graphql-auth')
@@ -658,6 +657,31 @@ class TestGraphQL(APITestCase):
         self._assert_expert_cannot_view_profile(UserRole.JUDGE,
                                                 UserRole.MENTOR)
 
+    def test_loggedin_expert_data_is_returned_on_missing_id(self):
+        user = expert_user(UserRole.MENTOR)
+
+        query, expected_json = _user_query(user, "expertProfile")
+        self._assert_response_equals_json(query, expected_json, email=user.email)
+
+    def test_logged_in_entrepreneur_data_is_returned_on_missing_id(self):
+        user = EntrepreneurFactory()
+        user_role = get_user_role_by_name(UserRole.FINALIST)
+        program_role = ProgramRoleFactory.create(
+            user_role=user_role,
+            program__program_status=ACTIVE_PROGRAM_STATUS
+        )
+        ProgramRoleGrantFactory(person=user,
+                                program_role=program_role)
+        user.set_password('password')
+        user.save()
+
+        query, expected_json = _user_query(user, "entrepreneurProfile")
+        self._assert_response_equals_json(
+            query, expected_json, email=user.email)
+
+
+
+
     def _assert_expert_can_view_profile(self, expert_role, profile_user_role):
         current_user = expert_user(expert_role)
         user = EntrepreneurFactory()
@@ -734,3 +758,21 @@ def expert_user(role=None, program_status=None):
     user.set_password('password')
     user.save()
     return user
+
+
+def _user_query(user, profile):
+    query = """
+            query{{
+                {profile} {{
+                    user{{lastName}}
+                }}
+            }}
+        """.format(profile=profile)
+    expected_json = {}
+    expected_json["data"] = {}
+    expected_json["data"][profile] = {
+        'user': {
+            'lastName': user.last_name
+        }
+    }
+    return query, expected_json

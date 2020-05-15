@@ -23,7 +23,8 @@ class Query(graphene.ObjectType):
         EntrepreneurProfileType, id=graphene.Int())
 
     def resolve_expert_profile(self, info, **kwargs):
-        user_id = kwargs.get('id')
+        user_id = kwargs.get('id', info.context.user.id)
+
         expert = ExpertProfile.objects.filter(user_id=user_id).first()
 
         if not expert:
@@ -32,7 +33,7 @@ class Query(graphene.ObjectType):
         return expert
 
     def resolve_entrepreneur_profile(self, info, **kwargs):
-        user_id = kwargs.get('id')
+        user_id = kwargs.get('id', info.context.user.id)
         entrepreneur = EntrepreneurProfile.objects.filter(
             user_id=user_id).first()
 
