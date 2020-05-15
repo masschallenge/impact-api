@@ -49,7 +49,6 @@ MENTEE_FIELDS = """
     }
 """
 
-
 class TestGraphQL(APITestCase):
     url = reverse('graphql')
     auth_url = reverse('graphql-auth')
@@ -660,22 +659,7 @@ class TestGraphQL(APITestCase):
 
     def test_loggedin_expert_data_is_returned_on_missing_id(self):
         user = expert_user(UserRole.MENTOR)
-        query = """
-            query{{
-                expertProfile {{
-                    user{{lastName}}
-                }}
-            }}
-        """.format()
-        expected_json = {
-            'data': {
-                'expertProfile': {
-                    'user': {
-                        'lastName': user.last_name
-                    }
-                }
-            }
-        }
+        query, expected_json = _user_query(user)
         self._assert_response_equals_json(query, expected_json, email=user.email)
 
     def test_loggedin_entrepnur_data_is_returned_on_missing_id(self):
@@ -689,23 +673,8 @@ class TestGraphQL(APITestCase):
                                 program_role=program_role)
         user.set_password('password')
         user.save()
-        query = """
-            query{{
-                entrepreneurProfile {{
-                    user{{lastName}}
-                }}
-            }}
-        """.format()
-        expected_json = {
-            'data': {
-                'entrepreneurProfile': {
-                    'user': {
-                        'lastName': user.last_name
-                    }
-                }
-            }
-        }
 
+        query, expected_json = _user_query(user)
         self._assert_response_equals_json(
             query, expected_json, email=user.email)
 
@@ -788,3 +757,23 @@ def expert_user(role=None, program_status=None):
     user.set_password('password')
     user.save()
     return user
+
+
+def _user_query(user):
+    query = """
+            query{{
+                entrepreneurProfile {{
+                    user{{lastName}}
+                }}
+            }}
+        """.format()
+    expected_json = {
+        'data': {
+            'entrepreneurProfile': {
+                'user': {
+                    'lastName': user.last_name
+                }
+            }
+        }
+    }
+    return query, expected_json
