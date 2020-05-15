@@ -659,10 +659,11 @@ class TestGraphQL(APITestCase):
 
     def test_loggedin_expert_data_is_returned_on_missing_id(self):
         user = expert_user(UserRole.MENTOR)
-        query, expected_json = _user_query(user)
+
+        query, expected_json = _user_query(user, "expertProfile")
         self._assert_response_equals_json(query, expected_json, email=user.email)
 
-    def test_loggedin_entrepreneur_data_is_returned_on_missing_id(self):
+    def test_loggedin_entrepnur_data_is_returned_on_missing_id(self):
         user = EntrepreneurFactory()
         user_role = get_user_role_by_name(UserRole.FINALIST)
         program_role = ProgramRoleFactory.create(
@@ -674,7 +675,7 @@ class TestGraphQL(APITestCase):
         user.set_password('password')
         user.save()
 
-        query, expected_json = _user_query(user)
+        query, expected_json = _user_query(user, "entrepreneurProfile")
         self._assert_response_equals_json(
             query, expected_json, email=user.email)
 
@@ -759,21 +760,19 @@ def expert_user(role=None, program_status=None):
     return user
 
 
-def _user_query(user):
+def _user_query(user, profile):
     query = """
             query{{
-                entrepreneurProfile {{
+                {profile} {{
                     user{{lastName}}
                 }}
             }}
-        """.format()
-    expected_json = {
-        'data': {
-            'entrepreneurProfile': {
-                'user': {
-                    'lastName': user.last_name
-                }
-            }
+        """.format(profile=profile)
+    expected_json = {}
+    expected_json["data"] = {}
+    expected_json["data"][profile] = {
+        'user': {
+            'lastName': user.last_name
         }
     }
     return query, expected_json
