@@ -662,7 +662,7 @@ class TestGraphQL(APITestCase):
         query, expected_json = _user_query(user)
         self._assert_response_equals_json(query, expected_json, email=user.email)
 
-    def test_loggedin_entrepnur_data_is_returned_on_missing_id(self):
+    def test_loggedin_entrepreneur_data_is_returned_on_missing_id(self):
         user = EntrepreneurFactory()
         user_role = get_user_role_by_name(UserRole.FINALIST)
         program_role = ProgramRoleFactory.create(
