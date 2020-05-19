@@ -72,3 +72,11 @@ def capture_stderr(command, *args, **kwargs):
         yield result, sys.stderr.read()
     finally:
         sys.stderr = err
+
+
+def get_ui_notification_dict(success, header, notification):
+    return {
+        'success': success,
+        'header': header,
+        'detail': notification
+    }

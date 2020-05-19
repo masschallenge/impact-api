@@ -6,15 +6,20 @@ from django.urls import reverse
 from accelerator.models import UserRole
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.utils import days_from_now
-
+from impact.permissions.v1_api_permissions import (
+    DEFAULT_PERMISSION_DENIED_DETAIL,
+)
 from impact.tests.api_test_case import APITestCase
 from impact.tests.factories import MentorProgramOfficeHourFactory
+from impact.tests.utils import get_ui_notification_dict
 from impact.v1.views.cancel_office_hour_session_view import (
     DEFAULT_TIMEZONE,
+    FAIL_HEADER,
     OFFICE_HOUR_SESSION_404,
     MENTOR_NOTIFICATION,
     PERMISSION_DENIED,
     STAFF_NOTIFICATION,
+    SUCCESS_HEADER,
     CancelOfficeHourSessionView,
     MentorProgramOfficeHour,
 )
@@ -53,7 +58,9 @@ class TestCancelOfficeHourSession(APITestCase):
         office_hour = MentorProgramOfficeHourFactory(
             mentor=mentor)
         response = self._cancel_office_hour_session(office_hour.id, mentor)
-        self.assert_ui_notification(response, PERMISSION_DENIED)
+        expected_ui_notification = get_ui_notification_dict(
+            False, FAIL_HEADER, PERMISSION_DENIED)
+        self.assert_ui_notification(response, expected_ui_notification)
 
     def test_mentor_cannot_cancel_someone_else_unreserved_office_hour(self):
         mentor = self._expert_user(UserRole.MENTOR)
@@ -112,7 +119,16 @@ class TestCancelOfficeHourSession(APITestCase):
 
     def test_office_hour_session_not_existing_ui_notification(self):
         response = self._cancel_office_hour_session(0, self.staff_user())
-        self.assert_ui_notification(response, OFFICE_HOUR_SESSION_404)
+        expected_ui_notification = get_ui_notification_dict(
+            False, FAIL_HEADER, OFFICE_HOUR_SESSION_404)
+        self.assert_ui_notification(response, expected_ui_notification)
+
+    def test_none_staff_or_none_mentor_ui_notification(self):
+        office_hour = MentorProgramOfficeHourFactory()
+        response = self._cancel_office_hour_session(office_hour.id,
+                                                    self.basic_user())
+        notification = {'detail': DEFAULT_PERMISSION_DENIED_DETAIL}
+        self.assert_ui_notification(response, notification)
 
     def assert_office_hour_session_was_cancelled(self, office_hour):
         self.assertFalse(MentorProgramOfficeHour.objects.filter(
@@ -125,15 +141,17 @@ class TestCancelOfficeHourSession(APITestCase):
     def assert_mentor_cancel_reservation_ui_notification(
             self, office_hour, response):
         context = self._get_office_hour_context(office_hour)
-        self.assert_ui_notification(response,
-                                    MENTOR_NOTIFICATION.format(**context))
+        expected_ui_notification = get_ui_notification_dict(
+            True, SUCCESS_HEADER, MENTOR_NOTIFICATION.format(**context))
+        self.assert_ui_notification(response, expected_ui_notification)
 
     def assert_staff_cancel_reservation_ui_notification(self,
                                                         office_hour,
                                                         response):
         context = self._get_office_hour_context(office_hour)
-        self.assert_ui_notification(response,
-                                    STAFF_NOTIFICATION.format(**context))
+        expected_ui_notification = get_ui_notification_dict(
+            True, SUCCESS_HEADER, STAFF_NOTIFICATION.format(**context))
+        self.assert_ui_notification(response, expected_ui_notification)
 
     def _get_office_hour_context(self, office_hour):
         tz = timezone(office_hour.location.timezone or DEFAULT_TIMEZONE)

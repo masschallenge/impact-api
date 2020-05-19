@@ -99,4 +99,4 @@ class APITestCase(TestCase):
                 self.assertEqual(options[key], params)
 
     def assert_ui_notification(self, response, notification):
-        self.assertEqual(response.data['detail'], notification)
+        self.assertEqual(response.data, notification)

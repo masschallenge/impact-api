@@ -51,8 +51,8 @@ class CancelOfficeHourReservationView(ImpactView):
             self.process_cancellation()
         return Response({
             "success": can_cancel,
+            "header": SUCCESS_HEADER if can_cancel else FAIL_HEADER,
             "detail": detail,
-            "header": SUCCESS_HEADER if can_cancel else FAIL_HEADER
         })
 
     def check_can_cancel(self):
