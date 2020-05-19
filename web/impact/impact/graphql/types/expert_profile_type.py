@@ -139,7 +139,7 @@ class ExpertProfileType(BaseUserProfileType):
             ProgramRoleGrant,
             Q(person_id=self.user.pk, program_role__user_role__name__in=roles,
               program_role__program__program_status__in=['active', 'upcoming']),
-            'program_role__program__start_date',
+            '-program_role__program__start_date',
             [
                 'id',
                 'program_role__program__id',
