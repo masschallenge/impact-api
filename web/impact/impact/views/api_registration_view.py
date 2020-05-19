@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from django.urls import reverse
-from registration.backends.simple.views import RegistrationView
+from django_registration.backends.one_step.views import RegistrationView
 
 
 class APIRegistrationView(RegistrationView):

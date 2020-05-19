@@ -56,7 +56,7 @@ sso_urlpatterns = [
 ]
 
 account_urlpatterns = [
-    url(r'^', include('registration.backends.simple.urls')),
+    url(r'^', include('django_registration.backends.one_step.urls')),
 ]
 
 urls = [
