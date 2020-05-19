@@ -6,6 +6,8 @@ from accelerator.models import (
     StartupRole,
     UserRole
 )
+
+from impact.graphql.types import LocationType
 from accelerator_abstract.models.base_user_utils import is_employee
 from impact.utils import (
     get_user_program_and_startup_roles,
@@ -13,6 +15,7 @@ from impact.utils import (
 
 
 class BaseUserProfileType(DjangoObjectType):
+    office_hour_location = graphene.List(LocationType)
     program_roles = GenericScalar()
 
     class Meta:

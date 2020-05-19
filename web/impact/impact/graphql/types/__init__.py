@@ -21,3 +21,7 @@ from impact.graphql.types.entrepreneur_startup_type import (
 from impact.graphql.types.expert_startup_type import (
     ExpertStartupType
 )
+
+from impact.graphql.types.location_type import (
+    LocationType
+)
