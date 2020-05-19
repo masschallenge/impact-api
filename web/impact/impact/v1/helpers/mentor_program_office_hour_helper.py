@@ -19,12 +19,9 @@ OFFFICE_HOUR_FIELDS = {
     "end_date_time": OPTIONAL_STRING_FIELD,
     "mentor_id": OPTIONAL_INTEGER_FIELD,
     "mentor_name": OPTIONAL_STRING_FIELD,
-    "mentor_title": OPTIONAL_STRING_FIELD,
-    "mentor_primary_industry": OPTIONAL_STRING_FIELD,
     "mentor_email": OPTIONAL_STRING_FIELD,
     "finalist_id": OPTIONAL_INTEGER_FIELD,
     "finalist_name": OPTIONAL_STRING_FIELD,
-    "finalist_title": OPTIONAL_STRING_FIELD,
     "finalist_email": OPTIONAL_STRING_FIELD,
     "is_open": BOOLEAN_FIELD,
     "topics": OPTIONAL_STRING_FIELD,
@@ -80,14 +77,6 @@ class MentorProgramOfficeHourHelper(ModelHelper):
         return self.subject.mentor.full_name()
 
     @property
-    def mentor_title(self):
-        return self.subject.mentor.user_title()
-
-    @property
-    def mentor_primary_industry(self):
-        return self.subject.mentor.startup_industry()
-
-    @property
     def mentor_email(self):
         return self.field_element("mentor", "email")
 
@@ -98,10 +87,6 @@ class MentorProgramOfficeHourHelper(ModelHelper):
     @property
     def finalist_name(self):
         return self.subject.finalist.full_name()
-
-    @property
-    def finalist_title(self):
-        return self.subject.finalist.user_title()
 
     @property
     def finalist_email(self):

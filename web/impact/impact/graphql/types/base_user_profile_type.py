@@ -1,25 +1,19 @@
 from graphene_django import DjangoObjectType
 from graphene.types.generic import GenericScalar
-from django.db.models import Q
 
 from accelerator.models import (
     BaseProfile,
     StartupRole,
-    UserRole,
-    ProgramRoleGrant
+    UserRole
 )
 from accelerator_abstract.models.base_user_utils import is_employee
 from impact.utils import (
     get_user_program_and_startup_roles,
 )
-from impact.v1.views.utils import (
-    map_data,
-)
 
 
 class BaseUserProfileType(DjangoObjectType):
     program_roles = GenericScalar()
-    mentor_program_role_grants = GenericScalar()
 
     class Meta:
         model = BaseProfile
@@ -37,39 +31,3 @@ class BaseUserProfileType(DjangoObjectType):
             startup_roles_of_interest += [StartupRole.ENTRANT]
         return get_user_program_and_startup_roles(
             self.user, user_roles_of_interest, startup_roles_of_interest)
-
-    def resolve_mentor_program_role_grants(self, info, **kwargs):
-        """
-        Returns the mentor program grants for a user
-        """
-        roles = ["Mentor", "Desired Mentor", "Deferred Mentor"]
-        results = map_data(
-            ProgramRoleGrant,
-            Q(person_id=self.user.pk, program_role__user_role__name__in=roles,
-              program_role__program__program_status__in=['active', 'upcoming']),
-            'id',
-            [
-                'id',
-                'program_role__program__id',
-                'program_role__program__name',
-                'program_role__program__start_date',
-                'program_role__program__end_date',
-                'program_role__user_role__name',
-                'program_role__program__program_overview_link',
-            ],
-            [
-                'id',
-                'program_id',
-                'program_name',
-                'program_start_date',
-                'program_end_date',
-                'user_role_name',
-                'program_overview_link',
-            ]
-        )
-
-        for data in results:
-            data['program_start_date'] = data['program_start_date'].isoformat()
-            data['program_end_date'] = data['program_end_date'].isoformat()
-
-        return {"results": results}
