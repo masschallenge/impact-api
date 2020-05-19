@@ -115,12 +115,14 @@ class TestGraphQL(APITestCase):
 
     def test_mentor_program_role_grants(self):
         user = ExpertFactory()
-        program = ProgramFactory()
-        user_role = get_user_role_by_name(UserRole.MENTOR)
-        pr = ProgramRoleFactory.create(program=program, user_role=user_role)
-        role_grant = ProgramRoleGrantFactory.create(program_role=pr,
-                                                    person=user)
+        role_grant = ProgramRoleGrantFactory.create(
+            program_role__user_role__name=UserRole.MENTOR,
+            person=user)
+        program = role_grant.program_role.program
+        program_overview_link = program.program_overview_link
+
         query = MENTOR_PRG_QUERY.format(id=user.id)
+
         expected_json = {
             'data': {
                 'expertProfile': {
@@ -129,9 +131,9 @@ class TestGraphQL(APITestCase):
                          'program_end_date': program.end_date.isoformat(),
                          'program_id': program.id,
                          'program_name': program.name,
-                         'program_overview_link': program.program_overview_link,
+                         'program_overview_link': program_overview_link,
                          'program_start_date': program.start_date.isoformat(),
-                         'user_role_name': user_role.name
+                         'user_role_name': UserRole.MENTOR
                          }]
                     }
                 }
@@ -141,17 +143,15 @@ class TestGraphQL(APITestCase):
     def test_mentor_program_role_grants_only_returns_mentor_roles(self):
         user = ExpertFactory()
         program = ProgramFactory()
-        mentor_user_role = get_user_role_by_name(UserRole.MENTOR)
-        judge_user_role = get_user_role_by_name(UserRole.JUDGE)
-        mentor_pr = ProgramRoleFactory.create(
-            program=program, user_role=mentor_user_role)
         mentor_role_grant = ProgramRoleGrantFactory.create(
-            program_role=mentor_pr, person=user)
-        judge_pr = ProgramRoleFactory.create(
-            program=program, user_role=judge_user_role)
+            program_role__user_role__name=UserRole.MENTOR, person=user)
+        program = mentor_role_grant.program_role.program
+        program_overview_link = program.program_overview_link
         judge_role_grant = ProgramRoleGrantFactory.create(
-            program_role=judge_pr, person=user)
+            program_role__user_role__name=UserRole.JUDGE, person=user)
+
         query = MENTOR_PRG_QUERY.format(id=user.id)
+
         expected_json = {
             'data': {
                 'expertProfile': {
@@ -160,9 +160,9 @@ class TestGraphQL(APITestCase):
                          'program_end_date': program.end_date.isoformat(),
                          'program_id': program.id,
                          'program_name': program.name,
-                         'program_overview_link': program.program_overview_link,
+                         'program_overview_link': program_overview_link,
                          'program_start_date': program.start_date.isoformat(),
-                         'user_role_name': mentor_user_role.name
+                         'user_role_name': UserRole.MENTOR
                          }]
                     }
                 }
