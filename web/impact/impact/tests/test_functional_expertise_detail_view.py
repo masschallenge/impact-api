@@ -5,9 +5,9 @@ import json
 from jsonschema import Draft4Validator
 from django.urls import reverse
 
-from .tests.factories import FunctionalExpertiseFactory
-from .tests.api_test_case import APITestCase
-from .tests.utils import assert_fields
+from .factories import FunctionalExpertiseFactory
+from .api_test_case import APITestCase
+from .utils import assert_fields
 from .v1.helpers import MPTT_FIELDS
 from .v1.views import FunctionalExpertiseDetailView
 

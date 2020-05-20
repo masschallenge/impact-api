@@ -1,6 +1,6 @@
 from mock import patch
 
-from .tests.api_test_case import APITestCase
+from .api_test_case import APITestCase
 
 
 class TestTrackAPICalls(APITestCase):

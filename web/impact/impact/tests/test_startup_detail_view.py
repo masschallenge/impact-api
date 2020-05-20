@@ -4,16 +4,16 @@
 from django.conf import settings
 from django.urls import reverse
 
-from .tests.factories import (
+from .factories import (
     IndustryFactory,
     ProgramFactory,
     StartupFactory,
     StartupStatusFactory,
     StartupTeamMemberFactory,
 )
-from .tests.contexts import UserContext
-from .tests.utils import match_errors
-from .tests.api_test_case import APITestCase
+from .contexts import UserContext
+from .utils import match_errors
+from .api_test_case import APITestCase
 from .v0.views.startup_detail_view import EMPTY_DETAIL_RESULT
 from .v0.views.utils import BADGE_DISPLAYS
 

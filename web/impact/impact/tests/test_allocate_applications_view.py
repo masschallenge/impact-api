@@ -31,7 +31,7 @@ from accelerator.tests.contexts import (
     AnalyzeJudgingContext,
     JudgeFeedbackContext,
 )
-from .tests.api_test_case import APITestCase
+from .api_test_case import APITestCase
 from .v1.views import (
     ALREADY_ASSIGNED_ERROR,
     AllocateApplicationsView,

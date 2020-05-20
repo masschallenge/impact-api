@@ -3,7 +3,7 @@
 
 from oauth2_provider.models import get_application_model
 from test_plus.test import TestCase
-from .tests.factories import UserFactory
+from .factories import UserFactory
 
 # pylint: disable=invalid-name
 OAuth_App = get_application_model()

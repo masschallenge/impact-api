@@ -6,9 +6,9 @@ from jsonschema import Draft4Validator
 
 from django.urls import reverse
 
-from .tests.factories import JudgingRoundFactory
-from .tests.api_test_case import APITestCase
-from .tests.utils import assert_fields
+from .factories import JudgingRoundFactory
+from .api_test_case import APITestCase
+from .utils import assert_fields
 from .v1.views import JudgingRoundDetailView
 
 JUDGING_ROUND_GET_FIELDS = [

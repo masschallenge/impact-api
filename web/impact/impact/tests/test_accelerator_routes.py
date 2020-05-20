@@ -17,11 +17,11 @@ from accelerator.tests.factories.organization_factory import (
 from django.contrib.auth.models import Permission
 import json
 
-from .tests.factories import (
+from .factories import (
     UserFactory,
     StartupStatusFactory
 )
-from .tests.factories import PermissionFactory
+from .factories import PermissionFactory
 from accelerator.models import Startup
 from .views.general_view_set import (
     MODELS_TO_EXCLUDE_FROM_URL_BINDING

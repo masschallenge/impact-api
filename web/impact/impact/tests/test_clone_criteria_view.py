@@ -3,7 +3,7 @@
 
 from django.urls import reverse
 
-from .tests.api_test_case import APITestCase
+from .api_test_case import APITestCase
 from .v1.views import (
     CloneCriteriaView,
     SOURCE_JUDGING_ROUND_KEY,
@@ -16,7 +16,7 @@ from accelerator.tests.factories import (
     CriterionOptionSpecFactory,
     JudgingRoundFactory,
 )
-from .tests.utils import assert_fields
+from .utils import assert_fields
 
 
 class TestCloneCriteriaView(APITestCase):

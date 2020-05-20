@@ -19,9 +19,9 @@ from .graphql.query import (
     EXPERT_NOT_FOUND_MESSAGE,
     NOT_ALLOWED_ACCESS_MESSAGE
 )
-from .tests.api_test_case import APITestCase
-from .tests.contexts import UserContext
-from .tests.factories import (
+from .api_test_case import APITestCase
+from .contexts import UserContext
+from .factories import (
     ApplicationFactory,
     EntrepreneurFactory,
     ExpertFactory,
@@ -33,7 +33,7 @@ from .tests.factories import (
     StartupStatusFactory,
     UserRoleFactory
 )
-from .tests.utils import capture_stderr
+from .utils import capture_stderr
 from .utils import get_user_program_and_startup_roles
 
 MENTEE_FIELDS = """

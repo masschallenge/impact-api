@@ -12,12 +12,12 @@ from accelerator.models import (
     ONLINE_JUDGING_ROUND_TYPE,
 )
 from accelerator.tests.factories.clearance_factory import ClearanceFactory
-from .tests.factories import JudgingRoundFactory
-from .tests.api_test_case import APITestCase
-from .tests.test_judging_round_detail_view import (
+from .factories import JudgingRoundFactory
+from .api_test_case import APITestCase
+from .test_judging_round_detail_view import (
     JUDGING_ROUND_GET_FIELDS,
 )
-from .tests.utils import assert_fields
+from .utils import assert_fields
 from .v1.views import (
     INVALID_IS_ACTIVE_ERROR,
     INVALID_ROUND_TYPE_ERROR,

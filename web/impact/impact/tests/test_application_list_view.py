@@ -2,12 +2,12 @@ import json
 from jsonschema import Draft4Validator
 
 from django.urls import reverse
-from .tests.factories import ApplicationFactory
-from .tests.api_test_case import APITestCase
-from .tests.utils import assert_fields
+from .factories import ApplicationFactory
+from .api_test_case import APITestCase
+from .utils import assert_fields
 from .v1.views import ApplicationListView
 
-from .tests.test_application_detail_view import (
+from .test_application_detail_view import (
     APPLICATION_GET_FIELDS,
 )
 

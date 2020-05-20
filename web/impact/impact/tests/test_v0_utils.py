@@ -3,7 +3,7 @@
 
 from test_plus.test import TestCase
 
-from .tests.factories import StartupFactory
+from .factories import StartupFactory
 from .v0.views.utils import (
     logo_url,
     pad_slash,

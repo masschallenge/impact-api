@@ -5,12 +5,12 @@ import json
 from jsonschema import Draft4Validator
 
 from django.urls import reverse
-from .tests.factories import ProgramFactory
-from .tests.api_test_case import APITestCase
-from .tests.test_program_detail_view import (
+from .factories import ProgramFactory
+from .api_test_case import APITestCase
+from .test_program_detail_view import (
     PROGRAM_GET_FIELDS,
 )
-from .tests.utils import assert_fields
+from .utils import assert_fields
 from .v1.views import ProgramListView
 
 

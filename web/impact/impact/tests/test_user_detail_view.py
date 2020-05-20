@@ -7,8 +7,8 @@ from jsonschema import Draft4Validator
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
-from .tests.contexts import UserContext
-from .tests.factories import (
+from .contexts import UserContext
+from .factories import (
     ExpertCategoryFactory,
     FunctionalExpertiseFactory,
     IndustryFactory,
@@ -16,8 +16,8 @@ from .tests.factories import (
     ProgramFamilyFactory,
     ProgramRoleGrantFactory,
 )
-from .tests.api_test_case import APITestCase
-from .tests.utils import (
+from .api_test_case import APITestCase
+from .utils import (
     assert_fields,
     assert_fields_missing,
     assert_fields_not_required,

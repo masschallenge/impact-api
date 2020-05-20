@@ -8,12 +8,12 @@ from django.contrib.contenttypes.models import ContentType
 from rest_framework.test import APIClient
 from test_plus.test import TestCase
 
-from .tests.factories import (
+from .factories import (
     ProgramRoleFactory,
     StartupStatusFactory,
     UserFactory,
 )
-from .tests.factories import (
+from .factories import (
     PermissionFactory,
     StartupFactory,
 )

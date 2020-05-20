@@ -22,12 +22,12 @@ from accelerator.tests.factories import (
     ProgramRoleGrantFactory,
 )
 
-from .tests.factories import MentorProgramOfficeHourFactory
-from .tests.api_test_case import APITestCase
+from .factories import MentorProgramOfficeHourFactory
+from .api_test_case import APITestCase
 from .v1.helpers.mentor_program_office_hour_helper import (
     OFFFICE_HOUR_FIELDS,
 )
-from .tests.utils import assert_fields
+from .utils import assert_fields
 from .v1.views import MentorProgramOfficeHourListView
 
 USER_OFFICE_HOUR_COUNT = 3

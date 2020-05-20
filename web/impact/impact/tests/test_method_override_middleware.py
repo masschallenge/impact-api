@@ -4,8 +4,8 @@
 from django.urls import reverse
 
 from .middleware.method_override_middleware import METHOD_OVERRIDE_HEADER
-from .tests.api_test_case import APITestCase
-from .tests.contexts import UserContext
+from .api_test_case import APITestCase
+from .contexts import UserContext
 
 
 class TestMethodOverrideMiddleware(APITestCase):

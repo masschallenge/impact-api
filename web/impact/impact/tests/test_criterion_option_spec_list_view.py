@@ -3,9 +3,9 @@ from accelerator.models import CriterionOptionSpec
 
 from .v1.views.utils import valid_keys_note
 from .v1.helpers.validators import INVALID_INTEGER_ERROR
-from .tests.api_test_case import APITestCase
-from .tests.utils import assert_data_is_consistent_with_instance
-from .tests.factories import (
+from .api_test_case import APITestCase
+from .utils import assert_data_is_consistent_with_instance
+from .factories import (
     CriterionOptionSpecFactory,
     CriterionFactory,
 )

@@ -8,8 +8,8 @@ from django.utils import timezone
 from jsonschema import Draft4Validator
 
 from accelerator.models import UserRole
-from .tests.api_test_case import APITestCase
-from .tests.factories import (
+from .api_test_case import APITestCase
+from .factories import (
     JudgingRoundFactory,
     NewsletterReceiptFactory,
     ProgramCycleFactory,
@@ -17,7 +17,7 @@ from .tests.factories import (
     StartupTeamMemberFactory,
     UserFactory,
 )
-from .tests.utils import (
+from .utils import (
     assert_fields,
     days_from_now,
     find_events,

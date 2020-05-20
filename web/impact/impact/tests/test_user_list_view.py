@@ -14,15 +14,15 @@ from accelerator.models import (
     ExpertProfile,
     MemberProfile,
 )
-from .tests.api_test_case import APITestCase
-from .tests.contexts import UserContext
-from .tests.factories import (
+from .api_test_case import APITestCase
+from .contexts import UserContext
+from .factories import (
     ExpertCategoryFactory,
     IndustryFactory,
     ProgramFamilyFactory,
     StartupTeamMemberFactory,
 )
-from .tests.test_user_detail_view import (
+from .test_user_detail_view import (
     ENTREPRENEUR_GET_FIELDS,
     EXPERT_GET_FIELDS,
     EXPERT_WRITE_FIELDS,
@@ -30,7 +30,7 @@ from .tests.test_user_detail_view import (
     NON_MEMBER_MUTABLE_FIELDS,
     WRITE_ONCE_FIELDS,
 )
-from .tests.utils import (
+from .utils import (
     assert_fields,
     assert_fields_not_required,
     assert_fields_required,

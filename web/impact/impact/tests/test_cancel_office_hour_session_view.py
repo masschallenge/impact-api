@@ -7,8 +7,8 @@ from accelerator.models import UserRole
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.utils import days_from_now
 
-from .tests.api_test_case import APITestCase
-from .tests.factories import MentorProgramOfficeHourFactory
+from .api_test_case import APITestCase
+from .factories import MentorProgramOfficeHourFactory
 from .v1.views.cancel_office_hour_session_view import (
     DEFAULT_TIMEZONE,
     OFFICE_HOUR_SESSION_404,
