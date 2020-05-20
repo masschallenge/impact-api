@@ -11,7 +11,6 @@ from impact.graphql.types.entrepreneur_startup_type import (
     EntrepreneurStartupType,
 )
 
-
 class EntrepreneurProfileType(BaseUserProfileType):
     image_url = graphene.String()
     title = graphene.String()

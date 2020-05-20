@@ -1,5 +1,6 @@
 from impact.graphql.types.user_type import UserType
 from impact.graphql.types.program_type import ProgramType
+from impact.graphql.types.location_type import LocationType
 from impact.graphql.types.base_user_profile_type import BaseUserProfileType
 from impact.graphql.types.startup_type import StartupType
 from impact.graphql.types.industry_type import IndustryType
@@ -20,8 +21,4 @@ from impact.graphql.types.entrepreneur_startup_type import (
 )
 from impact.graphql.types.expert_startup_type import (
     ExpertStartupType
-)
-
-from impact.graphql.types.location_type import (
-    LocationType
 )
