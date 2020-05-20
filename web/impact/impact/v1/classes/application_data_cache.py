@@ -3,7 +3,7 @@ from datetime import datetime
 from pytz import utc
 
 from ..classes.utils import collect_pairs
-from accelerator.models import (
+from mc.models import (
     ApplicationPanelAssignment,
     JUDGING_FEEDBACK_STATUS_COMPLETE,
     JUDGING_FEEDBACK_STATUS_INCOMPLETE,

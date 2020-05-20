@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from accelerator.models import (
+from mc.models import (
     JUDGING_FEEDBACK_STATUS_COMPLETE,
     JudgeApplicationFeedback,
     JudgeRoundCommitment,
