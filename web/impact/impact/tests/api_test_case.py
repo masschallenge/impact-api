@@ -98,5 +98,10 @@ class APITestCase(TestCase):
                 self.assertIn(key, options)
                 self.assertEqual(options[key], params)
 
-    def assert_ui_notification(self, response, notification):
-        self.assertEqual(response.data, notification)
+    def assert_ui_notification(self, response, success, notification):
+        expected_ui_notification = {
+            'success': success,
+            'header': self.success_header if success else self.fail_header,
+            'detail': notification
+        }
+        self.assertEqual(response.data, expected_ui_notification)
