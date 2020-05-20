@@ -13,8 +13,8 @@ from accelerator.models import (
     ACTIVE_PROGRAM_STATUS,
     ENDED_PROGRAM_STATUS
 )
-from .graphql.middleware import NOT_LOGGED_IN_MSG
-from .graphql.query import (
+from ..graphql.middleware import NOT_LOGGED_IN_MSG
+from ..graphql.query import (
     ENTREPRENEUR_NOT_FOUND_MESSAGE,
     EXPERT_NOT_FOUND_MESSAGE,
     NOT_ALLOWED_ACCESS_MESSAGE
@@ -34,7 +34,7 @@ from .factories import (
     UserRoleFactory
 )
 from .utils import capture_stderr
-from .utils import get_user_program_and_startup_roles
+from ..utils import get_user_program_and_startup_roles
 
 MENTEE_FIELDS = """
     startup {

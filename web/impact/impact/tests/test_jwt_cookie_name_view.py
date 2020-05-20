@@ -8,7 +8,7 @@ from rest_framework.test import APIClient
 
 from .api_test_case import APITestCase
 from .factories import UserFactory
-from .views import JWTCookieNameView
+from ..views import JWTCookieNameView
 
 User = get_user_model()  # pylint: disable=invalid-name
 

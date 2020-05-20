@@ -27,7 +27,7 @@ from .utils import (
     days_from_now,
     find_events,
 )
-from .utils import DAWN_OF_TIME
+from ..utils import DAWN_OF_TIME
 from ..v1.events import (
     OrganizationBecameEntrantEvent,
     OrganizationBecameFinalistEvent,

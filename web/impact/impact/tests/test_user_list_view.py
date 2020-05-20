@@ -35,7 +35,7 @@ from .utils import (
     assert_fields_not_required,
     assert_fields_required,
 )
-from .utils import (
+from ..utils import (
     get_profile,
     override_updated_at,
 )

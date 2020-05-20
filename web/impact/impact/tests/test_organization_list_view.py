@@ -18,10 +18,8 @@ from .test_organization_detail_view import (
     PARTNER_GET_FIELDS,
     STARTUP_GET_FIELDS,
 )
-from .utils import (
-    assert_fields,
-)
-from .utils import override_updated_at
+from .utils import assert_fields
+from ..utils import override_updated_at
 from ..v1.views import OrganizationListView
 
 

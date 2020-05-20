@@ -3,7 +3,7 @@
 
 from django.urls import reverse
 
-from .middleware.method_override_middleware import METHOD_OVERRIDE_HEADER
+from ..middleware.method_override_middleware import METHOD_OVERRIDE_HEADER
 from .api_test_case import APITestCase
 from .contexts import UserContext
 

@@ -1,11 +1,10 @@
-# MIT License
-# Copyright (c) 2017 MassChallenge, Inc.
-
+import json
 from test_plus.test import TestCase
-from .urls import schema_router
+
 from django.apps import apps
-from rest_framework.test import APIClient
+from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from rest_framework.test import APIClient
 
 from accelerator.tests.factories import (
     StartupFactory,
@@ -14,16 +13,15 @@ from accelerator.tests.factories import (
 from accelerator.tests.factories.organization_factory import (
     OrganizationFactory
 )
-from django.contrib.auth.models import Permission
-import json
-
-from .factories import (
-    UserFactory,
-    StartupStatusFactory
-)
-from .factories import PermissionFactory
 from accelerator.models import Startup
-from .views.general_view_set import (
+
+from ..urls import schema_router
+from .factories import (
+    PermissionFactory,
+    StartupStatusFactory,
+    UserFactory,
+)
+from ..views.general_view_set import (
     MODELS_TO_EXCLUDE_FROM_URL_BINDING
 )
 
