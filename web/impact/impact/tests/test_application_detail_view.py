@@ -8,7 +8,7 @@ from django.urls import reverse
 from .factories import ApplicationFactory
 from .api_test_case import APITestCase
 from .utils import assert_fields
-from .v1.views import ApplicationDetailView
+from ..v1.views import ApplicationDetailView
 
 APPLICATION_GET_FIELDS = [
     "id",

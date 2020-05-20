@@ -11,7 +11,7 @@ from .test_program_cycle_detail_view import (
     PROGRAM_CYCLE_GET_FIELDS,
 )
 from .utils import assert_fields
-from .v1.views import ProgramCycleListView
+from ..v1.views import ProgramCycleListView
 
 
 class TestProgramCycleListView(APITestCase):

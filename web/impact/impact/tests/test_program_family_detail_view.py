@@ -9,7 +9,7 @@ from django.urls import reverse
 from .factories import ProgramFamilyFactory
 from .api_test_case import APITestCase
 from .utils import assert_fields
-from .v1.views import ProgramFamilyDetailView
+from ..v1.views import ProgramFamilyDetailView
 
 PROGRAM_FAMILY_GET_FIELDS = [
     "id",

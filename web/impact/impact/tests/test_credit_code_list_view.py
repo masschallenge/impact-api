@@ -11,7 +11,7 @@ from .test_credit_code_detail_view import (
     CREDIT_CODE_GET_FIELDS,
 )
 from .utils import assert_fields
-from .v1.views import CreditCodeListView
+from ..v1.views import CreditCodeListView
 
 
 class TestCreditCodeListView(APITestCase):

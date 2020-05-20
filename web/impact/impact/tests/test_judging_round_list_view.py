@@ -18,7 +18,7 @@ from .test_judging_round_detail_view import (
     JUDGING_ROUND_GET_FIELDS,
 )
 from .utils import assert_fields
-from .v1.views import (
+from ..v1.views import (
     INVALID_IS_ACTIVE_ERROR,
     INVALID_ROUND_TYPE_ERROR,
     JudgingRoundListView,

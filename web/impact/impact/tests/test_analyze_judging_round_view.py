@@ -13,7 +13,7 @@ from accelerator.tests.contexts import (
 
 from .api_test_case import APITestCase
 from .utils import assert_fields
-from .v1.views import AnalyzeJudgingRoundView
+from ..v1.views import AnalyzeJudgingRoundView
 
 
 class TestAnalyzeJudgingRoundView(APITestCase):

@@ -14,7 +14,7 @@ from .utils import (
     assert_fields_missing,
 )
 from .api_test_case import APITestCase
-from .v1.views import OrganizationDetailView
+from ..v1.views import OrganizationDetailView
 
 SHARED_GET_FIELDS = [
     "id",

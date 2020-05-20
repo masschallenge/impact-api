@@ -4,7 +4,7 @@
 from django.urls import reverse
 
 from .api_test_case import APITestCase
-from .v1.views import (
+from ..v1.views import (
     CloneCriteriaView,
     SOURCE_JUDGING_ROUND_KEY,
     TARGET_JUDGING_ROUND_KEY,

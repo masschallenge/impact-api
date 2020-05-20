@@ -11,7 +11,7 @@ from django.urls import reverse
 from .factories import ExpertFactory
 from .api_test_case import APITestCase
 from .utils import assert_fields
-from .v1.views.user_confidential_view import UserConfidentialView
+from ..v1.views.user_confidential_view import UserConfidentialView
 
 TEST_EXPERT_GROUP = "11"
 TEST_INTERNAL_NOTES = "Amazing!"

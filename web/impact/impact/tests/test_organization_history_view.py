@@ -28,13 +28,13 @@ from .utils import (
     find_events,
 )
 from .utils import DAWN_OF_TIME
-from .v1.events import (
+from ..v1.events import (
     OrganizationBecameEntrantEvent,
     OrganizationBecameFinalistEvent,
     OrganizationBecameWinnerEvent,
     OrganizationCreatedEvent,
 )
-from .v1.views import OrganizationHistoryView
+from ..v1.views import OrganizationHistoryView
 
 
 class TestOrganizationHistoryView(APITestCase):

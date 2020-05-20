@@ -32,7 +32,7 @@ from accelerator.tests.contexts import (
     JudgeFeedbackContext,
 )
 from .api_test_case import APITestCase
-from .v1.views import (
+from ..v1.views import (
     ALREADY_ASSIGNED_ERROR,
     AllocateApplicationsView,
     JUDGING_ROUND_INACTIVE_ERROR,

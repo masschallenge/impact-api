@@ -8,7 +8,7 @@ from django.urls import reverse
 from accelerator.tests.contexts import AnalyzeJudgingContext
 from .api_test_case import APITestCase
 from .utils import assert_fields
-from .v1.views import JudgingRoundCriteriaHeaderView
+from ..v1.views import JudgingRoundCriteriaHeaderView
 
 
 class TestJudgingRoundCriteriaHeaderView(APITestCase):

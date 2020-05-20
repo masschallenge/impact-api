@@ -22,7 +22,7 @@ from .utils import (
     days_from_now,
     find_events,
 )
-from .v1.events import (
+from ..v1.events import (
     UserBecameConfirmedJudgeEvent,
     UserBecameConfirmedMentorEvent,
     UserBecameDesiredJudgeEvent,
@@ -32,7 +32,7 @@ from .v1.events import (
     UserJoinedStartupEvent,
     UserReceivedNewsletterEvent,
 )
-from .v1.views import UserHistoryView
+from ..v1.views import UserHistoryView
 
 
 class TestUserHistoryView(APITestCase):

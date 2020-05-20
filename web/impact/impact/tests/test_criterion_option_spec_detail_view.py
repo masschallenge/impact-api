@@ -4,8 +4,8 @@ from .factories import (
     CriterionFactory,
     CriterionOptionSpecFactory,
 )
-from .v1.views import CriterionOptionSpecDetailView
-from .v1.views.utils import valid_keys_note
+from ..v1.views import CriterionOptionSpecDetailView
+from ..v1.views.utils import valid_keys_note
 from django.urls import reverse
 
 

@@ -11,8 +11,8 @@ from accelerator.tests.factories import (
 
 from .api_test_case import APITestCase
 from .test_graphql import expert_user
-from .v1.views import MentorParticipationView
-from .v1.views.mentor_participation_view import (
+from ..v1.views import MentorParticipationView
+from ..v1.views.mentor_participation_view import (
     INVALID_INPUT_ERROR,
     SUBJECT
 )

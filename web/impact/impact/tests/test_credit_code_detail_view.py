@@ -9,7 +9,7 @@ from django.urls import reverse
 from .factories import RefundCodeFactory
 from .api_test_case import APITestCase
 from .utils import assert_fields
-from .v1.views import CreditCodeDetailView
+from ..v1.views import CreditCodeDetailView
 
 
 CREDIT_CODE_GET_FIELDS = [

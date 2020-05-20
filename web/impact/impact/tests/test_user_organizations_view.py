@@ -12,8 +12,8 @@ from .factories import (
 
 from .api_test_case import APITestCase
 from .utils import assert_fields
-from .v1.helpers import ORGANIZATION_USER_FIELDS
-from .v1.views import UserOrganizationsView
+from ..v1.helpers import ORGANIZATION_USER_FIELDS
+from ..v1.views import UserOrganizationsView
 
 USER_ORGANIZATIONS_GET_FIELDS = ["organizations"]
 

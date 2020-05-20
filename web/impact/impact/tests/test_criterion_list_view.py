@@ -9,9 +9,9 @@ from .factories import (
     JudgingRoundFactory,
 )
 from .utils import assert_data_is_consistent_with_instance
-from .v1.helpers import INVALID_INTEGER_ERROR
-from .v1.views import CriterionListView
-from .v1.views.utils import valid_keys_note
+from ..v1.helpers import INVALID_INTEGER_ERROR
+from ..v1.views import CriterionListView
+from ..v1.views.utils import valid_keys_note
 
 
 class TestCriterionListView(APITestCase):

@@ -40,20 +40,20 @@ from .utils import (
     override_updated_at,
 )
 
-from .v1.helpers.validators import (
+from ..v1.helpers.validators import (
     format_choices,
     INVALID_CHOICE_ERROR,
     INVALID_URL_ERROR,
 )
 
-from .v1.views.base_list_view import (
+from ..v1.views.base_list_view import (
     DEFAULT_MAX_LIMIT,
     GREATER_THAN_MAX_LIMIT_ERROR,
     KWARG_VALUE_NOT_INTEGER_ERROR,
     KWARG_VALUE_IS_NON_POSITIVE_ERROR,
     KWARG_VALUE_IS_NEGATIVE_ERROR,
 )
-from .v1.views.user_list_view import (
+from ..v1.views.user_list_view import (
     EMAIL_EXISTS_ERROR,
     UNSUPPORTED_KEY_ERROR,
     UserListView,

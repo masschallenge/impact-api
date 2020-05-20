@@ -13,7 +13,7 @@ from .factories import (
 
 from .api_test_case import APITestCase
 from .utils import assert_fields
-from .v1.views.organization_users_view import (
+from ..v1.views.organization_users_view import (
     ORGANIZATION_USER_FIELDS,
     OrganizationUsersView,
 )

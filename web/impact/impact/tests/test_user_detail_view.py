@@ -29,7 +29,7 @@ from ..v1.helpers import (
     MISSING_SUBJECT_ERROR,
     UserHelper,
 )
-from .v1.views.utils import VALID_KEYS_NOTE
+from ..v1.views.utils import VALID_KEYS_NOTE
 from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
 from accelerator_abstract.models.base_base_profile import (
     ENTREPRENEUR_USER_TYPE,
@@ -38,7 +38,7 @@ from accelerator_abstract.models.base_base_profile import (
     PHONE_MAX_LENGTH,
     TWITTER_HANDLE_MAX_LENGTH,
 )
-from .v1.views.user_detail_view import (
+from ..v1.views.user_detail_view import (
     MISSING_PROFILE_ERROR,
     NO_USER_ERROR,
     UserDetailView,

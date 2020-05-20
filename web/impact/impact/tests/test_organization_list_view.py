@@ -22,7 +22,7 @@ from .utils import (
     assert_fields,
 )
 from .utils import override_updated_at
-from .v1.views import OrganizationListView
+from ..v1.views import OrganizationListView
 
 
 class TestOrganizationListView(APITestCase):

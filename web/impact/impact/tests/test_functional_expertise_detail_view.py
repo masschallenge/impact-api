@@ -8,8 +8,8 @@ from django.urls import reverse
 from .factories import FunctionalExpertiseFactory
 from .api_test_case import APITestCase
 from .utils import assert_fields
-from .v1.helpers import MPTT_FIELDS
-from .v1.views import FunctionalExpertiseDetailView
+from ..v1.helpers import MPTT_FIELDS
+from ..v1.views import FunctionalExpertiseDetailView
 
 
 class TestFunctionalExpertiseDetailView(APITestCase):

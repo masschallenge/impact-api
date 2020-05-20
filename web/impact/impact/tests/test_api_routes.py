@@ -18,7 +18,7 @@ from .factories import (
     StartupFactory,
 )
 
-from .v1.views.user_detail_view import UserDetailView
+from ..v1.views.user_detail_view import UserDetailView
 
 
 class TestApiRoute(TestCase):
