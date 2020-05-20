@@ -3,12 +3,14 @@ import graphene
 from datetime import datetime
 from django.db.models import Q
 from django.utils import timezone
+from graphene.types.generic import GenericScalar
 from accelerator.models import (
     CONFIRMED_RELATIONSHIP,
     ExpertProfile,
     Program,
     ProgramRole,
-    UserRole
+    UserRole,
+    ProgramRoleGrant
 )
 
 from impact.graphql.types import (
@@ -25,6 +27,9 @@ from impact.graphql.types import StartupMentorRelationshipType
 from impact.utils import (
     compose_filter,
 )
+from impact.v1.views.utils import (
+    map_data,
+)
 from impact.v1.helpers.profile_helper import (
     latest_program_id_for_each_program_family,
 )
@@ -38,6 +43,7 @@ class ExpertProfileType(BaseUserProfileType):
     program_interests = graphene.List(graphene.String)
     available_office_hours = graphene.Boolean()
     confirmed_mentor_program_families = graphene.List(graphene.String)
+    mentor_program_role_grants = GenericScalar()
 
     class Meta:
         model = ExpertProfile
@@ -122,6 +128,43 @@ class ExpertProfileType(BaseUserProfileType):
         ).values_list(
             'program_role__program__program_family__name',
             flat=True).distinct()
+
+    def resolve_mentor_program_role_grants(self, info, **kwargs):
+        """
+        Returns the mentor program grants for a user
+        """
+        roles = [UserRole.MENTOR, UserRole.DESIRED_MENTOR,
+                 UserRole.DEFERRED_MENTOR]
+        results = map_data(
+            ProgramRoleGrant,
+            Q(person_id=self.user.pk, program_role__user_role__name__in=roles,
+              program_role__program__program_status__in=['active', 'upcoming']),
+            '-program_role__program__start_date',
+            [
+                'id',
+                'program_role__program__id',
+                'program_role__program__name',
+                'program_role__program__start_date',
+                'program_role__program__end_date',
+                'program_role__user_role__name',
+                'program_role__program__program_overview_link',
+            ],
+            [
+                'id',
+                'program_id',
+                'program_name',
+                'program_start_date',
+                'program_end_date',
+                'user_role_name',
+                'program_overview_link',
+            ]
+        )
+
+        for data in results:
+            data['program_start_date'] = data['program_start_date'].isoformat()
+            data['program_end_date'] = data['program_end_date'].isoformat()
+
+        return {"results": results}
 
 
 def _get_slugs(obj, mentor_program, latest_mentor_program, **kwargs):
