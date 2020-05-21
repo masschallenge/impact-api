@@ -19,7 +19,7 @@ from impact.utils import (
 )
 
 class BaseUserProfileType(DjangoObjectType):
-    office_hour_location = graphene.List(LocationType)
+    office_hour_locations = graphene.List(LocationType)
     program_roles = GenericScalar()
 
     class Meta:
@@ -40,7 +40,7 @@ class BaseUserProfileType(DjangoObjectType):
             self.user, user_roles_of_interest, startup_roles_of_interest)
 
 
-    def resolve_office_hour_location(self, info, **kwargs):
+    def resolve_office_hour_locations(self, info, **kwargs):
         family_ids = Clearance.objects.clearances_for_user(
             self.user
         ).values_list("program_family", flat=True)
@@ -51,7 +51,6 @@ class BaseUserProfileType(DjangoObjectType):
             ).values_list(
                 "program_role__program__program_family", flat=True
                 ).distinct()
-
         ids = list(set(chain(family_ids, program_family_ids)))
 
         return Location.objects.filter(
