@@ -1,7 +1,7 @@
 import graphene
 from graphql import GraphQLError
 
-from accelerator.models import (
+from mc.models import (
     EntrepreneurProfile,
     ExpertProfile
 )

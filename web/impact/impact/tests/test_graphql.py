@@ -3,15 +3,16 @@
 import json
 from django.urls import reverse
 
-from accelerator.models import StartupRole, UserRole
 from accelerator.tests.contexts import (
     StartupTeamMemberContext,
     UserRoleContext
 )
 from accelerator.tests.contexts.context_utils import get_user_role_by_name
-from accelerator.models import (
+from mc.models import (
     ACTIVE_PROGRAM_STATUS,
-    ENDED_PROGRAM_STATUS
+    ENDED_PROGRAM_STATUS,
+    StartupRole,
+    UserRole,
 )
 from ..graphql.middleware import NOT_LOGGED_IN_MSG
 from ..graphql.query import (
