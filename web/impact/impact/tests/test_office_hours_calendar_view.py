@@ -1,6 +1,8 @@
 from datetime import (datetime,
                       timedelta,
 )
+from pytz import utc
+
 from django.urls import reverse
 
 from accelerator.tests.factories import MentorProgramOfficeHourFactory
@@ -9,6 +11,7 @@ from accelerator.tests.utils import days_from_now
 from impact.tests.api_test_case import APITestCase
 from impact.v1.views import (ISO_8601_DATE_FORMAT,
                              OfficeHoursCalendarView,
+                             ONE_DAY,
 )
                              
 
@@ -44,10 +47,18 @@ class TestOfficeHoursCalendarView(APITestCase):
                                      date_spec=date_spec)
         self.assert_hour_not_in_response(response, office_hour)        
 
-
-
-    def test_mentor_sees_hours_in_sorted_order(self):
-        pass
+    def test_hours_returned_in_date_sorted_order(self):
+        start_date_time = utc.localize(datetime(2020,1,31)) # a Wednesday
+        date_spec = start_date_time.strftime(ISO_8601_DATE_FORMAT)
+        office_hour = self.create_office_hour(start_date_time=start_date_time)
+        self.create_office_hour(start_date_time=start_date_time-ONE_DAY,
+                                mentor=office_hour.mentor)
+        self.create_office_hour(start_date_time=start_date_time+ONE_DAY,
+                                mentor=office_hour.mentor)
+        response = self.get_response(user=office_hour.mentor,
+                                     date_spec=date_spec)
+        self.assert_sessions_sorted_by_date(response)
+        
 
     def test_office_hour_has_correct_mentor_information(self):
         pass
@@ -82,7 +93,7 @@ class TestOfficeHoursCalendarView(APITestCase):
                            duration_minutes=30):
         create_params = {}
         if mentor:
-            create_params=mentor
+            create_params['mentor'] = mentor
         duration=timedelta(duration_minutes)            
         start_date_time = start_date_time or datetime.now()
         end_date_time = start_date_time + duration
@@ -97,6 +108,11 @@ class TestOfficeHoursCalendarView(APITestCase):
     def assert_hour_not_in_response(self, response, hour):
         self.assertFalse(check_hour_in_response(response, hour),
                         msg="The office hour session was in the response")
+
+    def assert_sessions_sorted_by_date(self, response):
+        dates = [session['start_date_time']
+                 for session in response.data['calendar_data']]
+        self.assertEqual(dates, sorted(dates))
         
     def get_response(self,
                      user=None,
