@@ -39,7 +39,7 @@ class OfficeHoursCalendarView(ImpactView):
         self.response_elements['header'] = SUCCESS_HEADER
         
     def _get_target_user(self, request):
-        user_id = request.data.get("user_id", None)
+        user_id = request.query_params.get("user_id", None)
         if user_id is None:
             self.target_user = request.user
         else:
@@ -51,7 +51,7 @@ class OfficeHoursCalendarView(ImpactView):
         return True
 
     def _get_start_date(self, request):
-        date_spec = request.data.get("date_spec", None)
+        date_spec = request.query_params.get("date_spec", None)
 
         try: 
             self.start_date = start_date(date_spec)
@@ -61,7 +61,7 @@ class OfficeHoursCalendarView(ImpactView):
         return True
 
     def _get_office_hours_data(self):
-        end_date = self.start_date + 2 * ONE_WEEK + 2 * ONE_DAY
+        end_date = self.start_date + ONE_WEEK + 2 * ONE_DAY
         office_hours = MentorProgramOfficeHour.objects.filter(
              mentor = self.target_user,
              start_date_time__range=[self.start_date, end_date]).order_by(
