@@ -98,5 +98,11 @@ class APITestCase(TestCase):
                 self.assertIn(key, options)
                 self.assertEqual(options[key], params)
 
-    def assert_ui_notification(self, response, notification):
-        self.assertEqual(response.data['detail'], notification)
+    def assert_ui_notification(self, response, success, notification):
+        data = response.data
+        header = self.success_header if success else self.fail_header
+        self.assertTrue(all([
+            data['success'] == success,
+            data['header'] == header,
+            data['detail'] == notification
+        ]), msg='Notification data was not as expected')
