@@ -4,7 +4,14 @@ from datetime import (date,
 )
 
 from rest_framework.response import Response
+
+from django.db.models import (
+    Count,
+    F,
+)
+
 from . import ImpactView
+from accelerator.models import MentorProgramOfficeHour
 from impact.permissions.v1_api_permissions import (
     OfficeHourFinalistPermission,
     OfficeHourMentorPermission,
@@ -12,16 +19,24 @@ from impact.permissions.v1_api_permissions import (
 
 ISO_8601_DATE_FORMAT = "%Y-%m-%d"
 ONE_DAY = timedelta(1)
+ONE_WEEK = timedelta(8)
+SUCCESS_HEADER = "Placeholder text for success header"
+FAILURE_HEADER = "Placeholder text for failure header"
+
 
 class OfficeHoursCalendarView(ImpactView):
     permission_classes = [OfficeHourFinalistPermission | OfficeHourMentorPermission]
     view_name = "office_hours_calendar_view"
 
     def fail(self, detail):
-        self.success = False
-        self.header = SUCCESS_HEADER
-        self.detail = detail
-        self.calendar_data = None
+        self.response_elements['success'] = False
+        self.response_elements['header'] = FAILURE_HEADER
+        self.response_elements['detail'] = detail
+        self.response_elements['calendar_data'] = None
+
+    def succeed(self):
+        self.response_elements['success'] = True
+        self.response_elements['header'] = SUCCESS_HEADER
         
     def _get_target_user(self, request):
         user_id = request.data.get("user_id", None)
@@ -40,53 +55,44 @@ class OfficeHoursCalendarView(ImpactView):
 
         try: 
             self.start_date = start_date(date_spec)
-
         except ValueError:
             self.fail(BAD_DATE_SPEC)
             return False
         return True
 
-    def _get_office_hours_calendar_data(self):
-         office_hours = MentorProgramOfficeHour.objects.filter(
+    def _get_office_hours_data(self):
+        end_date = self.start_date + 2 * ONE_WEEK + 2 * ONE_DAY
+        office_hours = MentorProgramOfficeHour.objects.filter(
              mentor = self.target_user,
-             start_date_time__range=[self.start, self.end]).order_by(
-                 'start_date_time')
+             start_date_time__range=[self.start_date, end_date]).order_by(
+                 'start_date_time').annotate(finalist_count=Count("finalist"))
 
-         self.calendar_data = office_hours.values(
-             "id",
-             "start_date_time",
-             "end_date_time", 
-             "mentor__last_name"
-             "mentor__last_name",
-             "description",
-             "topics",             
-             "finalist__first_name",
-             "finalist__last_name",
-             "startup": F("startup__organization__name"),
-             "reserved"=F("finalist_count"),
-         )
+        self.response_elements['calendar_data'] = office_hours.values(
+            "id",
+            "start_date_time",
+            "end_date_time", 
+            "mentor__last_name",
+            "mentor__first_name",
+            "description",
+            "topics",             
+            "finalist__first_name",
+            "finalist__last_name",
+#            startup=F("startup__organization__name"),
+            reserved=F("finalist_count"),
+        )
              
-         self.timezones = office_hours.order_by("location__timezone").values_list(
-             "location__timezone", flat=True).distinct()
-         
+        self.response_elements['timezones'] = office_hours.order_by(
+            "location__timezone").values_list(
+                "location__timezone", flat=True).distinct()
+        self.succeed()
              
          
     def get(self, request):
+        self.response_elements = {}
         (self._get_target_user(request) and
-         self._get_start_date() and
-         self._get_office_hours_data())
-        
-
-        return self.response()
-
-    def response(self):
-        content = {"success": self.success,
-                   "header": self.header,
-                   "detail": self.detail}
-        if self.calendar_data is not None:
-            content['calendar_data'] = self.calendar_data
-            content['timezones'] = self.timezones
-        response =  Response(content)
+         self._get_start_date(request) and
+         self._get_office_hours_data())        
+        return Response(self.response_elements)
         
 
 
@@ -104,8 +110,8 @@ def start_date(date_spec=None):
 
     # This calculation depends on the fact that monday == 0 in python
     
-    start_date =  initidal_date - datetime(initial_date.weekday())
-    adjusted start_date = start_date - ONE_DAY
+    start_date = initial_date - timedelta(initial_date.weekday())
+    adjusted_start_date = start_date - ONE_DAY
     return start_date
 
     
