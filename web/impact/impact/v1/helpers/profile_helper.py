@@ -12,7 +12,7 @@ from django.db.models import (
     OuterRef,
     Subquery,
 )
-from accelerator.models import (
+from mc.models import (
     EntrepreneurProfile,
     ExpertCategory,
     ExpertProfile,

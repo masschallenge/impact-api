@@ -1,4 +1,4 @@
-from accelerator.models import ProgramCycle
+from mc.models import ProgramCycle
 from .model_helper import (
     BOOLEAN_FIELD,
     ModelHelper,

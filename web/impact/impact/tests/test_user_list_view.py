@@ -9,7 +9,7 @@ import pytz
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from accelerator.models import (
+from mc.models import (
     EntrepreneurProfile,
     ExpertProfile,
     MemberProfile,

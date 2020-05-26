@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from accelerator.models import JudgingRound
+from mc.models import JudgingRound
 from .model_helper import (
     BOOLEAN_FIELD,
     OPTIONAL_INTEGER_FIELD,

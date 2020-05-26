@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from django.db.models import Q, F
-from accelerator.models import (
+from mc.models import (
     Industry,
     Startup,
 )

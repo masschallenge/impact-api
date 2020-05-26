@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 
 
-from accelerator.models import (
+from mc.models import (
     BaseProfile,
     ExpertProfile,
     MemberProfile,
