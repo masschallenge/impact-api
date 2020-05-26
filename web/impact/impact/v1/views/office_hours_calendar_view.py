@@ -73,6 +73,7 @@ class OfficeHoursCalendarView(ImpactView):
             "end_date_time", 
             "mentor__last_name",
             "mentor__first_name",
+            "mentor__expertprofile__title", 
             "description",
             "topics",             
             "finalist__first_name",

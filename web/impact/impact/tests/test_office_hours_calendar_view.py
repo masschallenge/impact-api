@@ -59,25 +59,36 @@ class TestOfficeHoursCalendarView(APITestCase):
                                      date_spec=date_spec)
         self.assert_sessions_sorted_by_date(response)
         
-
-    def test_office_hour_has_correct_mentor_information(self):
-        pass
-
-    def test_office_hour_has_correct_finalist_information(self):
-        pass
-
     def test_user_with_no_hours_sees_empty_response(self):
-        pass
-
-    def test_user_with_no_hours_sees_success_response(self):
-        pass
+        user = self.basic_user()
+        session = self.create_office_hour()
+        response = self.get_response(user=user)
+        sessions = response.data['calendar_data']
+        self.assertEqual(len(sessions), 0)
+    
+    def test_user_with_no_hours_gets_success_response(self):
+        user = self.basic_user()
+        session = self.create_office_hour()
+        response = self.get_response(user=user)
+        self.assert_success(response)
 
     def test_user_with_no_hours_in_range_sees_empty_response(self):
-        pass
+        two_weeks_ago = days_from_now(-14)
+        session = self.create_office_hour(start_date_time=two_weeks_ago)
+        response = self.get_response(user=session.mentor)
+        sessions = response.data['calendar_data']
+        self.assertEqual(len(sessions), 0)
 
     def test_user_with_no_hours_in_range_sees_success_response(self):
-        pass
+        two_weeks_ago = days_from_now(-14)
+        session = self.create_office_hour(start_date_time=two_weeks_ago)
+        response = self.get_response(user=session.mentor)
+        self.assert_success(response)
 
+
+    def test_return_includes_session_timezones(self):
+        pass
+    
     def test_bad_date_spec_gets_fail_response(self):
         pass
 
@@ -113,6 +124,9 @@ class TestOfficeHoursCalendarView(APITestCase):
         dates = [session['start_date_time']
                  for session in response.data['calendar_data']]
         self.assertEqual(dates, sorted(dates))
+    
+    def assert_success(self, response):
+        self.assertTrue(response.data['success'])
         
     def get_response(self,
                      user=None,
