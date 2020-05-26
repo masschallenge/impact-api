@@ -4,7 +4,6 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.template import loader
 
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 
 from accelerator.models import MentorProgramOfficeHour
@@ -17,14 +16,14 @@ User = get_user_model()
 DEFAULT_TIMEZONE = 'UTC'
 SUBJECT = '[Office Hours] Canceled: {date}, {start_time}'
 
-STAFF_NOTIFICATION = ('Canceled office hours on behalf of '
-                      '{mentor_name} at {start_time} - {end_time} on {date}')
-MENTOR_NOTIFICATION = ('Canceled office hours at {start_time} - '
-                       '{end_time} on {date}')
-PERMISSION_DENIED = ('Office hour session could not be canceled. '
-                     'You do not have permission to cancel that session')
+STAFF_NOTIFICATION = ('on behalf of {mentor_name} at {start_time} '
+                      '- {end_time} on {date}')
+MENTOR_NOTIFICATION = 'at {start_time} - {end_time} on {date}'
+PERMISSION_DENIED = 'You do not have permission to cancel that session'
 OFFICE_HOUR_SESSION_404 = ("The office hour session you are trying to cancel "
                            "doesn't exist")
+SUCCESS_HEADER = 'Canceled office hour session'
+FAIL_HEADER = 'Office hour session could not be canceled'
 
 
 def get_office_hours_list_url(family_slug, program_slug):
@@ -59,6 +58,14 @@ def get_ui_notification(context, staff=False):
     return MENTOR_NOTIFICATION.format(**context)
 
 
+def get_response(success, detail):
+    return Response({
+        'success': success,
+        'header': SUCCESS_HEADER if success else FAIL_HEADER,
+        'detail': detail
+    })
+
+
 class CancelOfficeHourSessionView(ImpactView):
     permission_classes = (OfficeHourMentorPermission,)
     view_name = 'cancel_office_hour_session_view'
@@ -67,17 +74,17 @@ class CancelOfficeHourSessionView(ImpactView):
         shared_context = get_office_hour_shared_context(office_hour, message)
         if user == office_hour.mentor:
             if office_hour.finalist:
-                raise PermissionDenied(PERMISSION_DENIED)
+                return PERMISSION_DENIED, False
             self.handle_notification(office_hour, shared_context, 'You have')
             ui_notification = get_ui_notification(shared_context)
             office_hour.delete()
-            return ui_notification
+            return ui_notification, True
         else:
             self.handle_notification(
                 office_hour, shared_context, 'MassChallenge has')
             ui_notification = get_ui_notification(shared_context, staff=True)
             office_hour.delete()
-            return ui_notification
+            return ui_notification, True
 
     def post(self, request):
         message = request.data.get('message', None)
@@ -85,11 +92,11 @@ class CancelOfficeHourSessionView(ImpactView):
         try:
             office_hour = MentorProgramOfficeHour.objects.get(pk=id)
         except MentorProgramOfficeHour.DoesNotExist:
-            return Response({'detail': OFFICE_HOUR_SESSION_404})
+            return get_response(False, OFFICE_HOUR_SESSION_404)
         self.check_object_permissions(request, office_hour)
-        response_detail = self.cancel_office_hour_session(
+        response_detail, success = self.cancel_office_hour_session(
             office_hour, request.user, message)
-        return Response({'detail': response_detail})
+        return get_response(success, response_detail)
 
     def get_addressee_info(self, office_hour, mentor_name):
         addressee_dict = {
