@@ -4,6 +4,7 @@ from datetime import (datetime,
 from django.urls import reverse
 
 from accelerator.tests.factories import MentorProgramOfficeHourFactory
+from accelerator.tests.utils import days_from_now
 
 from impact.tests.api_test_case import APITestCase
 from impact.v1.views import OfficeHoursCalendarView
@@ -17,37 +18,12 @@ class TestOfficeHoursCalendarView(APITestCase):
         response = self.get_response(user=office_hour.mentor)
         self.assert_hour_in_response(response, office_hour)
 
-    def create_office_hour(self,
-                           mentor=None,
-                           finalist=None,
-                           start_date_time=None,
-                           duration_minutes=30):
-        create_params = {}
-        if mentor:
-            create_params=mentor
-        duration=timedelta(duration_minutes)            
-        start_date_time = start_date_time or datetime.now()
-        end_date_time = start_date_time + duration
-        create_params['start_date_time'] = start_date_time
-        create_params['end_date_time'] = end_date_time
-        return MentorProgramOfficeHourFactory(**create_params)
-
-    def assert_hour_in_response(self, response, hour):
-        response_data = response.data['calendar_data']
-        self.assertIn(hour.id, [response_hour['id']
-                                for response_hour in response_data])
-
-    def get_response(self, user=None, data=None):
-        user = user or self.staff_user()
-        user.set_password("password")
-        user.save()
-        url = reverse(self.view_name)
-        data = {} or data
-        with self.login(email=user.email):
-            return self.get(url, data=data)
-        
     def test_no_date_specified_does_not_see_last_week(self):
-        pass
+        office_hour = self.create_office_hour(
+            start_date_time=days_from_now(-9))
+        response = self.get_response(user=office_hour.mentor)
+        self.assert_hour_not_in_response(response, office_hour)
+        
     
     def test_sees_correct_range_when_date_specified(self):
         pass
@@ -86,3 +62,40 @@ class TestOfficeHoursCalendarView(APITestCase):
 
     
     
+
+    def create_office_hour(self,
+                           mentor=None,
+                           finalist=None,
+                           start_date_time=None,
+                           duration_minutes=30):
+        create_params = {}
+        if mentor:
+            create_params=mentor
+        duration=timedelta(duration_minutes)            
+        start_date_time = start_date_time or datetime.now()
+        end_date_time = start_date_time + duration
+        create_params['start_date_time'] = start_date_time
+        create_params['end_date_time'] = end_date_time
+        return MentorProgramOfficeHourFactory(**create_params)
+
+    def assert_hour_in_response(self, response, hour):
+        self.assertTrue(check_hour_in_response(response, hour),
+                        msg="The office hour session was not in the response")
+
+    def assert_hour_not_in_response(self, response, hour):
+        self.assertFalse(check_hour_in_response(response, hour),
+                        msg="The office hour session was in the response")
+        
+    def get_response(self, user=None, data=None):
+        user = user or self.staff_user()
+        user.set_password("password")
+        user.save()
+        url = reverse(self.view_name)
+        data = {} or data
+        with self.login(email=user.email):
+            return self.get(url, data=data)
+       
+def check_hour_in_response(response, hour):
+    response_data = response.data['calendar_data']
+    return hour.id in [response_hour['id'] 
+                       for response_hour in response_data]
