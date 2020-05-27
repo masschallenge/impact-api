@@ -10,7 +10,7 @@ from collections import namedtuple
 from itertools import chain
 from django.urls import reverse
 
-from accelerator.models import (
+from mc.models import (
     Application,
     JUDGING_FEEDBACK_STATUS_CONFLICT,
     JUDGING_STATUS_CONFLICT,
