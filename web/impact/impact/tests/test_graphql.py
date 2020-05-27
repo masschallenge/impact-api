@@ -52,6 +52,15 @@ MENTEE_FIELDS = """
     }
 """
 
+MENTOR_PRG_QUERY = """
+            query {{
+                expertProfile(id: {id}){{
+                    mentorProgramRoleGrants
+                }}
+            }}
+        """
+
+
 class TestGraphQL(APITestCase):
     url = reverse('graphql')
     auth_url = reverse('graphql-auth')
@@ -84,6 +93,7 @@ class TestGraphQL(APITestCase):
                     availableOfficeHours
                     officeHoursUrl
                     programInterests
+                    mentorProgramRoleGrants
                 }}
             }}
         """.format(id=user.id)
@@ -100,9 +110,66 @@ class TestGraphQL(APITestCase):
                     'availableOfficeHours': False,
                     'officeHoursUrl': None,
                     'programInterests': [],
+                    'mentorProgramRoleGrants': {'results': []}
                 }
             }
         }
+        self._assert_response_equals_json(query, expected_json)
+
+    def test_mentor_program_role_grants(self):
+        user = ExpertFactory()
+        role_grant = ProgramRoleGrantFactory.create(
+            program_role__user_role__name=UserRole.MENTOR,
+            person=user)
+        program = role_grant.program_role.program
+        program_overview_link = program.program_overview_link
+
+        query = MENTOR_PRG_QUERY.format(id=user.id)
+
+        expected_json = {
+            'data': {
+                'expertProfile': {
+                    'mentorProgramRoleGrants': {'results': [
+                        {'id': role_grant.id,
+                         'program_end_date': program.end_date.isoformat(),
+                         'program_id': program.id,
+                         'program_name': program.name,
+                         'program_overview_link': program_overview_link,
+                         'program_start_date': program.start_date.isoformat(),
+                         'user_role_name': UserRole.MENTOR
+                         }]
+                    }
+                }
+            }}
+        self._assert_response_equals_json(query, expected_json)
+
+    def test_mentor_program_role_grants_only_returns_mentor_roles(self):
+        user = ExpertFactory()
+        program = ProgramFactory()
+        mentor_role_grant = ProgramRoleGrantFactory.create(
+            program_role__user_role__name=UserRole.MENTOR, person=user)
+        program = mentor_role_grant.program_role.program
+        program_overview_link = program.program_overview_link
+        judge_role_grant = ProgramRoleGrantFactory.create(
+            program_role__user_role__name=UserRole.JUDGE, person=user)
+
+        query = MENTOR_PRG_QUERY.format(id=user.id)
+
+        expected_json = {
+            'data': {
+                'expertProfile': {
+                    'mentorProgramRoleGrants': {'results': [
+                        {'id': mentor_role_grant.id,
+                         'program_end_date': program.end_date.isoformat(),
+                         'program_id': program.id,
+                         'program_name': program.name,
+                         'program_overview_link': program_overview_link,
+                         'program_start_date': program.start_date.isoformat(),
+                         'user_role_name': UserRole.MENTOR
+                         }]
+                    }
+                }
+            }}
         self._assert_response_equals_json(query, expected_json)
 
     def test_query_with_entrepreneur(self):
@@ -215,12 +282,12 @@ class TestGraphQL(APITestCase):
         family_slug = mentor_program.program_family.url_slug
         program_slug = mentor_program.url_slug
         office_hours_url = (
-                "/officehours/list/{family_slug}/{program_slug}/"
-                .format(
-                    family_slug=family_slug,
-                    program_slug=program_slug) + (
-                    '?mentor_id={mentor_id}'.format(
-                        mentor_id=confirmed.id)))
+            "/officehours/list/{family_slug}/{program_slug}/"
+            .format(
+                family_slug=family_slug,
+                program_slug=program_slug) + (
+                '?mentor_id={mentor_id}'.format(
+                    mentor_id=confirmed.id)))
 
         query = """
             query {{
@@ -664,7 +731,8 @@ class TestGraphQL(APITestCase):
         user = expert_user(UserRole.MENTOR)
 
         query, expected_json = _user_query(user, "expertProfile")
-        self._assert_response_equals_json(query, expected_json, email=user.email)
+        self._assert_response_equals_json(
+            query, expected_json, email=user.email)
 
     def test_logged_in_entrepreneur_data_is_returned_on_missing_id(self):
         user = EntrepreneurFactory()
