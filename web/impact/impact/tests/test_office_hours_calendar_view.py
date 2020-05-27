@@ -1,22 +1,19 @@
-from datetime import (datetime,
-                      timedelta,
+from datetime import (
+    datetime,
+    timedelta,
 )
 from pytz import utc
 
 from django.urls import reverse
 
 from accelerator.tests.factories import MentorProgramOfficeHourFactory
-from accelerator.tests.utils import (
-    days_from_now,
-    minutes_from_now,
-)
+from accelerator.tests.utils import days_from_now
 
 from impact.tests.api_test_case import APITestCase
-from impact.v1.views import (ISO_8601_DATE_FORMAT,
-                             OfficeHoursCalendarView,
-                             ONE_DAY,
+from impact.v1.views import (
+    ISO_8601_DATE_FORMAT,
+    OfficeHoursCalendarView,
 )
-
 
 
 class TestOfficeHoursCalendarView(APITestCase):
@@ -51,12 +48,13 @@ class TestOfficeHoursCalendarView(APITestCase):
         self.assert_hour_not_in_response(response, office_hour)
 
     def test_hours_returned_in_date_sorted_order(self):
-        start_date_time = utc.localize(datetime(2020,1,31)) # a Wednesday
-        date_spec = start_date_time.strftime(ISO_8601_DATE_FORMAT)
-        office_hour = self.create_office_hour(start_date_time=start_date_time)
-        self.create_office_hour(start_date_time=start_date_time-ONE_DAY,
+        one_day = timedelta(1)
+        wednesday = utc.localize(datetime(2020, 1, 31))
+        date_spec = wednesday.strftime(ISO_8601_DATE_FORMAT)
+        office_hour = self.create_office_hour(start_date_time=wednesday)
+        self.create_office_hour(start_date_time=wednesday-one_day,
                                 mentor=office_hour.mentor)
-        self.create_office_hour(start_date_time=start_date_time+ONE_DAY,
+        self.create_office_hour(start_date_time=wednesday+one_day,
                                 mentor=office_hour.mentor)
         response = self.get_response(user=office_hour.mentor,
                                      date_spec=date_spec)
@@ -64,14 +62,14 @@ class TestOfficeHoursCalendarView(APITestCase):
 
     def test_user_with_no_hours_sees_empty_response(self):
         user = self.basic_user()
-        session = self.create_office_hour()
+        self.create_office_hour()
         response = self.get_response(user=user)
         sessions = response.data['calendar_data']
         self.assertEqual(len(sessions), 0)
 
     def test_user_with_no_hours_gets_success_response(self):
         user = self.basic_user()
-        session = self.create_office_hour()
+        self.create_office_hour()
         response = self.get_response(user=user)
         self.assert_success(response)
 
@@ -91,14 +89,14 @@ class TestOfficeHoursCalendarView(APITestCase):
     def test_return_includes_session_timezones(self):
         office_hour = self.create_office_hour()
         timezones = ["America/New_York", "Asia/Jerusalem", "Africa/Accra"]
-        for tz in timezones:        
+        for tz in timezones:
             self.create_office_hour(timezone=tz,
                                     mentor=office_hour.mentor)
         response = self.get_response(target_user_id=office_hour.mentor_id)
         response_timezones = set(response.data['timezones'])
         self.assertSetEqual(response_timezones, set(timezones))
         self.assertTrue(all([tz in response_timezones for tz in timezones]))
-        
+
     def test_bad_date_spec_gets_fail_response(self):
         bad_date_spec = "2020-20-20"  # this cannot be parsed as a date
         response = self.get_response(date_spec=bad_date_spec)
@@ -127,7 +125,7 @@ class TestOfficeHoursCalendarView(APITestCase):
 
     def assert_hour_not_in_response(self, response, hour):
         self.assertFalse(check_hour_in_response(response, hour),
-                        msg="The office hour session was in the response")
+                         msg="The office hour session was in the response")
 
     def assert_sessions_sorted_by_date(self, response):
         dates = [session['start_date_time']
@@ -136,7 +134,6 @@ class TestOfficeHoursCalendarView(APITestCase):
 
     def assert_success(self, response):
         self.assertTrue(response.data['success'])
-
 
     def assert_failure(self, response, failure_message):
         data = response.data
@@ -159,6 +156,7 @@ class TestOfficeHoursCalendarView(APITestCase):
             data['user_id'] = target_user_id
         with self.login(email=user.email):
             return self.get(url, data=data)
+
 
 def check_hour_in_response(response, hour):
     response_data = response.data['calendar_data']
