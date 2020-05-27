@@ -2,9 +2,11 @@ from datetime import (date,
                       datetime,
                       timedelta,
 )
+from pytz import utc
 
 from rest_framework.response import Response
 
+from django.contrib.auth import get_user_model
 from django.db.models import (
     Count,
     F,
@@ -16,27 +18,30 @@ from impact.permissions.v1_api_permissions import (
     OfficeHourFinalistPermission,
     OfficeHourMentorPermission,
 )
+User = get_user_model()
 
 ISO_8601_DATE_FORMAT = "%Y-%m-%d"
 ONE_DAY = timedelta(1)
 ONE_WEEK = timedelta(8)
-SUCCESS_HEADER = "Placeholder text for success header"
-FAILURE_HEADER = "Placeholder text for failure header"
-
 
 class OfficeHoursCalendarView(ImpactView):
     permission_classes = [OfficeHourFinalistPermission | OfficeHourMentorPermission]
     view_name = "office_hours_calendar_view"
 
+    SUCCESS_HEADER = "Placeholder text for success header"
+    FAILURE_HEADER = "Placeholder text for failure header"
+    BAD_DATE_SPEC = "We were unable to parse the date specifier"
+    NO_SUCH_USER = "We were not able to locate that user"
+
     def fail(self, detail):
         self.response_elements['success'] = False
-        self.response_elements['header'] = FAILURE_HEADER
+        self.response_elements['header'] = self.FAILURE_HEADER
         self.response_elements['detail'] = detail
         self.response_elements['calendar_data'] = None
 
     def succeed(self):
         self.response_elements['success'] = True
-        self.response_elements['header'] = SUCCESS_HEADER
+        self.response_elements['header'] = self.SUCCESS_HEADER
         
     def _get_target_user(self, request):
         user_id = request.query_params.get("user_id", None)
@@ -46,7 +51,7 @@ class OfficeHoursCalendarView(ImpactView):
             try:
                 self.target_user = User.objects.get(pk=user_id)
             except User.DoesNotExist:
-                self.fail(NO_SUCH_USER)                
+                self.fail(self.NO_SUCH_USER)                
                 return False
         return True
 
@@ -56,7 +61,7 @@ class OfficeHoursCalendarView(ImpactView):
         try: 
             self.start_date = start_date(date_spec)
         except ValueError:
-            self.fail(BAD_DATE_SPEC)
+            self.fail(self.BAD_DATE_SPEC)
             return False
         return True
 
@@ -105,14 +110,14 @@ def start_date(date_spec=None):
     # start-of-week
     
     if date_spec:
-        initial_date = datetime.strptime(date_spec, ISO_8601_DATE_FORMAT).date()        
+        initial_date = datetime.strptime(date_spec, ISO_8601_DATE_FORMAT)
     else:
-        initial_date = date.today()
+        initial_date = datetime.now()
 
     # This calculation depends on the fact that monday == 0 in python
     
     start_date = initial_date - timedelta(initial_date.weekday())
     adjusted_start_date = start_date - ONE_DAY
-    return start_date
+    return utc.localize(start_date)
 
     
