@@ -6,7 +6,7 @@ from django.template import loader
 
 from rest_framework.response import Response
 
-from accelerator.models import MentorProgramOfficeHour
+from mc.models import MentorProgramOfficeHour
 from ...minimal_email_handler import MinimalEmailHandler
 from ...permissions.v1_api_permissions import OfficeHourMentorPermission
 from .impact_view import ImpactView

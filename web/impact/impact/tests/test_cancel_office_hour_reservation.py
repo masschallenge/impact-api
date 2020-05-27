@@ -1,21 +1,16 @@
 from django.core import mail
 from django.urls import reverse
 
-from accelerator.tests.factories import (
-    MentorProgramOfficeHourFactory,
-)
-from impact.permissions.v1_api_permissions import (
-    DEFAULT_PERMISSION_DENIED_DETAIL,
-)
-from impact.tests.api_test_case import APITestCase
-from impact.v1.views import (
+from accelerator.tests.factories import MentorProgramOfficeHourFactory
+from .api_test_case import APITestCase
+from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
+from ..v1.views import (
     CancelOfficeHourReservationView,
     formatted_success_notification,
     NO_SUCH_RESERVATION,
     NO_SUCH_OFFICE_HOUR,
 )
-
-from impact.v1.views.cancel_office_hour_reservation_view import (
+from ..v1.views.cancel_office_hour_reservation_view import (
     FAIL_HEADER,
     SUCCESS_HEADER,
 )
