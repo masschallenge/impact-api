@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 from rest_framework.response import Response
 
-from accelerator.models import JudgingRound
+from mc.models import JudgingRound
 from .impact_view import ImpactView
 from ..helpers import (
     CriterionHelper,
