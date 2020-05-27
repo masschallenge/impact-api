@@ -1,11 +1,9 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
-
-from accelerator.models import (
-    CriterionOptionSpec,
-    JudgingRound,
-)
 from rest_framework.response import Response
+
+from accelerator.models import CriterionOptionSpec
+from mc.models import JudgingRound
 from .impact_view import ImpactView
 from ..helpers.model_helper import READ_ONLY_INTEGER_FIELD
 

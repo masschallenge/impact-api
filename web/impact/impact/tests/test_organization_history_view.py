@@ -6,7 +6,7 @@ from jsonschema import Draft4Validator
 
 from django.urls import reverse
 
-from accelerator.models import (
+from mc.models import (
     SUBMITTED_APP_STATUS,
     StartupRole,
 )

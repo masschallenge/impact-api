@@ -2,7 +2,7 @@ from django.core import mail
 from django.urls import reverse
 
 from accelerator.tests.contexts.context_utils import get_user_role_by_name
-from accelerator.models import UserRole
+from mc.models import UserRole
 from accelerator.tests.factories import (
     ProgramFactory,
     ProgramRoleFactory,

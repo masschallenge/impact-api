@@ -6,7 +6,7 @@ from jsonschema import Draft4Validator
 
 from django.urls import reverse
 
-from accelerator.models import (
+from mc.models import (
     CLEARANCE_LEVEL_GLOBAL_MANAGER,
     IN_PERSON_JUDGING_ROUND_TYPE,
     ONLINE_JUDGING_ROUND_TYPE,

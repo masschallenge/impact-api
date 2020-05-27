@@ -4,14 +4,16 @@
 from datetime import datetime
 import dateutil.parser
 from pytz import utc
-from accelerator.models import (
+
+from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
+from django.utils.formats import get_format
+
+from mc.models import (
     Startup,
     StartupTeamMember
 )
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Q
 
-from django.utils.formats import get_format
 
 DAWN_OF_TIME = utc.localize(datetime.strptime(
     "2010-01-01T00:00:00Z",

@@ -8,7 +8,7 @@ from django.test import override_settings
 
 from rest_framework.test import APIClient
 
-from accelerator.models import UserRole
+from mc.models import UserRole
 from accelerator.tests.factories import (
     NamedGroupFactory,
     ProgramFactory,

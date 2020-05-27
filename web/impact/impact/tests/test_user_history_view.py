@@ -7,7 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 from jsonschema import Draft4Validator
 
-from accelerator.models import UserRole
+from mc.models import UserRole
 from .api_test_case import APITestCase
 from .factories import (
     JudgingRoundFactory,

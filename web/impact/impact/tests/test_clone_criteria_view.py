@@ -4,19 +4,17 @@
 from django.urls import reverse
 
 from .api_test_case import APITestCase
+from .utils import assert_fields
 from ..v1.views import (
     CloneCriteriaView,
     SOURCE_JUDGING_ROUND_KEY,
     TARGET_JUDGING_ROUND_KEY,
 )
-from accelerator.models import (
-    CriterionOptionSpec,
-)
+from accelerator.models import CriterionOptionSpec
 from accelerator.tests.factories import (
     CriterionOptionSpecFactory,
     JudgingRoundFactory,
 )
-from .utils import assert_fields
 
 
 class TestCloneCriteriaView(APITestCase):

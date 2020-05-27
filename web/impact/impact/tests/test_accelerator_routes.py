@@ -13,7 +13,7 @@ from accelerator.tests.factories import (
 from accelerator.tests.factories.organization_factory import (
     OrganizationFactory
 )
-from accelerator.models import Startup
+from mc.models import Startup
 
 from ..urls import schema_router
 from .factories import (

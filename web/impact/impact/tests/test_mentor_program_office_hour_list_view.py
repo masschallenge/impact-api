@@ -13,7 +13,7 @@ from pytz import utc
 
 from django.urls import reverse
 
-from accelerator.models import UserRole
+from mc.models import UserRole
 from accelerator.tests.factories import (
     EntrepreneurFactory,
     ExpertFactory,
