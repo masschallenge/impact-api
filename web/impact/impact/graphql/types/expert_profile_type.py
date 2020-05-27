@@ -1,17 +1,20 @@
 import graphene
-from graphene_django import DjangoObjectType
-from graphene.types.generic import GenericScalar
 
 from datetime import datetime
 from django.db.models import Q
 from django.utils import timezone
+from graphene.types.generic import GenericScalar
 from accelerator.models import (
     CONFIRMED_RELATIONSHIP,
     ExpertProfile,
     Program,
     ProgramRole,
-    StartupRole,
-    UserRole
+    UserRole,
+    ProgramRoleGrant
+)
+
+from impact.graphql.types import (
+    BaseUserProfileType,
 )
 from accelerator_abstract.models import (
     ACTIVE_PROGRAM_STATUS,
@@ -23,22 +26,24 @@ from impact.graphql.types import StartupMentorRelationshipType
 
 from impact.utils import (
     compose_filter,
-    get_user_program_and_startup_roles,
+)
+from impact.v1.views.utils import (
+    map_data,
 )
 from impact.v1.helpers.profile_helper import (
     latest_program_id_for_each_program_family,
 )
 
 
-class ExpertProfileType(DjangoObjectType):
+class ExpertProfileType(BaseUserProfileType):
     current_mentees = graphene.List(StartupMentorRelationshipType)
     previous_mentees = graphene.List(StartupMentorRelationshipType)
     image_url = graphene.String()
     office_hours_url = graphene.String()
     program_interests = graphene.List(graphene.String)
     available_office_hours = graphene.Boolean()
-    program_roles = GenericScalar()
     confirmed_mentor_program_families = graphene.List(graphene.String)
+    mentor_program_role_grants = GenericScalar()
 
     class Meta:
         model = ExpertProfile
@@ -124,18 +129,42 @@ class ExpertProfileType(DjangoObjectType):
             'program_role__program__program_family__name',
             flat=True).distinct()
 
-    def resolve_program_roles(self, info, **kwargs):
+    def resolve_mentor_program_role_grants(self, info, **kwargs):
         """
-        Returns the program roles and startup roles for this user
-        Note that name is deceptive, since startup roles are included in the
-        return but not mentioned in the name. This cannot be fixed here
-        without changing GraphQL queries on the front end.
+        Returns the mentor program grants for a user
         """
-        user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-        startup_roles_of_interest = [StartupRole.ENTRANT]
-        startup_roles_of_interest += StartupRole.WINNER_STARTUP_ROLES
-        return get_user_program_and_startup_roles(
-            self.user, user_roles_of_interest, startup_roles_of_interest)
+        roles = [UserRole.MENTOR, UserRole.DESIRED_MENTOR,
+                 UserRole.DEFERRED_MENTOR]
+        results = map_data(
+            ProgramRoleGrant,
+            Q(person_id=self.user.pk, program_role__user_role__name__in=roles,
+              program_role__program__program_status__in=['active', 'upcoming']),
+            '-program_role__program__start_date',
+            [
+                'id',
+                'program_role__program__id',
+                'program_role__program__name',
+                'program_role__program__start_date',
+                'program_role__program__end_date',
+                'program_role__user_role__name',
+                'program_role__program__program_overview_link',
+            ],
+            [
+                'id',
+                'program_id',
+                'program_name',
+                'program_start_date',
+                'program_end_date',
+                'user_role_name',
+                'program_overview_link',
+            ]
+        )
+
+        for data in results:
+            data['program_start_date'] = data['program_start_date'].isoformat()
+            data['program_end_date'] = data['program_end_date'].isoformat()
+
+        return {"results": results}
 
 
 def _get_slugs(obj, mentor_program, latest_mentor_program, **kwargs):

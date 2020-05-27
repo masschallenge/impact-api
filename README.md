@@ -98,6 +98,16 @@ on which the Django project is running (service "web"), run `make bash-shell`.
 * In order to access the Django shell, run `make django-shell`.
 * In order to access the mysql shell, run `make db-shell`.
 
+### Writing to/reading from the host machine
+If you need to write out data from a local impact-api instance to your host
+machine's drive, the directory `/wwwroot` on the docker 
+container is mapped to `impact-api/web/impact` on your host machine. If you are
+working in a Django shell on the impact-api container, creating a filehandle 
+`f = open("/wwwroot/foo.txt", "w")`will allow you to write out data to 
+an accessible location on your host machine. Similarly, to test a script or data 
+file locally, place it in `impact-api/web/impact` to make it available on the 
+impact-api docker container. 
+
 
 ### Running A Web Server In Supervisor/Debug Mode
 
@@ -129,7 +139,7 @@ https://mike.tig.as/blog/2010/09/14/pdb/
 
 
 #### Supervisor Mode
-At times, you may want to see the gunicorn + supervisor
+At times, you may want to see the waitress + supervisor
 server as is being run in production. This mode also shows
 a more detailed output of the docker-compose up command 
 that is executed in the background.

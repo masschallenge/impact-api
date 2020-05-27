@@ -12,7 +12,6 @@ algoliasearch<2.0.0
 newrelic
 
 # Misc
-gunicorn
 oauth2_provider
 pycrypto
 pytz
@@ -20,8 +19,8 @@ urllib3
 mock
 pycrypto
 python-magic
-gunicorn
 numpy
+waitress
 
 # Django
 boto3==1.6.0

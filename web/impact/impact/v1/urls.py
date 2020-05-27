@@ -5,6 +5,8 @@ from impact.v1.views import (
     AnalyzeJudgingRoundView,
     ApplicationDetailView,
     ApplicationListView,
+    CancelOfficeHourReservationView,
+    CancelOfficeHourSessionView,
     CloneCriteriaView,
     CreditCodeDetailView,
     CreditCodeListView,
@@ -34,7 +36,8 @@ from impact.v1.views import (
     UserDetailView,
     UserHistoryView,
     UserListView,
-    UserOrganizationsView
+    UserOrganizationsView,
+    MentorParticipationView,
 )
 
 v1_urlpatterns = [
@@ -50,6 +53,9 @@ v1_urlpatterns = [
     url(r"^application/$",
         ApplicationListView.as_view(),
         name=ApplicationListView.view_name),
+    url("^cancel_office_hour_reservation/$",
+        CancelOfficeHourReservationView.as_view(),
+        name=CancelOfficeHourReservationView.view_name),
     url(r"^clone_criteria/$",
         CloneCriteriaView.as_view(),
         name=CloneCriteriaView.view_name),
@@ -140,4 +146,10 @@ v1_urlpatterns = [
     url(r"^user/(?P<pk>[0-9]+)/organizations/$",
         UserOrganizationsView.as_view(),
         name=UserOrganizationsView.view_name),
+    url(r"^cancel_office_hour_session/$",
+        CancelOfficeHourSessionView.as_view(),
+        name=CancelOfficeHourSessionView.view_name),
+    url(r"^expert/program-confirmation/$",
+        MentorParticipationView.as_view(),
+        name=MentorParticipationView.view_name),
 ]
