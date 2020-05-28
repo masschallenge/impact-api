@@ -11,6 +11,7 @@ class MinimalEmailHandler:
       (attachment_text, MIME_type)
       (generally used for html version of the email)
     '''
+
     def __init__(self,
                  to,
                  subject,
@@ -24,7 +25,7 @@ class MinimalEmailHandler:
             body,
             to=to,
             bcc=bcc or [settings.BCC_EMAIL],
-            from_email=from_email or [settings.NO_REPLY_EMAIL])
+            from_email=from_email or settings.NO_REPLY_EMAIL)
         if attachment:
             self.email.attach(*attachment)
         if attach_alternative:
