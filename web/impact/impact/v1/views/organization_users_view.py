@@ -4,7 +4,7 @@
 from django.db.models import Q
 from rest_framework.response import Response
 
-from accelerator.models import (
+from mc.models import (
     Organization,
     PartnerTeamMember,
     StartupTeamMember,
