@@ -15,8 +15,16 @@ from impact.v1.views import (
     NO_SUCH_OFFICE_HOUR,
 )
 
+from impact.v1.views.cancel_office_hour_reservation_view import (
+    FAIL_HEADER,
+    SUCCESS_HEADER,
+)
+
 
 class TestCancelOfficeHourReservationView(APITestCase):
+    fail_header = FAIL_HEADER
+    success_header = SUCCESS_HEADER
+
     def test_finalist_cancels_their_own_office_hour_reservation(self):
         office_hour = MentorProgramOfficeHourFactory()
         self._submit_cancellation(office_hour, user=office_hour.finalist)
@@ -36,7 +44,7 @@ class TestCancelOfficeHourReservationView(APITestCase):
         response = self._submit_cancellation(office_hour,
                                              user=office_hour.finalist)
         notification = formatted_success_notification(office_hour)
-        self.assert_ui_notification(response, notification)
+        self.assert_ui_notification(response, True, notification)
 
     def test_finalist_cancels_mentor_gets_notification(self):
         '''A finalist cancelling their reservation should trigger a
@@ -66,18 +74,18 @@ class TestCancelOfficeHourReservationView(APITestCase):
         response = self._submit_cancellation(office_hour,
                                              user=self.staff_user())
         notification = formatted_success_notification(office_hour)
-        self.assert_ui_notification(response, notification)
+        self.assert_ui_notification(response, True, notification)
 
     def test_staff_user_cancels_nonexistent_reservation_ui_notification(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         response = self._submit_cancellation(office_hour,
                                              user=self.staff_user())
-        self.assert_ui_notification(response, NO_SUCH_RESERVATION)
+        self.assert_ui_notification(response, False, NO_SUCH_RESERVATION)
 
     def test_staff_user_cancels_nonexistent_hour_ui_notification(self):
         response = self._submit_cancellation(None,
                                              user=self.staff_user())
-        self.assert_ui_notification(response, NO_SUCH_OFFICE_HOUR)
+        self.assert_ui_notification(response, False, NO_SUCH_OFFICE_HOUR)
 
     def test_staff_user_trigger_notification_mentor(self):
         '''A staff user cancelling someone else's office hour should trigger a
@@ -111,7 +119,8 @@ class TestCancelOfficeHourReservationView(APITestCase):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         response = self._submit_cancellation(office_hour,
                                              user=self.make_user())
-        self.assert_ui_notification(response, DEFAULT_PERMISSION_DENIED_DETAIL)
+        notification = {'detail': DEFAULT_PERMISSION_DENIED_DETAIL}
+        self.assertEqual(response.data, notification)
 
     def test_user_cancels_non_existent_reservation_no_notification(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
@@ -159,4 +168,3 @@ class TestCancelOfficeHourReservationView(APITestCase):
         self.assertEqual(office_hour.finalist,
                          old_finalist,
                          msg="Reservation was cancelled")
-
