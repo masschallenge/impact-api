@@ -3,7 +3,7 @@
 import json
 from django.urls import reverse
 
-from accelerator.models import StartupRole, UserRole, Location
+from accelerator.models import StartupRole, UserRole
 from accelerator.tests.contexts import (
     StartupTeamMemberContext,
     UserRoleContext
@@ -150,7 +150,7 @@ class TestGraphQL(APITestCase):
             program_role__user_role__name=UserRole.MENTOR, person=user)
         program = mentor_role_grant.program_role.program
         program_overview_link = program.program_overview_link
-        judge_role_grant = ProgramRoleGrantFactory.create(
+        ProgramRoleGrantFactory.create(
             program_role__user_role__name=UserRole.JUDGE, person=user)
 
         query = MENTOR_PRG_QUERY.format(id=user.id)
@@ -763,7 +763,8 @@ class TestGraphQL(APITestCase):
             ).user
 
         program_role = user.programrolegrant_set.filter(
-            program_role__program__program_status="active", program_role__user_role__name__in=desired_user_roles
+            program_role__program__program_status="active",
+            program_role__user_role__name__in=desired_user_roles
         ).first().program_role
 
         program_family = program_role.program.program_family
@@ -796,8 +797,6 @@ class TestGraphQL(APITestCase):
 
         self._assert_response_equals_json(
             query=query, expected_json=expected_json)
-
-
 
     def _assert_expert_can_view_profile(self, expert_role, profile_user_role):
         current_user = expert_user(expert_role)

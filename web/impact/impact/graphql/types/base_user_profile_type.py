@@ -6,7 +6,6 @@ import graphene
 from accelerator.models import (
     BaseProfile,
     StartupRole,
-    ProgramRole,
     Clearance,
     UserRole,
     Location
@@ -17,6 +16,7 @@ from accelerator_abstract.models.base_user_utils import is_employee
 from impact.utils import (
     get_user_program_and_startup_roles,
 )
+
 
 class BaseUserProfileType(DjangoObjectType):
     office_hour_locations = graphene.List(LocationType)
@@ -39,7 +39,6 @@ class BaseUserProfileType(DjangoObjectType):
         return get_user_program_and_startup_roles(
             self.user, user_roles_of_interest, startup_roles_of_interest)
 
-
     def resolve_office_hour_locations(self, info, **kwargs):
         family_ids = Clearance.objects.clearances_for_user(
             self.user
@@ -47,7 +46,8 @@ class BaseUserProfileType(DjangoObjectType):
         desired_user_roles = [
             UserRole.MENTOR, UserRole.FINALIST, UserRole.AIR]
         program_family_ids = self.user.programrolegrant_set.filter(
-            program_role__program__program_status="active", program_role__user_role__name__in=desired_user_roles
+            program_role__program__program_status="active",
+            program_role__user_role__name__in=desired_user_roles
             ).values_list(
                 "program_role__program__program_family", flat=True
                 ).distinct()

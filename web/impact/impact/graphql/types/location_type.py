@@ -1,5 +1,4 @@
 from graphene_django import DjangoObjectType
-import graphene
 
 
 from accelerator.models import Location
