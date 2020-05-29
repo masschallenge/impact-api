@@ -110,8 +110,8 @@ urls = [
             graphiql=settings.DEBUG,
             schema=auth_schema)),
         name="graphql-auth"),
-    # url(r'^oauth/', include('oauth2_provider.urls',
-    # namespace='oauth2_provider')),
+    url(r'^oauth/', include('oauth2_provider.urls',
+    namespace='oauth2_provider')),
     url(r'^schema/$', schema_view, name='schema'),
     url(r'^directory/(?:.*)$', TemplateView.as_view(
         template_name='front-end.html'),
