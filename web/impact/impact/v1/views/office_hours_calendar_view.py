@@ -9,8 +9,12 @@ from rest_framework.response import Response
 
 from django.contrib.auth import get_user_model
 from django.db.models import (
+    BooleanField,
+    Case,
     Count,
     F,
+    When,
+    Value,
 )
 
 from . import ImpactView
@@ -67,20 +71,32 @@ class OfficeHoursCalendarView(ImpactView):
         office_hours = MentorProgramOfficeHour.objects.filter(
              mentor=self.target_user,
              start_date_time__range=[self.start_date, end_date]).order_by(
-                 'start_date_time').annotate(finalist_count=Count("finalist"))
+                 'start_date_time').annotate(
+                     finalist_count=Count("finalist")).annotate(
+                         reserved=Case(
+                             When(finalist_count__gt=0, then=Value(True)),
+                             default=Value(False),
+                             output_field=BooleanField()))                
 
         self.response_elements['calendar_data'] = office_hours.values(
             "id",
+            "mentor_id",
+            "finalist_id", 
             "start_date_time",
             "end_date_time",
-            "mentor__last_name",
-            "mentor__first_name",
-            "mentor__expertprofile__title",
             "description",
             "topics",
-            "finalist__first_name",
-            "finalist__last_name",
-            reserved=F("finalist_count"),
+            "startup_id",
+            "reserved",
+            location_name=F("location__name"),
+            location_timezone=F("location__timezone"),
+            finalist_first_name=F("finalist__first_name"),
+            finalist_last_name=F("finalist__last_name"),
+            mentor_title=F("mentor__expertprofile__title"),
+            mentor_company=F("mentor__expertprofile__company"),
+            mentor_first_name=F("mentor__first_name"),
+            mentor_last_namf=F("mentor__last_name"),
+            startup_name=F("startup__organization__name"),
         )
 
         self.response_elements['timezones'] = office_hours.order_by(
