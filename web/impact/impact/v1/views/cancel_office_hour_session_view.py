@@ -26,28 +26,26 @@ SUCCESS_HEADER = 'Canceled office hour session'
 FAIL_HEADER = 'Office hour session could not be canceled'
 
 
-def get_office_hours_list_url(family_slug, program_slug):
+def get_office_hours_url():
     site_url = 'accelerate.masschallenge.org'
-    return 'https://{}/officehours/list/{}/{}'.format(
-        site_url, family_slug, program_slug
-    )
+    return 'https://{}/newofficehour/'.format(site_url)
 
 
 def get_office_hour_shared_context(office_hour, message=None):
-    family_slug = office_hour.program.program_family.url_slug
-    program_slug = office_hour.program.url_slug
     tz = timezone(office_hour.location.timezone or DEFAULT_TIMEZONE)
     date = office_hour.start_date_time.astimezone(tz).strftime('%A, %d %B, %Y')
     start_time = office_hour.start_date_time.astimezone(tz).strftime('%I:%M%p')
     end_time = office_hour.end_date_time.astimezone(tz).strftime('%I:%M%p')
+    program = office_hour.program
+    phone = program.program_family.phone_number if program else ''
     return {
         'date': date,
         'start_time': start_time,
         'end_time': end_time,
         'location': office_hour.location.name if office_hour.location else '',
-        'dashboard_url': get_office_hours_list_url(family_slug, program_slug),
+        'dashboard_url': get_office_hours_url(),
         'mentor_name': office_hour.mentor.get_profile().full_name(),
-        'phone': office_hour.program.program_family.phone_number,
+        'phone': phone,
         'message': message,
     }
 

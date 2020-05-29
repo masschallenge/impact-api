@@ -46,7 +46,8 @@ class MentorProgramOfficeHourHelper(ModelHelper):
 
     @property
     def program_family(self):
-        return self.subject.program.program_family.name
+        program = self.subject.program
+        return program.program_family.name if program else ''
 
     @property
     def location(self):
