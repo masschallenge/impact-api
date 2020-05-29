@@ -25,9 +25,8 @@ ONE_WEEK = timedelta(8)
 class OfficeHoursCalendarView(ImpactView):
     permission_classes = []
     view_name = "office_hours_calendar_view"
-
-    SUCCESS_HEADER = "Placeholder text for success header"
-    FAILURE_HEADER = "Placeholder text for failure header"
+    SUCCESS_HEADER = "Office hours fetched successfully"
+    FAILURE_HEADER = "Office hours could not be fetched"
     BAD_DATE_SPEC = "We were unable to parse the date specifier"
     NO_SUCH_USER = "We were not able to locate that user"
 
