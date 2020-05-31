@@ -27,13 +27,15 @@ class CalendarReminderView(View):
         title = params.get('title', 'new reminder')
         description = params.get('description', '')
         location = params.get('location', 'MassChallenge')
+        timezone = params.get('timezone', 'UTC')
         link_type = params.get('link_type', 'data')
         add2cal = Add2Cal(
             start=start,
             end=end,
             title=title,
             description=description,
-            location=location)
+            location=location,
+            timezone=timezone)
         calendar_data = add2cal.as_dict()
         if link_type == ICAL_LINK_TYPE:
             response = HttpResponse(
