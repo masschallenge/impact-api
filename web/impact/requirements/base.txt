@@ -53,4 +53,4 @@ django-oidc-provider==0.7.0
 django-sitetree==1.13.1
 django-graphql-jwt==0.1.10
 
-git+https://github.com/masschallenge/add2cal
+git+https://github.com/masschallenge/add2cal/tree/AC-7728
