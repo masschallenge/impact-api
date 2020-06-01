@@ -1,6 +1,6 @@
 from . import BasePermission
 from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
-from accelerator.models import UserRole
+from mc.models import UserRole
 from accelerator_abstract.models.base_user_utils import is_employee
 from accelerator_abstract.models.base_permission_checks import (
     base_accelerator_check

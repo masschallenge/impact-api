@@ -3,7 +3,7 @@ from django.db.models import F
 from django.template import loader
 from rest_framework.exceptions import ParseError
 from rest_framework.response import Response
-from accelerator.models import (
+from mc.models import (
     UserRole,
     Program,
     ProgramRoleGrant,

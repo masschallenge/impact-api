@@ -4,7 +4,7 @@ from datetime import datetime
 from django.db.models import Value as V
 from django.db.models.functions import Concat
 
-from accelerator.models import UserRole
+from mc.models import UserRole
 from ..helpers import (
     MentorProgramOfficeHourHelper,
 )

@@ -1,10 +1,8 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from accelerator.models import UserRole
-from .base_user_became_judge_event import (
-    BaseUserBecameJudgeEvent,
-)
+from mc.models import UserRole
+from .base_user_became_judge_event import BaseUserBecameJudgeEvent
 
 
 class UserBecameDesiredJudgeEvent(BaseUserBecameJudgeEvent):
