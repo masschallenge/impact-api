@@ -4,7 +4,7 @@ from datetime import datetime
 from django.db.models import Q
 from django.utils import timezone
 from graphene.types.generic import GenericScalar
-from accelerator.models import (
+from mc.models import (
     CONFIRMED_RELATIONSHIP,
     ExpertProfile,
     Program,

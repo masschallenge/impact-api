@@ -1,7 +1,7 @@
 from graphene_django import DjangoObjectType
 from graphene.types.generic import GenericScalar
 
-from accelerator.models import (
+from mc.models import (
     BaseProfile,
     StartupRole,
     UserRole

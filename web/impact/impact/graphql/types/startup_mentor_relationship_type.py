@@ -1,7 +1,7 @@
 import graphene
 from graphene_django import DjangoObjectType
 
-from accelerator.models import StartupMentorRelationship
+from mc.models import StartupMentorRelationship
 from .program_type import ProgramType
 from .expert_startup_type import ExpertStartupType
 

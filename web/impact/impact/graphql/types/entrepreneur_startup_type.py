@@ -1,6 +1,6 @@
 import graphene
 
-from accelerator.models import (
+from mc.models import (
     StartupStatus,
     Startup,
 )

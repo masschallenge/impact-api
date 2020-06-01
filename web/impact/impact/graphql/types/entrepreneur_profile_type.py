@@ -1,5 +1,5 @@
 import graphene
-from accelerator.models import (
+from mc.models import (
     EntrepreneurProfile,
     Startup,
     StartupTeamMember

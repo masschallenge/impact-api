@@ -1,6 +1,6 @@
 from graphene_django import DjangoObjectType
 
-from accelerator.models.program_family import ProgramFamily
+from mc.models import ProgramFamily
 
 
 class ProgramFamilyType(DjangoObjectType):

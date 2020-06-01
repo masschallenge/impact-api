@@ -1,4 +1,4 @@
-from accelerator.models import Startup
+from mc.models import Startup
 from . import StartupType
 
 

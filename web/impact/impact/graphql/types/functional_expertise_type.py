@@ -1,5 +1,5 @@
 from graphene_django import DjangoObjectType
-from accelerator.models.functional_expertise import FunctionalExpertise
+from mc.models import FunctionalExpertise
 
 
 class FunctionalExpertiseType(DjangoObjectType):
