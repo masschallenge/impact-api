@@ -1,88 +1,164 @@
-from datetime import (datetime,
-                      timedelta,
+from datetime import (
+    datetime,
+    timedelta,
 )
+from pytz import utc
+
 from django.urls import reverse
 
 from accelerator.tests.factories import MentorProgramOfficeHourFactory
+from accelerator.tests.utils import days_from_now
 
 from impact.tests.api_test_case import APITestCase
-from impact.v1.views import OfficeHoursCalendarView
+from impact.v1.views import (
+    ISO_8601_DATE_FORMAT,
+    OfficeHoursCalendarView,
+)
 
 
 class TestOfficeHoursCalendarView(APITestCase):
-    view_name = OfficeHoursCalendarView.view_name
-    
+    view = OfficeHoursCalendarView
+
     def test_no_date_specified_sees_current_week(self):
         office_hour = self.create_office_hour()
         response = self.get_response(user=office_hour.mentor)
         self.assert_hour_in_response(response, office_hour)
 
+    def test_no_date_specified_does_not_see_last_week(self):
+        office_hour = self.create_office_hour(
+            start_date_time=days_from_now(-9))
+        response = self.get_response(user=office_hour.mentor)
+        self.assert_hour_not_in_response(response, office_hour)
+
+    def test_date_specified_sees_sessions_in_range(self):
+        two_weeks_ago = days_from_now(-14)
+        date_spec = two_weeks_ago.strftime(ISO_8601_DATE_FORMAT)
+        office_hour = self.create_office_hour(
+            start_date_time=two_weeks_ago)
+        response = self.get_response(user=office_hour.mentor,
+                                     date_spec=date_spec)
+        self.assert_hour_in_response(response, office_hour)
+
+    def test_date_specified_does_not_see_sessions_not_in_range(self):
+        two_weeks_ago = days_from_now(-14)
+        date_spec = two_weeks_ago.strftime(ISO_8601_DATE_FORMAT)
+        office_hour = self.create_office_hour()
+        response = self.get_response(user=office_hour.mentor,
+                                     date_spec=date_spec)
+        self.assert_hour_not_in_response(response, office_hour)
+
+    def test_hours_returned_in_date_sorted_order(self):
+        one_day = timedelta(1)
+        wednesday = utc.localize(datetime(2020, 1, 31))
+        date_spec = wednesday.strftime(ISO_8601_DATE_FORMAT)
+        office_hour = self.create_office_hour(start_date_time=wednesday)
+        self.create_office_hour(start_date_time=wednesday-one_day,
+                                mentor=office_hour.mentor)
+        self.create_office_hour(start_date_time=wednesday+one_day,
+                                mentor=office_hour.mentor)
+        response = self.get_response(user=office_hour.mentor,
+                                     date_spec=date_spec)
+        self.assert_sessions_sorted_by_date(response)
+
+    def test_user_with_no_hours_sees_empty_response(self):
+        user = self.basic_user()
+        self.create_office_hour()
+        response = self.get_response(user=user)
+        sessions = response.data['calendar_data']
+        self.assertEqual(len(sessions), 0)
+
+    def test_user_with_no_hours_gets_success_response(self):
+        user = self.basic_user()
+        self.create_office_hour()
+        response = self.get_response(user=user)
+        self.assert_success(response)
+
+    def test_user_with_no_hours_in_range_sees_empty_response(self):
+        two_weeks_ago = days_from_now(-14)
+        session = self.create_office_hour(start_date_time=two_weeks_ago)
+        response = self.get_response(user=session.mentor)
+        sessions = response.data['calendar_data']
+        self.assertEqual(len(sessions), 0)
+
+    def test_user_with_no_hours_in_range_sees_success_response(self):
+        two_weeks_ago = days_from_now(-14)
+        session = self.create_office_hour(start_date_time=two_weeks_ago)
+        response = self.get_response(user=session.mentor)
+        self.assert_success(response)
+
+    def test_return_includes_session_timezones(self):
+        office_hour = self.create_office_hour()
+        timezones = ["America/New_York", "Asia/Jerusalem", "Africa/Accra"]
+        for tz in timezones:
+            self.create_office_hour(timezone=tz,
+                                    mentor=office_hour.mentor)
+        response = self.get_response(target_user_id=office_hour.mentor_id)
+        response_timezones = set(response.data['timezones'])
+        self.assertSetEqual(response_timezones, set(timezones))
+        self.assertTrue(all([tz in response_timezones for tz in timezones]))
+
+    def test_bad_date_spec_gets_fail_response(self):
+        bad_date_spec = "2020-20-20"  # this cannot be parsed as a date
+        response = self.get_response(date_spec=bad_date_spec)
+        self.assert_failure(response, self.view.BAD_DATE_SPEC)
+
     def create_office_hour(self,
                            mentor=None,
                            finalist=None,
                            start_date_time=None,
-                           duration_minutes=30):
+                           duration_minutes=30,
+                           timezone="America/New_York"):
         create_params = {}
         if mentor:
-            create_params=mentor
-        duration=timedelta(duration_minutes)            
-        start_date_time = start_date_time or datetime.now()
+            create_params['mentor'] = mentor
+        duration = timedelta(duration_minutes)
+        start_date_time = start_date_time or utc.localize(datetime.now())
         end_date_time = start_date_time + duration
         create_params['start_date_time'] = start_date_time
         create_params['end_date_time'] = end_date_time
+        create_params['location__timezone'] = timezone
         return MentorProgramOfficeHourFactory(**create_params)
 
     def assert_hour_in_response(self, response, hour):
-        response_data = response.data['calendar_data']
-        self.assertIn(hour.id, [response_hour['id']
-                                for response_hour in response_data])
+        self.assertTrue(check_hour_in_response(response, hour),
+                        msg="The office hour session was not in the response")
 
-    def get_response(self, user=None, data=None):
+    def assert_hour_not_in_response(self, response, hour):
+        self.assertFalse(check_hour_in_response(response, hour),
+                         msg="The office hour session was in the response")
+
+    def assert_sessions_sorted_by_date(self, response):
+        dates = [session['start_date_time']
+                 for session in response.data['calendar_data']]
+        self.assertEqual(dates, sorted(dates))
+
+    def assert_success(self, response):
+        self.assertTrue(response.data['success'])
+
+    def assert_failure(self, response, failure_message):
+        data = response.data
+        self.assertFalse(data['success'])
+        self.assertEqual(data['header'], self.view.FAILURE_HEADER)
+        self.assertEqual(data['detail'], failure_message)
+
+    def get_response(self,
+                     user=None,
+                     target_user_id=None,
+                     date_spec=None):
         user = user or self.staff_user()
         user.set_password("password")
         user.save()
-        url = reverse(self.view_name)
-        data = {} or data
+        url = reverse(self.view.view_name)
+        data = {}
+        if date_spec is not None:
+            data['date_spec'] = date_spec
+        if target_user_id is not None:
+            data['user_id'] = target_user_id
         with self.login(email=user.email):
             return self.get(url, data=data)
-        
-    def test_no_date_specified_does_not_see_last_week(self):
-        pass
-    
-    def test_sees_correct_range_when_date_specified(self):
-        pass
-    
-    def test_mentor_with_hours_sees_hours_in_range(self):
-        pass
 
-    def test_mentor_with_hours_does_not_see_hours_out_of_range(self):
-        pass
 
-    def test_mentor_sees_hours_in_sorted_order(self):
-        pass
-
-    def test_office_hour_has_correct_mentor_information(self):
-        pass
-
-    def test_office_hour_has_correct_finalist_information(self):
-        pass
-
-    def test_user_with_no_hours_sees_empty_response(self):
-        pass
-
-    def test_user_with_no_hours_sees_success_response(self):
-        pass
-
-    def test_user_with_no_hours_in_range_sees_empty_response(self):
-        pass
-
-    def test_user_with_no_hours_in_range_sees_success_response(self):
-        pass
-
-    def test_bad_date_spec_gets_fail_response(self):
-        pass
-
-    
-
-    
-    
+def check_hour_in_response(response, hour):
+    response_data = response.data['calendar_data']
+    return hour.id in [response_hour['id']
+                       for response_hour in response_data]
