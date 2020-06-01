@@ -95,7 +95,7 @@ class OfficeHoursCalendarView(ImpactView):
             mentor_title=F("mentor__expertprofile__title"),
             mentor_company=F("mentor__expertprofile__company"),
             mentor_first_name=F("mentor__first_name"),
-            mentor_last_namf=F("mentor__last_name"),
+            mentor_last_name=F("mentor__last_name"),
             startup_name=F("startup__organization__name"),
         )
 
