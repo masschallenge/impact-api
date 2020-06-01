@@ -1,16 +1,16 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
+from itertools import chain
 
 from django.db.models import Count
-from itertools import chain
-from accelerator.models import (
+from rest_framework.response import Response
+
+from accelerator.models import CriterionOptionSpec
+from mc.models import (
     Application,
-    CriterionOptionSpec,
     JudgePanelAssignment,
     JudgingRound,
-
 )
-from rest_framework.response import Response
 from . import (
     find_criterion_helpers,
     ImpactView,
