@@ -25,6 +25,7 @@ class TestCalendarReminderView(APITestCase):
             title="mentoring session with dj shank",
             location='boston',
             description='test'
+            timezone="America/New_York"
         )
 
     def test_outlook_reminder_link(self):
