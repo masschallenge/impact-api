@@ -36,7 +36,8 @@ class TestCalendarReminderView(APITestCase):
                 "end": "20190523T144641",
                 "title": "mentoring session with dj shank",
                 'location': 'boston',
-                'description': 'test'
+                'description': 'test',
+                'timezone': 'America/New_York'
             }
             response = self.get("calendar_reminder_view", data=params)
             self.response_302()
@@ -53,7 +54,8 @@ class TestCalendarReminderView(APITestCase):
                 "end": "20190523T144641",
                 "title": "mentoring session with dj shank",
                 'location': 'boston',
-                'description': 'test'
+                'description': 'test',
+                'timezone': 'America/New_York'
             }
             response = self.get("calendar_reminder_view", data=params)
             self.response_302()
@@ -70,7 +72,8 @@ class TestCalendarReminderView(APITestCase):
                 "end": "20190523T144641",
                 "title": "mentoring session with dj shank",
                 'location': 'boston',
-                'description': 'test'
+                'description': 'test',
+                'timezone': 'America/New_York'
             }
             response = self.get("calendar_reminder_view", data=params)
             self.response_302()
@@ -87,7 +90,8 @@ class TestCalendarReminderView(APITestCase):
                 "end": "20190523T144641",
                 "title": "mentoring session with dj shank",
                 'location': 'boston',
-                'description': 'test'
+                'description': 'test',
+                'timezone': 'America/New_York'
             }
             response = self.get("calendar_reminder_view", data=params)
             self.response_200()
