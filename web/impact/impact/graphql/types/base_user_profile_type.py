@@ -52,6 +52,10 @@ class BaseUserProfileType(DjangoObjectType):
                 "program_role__program__program_family", flat=True
                 ).distinct()
         ids = list(set(chain(family_ids, program_family_ids)))
+        remote = Location.objects.filter(name='remote').first()
+        result = Location.objects.filter(
+            programfamilylocation__program_family_id__in=ids).distinct()
+        locations = [x for x in result]
+        locations.append(remote)
 
-        return Location.objects.filter(
-            programfamilylocation__program_family_id__in=ids)
+        return locations
