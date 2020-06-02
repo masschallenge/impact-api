@@ -772,8 +772,14 @@ class TestGraphQL(APITestCase):
         location = LocationFactory(
             name='Nigeria', street_address='18 pius eze', city='Ago')
 
+        location1 = LocationFactory(
+            name='Remote', street_address='18 pius eze', city='Ago')
+
         ProgramFamilyLocationFactory.create(
             program_family=program_family, location=location)
+
+        ProgramFamilyLocationFactory.create(
+            program_family=program_family, location=location1)
 
         query = """
             query{{
@@ -789,6 +795,9 @@ class TestGraphQL(APITestCase):
                     'officeHourLocations': [
                         {
                             'name': location.name
+                        },
+                        {
+                            'name': 'Remote'
                         }
                     ]
                 }
