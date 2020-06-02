@@ -13,10 +13,11 @@ from django.db.models import (
     Case,
     Count,
     F,
+    Q,
     When,
     Value,
 )
-
+from impact.utils import compose_filter
 from . import ImpactView
 from accelerator.models import MentorProgramOfficeHour
 User = get_user_model()
@@ -98,12 +99,28 @@ class OfficeHoursCalendarView(ImpactView):
             mentor_last_name=F("mentor__last_name"),
             startup_name=F("startup__organization__name"),
         )
-
+        self.response_elements['location_choices'] = self.location_choices()
         self.response_elements['timezones'] = office_hours.order_by(
             "location__timezone").values_list(
                 "location__timezone", flat=True).distinct()
+        self.response_elements['location_choices'] = self.location_choices()
         self.succeed()
 
+    def location_choices(self):
+        office_hours_holder = Q(program_role__user_role__name__in=['MENTOR', 'AIR'])
+        active_program = Q(program_role__program__program_status='active')
+        location_path = "__".join(["program_role",
+                                   "program",
+                                   "program_family",
+                                   "programfamilylocation",
+                                   "location"])
+        location_name = location_path + "__name"
+        location_id = location_path + "__id"
+        return self.target_user.programrolegrant_set.filter(
+            office_hours_holder and
+            active_program).values_list(
+                location_name, location_id)        
+            
     def get(self, request):
         self.response_elements = {}
         (self._get_target_user(request) and
