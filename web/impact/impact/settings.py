@@ -103,8 +103,6 @@ class Base(Configuration):
 
     ACCELERATOR_MODELS_ARE_MANAGED = True
 
-    AUTH_USER_MODEL = 'simpleuser.User'
-
     if os.environ.get('READ_REPLICA_DATABASE_URL'):
         DATABASES.update(values.DatabaseURLValue(  # pragma: no cover
             alias='read-replica',
@@ -184,27 +182,6 @@ class Base(Configuration):
 
     V0_SITE_NAME = bytes(os.environ.get(
         'IMPACT_API_V0_SITE_NAME', 'masschallenge.org'), 'utf-8')
-
-    OAUTH2_PROVIDER = {
-        # this is the list of available scopes
-        'SCOPES': {
-            'read': 'Read scope',
-            'write': 'Write scope',
-            'groups': 'Access to your groups'
-        }
-    }
-
-    REST_PROXY = {
-        'HOST': os.environ.get('ACCELERATE_SITE_URL',
-                               'https://accelerate.masschallenge.org'),
-        'AUTH': {
-            'user': None,
-            'password': None,
-            # Or alternatively:
-            'token': None,
-        },
-        'VERIFY_SSL': False,
-    }
 
     AUTHENTICATION_BACKENDS = (
         'oauth2_provider.backends.OAuth2Backend',
