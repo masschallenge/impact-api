@@ -31,8 +31,7 @@ from .factories import (
     ProgramRoleGrantFactory,
     ProgramStartupStatusFactory,
     StartupMentorRelationshipFactory,
-    StartupStatusFactory,
-    UserRoleFactory
+    StartupStatusFactory
 )
 from .utils import capture_stderr
 from ..utils import get_user_program_and_startup_roles
@@ -268,7 +267,7 @@ class TestGraphQL(APITestCase):
     def test_office_url_field_returns_correct_value(self):
         program = ProgramFactory()
         confirmed = ExpertFactory()
-        confirmed_role = UserRoleFactory(name=UserRole.MENTOR)
+        confirmed_role = get_user_role_by_name(UserRole.MENTOR)
         program_role = ProgramRoleFactory(program=program,
                                           user_role=confirmed_role)
 
@@ -561,9 +560,10 @@ class TestGraphQL(APITestCase):
         self._assert_response_equals_json(query, expected_json, True)
 
     def test_get_user_confirmed_mentor_program_families(self):
+        _mentor = get_user_role_by_name(UserRole.MENTOR)
         role_grant = ProgramRoleGrantFactory(
             program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
-            program_role__user_role__name=UserRole.MENTOR,
+            program_role__user_role=_mentor,
             person=ExpertFactory(),
         )
         user = role_grant.person
