@@ -779,7 +779,7 @@ class TestGraphQL(APITestCase):
             program_family=program_family, location=location)
 
         ProgramFamilyLocationFactory.create(
-            program_family=program_family, location=location1)
+            program_family=ProgramFamilyFactory(), location=location1)
 
         query = """
             query{{
