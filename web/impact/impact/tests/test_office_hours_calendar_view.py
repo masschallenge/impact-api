@@ -114,32 +114,29 @@ class TestOfficeHoursCalendarView(APITestCase):
         [ProgramFamilyLocationFactory(location=location,
                                       program_family=program_family)
          for (location, program_family) in zip(locations, program_families)]
-        
 
-        mentor_grants = [ProgramRoleGrantFactory(
+        [ProgramRoleGrantFactory(
             person=office_hour.mentor,
             program_role__user_role=user_role,
             program_role__program__program_status="active",
             program_role__program__program_family=program_family)
-                         for program_family in program_families]
+         for program_family in program_families]
 
         response = self.get_response(user=office_hour.mentor)
         response_locations = response.data['location_choices']
         self.assertTrue(all([(loc.name, loc.id) in response_locations
                              for loc in locations]))
-        
-        
+
     def test_bad_date_spec_gets_fail_response(self):
         bad_date_spec = "2020-20-20"  # this cannot be parsed as a date
         response = self.get_response(date_spec=bad_date_spec)
         self.assert_failure(response, self.view.BAD_DATE_SPEC)
 
-
     def test_nonexistent_user_gets_fail_response(self):
         bad_user_id = _nonexistent_user_id()
         response = self.get_response(target_user_id=bad_user_id)
         self.assert_failure(response, self.view.NO_SUCH_USER)
-        
+
     def create_office_hour(self,
                            mentor=None,
                            finalist=None,
@@ -200,6 +197,7 @@ def check_hour_in_response(response, hour):
     response_data = response.data['calendar_data']
     return hour.id in [response_hour['id']
                        for response_hour in response_data]
+
 
 def _nonexistent_user_id():
     user = UserFactory()

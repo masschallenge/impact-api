@@ -17,14 +17,19 @@ from django.db.models import (
     When,
     Value,
 )
-from impact.utils import compose_filter
 from . import ImpactView
-from accelerator.models import MentorProgramOfficeHour
+from accelerator.models import (
+    MentorProgramOfficeHour,
+    UserRole,
+)
+
 User = get_user_model()
 
 ISO_8601_DATE_FORMAT = "%Y-%m-%d"
 ONE_DAY = timedelta(1)
 ONE_WEEK = timedelta(8)
+
+OFFICE_HOUR_HOLDER_ROLES = [UserRole.MENTOR, UserRole.AIR]
 
 
 class OfficeHoursCalendarView(ImpactView):
@@ -77,12 +82,12 @@ class OfficeHoursCalendarView(ImpactView):
                          reserved=Case(
                              When(finalist_count__gt=0, then=Value(True)),
                              default=Value(False),
-                             output_field=BooleanField()))                
+                             output_field=BooleanField()))
 
         self.response_elements['calendar_data'] = office_hours.values(
             "id",
             "mentor_id",
-            "finalist_id", 
+            "finalist_id",
             "start_date_time",
             "end_date_time",
             "description",
@@ -107,7 +112,8 @@ class OfficeHoursCalendarView(ImpactView):
         self.succeed()
 
     def location_choices(self):
-        office_hours_holder = Q(program_role__user_role__name__in=['MENTOR', 'AIR'])
+        office_hours_holder = Q(
+            program_role__user_role__name__in=OFFICE_HOUR_HOLDER_ROLES)
         active_program = Q(program_role__program__program_status='active')
         location_path = "__".join(["program_role",
                                    "program",
@@ -119,8 +125,8 @@ class OfficeHoursCalendarView(ImpactView):
         return self.target_user.programrolegrant_set.filter(
             office_hours_holder and
             active_program).values_list(
-                location_name, location_id)        
-            
+                location_name, location_id)
+
     def get(self, request):
         self.response_elements = {}
         (self._get_target_user(request) and
