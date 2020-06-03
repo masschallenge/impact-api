@@ -4,6 +4,8 @@ from datetime import (
 )
 from pytz import utc
 
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
 from accelerator.tests.factories.location_factory import LocationFactory
@@ -136,6 +138,15 @@ class TestOfficeHoursCalendarView(APITestCase):
         bad_user_id = _nonexistent_user_id()
         response = self.get_response(target_user_id=bad_user_id)
         self.assert_failure(response, self.view.NO_SUCH_USER)
+
+    def test_no_n_plus_one_queries(self):
+        office_hour = self.create_office_hour()
+        with CaptureQueriesContext(connection) as captured_queries:
+            self.get_response(target_user_id=office_hour.mentor_id)
+            total_queries = len(captured_queries)
+        [self.create_office_hour(mentor=office_hour.mentor) for _ in range(10)]
+        with self.assertNumQueries(total_queries):
+            self.get_response(target_user_id=office_hour.mentor_id)
 
     def create_office_hour(self,
                            mentor=None,
