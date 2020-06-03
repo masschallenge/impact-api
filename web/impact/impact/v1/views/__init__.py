@@ -54,6 +54,10 @@ from .judging_round_list_view import (
     INVALID_ROUND_TYPE_ERROR,
     JudgingRoundListView,
 )
+from .office_hours_calendar_view import (
+    ISO_8601_DATE_FORMAT,
+    OfficeHoursCalendarView,
+)
 from .organization_detail_view import OrganizationDetailView
 from .organization_history_view import OrganizationHistoryView
 from .organization_list_view import OrganizationListView
