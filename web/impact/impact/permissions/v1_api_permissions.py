@@ -1,12 +1,14 @@
+from rest_framework.permissions import IsAuthenticated
+
 from accelerator_abstract.models.base_user_utils import (
     is_employee,
     is_expert,
 )
+from accelerator.models import UserRole
 from impact.permissions import (
     settings,
     BasePermission,
 )
-from rest_framework.permissions import IsAuthenticated
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 DEFAULT_PERMISSION_DENIED_DETAIL = ("You do not have permission to perform "
@@ -54,3 +56,19 @@ class IsExpertUser(IsAuthenticated):
     def has_permission(self, request, view):
         return (super().has_permission(request, view) and
                 is_expert(request.user))
+
+
+class OfficeHourPermission(IsAuthenticated):
+    def has_permission(self, request, view):
+        roles = [UserRole.MENTOR, UserRole.AIR]
+        return super().has_permission(request, view) and (
+                is_employee(request.user) or
+                request.user.programrolegrant_set.filter(
+                    program_role__user_role__name__in=roles,
+                    program_role__program__program_status='active',
+                ).exists())
+
+    def has_object_permission(self, request, view, office_hour):
+        is_reserved = office_hour.finalist
+        return (is_employee(request.user) or
+                office_hour.mentor == request.user and not is_reserved)
