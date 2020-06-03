@@ -79,3 +79,6 @@ from impact.v1.views.cancel_office_hour_session_view import (
 from impact.v1.views.mentor_participation_view import (
     MentorParticipationView
 )
+from impact.v1.views.office_hour_view import (
+    OfficeHourViewSet
+)
