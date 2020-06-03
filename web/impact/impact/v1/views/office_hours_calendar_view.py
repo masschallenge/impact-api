@@ -84,6 +84,7 @@ class OfficeHoursCalendarView(ImpactView):
                              default=Value(False),
                              output_field=BooleanField()))
 
+        primary_industry_key = "mentor__expertprofile__primary_industry"
         self.response_elements['calendar_data'] = office_hours.values(
             "id",
             "mentor_id",
@@ -102,7 +103,7 @@ class OfficeHoursCalendarView(ImpactView):
             mentor_company=F("mentor__expertprofile__company"),
             mentor_first_name=F("mentor__first_name"),
             mentor_last_name=F("mentor__last_name"),
-            mentor_primary_industry=F("mentor__expertprofile__primary_industry"),
+            mentor_primary_industry=F(primary_industry_key),
             startup_name=F("startup__organization__name"),
         )
         self.response_elements['location_choices'] = self.location_choices()
@@ -129,7 +130,6 @@ class OfficeHoursCalendarView(ImpactView):
                 location_name, location_id)
         return location_choices.distinct()
 
-    
     def get(self, request):
         self.response_elements = {}
         (self._get_target_user(request) and
