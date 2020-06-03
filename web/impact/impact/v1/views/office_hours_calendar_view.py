@@ -84,7 +84,7 @@ class OfficeHoursCalendarView(ImpactView):
                              default=Value(False),
                              output_field=BooleanField()))
 
-        primary_industry_key = "mentor__expertprofile__primary_industry"
+        primary_industry_key = "mentor__expertprofile__primary_industry__name"
         self.response_elements['calendar_data'] = office_hours.values(
             "id",
             "mentor_id",
