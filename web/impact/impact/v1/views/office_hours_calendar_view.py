@@ -122,11 +122,13 @@ class OfficeHoursCalendarView(ImpactView):
                                    "location"])
         location_name = location_path + "__name"
         location_id = location_path + "__id"
-        return self.target_user.programrolegrant_set.filter(
+        location_choices = self.target_user.programrolegrant_set.filter(
             office_hours_holder and
             active_program).values_list(
                 location_name, location_id)
+        return location_choices.distinct()
 
+    
     def get(self, request):
         self.response_elements = {}
         (self._get_target_user(request) and
