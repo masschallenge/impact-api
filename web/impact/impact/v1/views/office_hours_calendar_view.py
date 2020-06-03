@@ -122,7 +122,8 @@ class OfficeHoursCalendarView(ImpactView):
     def mentor_program_families(self):
         return self.target_user.programrolegrant_set.filter(
             OFFICE_HOURS_HOLDER and ACTIVE_PROGRAM).values_list(
-                "program_role__program__program_family__name", flat=True)
+                "program_role__program__program_family__name",
+                flat=True).distinct()
 
     def location_choices(self):
         location_path = "__".join(["program_role",
