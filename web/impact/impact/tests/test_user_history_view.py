@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 from jsonschema import Draft4Validator
 
+from accelerator.tests.contexts.context_utils import get_user_role_by_name
 from mc.models import UserRole
 from .api_test_case import APITestCase
 from .factories import (
@@ -80,8 +81,9 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(next_created_at, events[0]["latest_datetime"])
 
     def test_user_became_finalist(self):
+        _finalist = get_user_role_by_name(UserRole.FINALIST)
         prg = ProgramRoleGrantFactory(
-            program_role__user_role__name=UserRole.FINALIST)
+            program_role__user_role=_finalist)
         with self.login(email=self.basic_user().email):
             url = reverse(UserHistoryView.view_name, args=[prg.person.id])
             response = self.client.get(url)
@@ -99,10 +101,11 @@ class TestUserHistoryView(APITestCase):
         cycle = ProgramCycleFactory(application_final_deadline_date=deadline)
         user_date = days_from_now(-2)
         user = UserFactory(date_joined=user_date)
+        _finalist = get_user_role_by_name(UserRole.FINALIST)
         prg = ProgramRoleGrantFactory(
             person=user,
             program_role__program__cycle=cycle,
-            program_role__user_role__name=UserRole.FINALIST)
+            program_role__user_role=_finalist)
         prg.created_at = None
         prg.save()
         next_prg_date = days_from_now(-1)
@@ -123,10 +126,11 @@ class TestUserHistoryView(APITestCase):
         user = UserFactory(date_joined=user_date)
         deadline = days_from_now(-2)
         cycle = ProgramCycleFactory(application_final_deadline_date=deadline)
+        _finalist = get_user_role_by_name(UserRole.FINALIST)
         prg = ProgramRoleGrantFactory(
             person=user,
             program_role__program__cycle=cycle,
-            program_role__user_role__name=UserRole.FINALIST)
+            program_role__user_role=_finalist)
         prg.created_at = None
         prg.save()
         with self.login(email=self.basic_user().email):
@@ -138,8 +142,9 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(deadline, events[0]["datetime"])
 
     def test_user_became_confirmed_judge(self):
+        _judge = get_user_role_by_name(UserRole.JUDGE)
         prg = ProgramRoleGrantFactory(
-            program_role__user_role__name=UserRole.JUDGE)
+            program_role__user_role=_judge)
         with self.login(email=self.basic_user().email):
             url = reverse(UserHistoryView.view_name, args=[prg.person.id])
             response = self.client.get(url)
@@ -154,8 +159,9 @@ class TestUserHistoryView(APITestCase):
                     events[0]["description"])
 
     def test_user_became_confirmed_judge_with_missing_label(self):
+        _judge = get_user_role_by_name(UserRole.JUDGE)
         prg = ProgramRoleGrantFactory(
-            program_role__user_role__name=UserRole.JUDGE,
+            program_role__user_role=_judge,
             program_role__user_label=None)
         with self.login(email=self.basic_user().email):
             url = reverse(UserHistoryView.view_name, args=[prg.person.id])
@@ -171,8 +177,9 @@ class TestUserHistoryView(APITestCase):
                 events[0]["description"])
 
     def test_user_became_confirmed_judge_with_judging_round(self):
+        _judge = get_user_role_by_name(UserRole.JUDGE)
         prg = ProgramRoleGrantFactory(
-            program_role__user_role__name=UserRole.JUDGE)
+            program_role__user_role=_judge)
         jr = JudgingRoundFactory(
             confirmed_judge_label=prg.program_role.user_label)
         with self.login(email=self.basic_user().email):
@@ -191,8 +198,9 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(jr.short_name(), events[0]["judging_round_name"])
 
     def test_user_became_confirmed_judge_with_cycle_based_judging_round(self):
+        _judge = get_user_role_by_name(UserRole.JUDGE)
         prg = ProgramRoleGrantFactory(
-            program_role__user_role__name=UserRole.JUDGE)
+            program_role__user_role=_judge)
         jr = JudgingRoundFactory(
             confirmed_judge_label=prg.program_role.user_label,
             cycle_based_round=True)
@@ -210,8 +218,9 @@ class TestUserHistoryView(APITestCase):
                 events[0]["description"])
 
     def test_user_became_desired_judge(self):
+        _djudge = get_user_role_by_name(UserRole.DESIRED_JUDGE)
         prg = ProgramRoleGrantFactory(
-            program_role__user_role__name=UserRole.DESIRED_JUDGE)
+            program_role__user_role=_djudge)
         with self.login(email=self.basic_user().email):
             url = reverse(UserHistoryView.view_name, args=[prg.person.id])
             response = self.client.get(url)
@@ -226,8 +235,9 @@ class TestUserHistoryView(APITestCase):
                 events[0]["description"])
 
     def test_user_became_desired_judge_with_missing_label(self):
+        _djudge = get_user_role_by_name(UserRole.DESIRED_JUDGE)
         prg = ProgramRoleGrantFactory(
-            program_role__user_role__name=UserRole.DESIRED_JUDGE,
+            program_role__user_role=_djudge,
             program_role__user_label=None)
         with self.login(email=self.basic_user().email):
             url = reverse(UserHistoryView.view_name, args=[prg.person.id])
@@ -243,8 +253,9 @@ class TestUserHistoryView(APITestCase):
                 events[0]["description"])
 
     def test_user_became_confirmed_mentor(self):
+        _mentor = get_user_role_by_name(UserRole.MENTOR)
         prg = ProgramRoleGrantFactory(
-            program_role__user_role__name=UserRole.MENTOR)
+            program_role__user_role=_mentor)
         with self.login(email=self.basic_user().email):
             url = reverse(UserHistoryView.view_name, args=[prg.person.id])
             response = self.client.get(url)
@@ -254,8 +265,9 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(prg.created_at, events[0]["datetime"])
 
     def test_user_became_desired_mentor(self):
+        _dementor = get_user_role_by_name(UserRole.DESIRED_MENTOR)
         prg = ProgramRoleGrantFactory(
-            program_role__user_role__name=UserRole.DESIRED_MENTOR)
+            program_role__user_role=_dementor)
         with self.login(email=self.basic_user().email):
             url = reverse(UserHistoryView.view_name, args=[prg.person.id])
             response = self.client.get(url)
