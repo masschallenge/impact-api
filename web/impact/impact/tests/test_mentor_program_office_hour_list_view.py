@@ -14,6 +14,7 @@ from pytz import utc
 from django.urls import reverse
 
 from mc.models import UserRole
+from accelerator.tests.contexts.context_utils import get_user_role_by_name
 from accelerator.tests.factories import (
     EntrepreneurFactory,
     ExpertFactory,
@@ -182,11 +183,10 @@ class TestMentorProgramOfficeHourListView(APITestCase):
         mentor = ExpertFactory()
         program = ProgramFactory()
         user = self.basic_user()
-        user_role = UserRole.FINALIST
-        pr = ProgramRoleFactory(program=program,
-                                user_role__name=user_role)
+        _finalist = get_user_role_by_name(UserRole.FINALIST)
+        pr = ProgramRoleFactory(program=program, user_role=_finalist)
         ProgramRoleGrantFactory(person=user, program_role=pr,
-                                program_role__user_role__name=user_role)
+                                program_role__user_role=_finalist)
         self.mentor = mentor
         self._create_office_hours(tomorrow_offset, 13, program, user)
         user_open_upcoming_hour = self._create_office_hours(
