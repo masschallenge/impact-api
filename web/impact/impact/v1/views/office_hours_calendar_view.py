@@ -31,6 +31,10 @@ ONE_WEEK = timedelta(8)
 
 OFFICE_HOUR_HOLDER_ROLES = [UserRole.MENTOR, UserRole.AIR]
 
+OFFICE_HOURS_HOLDER = Q(
+    program_role__user_role__name__in=OFFICE_HOUR_HOLDER_ROLES)
+ACTIVE_PROGRAM = Q(program_role__program__program_status='active')
+
 
 class OfficeHoursCalendarView(ImpactView):
     permission_classes = []
@@ -111,12 +115,16 @@ class OfficeHoursCalendarView(ImpactView):
             "location__timezone").values_list(
                 "location__timezone", flat=True).distinct()
         self.response_elements['location_choices'] = self.location_choices()
+        program_families = self.mentor_program_families()
+        self.response_elements['mentor_program_families'] = program_families
         self.succeed()
 
+    def mentor_program_families(self):
+        return self.target_user.programrolegrant_set.filter(
+            OFFICE_HOURS_HOLDER and ACTIVE_PROGRAM).values_list(
+                "program_role__program__program_family__name", flat=True)
+
     def location_choices(self):
-        office_hours_holder = Q(
-            program_role__user_role__name__in=OFFICE_HOUR_HOLDER_ROLES)
-        active_program = Q(program_role__program__program_status='active')
         location_path = "__".join(["program_role",
                                    "program",
                                    "program_family",
@@ -125,8 +133,8 @@ class OfficeHoursCalendarView(ImpactView):
         location_name = location_path + "__name"
         location_id = location_path + "__id"
         location_choices = self.target_user.programrolegrant_set.filter(
-            office_hours_holder and
-            active_program).values_list(
+            OFFICE_HOURS_HOLDER and
+            ACTIVE_PROGRAM).values_list(
                 location_name, location_id)
         return location_choices.distinct()
 

@@ -8,6 +8,7 @@ from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
+from accelerator.models import UserRole
 from accelerator.tests.factories.location_factory import LocationFactory
 from accelerator.tests.factories.program_family_location_factory import (
     ProgramFamilyLocationFactory,
@@ -110,7 +111,7 @@ class TestOfficeHoursCalendarView(APITestCase):
 
     def test_return_includes_mentor_locations(self):
         office_hour = self.create_office_hour()
-        user_role = get_user_role_by_name("MENTOR")
+        user_role = get_user_role_by_name(UserRole.MENTOR)
         locations = LocationFactory.create_batch(3)
         program_families = ProgramFamilyFactory.create_batch(3)
         [ProgramFamilyLocationFactory(location=location,
@@ -138,6 +139,19 @@ class TestOfficeHoursCalendarView(APITestCase):
         bad_user_id = _nonexistent_user_id()
         response = self.get_response(target_user_id=bad_user_id)
         self.assert_failure(response, self.view.NO_SUCH_USER)
+
+    def test_mentor_program_families_in_result(self):
+        office_hour = self.create_office_hour()
+        user_role = get_user_role_by_name(UserRole.MENTOR)
+        prgs = ProgramRoleGrantFactory.create_batch(
+            3,
+            person=office_hour.mentor,
+            program_role__user_role=user_role)
+        response = self.get_response(user=office_hour.mentor)
+        response_program_families = response.data['mentor_program_families']
+        self.assertTrue(all([prg.program_role.program.program_family.name
+                             in response_program_families
+                             for prg in prgs]))
 
     def test_no_n_plus_one_queries(self):
         office_hour = self.create_office_hour()
