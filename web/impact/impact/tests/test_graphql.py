@@ -115,8 +115,9 @@ class TestGraphQL(APITestCase):
 
     def test_mentor_program_role_grants(self):
         user = ExpertFactory()
+        _mentor = get_user_role_by_name(UserRole.MENTOR)
         role_grant = ProgramRoleGrantFactory.create(
-            program_role__user_role__name=UserRole.MENTOR,
+            program_role__user_role=_mentor,
             person=user)
         program = role_grant.program_role.program
         program_overview_link = program.program_overview_link
@@ -143,12 +144,14 @@ class TestGraphQL(APITestCase):
     def test_mentor_program_role_grants_only_returns_mentor_roles(self):
         user = ExpertFactory()
         program = ProgramFactory()
+        _mentor = get_user_role_by_name(UserRole.MENTOR)
+        _judge = get_user_role_by_name(UserRole.JUDGE)
         mentor_role_grant = ProgramRoleGrantFactory.create(
-            program_role__user_role__name=UserRole.MENTOR, person=user)
+            program_role__user_role=_mentor, person=user)
         program = mentor_role_grant.program_role.program
         program_overview_link = program.program_overview_link
         judge_role_grant = ProgramRoleGrantFactory.create(
-            program_role__user_role__name=UserRole.JUDGE, person=user)
+            program_role__user_role=_judge, person=user)
 
         query = MENTOR_PRG_QUERY.format(id=user.id)
 
@@ -484,11 +487,12 @@ class TestGraphQL(APITestCase):
     def test_query_program_roles_program_role_names_are_normalized(self):
         program_role_name = "BEST IN SHOW (BOS)"
         user_role_name = UserRole.FINALIST
+        _finalist = get_user_role_by_name(UserRole.FINALIST)
         user = ExpertFactory()
         ProgramRoleGrantFactory(
             person=user,
             program_role__name=program_role_name,
-            program_role__user_role__name=user_role_name)
+            program_role__user_role=_finalist)
         query = """
             query{{
                 expertProfile(id:{id}) {{
