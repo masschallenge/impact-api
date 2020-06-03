@@ -102,6 +102,7 @@ class OfficeHoursCalendarView(ImpactView):
             mentor_company=F("mentor__expertprofile__company"),
             mentor_first_name=F("mentor__first_name"),
             mentor_last_name=F("mentor__last_name"),
+            mentor_primary_industry=F("mentor__expertprofile__primary_industry"),
             startup_name=F("startup__organization__name"),
         )
         self.response_elements['location_choices'] = self.location_choices()
