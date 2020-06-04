@@ -183,6 +183,12 @@ from accelerator.tests.factories.mentor_program_office_hour_factory import (
 from accelerator.tests.factories.startup_mentor_relationship_factory import (
     StartupMentorRelationshipFactory,
 )
+from accelerator.tests.factories.program_family_location_factory import (
+    ProgramFamilyLocationFactory
+)
+from accelerator.tests.factories.location_factory import (
+    LocationFactory
+)
 
 # Other utility methods
 from accelerator.tests.factories.factory_utils import expert_data
