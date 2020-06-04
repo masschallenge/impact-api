@@ -36,7 +36,7 @@ class CalendarReminderView(View):
             title=title,
             description=description,
             location=location,
-            timezone=timezone)
+            timezone=tz)
         calendar_data = add2cal.as_dict()
         if link_type == ICAL_LINK_TYPE:
             response = HttpResponse(
