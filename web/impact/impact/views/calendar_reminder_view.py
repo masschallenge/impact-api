@@ -1,6 +1,7 @@
 from django.views import View
 from django.http import HttpResponseRedirect
 from add2cal import Add2Cal
+from pytz import timezone
 import datetime
 from django.http import (
     JsonResponse,
@@ -27,7 +28,7 @@ class CalendarReminderView(View):
         title = params.get('title', 'new reminder')
         description = params.get('description', '')
         location = params.get('location', 'MassChallenge')
-        timezone = params.get('timezone', 'UTC')
+        tz = params.get('timezone', timezone('UTC'))
         link_type = params.get('link_type', 'data')
         add2cal = Add2Cal(
             start=start,
