@@ -18,7 +18,7 @@ from django.db.models import (
     Value,
 )
 from . import ImpactView
-from accelerator.models import (
+from mc.models import (
     MentorProgramOfficeHour,
     UserRole,
 )
