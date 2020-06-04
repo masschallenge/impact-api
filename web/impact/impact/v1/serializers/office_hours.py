@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from accelerator_abstract.models.base_user_utils import is_employee
 from accelerator.models import (
     Location,
     MentorProgramOfficeHour,
@@ -36,6 +37,12 @@ class OfficeHourSerializer(serializers.ModelSerializer):
                 'end_date_time': INVALID_END_DATE,
             })
         return attrs
+
+    def validate_mentor(self, mentor):
+        user = self.context['request'].user
+        if not is_employee(user):
+            return user
+        return mentor
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
