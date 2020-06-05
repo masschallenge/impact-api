@@ -116,7 +116,19 @@ class TestCancelOfficeHourReservationView(APITestCase):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         response = self._submit_cancellation(office_hour,
                                              user=self.make_user())
-        notification = {'detail': NO_SUCH_OFFICE_HOUR}
+        notification = {
+            'detail': NO_SUCH_RESERVATION,
+            'header': FAIL_HEADER,
+            'success': False}
+        self.assertEqual(response.data, notification)
+
+    def test_user_attempts_to_cancel_non_existent_hour(self):
+        response = self._submit_cancellation(None,
+                                             user=self.make_user())
+        notification = {
+            'detail': NO_SUCH_OFFICE_HOUR,
+            'header': FAIL_HEADER,
+            'success': False}
         self.assertEqual(response.data, notification)
 
     def test_user_cancels_non_existent_reservation_no_notification(self):
