@@ -14,7 +14,10 @@ from impact.permissions.v1_api_permissions import (
     DEFAULT_PERMISSION_DENIED_DETAIL,
 )
 from impact.tests.api_test_case import APITestCase
-from impact.v1.serializers.office_hours import INVALID_END_DATE
+from impact.v1.serializers.office_hours import (
+    INVALID_END_DATE,
+    INVALID_USER
+)
 from impact.v1.views.office_hour_view import (
     FAIL_CREATE_HEADER,
     FAIL_EDIT_HEADER,
@@ -115,8 +118,9 @@ class TestCreateEditOfficeHourView(APITestCase):
             'end_date_time': start_time + timedelta(minutes=-30),
         })
         response = self._create_office_hour_session(mentor, data)
-        self.assertIn(INVALID_END_DATE,
-                      response.data['errors']['end_date_time'])
+        self._assert_error_response(response.data,
+                                    key='end_date_time',
+                                    expected=INVALID_END_DATE)
 
     def test_none_staff_or_none_mentor_response(self):
         mentor = self._expert_user(UserRole.MENTOR)
@@ -132,6 +136,19 @@ class TestCreateEditOfficeHourView(APITestCase):
                                            get_data={'mentor': mentor2.id})
         response = self._create_office_hour_session(mentor, data)
         self.assertEqual(response.data['data']['mentor']['id'], mentor.id)
+
+    def test_admin_cant_create_office_hour_for_restricted_user_response(self):
+        user = self._expert_user(UserRole.JUDGE)
+        data = self._get_post_request_data(user)
+        response = self._create_office_hour_session(self.staff_user(), data)
+        self._assert_error_response(response.data,
+                                    key='mentor', expected=INVALID_USER)
+
+    def test_admin_cant_create_office_hour_for_restricted_user(self):
+        user = self._expert_user(UserRole.JUDGE)
+        data = self._get_post_request_data(user)
+        self._create_office_hour_session(self.staff_user(), data)
+        self._assert_office_hour_was_not_created(user)
 
     def _expert_with_inactive_program(self, role):
         program = ProgramFactory(program_status='ended')
@@ -178,6 +195,9 @@ class TestCreateEditOfficeHourView(APITestCase):
             not data['success'],
             data['header'] == header,
         ]))
+
+    def _assert_error_response(self, data, key, expected):
+        self.assertIn(expected, data['errors'][key])
 
     def _office_hour_created(self, mentor, from_now, staff):
         count_before = MentorProgramOfficeHour.objects.count()
