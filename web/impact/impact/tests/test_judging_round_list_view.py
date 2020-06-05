@@ -17,6 +17,7 @@ from .api_test_case import APITestCase
 from .test_judging_round_detail_view import (
     JUDGING_ROUND_GET_FIELDS,
 )
+from accelerator.tests.contexts import JudgingRoundContext
 from .utils import assert_fields
 from ..v1.views import (
     INVALID_IS_ACTIVE_ERROR,
@@ -60,8 +61,10 @@ class TestJudgingRoundListView(APITestCase):
             assert validator.is_valid(json.loads(get_response.content))
 
     def test_get_is_active(self):
-        active_judging_round = JudgingRoundFactory.create(is_active=True)
-        inactive_judging_round = JudgingRoundFactory.create(is_active=False)
+        active_judging_round = JudgingRoundContext(
+            is_active=True).judging_round
+        inactive_judging_round = JudgingRoundContext(
+            is_active=False).judging_round
         user = self.basic_user()
         _add_clearance(user, active_judging_round)
         _add_clearance(user, inactive_judging_round)
