@@ -36,6 +36,7 @@ class ReserveOfficeHourView(ImpactView):
     NO_OFFICE_HOUR_SPECIFIED = "No office hour was specified"
     NO_SUCH_OFFICE_HOUR = "No such office hour exists."
     NO_SUCH_STARTUP = "No such startup exists"
+    OFFICE_HOUR_ALREADY_RESERVED = "That session has already been reserved"
     SUBJECT = "Office Hours Reservation Notification"
     
     def post(self, request):
@@ -97,11 +98,14 @@ class ReserveOfficeHourView(ImpactView):
             try:
                 self.startup = Startup.objects.get(pk=startup_id)
             except Startup.DoesNotExist:
-                self.fail(NO_SUCH_STARTUP)
+                self.fail(self.NO_SUCH_STARTUP)
                 return False
         return True
                              
     def _reserve_office_hour(self):
+        if self.office_hour.finalist is not None:
+            self.fail(self.OFFICE_HOUR_ALREADY_RESERVED)
+            return False
         self._update_office_hour_data()
         self._send_confirmation_emails()
         self._succeed()

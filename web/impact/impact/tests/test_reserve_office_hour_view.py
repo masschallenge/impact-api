@@ -26,7 +26,14 @@ class TestReserveOfficeHourView(APITestCase):
     
     def test_previously_reserved_office_hour_gets_failure(self):
         # a finalist reserves a reserved office hour, gets failure response
-        pass
+        office_hour = MentorProgramOfficeHourFactory()
+        finalist = _finalist()
+        response = self.post_response(office_hour.id,
+                                      request_user=finalist)
+        self.assert_ui_notification(response,
+                                    False,
+                                    self.view.OFFICE_HOUR_ALREADY_RESERVED)
+        
 
     def test_reserve_on_behalf_of_success(self):
         # staff reserves a session on behalf of finalist, gets success
@@ -44,7 +51,6 @@ class TestReserveOfficeHourView(APITestCase):
         response = self.post_response(office_hour.id,
                                       finalist.id)
         self.assert_notified(finalist)
-
 
     def test_reserve_on_behalf_of_finalist_mentor_gets_email_notification(self):    
         # staff reserves a session on behalf of finalist, mentor is
