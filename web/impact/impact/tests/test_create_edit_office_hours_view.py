@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 from datetime import datetime, timedelta
 from django.core import mail
 from django.urls import reverse
@@ -11,7 +12,7 @@ from accelerator.tests.factories import (
 from accelerator.tests.factories.location_factory import LocationFactory
 
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
-from ..v1.serializers.office_hours import (
+from ..v1.serializers.office_hours_serializer import (
     INVALID_END_DATE,
     INVALID_USER
 )
@@ -27,14 +28,19 @@ from .api_test_case import APITestCase
 
 class TestCreateEditOfficeHourView(APITestCase):
     url = reverse(f'{OfficeHourViewSet.view_name}-list')
+    updated_topics = 'updated topics'
 
     def test_mentor_can_create_office_hour_session(self):
         mentor = self._expert_user(UserRole.MENTOR)
-        self._assert_office_hour_created(mentor)
+        data = self._get_post_request_data(mentor)
+        with self._assert_office_hour_created():
+            self._create_office_hour_session(mentor, data)
 
     def test_mentor_can_create_office_hour_session_for_date_prior_to_now(self):
         mentor = self._expert_user(UserRole.MENTOR)
-        self._assert_office_hour_created(mentor, from_now=-120)
+        data = self._get_post_request_data(mentor, minutes_from_now=-120)
+        with self._assert_office_hour_created():
+            self._create_office_hour_session(mentor, data)
 
     def test_mentor_can_create_office_hour_session_response_details(self):
         mentor = self._expert_user(UserRole.MENTOR)
@@ -49,7 +55,8 @@ class TestCreateEditOfficeHourView(APITestCase):
 
     def test_mentor_can_edit_office_hour_session_for_date_prior_to_now(self):
         mentor = self._expert_user(UserRole.MENTOR)
-        office_hour = self._create_office_hour_obj(mentor, from_now=-120)
+        office_hour = self._create_office_hour_obj(mentor,
+                                                   minutes_from_now=-120)
         self._assert_update_office_hour(mentor, office_hour)
 
     def test_mentor_can_edit_office_hour_session_response_details(self):
@@ -60,11 +67,15 @@ class TestCreateEditOfficeHourView(APITestCase):
 
     def test_staff_can_create_office_hour_session_on_behalf_of_mentor(self):
         mentor = self._expert_user(UserRole.MENTOR)
-        self._assert_office_hour_created(mentor, staff=True)
+        data = self._get_post_request_data(mentor)
+        with self._assert_office_hour_created():
+            self._create_office_hour_session(self.staff_user(), data)
 
     def test_staff_can_create_office_hour_session_for_date_prior_to_now(self):
         mentor = self._expert_user(UserRole.MENTOR)
-        self._assert_office_hour_created(mentor, from_now=-120, staff=True)
+        data = self._get_post_request_data(mentor, minutes_from_now=-120)
+        with self._assert_office_hour_created():
+            self._create_office_hour_session(self.staff_user(), data)
 
     def test_staff_can_create_office_hour_on_behalf_of_mentor_response(self):
         mentor = self._expert_user(UserRole.MENTOR)
@@ -79,7 +90,8 @@ class TestCreateEditOfficeHourView(APITestCase):
 
     def test_staff_can_edit_office_hour_session_for_date_prior_to_now(self):
         mentor = self._expert_user(UserRole.MENTOR)
-        office_hour = self._create_office_hour_obj(mentor, from_now=-120)
+        office_hour = self._create_office_hour_obj(mentor,
+                                                   minutes_from_now=-120)
         self._assert_update_office_hour(mentor, office_hour, staff=True)
 
     def test_mail_to_mentor_when_staff_create_office_hour_session(self):
@@ -91,15 +103,15 @@ class TestCreateEditOfficeHourView(APITestCase):
     def test_mail_to_mentor_when_staff_updates_office_hour_session(self):
         mentor = self._expert_user(UserRole.MENTOR)
         office_hour = self._create_office_hour_obj(mentor)
-        data = self._get_patch_request_data(office_hour, {
-            'topics': 'Updated topics',
-            'description': 'Updated description', })
+        data = {'topics': self.updated_topics}
         self._edit_office_hour_session(self.staff_user(), office_hour, data)
         self.assertEqual(mail.outbox[0].to, [mentor.email])
 
     def test_mentor_not_in_active_program_cannot_create_office_hour(self):
         mentor = self._expert_with_inactive_program(UserRole.MENTOR)
-        self._assert_office_hour_was_not_created(mentor)
+        data = self._get_post_request_data(mentor)
+        with self._assert_office_hour_created(created=False):
+            self._create_office_hour_session(mentor, data)
 
     def test_mentor_in_non_active_program_cant_create_office_response(self):
         mentor = self._expert_with_inactive_program(UserRole.MENTOR)
@@ -145,16 +157,17 @@ class TestCreateEditOfficeHourView(APITestCase):
     def test_admin_cant_create_office_hour_for_restricted_user(self):
         user = self._expert_user(UserRole.JUDGE)
         data = self._get_post_request_data(user)
-        self._create_office_hour_session(self.staff_user(), data)
-        self._assert_office_hour_was_not_created(user)
+        with self._assert_office_hour_created(created=False):
+            self._create_office_hour_session(self.staff_user(), data)
 
     def _expert_with_inactive_program(self, role):
         program = ProgramFactory(program_status='ended')
         return self._expert_user(role, program)
 
-    def _get_post_request_data(self, mentor, from_now=0, get_data=None):
+    def _get_post_request_data(self,
+                               mentor, minutes_from_now=0, get_data=None):
         location = LocationFactory()
-        start_time = datetime.now() + timedelta(minutes=from_now)
+        start_time = datetime.now() + timedelta(minutes=minutes_from_now)
         data = {
             'mentor': mentor.id,
             'start_date_time': start_time,
@@ -165,19 +178,6 @@ class TestCreateEditOfficeHourView(APITestCase):
         }
         if get_data:
             data.update(get_data)
-        return data
-
-    def _get_patch_request_data(self, office_hour, patch_data=None):
-        data = {
-            'mentor': office_hour.mentor.id,
-            'start_date_time': office_hour.start_date_time,
-            'end_date_time': office_hour.end_date_time,
-            'topics': office_hour.topics,
-            'description': office_hour.description,
-            'location': office_hour.location.id
-        }
-        if patch_data:
-            data.update(patch_data)
         return data
 
     def _assert_success_response(self, data, edit=False):
@@ -197,23 +197,9 @@ class TestCreateEditOfficeHourView(APITestCase):
     def _assert_error_response(self, data, key, expected):
         self.assertIn(expected, data['errors'][key])
 
-    def _office_hour_created(self, mentor, from_now, staff):
-        count_before = MentorProgramOfficeHour.objects.count()
-        data = self._get_post_request_data(mentor, from_now)
-        user = self.staff_user() if staff else mentor
-        self._create_office_hour_session(user, data)
-        count_after = MentorProgramOfficeHour.objects.count()
-        return count_after == count_before + 1
-
-    def _assert_office_hour_created(self, mentor, from_now=30, staff=False):
-        self.assertTrue(self._office_hour_created(mentor, from_now, staff))
-
-    def _assert_office_hour_was_not_created(self, mentor,
-                                            from_now=30, staff=False):
-        self.assertFalse(self._office_hour_created(mentor, from_now, staff))
-
-    def _create_office_hour_obj(self, mentor, from_now=0, finalist=None):
-        start_time = datetime.now() + timedelta(minutes=from_now)
+    def _create_office_hour_obj(self,
+                                mentor, minutes_from_now=0, finalist=None):
+        start_time = datetime.now() + timedelta(minutes=minutes_from_now)
         end_time = start_time + timedelta(minutes=30)
         return MentorProgramOfficeHourFactory(
             mentor=mentor,
@@ -223,14 +209,12 @@ class TestCreateEditOfficeHourView(APITestCase):
         )
 
     def _assert_update_office_hour(self, mentor, office_hour, staff=False):
-        updated_topics = 'updated topics'
-        data = self._get_patch_request_data(office_hour,
-                                            {'topics': updated_topics})
+        data = {'topics': self.updated_topics}
         user = self.staff_user() if staff else mentor
         self._edit_office_hour_session(user, office_hour, data)
         updated_office_hour = MentorProgramOfficeHour.objects.get(
             pk=office_hour.id)
-        self.assertEqual(updated_office_hour.topics, updated_topics)
+        self.assertEqual(updated_office_hour.topics, self.updated_topics)
 
     def _create_office_hour_session(self, user, data):
         with self.login(email=user.email):
@@ -248,3 +232,13 @@ class TestCreateEditOfficeHourView(APITestCase):
         user.set_password('password')
         user.save()
         return user
+
+    @contextmanager
+    def _assert_office_hour_created(self, created=True):
+        count_before = MentorProgramOfficeHour.objects.count()
+        yield
+        count_after = MentorProgramOfficeHour.objects.count()
+        if not created:
+            self.assertFalse(count_after == count_before + 1)
+        else:
+            self.assertTrue(count_after == count_before + 1)
