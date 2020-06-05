@@ -18,11 +18,20 @@ class TestReserveOfficeHourView(APITestCase):
 
     def test_finalist_reserves_office_hour_timecard(self):
         # a finalist reserves an office hour, gets timecard details in response
-        pass
+        office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        finalist = _finalist()
+        response = self.post_response(office_hour.id,
+                                      request_user=finalist)
+#        self.assert_response_contains_session_details(response)
 
     def test_finalist_reserves_office_hour_gets_confirmation_email(self):
         # a finalist reserves and office hour, gets a confirmation email
-        pass
+        office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        finalist = _finalist()
+        response = self.post_response(office_hour.id,
+                                      request_user=finalist)
+        self.assert_notified(finalist)
+
     
     def test_previously_reserved_office_hour_gets_failure(self):
         # a finalist reserves a reserved office hour, gets failure response
