@@ -155,7 +155,7 @@ class ReserveOfficeHourView(ImpactView):
 
     def fail(self, detail):
         self.success = False
-        self.header = self.SUCCESS_HEADER
+        self.header = self.FAIL_HEADER
         self.detail = detail
         self.timecard_info = {}
         

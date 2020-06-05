@@ -2,6 +2,7 @@ from django.urls import reverse
 
 from impact.tests.api_test_case import APITestCase
 from impact.v1.views import ReserveOfficeHourView
+from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from accelerator.tests.factories import MentorProgramOfficeHourFactory
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.models import UserRole
@@ -54,6 +55,18 @@ class TestReserveOfficeHourView(APITestCase):
                                       finalist.id)
         self.assert_notified(office_hour.mentor)
 
+    def test_non_staff_reserve_on_behalf_of_failure(self):
+        # finalist reserves a session on behalf of finalist, gets failure
+        office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        finalist = _finalist()
+        response = self.post_response(office_hour.id,
+                                      finalist.id,
+                                      request_user=_finalist())
+        self.assert_ui_notification(response,
+                                    False,
+                                    DEFAULT_PERMISSION_DENIED_DETAIL)
+
+        
 
     def post_response(self,
                       office_hour_id,
@@ -76,3 +89,7 @@ class TestReserveOfficeHourView(APITestCase):
         
 def _finalist():
     return UserRoleContext(UserRole.FINALIST).user
+
+def _mentor():
+    return UserRoleContext(UserRole.MENTOR).user
+    
