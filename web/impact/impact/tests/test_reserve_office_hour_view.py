@@ -14,7 +14,12 @@ class TestReserveOfficeHourView(APITestCase):
     
     def test_finalist_reserves_office_hour_success(self):
         # a finalist reserves an office hour, gets success response
-        pass
+        office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        finalist = _finalist()
+        response = self.post_response(office_hour.id,
+                                      request_user=finalist)
+        self.assert_ui_notification(response, True, self.view.SUCCESS_DETAIL)
+
 
     def test_finalist_reserves_office_hour_timecard(self):
         # a finalist reserves an office hour, gets timecard details in response
