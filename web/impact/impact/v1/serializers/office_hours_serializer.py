@@ -2,28 +2,15 @@ from rest_framework import serializers
 
 from accelerator_abstract.models.base_user_utils import is_employee
 from accelerator.models import (
-    Location,
     MentorProgramOfficeHour,
-    User,
     UserRole
 )
+from .location_serializer import LocationSerializer
+from .user_serializer import UserSerializer
 
 INVALID_END_DATE = 'office hour end time must be later than the start time'
 INVALID_USER = ('must be of type Mentor or Alumni in residence '
                 'in an active program')
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'first_name', 'last_name', 'email']
-
-
-class LocationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Location
-        fields = ['id', 'street_address', 'timezone', 'country',
-                  'state', 'name', 'city', ]
 
 
 class OfficeHourSerializer(serializers.ModelSerializer):
@@ -35,7 +22,9 @@ class OfficeHourSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        if attrs['start_date_time'] > attrs['end_date_time']:
+        start_datetime = attrs.get('start_date_time', None)
+        end_datetime = attrs.get('end_date_time', None)
+        if start_datetime and end_datetime and start_datetime > end_datetime:
             raise serializers.ValidationError({
                 'end_date_time': INVALID_END_DATE,
             })
