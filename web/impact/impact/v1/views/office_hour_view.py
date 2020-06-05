@@ -5,9 +5,9 @@ from rest_framework.response import Response
 
 from accelerator.models import MentorProgramOfficeHour
 
-from impact.minimal_email_handler import MinimalEmailHandler
-from impact.permissions.v1_api_permissions import OfficeHourPermission
-from impact.v1.serializers.office_hours import OfficeHourSerializer
+from ...minimal_email_handler import MinimalEmailHandler
+from ...permissions.v1_api_permissions import OfficeHourPermission
+from ..serializers.office_hours import OfficeHourSerializer
 
 FAIL_CREATE_HEADER = 'Office hour session could not be created'
 FAIL_EDIT_HEADER = 'Office hour session could not be modified'

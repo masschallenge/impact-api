@@ -10,21 +10,19 @@ from accelerator.tests.factories import (
 )
 from accelerator.tests.factories.location_factory import LocationFactory
 
-from impact.permissions.v1_api_permissions import (
-    DEFAULT_PERMISSION_DENIED_DETAIL,
-)
-from impact.tests.api_test_case import APITestCase
-from impact.v1.serializers.office_hours import (
+from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
+from ..v1.serializers.office_hours import (
     INVALID_END_DATE,
     INVALID_USER
 )
-from impact.v1.views.office_hour_view import (
+from ..v1.views.office_hour_view import (
     FAIL_CREATE_HEADER,
     FAIL_EDIT_HEADER,
     SUCCESS_CREATE_HEADER,
     SUCCESS_EDIT_HEADER,
     OfficeHourViewSet
 )
+from .api_test_case import APITestCase
 
 
 class TestCreateEditOfficeHourView(APITestCase):
