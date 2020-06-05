@@ -1,6 +1,6 @@
 from graphene_django import DjangoObjectType
 
-from accelerator.models import InterestCategory
+from mc.models import InterestCategory
 
 
 class InterestCategoryType(DjangoObjectType):

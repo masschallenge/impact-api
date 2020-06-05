@@ -1,4 +1,4 @@
-from accelerator.models import Program
+from mc.models import Program
 from .model_helper import (
     ModelHelper,
     OPTIONAL_FLOAT_FIELD,

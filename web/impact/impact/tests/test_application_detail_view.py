@@ -5,10 +5,10 @@ import json
 from jsonschema import Draft4Validator
 
 from django.urls import reverse
-from .tests.factories import ApplicationFactory
-from .tests.api_test_case import APITestCase
-from .tests.utils import assert_fields
-from .v1.views import ApplicationDetailView
+from .factories import ApplicationFactory
+from .api_test_case import APITestCase
+from .utils import assert_fields
+from ..v1.views import ApplicationDetailView
 
 APPLICATION_GET_FIELDS = [
     "id",

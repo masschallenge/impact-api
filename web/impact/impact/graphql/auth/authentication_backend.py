@@ -1,6 +1,6 @@
 from graphql_jwt.shortcuts import get_user_by_token
 
-from .graphql.auth.utils import get_jwt_cookie
+from .utils import get_jwt_cookie
 
 
 class JWTokenCookieBackend(object):

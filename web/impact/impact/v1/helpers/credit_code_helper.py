@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from accelerator.models import RefundCode
+from mc.models import RefundCode
 from .model_helper import (
     BOOLEAN_FIELD,
     INTEGER_ARRAY_FIELD,

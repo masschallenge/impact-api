@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2019 MassChallenge, Inc.
 
-from accelerator.models import MentorProgramOfficeHour
+from mc.models import MentorProgramOfficeHour
 from .model_helper import (
     ModelHelper,
     BOOLEAN_FIELD,

@@ -5,9 +5,9 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from pytz import timezone
 from add2cal import Add2Cal
-from .tests.api_test_case import APITestCase
+from .api_test_case import APITestCase
 
-from .tests.factories import UserFactory
+from .factories import UserFactory
 
 User = get_user_model()  # pylint: disable=invalid-name
 

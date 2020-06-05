@@ -1,8 +1,7 @@
-from accelerator.models import (
-    UserRole,
-)
-from accelerator_abstract.models.base_user_utils import is_employee
+from mc.models import UserRole
 from accelerator.models import ACTIVE_PROGRAM_STATUS
+from accelerator_abstract.models.base_user_utils import is_employee
+
 
 BASIC_ALLOWED_USER_ROLES = [
     UserRole.FINALIST,

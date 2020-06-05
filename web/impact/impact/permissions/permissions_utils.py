@@ -3,7 +3,7 @@
 
 import logging
 from django.contrib.auth import get_user_model
-from accelerator.models import Clearance
+from mc.models import Clearance
 from accelerator_abstract.models.base_clearance import (
     CLEARANCE_LEVEL_GLOBAL_MANAGER,
     CLEARANCE_LOGGER_FAILED_INSUFFICIENT_CLEARANCE_MSG,

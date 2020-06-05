@@ -3,7 +3,7 @@
 
 from django.conf import settings
 
-from accelerator.models import (
+from mc.models import (
     Site,
     SiteProgramAuthorization,
 )

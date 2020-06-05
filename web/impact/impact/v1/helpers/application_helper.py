@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from accelerator.models import Application
+from mc.models import Application
 from .model_helper import (
     ModelHelper,
     OPTIONAL_INTEGER_FIELD,

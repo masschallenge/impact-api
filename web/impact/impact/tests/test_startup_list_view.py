@@ -4,8 +4,8 @@
 from django.urls import reverse
 
 from .v0.api_data.startup_list_data import StartupListData as Data
-from .tests.api_test_case import APITestCase
-from .tests.factories import (
+from .api_test_case import APITestCase
+from .factories import (
     IndustryFactory,
     ProgramFactory,
     ProgramStartupStatusFactory,
@@ -13,7 +13,7 @@ from .tests.factories import (
     StartupFactory,
     StartupStatusFactory,
 )
-from .tests.utils import match_errors
+from .utils import match_errors
 from .v0.views.utils import BADGE_DISPLAYS
 
 TEST_BADGE_DISPLAY = BADGE_DISPLAYS[0]

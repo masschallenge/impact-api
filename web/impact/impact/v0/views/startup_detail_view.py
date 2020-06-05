@@ -10,10 +10,8 @@ from embed_video.backends import (
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accelerator.models import ProgramStartupStatus
-from ...permissions import (
-    V0APIPermissions,
-)
+from mc.models import ProgramStartupStatus
+from ...permissions import V0APIPermissions
 from ...utils import get_profile
 from ..api_data.startup_detail_data import StartupDetailData
 from ..views.utils import (

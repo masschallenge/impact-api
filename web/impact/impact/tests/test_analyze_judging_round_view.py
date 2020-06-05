@@ -11,9 +11,9 @@ from accelerator.tests.contexts import (
     CriterionOptionSpecContext,
 )
 
-from .tests.api_test_case import APITestCase
-from .tests.utils import assert_fields
-from .v1.views import AnalyzeJudgingRoundView
+from .api_test_case import APITestCase
+from .utils import assert_fields
+from ..v1.views import AnalyzeJudgingRoundView
 
 
 class TestAnalyzeJudgingRoundView(APITestCase):

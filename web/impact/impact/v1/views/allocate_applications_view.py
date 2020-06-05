@@ -9,12 +9,15 @@ from numpy import (
     array,
     matmul,
 )
+from rest_framework.response import Response
+
 from ..classes.application_data_cache import ApplicationDataCache
 from ..classes.criteria_data_cache import CriteriaDataCache
 from ..classes.judge_data_cache import JudgeDataCache
-from accelerator.models import (
+
+from accelerator.models import Allocator
+from mc.models import (
     ACTIVE_PANEL_STATUS,
-    Allocator,
     Application,
     ApplicationPanelAssignment,
     ASSIGNED_PANEL_ASSIGNMENT_STATUS,
@@ -24,12 +27,10 @@ from accelerator.models import (
     Scenario,
     User,
 )
-from rest_framework.response import Response
+
 from ..helpers import CriterionHelper
 from ..views.impact_view import ImpactView
-from ...permissions import (
-    AllocateApplicationsPermissions,
-)
+from ...permissions import AllocateApplicationsPermissions
 from ..classes.option_analysis import feedbacks_for_judging_round
 
 ALREADY_ASSIGNED_ERROR = "{judge} is already assigned to {count} applications"

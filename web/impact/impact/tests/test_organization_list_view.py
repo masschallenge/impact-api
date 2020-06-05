@@ -8,21 +8,19 @@ import pytz
 
 from django.urls import reverse
 
-from .tests.factories import (
+from .factories import (
     PartnerFactory,
     OrganizationFactory,
     StartupFactory,
 )
-from .tests.api_test_case import APITestCase
-from .tests.test_organization_detail_view import (
+from .api_test_case import APITestCase
+from .test_organization_detail_view import (
     PARTNER_GET_FIELDS,
     STARTUP_GET_FIELDS,
 )
-from .tests.utils import (
-    assert_fields,
-)
-from .utils import override_updated_at
-from .v1.views import OrganizationListView
+from .utils import assert_fields
+from ..utils import override_updated_at
+from ..v1.views import OrganizationListView
 
 
 class TestOrganizationListView(APITestCase):

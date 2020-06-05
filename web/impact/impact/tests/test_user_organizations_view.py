@@ -5,15 +5,15 @@ import json
 from jsonschema import Draft4Validator
 from django.urls import reverse
 
-from .tests.factories import (
+from .factories import (
     PartnerTeamMemberFactory,
     StartupTeamMemberFactory,
 )
 
-from .tests.api_test_case import APITestCase
-from .tests.utils import assert_fields
-from .v1.helpers import ORGANIZATION_USER_FIELDS
-from .v1.views import UserOrganizationsView
+from .api_test_case import APITestCase
+from .utils import assert_fields
+from ..v1.helpers import ORGANIZATION_USER_FIELDS
+from ..v1.views import UserOrganizationsView
 
 USER_ORGANIZATIONS_GET_FIELDS = ["organizations"]
 

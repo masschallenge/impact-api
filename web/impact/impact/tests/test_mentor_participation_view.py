@@ -2,17 +2,17 @@ from django.core import mail
 from django.urls import reverse
 
 from accelerator.tests.contexts.context_utils import get_user_role_by_name
-from accelerator.models import UserRole
+from mc.models import UserRole
 from accelerator.tests.factories import (
     ProgramFactory,
     ProgramRoleFactory,
     ProgramRoleGrantFactory,
 )
 
-from .tests.api_test_case import APITestCase
-from .tests.test_graphql import expert_user
-from .v1.views import MentorParticipationView
-from .v1.views.mentor_participation_view import (
+from .api_test_case import APITestCase
+from .test_graphql import expert_user
+from ..v1.views import MentorParticipationView
+from ..v1.views.mentor_participation_view import (
     INVALID_INPUT_ERROR,
     SUBJECT
 )

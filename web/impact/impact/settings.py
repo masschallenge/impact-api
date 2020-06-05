@@ -103,25 +103,6 @@ class Base(Configuration):
 
     ACCELERATOR_MODELS_ARE_MANAGED = True
 
-    AUTH_USER_MODEL = 'simpleuser.User'
-
-    MIDDLEWARE = [
-        'django.contrib.sessions.middleware.SessionMiddleware',
-        'django.middleware.common.CommonMiddleware',
-        'django.middleware.csrf.CsrfViewMiddleware',
-        'corsheaders.middleware.CorsMiddleware',
-        'django.contrib.auth.middleware.AuthenticationMiddleware',
-        'impact.graphql.auth.middleware.CookieJSONWebTokenMiddleware',
-        'impact.middleware.TrackAPICalls',
-        'django.contrib.messages.middleware.MessageMiddleware',
-        'django.middleware.clickjacking.XFrameOptionsMiddleware',
-        'django.middleware.security.SecurityMiddleware',
-        'django.contrib.admindocs.middleware.XViewMiddleware',
-        'django.middleware.locale.LocaleMiddleware',
-        'oauth2_provider.middleware.OAuth2TokenMiddleware',
-        'impact.middleware.MethodOverrideMiddleware',
-    ]
-
     if os.environ.get('READ_REPLICA_DATABASE_URL'):
         DATABASES.update(values.DatabaseURLValue(  # pragma: no cover
             alias='read-replica',
@@ -202,36 +183,6 @@ class Base(Configuration):
     V0_SITE_NAME = bytes(os.environ.get(
         'IMPACT_API_V0_SITE_NAME', 'masschallenge.org'), 'utf-8')
 
-    V0_API_GROUP = os.environ.get(
-        'IMPACT_API_V0_API_GROUP', 'v0_clients')
-
-    # This and the above should get generalized.  See AC-4574.
-    V1_API_GROUP = os.environ.get(
-        'IMPACT_API_V1_API_GROUP', 'v1_clients')
-
-    V1_CONFIDENTIAL_API_GROUP = bytes('v1_confidential', 'utf-8')
-
-    OAUTH2_PROVIDER = {
-        # this is the list of available scopes
-        'SCOPES': {
-            'read': 'Read scope',
-            'write': 'Write scope',
-            'groups': 'Access to your groups'
-        }
-    }
-
-    REST_PROXY = {
-        'HOST': os.environ.get('ACCELERATE_SITE_URL',
-                               'https://accelerate.masschallenge.org'),
-        'AUTH': {
-            'user': None,
-            'password': None,
-            # Or alternatively:
-            'token': None,
-        },
-        'VERIFY_SSL': False,
-    }
-
     AUTHENTICATION_BACKENDS = (
         'oauth2_provider.backends.OAuth2Backend',
         'impact.graphql.auth.authentication_backend.JWTokenCookieBackend',
@@ -239,20 +190,6 @@ class Base(Configuration):
         'django.contrib.auth.backends.ModelBackend',
     )
     SESSION_COOKIE_AGE = 3600 * 24 * 7 * 2  # default
-    JWT_AUTH = {
-        'JWT_ALLOW_REFRESH': False,
-        'JWT_EXPIRATION_DELTA': datetime.timedelta(
-            seconds=(SESSION_COOKIE_AGE * 2)),
-        # after timedelta has passed, token is no longer valid, and cannot
-        # be refreshed any longer
-        'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(
-            seconds=(SESSION_COOKIE_AGE * 2)),
-        # after timedelta has passed since first obtaining the token,
-        # it is no longer possible to refresh the token, even if the token
-        # did not expire
-        'JWT_AUTH_COOKIE': os.environ.get('JWT_AUTH_COOKIE', ''),
-        'JWT_SECRET_KEY': os.environ.get('JWT_SECRET_KEY', ''),
-    }
 
     PAYPAL_WPP_USER = ''
     PAYPAL_WPP_PASSWORD = ''

@@ -6,19 +6,19 @@ from jsonschema import Draft4Validator
 
 from django.urls import reverse
 
-from accelerator.models import (
+from mc.models import (
     CLEARANCE_LEVEL_GLOBAL_MANAGER,
     IN_PERSON_JUDGING_ROUND_TYPE,
     ONLINE_JUDGING_ROUND_TYPE,
 )
 from accelerator.tests.factories.clearance_factory import ClearanceFactory
-from .tests.factories import JudgingRoundFactory
-from .tests.api_test_case import APITestCase
-from .tests.test_judging_round_detail_view import (
+from .factories import JudgingRoundFactory
+from .api_test_case import APITestCase
+from .test_judging_round_detail_view import (
     JUDGING_ROUND_GET_FIELDS,
 )
-from .tests.utils import assert_fields
-from .v1.views import (
+from .utils import assert_fields
+from ..v1.views import (
     INVALID_IS_ACTIVE_ERROR,
     INVALID_ROUND_TYPE_ERROR,
     JudgingRoundListView,

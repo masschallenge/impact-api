@@ -4,7 +4,7 @@ from datetime import datetime
 from django.db.models import Q
 from django.utils import timezone
 from graphene.types.generic import GenericScalar
-from accelerator.models import (
+from mc.models import (
     CONFIRMED_RELATIONSHIP,
     ExpertProfile,
     Program,
@@ -23,13 +23,9 @@ from accelerator_abstract.models import (
     HIDDEN_PROGRAM_STATUS,
     UPCOMING_PROGRAM_STATUS
 )
-from ...utils import (
-    compose_filter,
-)
-from ...v1.views.utils import (
-    map_data,
-)
-from ....v1.helpers.profile_helper import (
+from ...utils import compose_filter
+from ...v1.views.utils import map_data
+from ...v1.helpers.profile_helper import (
     latest_program_id_for_each_program_family,
 )
 

@@ -8,7 +8,7 @@ from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
-from accelerator.models import UserRole
+from mc.models import UserRole
 from accelerator.tests.factories.location_factory import LocationFactory
 from accelerator.tests.factories.program_family_location_factory import (
     ProgramFamilyLocationFactory,
@@ -21,9 +21,9 @@ from accelerator.tests.factories import (
 from accelerator.tests.contexts.context_utils import get_user_role_by_name
 from accelerator.tests.utils import days_from_now
 
-from impact.tests.api_test_case import APITestCase
-from impact.tests.factories import UserFactory
-from impact.v1.views import (
+from .api_test_case import APITestCase
+from .factories import UserFactory
+from ..v1.views import (
     ISO_8601_DATE_FORMAT,
     OfficeHoursCalendarView,
 )

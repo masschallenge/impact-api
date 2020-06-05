@@ -4,7 +4,8 @@ from datetime import timedelta
 
 from django.utils import timezone
 
-from .tests.factories import (
+from accelerator.tests.contexts.context_utils import get_user_role_by_name
+from ..factories import (
     BaseProfileFactory,
     EntrepreneurProfileFactory,
     ExpertProfileFactory,
@@ -53,7 +54,7 @@ class UserContext(object):
         self.user.save()
         self.program_role_grants = [
             ProgramRoleGrantFactory(person=self.user,
-                                    program_role__user_role__name=role_name)
+                program_role__user_role=get_user_role_by_name(role_name))
             for role_name in self.program_role_names]
         self.startup_role_grants = [
             StartupStatusFactory(

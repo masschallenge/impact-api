@@ -1,11 +1,11 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from .model_utils import (
+from ..model_utils import (
     model_name_to_snake,
     snake_to_model_name,
 )
-from .tests.api_test_case import APITestCase
+from .api_test_case import APITestCase
 
 
 empty_string = ''

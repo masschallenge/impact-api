@@ -3,7 +3,7 @@
 
 import re
 
-from accelerator.models import (
+from mc.models import (
     PHONE_MAX_LENGTH,
     TWITTER_HANDLE_MAX_LENGTH,
 )

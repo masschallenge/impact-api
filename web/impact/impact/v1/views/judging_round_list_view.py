@@ -1,12 +1,11 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from accelerator.models import (
+from mc.models import (
     Clearance,
     IN_PERSON_JUDGING_ROUND_TYPE,
     ONLINE_JUDGING_ROUND_TYPE,
 )
-
 from .base_list_view import BaseListView
 from ..helpers import JudgingRoundHelper
 

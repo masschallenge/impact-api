@@ -5,13 +5,13 @@ import json
 from jsonschema import Draft4Validator
 
 from django.urls import reverse
-from .tests.factories import RefundCodeFactory
-from .tests.api_test_case import APITestCase
-from .tests.test_credit_code_detail_view import (
+from .factories import RefundCodeFactory
+from .api_test_case import APITestCase
+from .test_credit_code_detail_view import (
     CREDIT_CODE_GET_FIELDS,
 )
-from .tests.utils import assert_fields
-from .v1.views import CreditCodeListView
+from .utils import assert_fields
+from ..v1.views import CreditCodeListView
 
 
 class TestCreditCodeListView(APITestCase):

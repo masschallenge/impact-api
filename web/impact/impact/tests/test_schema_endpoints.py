@@ -2,13 +2,13 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from django.urls import reverse
-from .tests.api_test_case import APITestCase
+from .api_test_case import APITestCase
 from .v1.helpers import (
     ORGANIZATION_FIELDS,
     USER_FIELDS,
 )
 from .v1.helpers import ORGANIZATION_USER_FIELDS
-from .tests.factories import (
+from .factories import (
     StartupFactory
 )
 import json

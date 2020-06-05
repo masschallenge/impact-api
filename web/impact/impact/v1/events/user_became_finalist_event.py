@@ -1,10 +1,8 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from accelerator.models import UserRole
-from .base_user_role_grant_event import (
-    BaseUserRoleGrantEvent,
-)
+from mc.models import UserRole
+from .base_user_role_grant_event import BaseUserRoleGrantEvent
 
 
 class UserBecameFinalistEvent(BaseUserRoleGrantEvent):

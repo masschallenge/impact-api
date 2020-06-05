@@ -6,9 +6,9 @@ import json
 from django.urls import reverse
 
 from accelerator.tests.contexts import AnalyzeJudgingContext
-from .tests.api_test_case import APITestCase
-from .tests.utils import assert_fields
-from .v1.views import JudgingRoundCriteriaHeaderView
+from .api_test_case import APITestCase
+from .utils import assert_fields
+from ..v1.views import JudgingRoundCriteriaHeaderView
 
 
 class TestJudgingRoundCriteriaHeaderView(APITestCase):

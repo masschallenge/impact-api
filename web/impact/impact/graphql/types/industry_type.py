@@ -1,6 +1,6 @@
 from graphene_django import DjangoObjectType
 
-from accelerator.models.industry import Industry
+from mc.models import Industry
 
 
 class IndustryType(DjangoObjectType):

@@ -6,10 +6,10 @@ from jsonschema import Draft4Validator
 
 from django.urls import reverse
 
-from .tests.factories import RefundCodeFactory
-from .tests.api_test_case import APITestCase
-from .tests.utils import assert_fields
-from .v1.views import CreditCodeDetailView
+from .factories import RefundCodeFactory
+from .api_test_case import APITestCase
+from .utils import assert_fields
+from ..v1.views import CreditCodeDetailView
 
 
 CREDIT_CODE_GET_FIELDS = [
@@ -30,11 +30,12 @@ class TestCreditCodeDetailView(APITestCase):
             url = reverse(CreditCodeDetailView.view_name,
                           args=[code.pk])
             response = self.client.get(url)
-            assert response.data["discount"] == code.discount
-            assert response.data["issued_to"] == code.issued_to.organization.id
-            assert response.data["unique_code"] == code.unique_code
-            assert response.data["programs"] == [
-                program.pk for program in code.programs.all()]
+            self.assertEqual(response.data["discount"], code.discount)
+            self.assertEqual(response.data[
+                "issued_to"], code.issued_to.organization.id)
+            self.assertEqual(response.data["unique_code"], code.unique_code)
+            self.assertEqual(response.data["programs"],
+                [program.pk for program in code.programs.all()])
 
     def test_options(self):
         code = RefundCodeFactory()
@@ -42,7 +43,7 @@ class TestCreditCodeDetailView(APITestCase):
             url = reverse(CreditCodeDetailView.view_name,
                           args=[code.pk])
             response = self.client.options(url)
-            assert response.status_code == 200
+            self.assertEqual(response.status_code, 200)
             get_options = response.data["actions"]["GET"]["properties"]
             assert_fields(CREDIT_CODE_GET_FIELDS, get_options)
 

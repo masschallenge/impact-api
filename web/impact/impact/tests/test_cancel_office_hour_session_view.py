@@ -3,14 +3,14 @@ from pytz import timezone
 from django.core import mail
 from django.urls import reverse
 
-from accelerator.models import UserRole
+from mc.models import UserRole
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.utils import days_from_now
 
+from .api_test_case import APITestCase
+from .factories import MentorProgramOfficeHourFactory
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
-from .tests.api_test_case import APITestCase
-from .tests.factories import MentorProgramOfficeHourFactory
-from .v1.views.cancel_office_hour_session_view import (
+from ..v1.views.cancel_office_hour_session_view import (
     DEFAULT_TIMEZONE,
     FAIL_HEADER,
     OFFICE_HOUR_SESSION_404,

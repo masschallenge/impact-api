@@ -1,7 +1,7 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from accelerator.models import Organization
+from mc.models import Organization
 from ..helpers import (
     COULD_BE_STARTUP_CHECK,
     IS_STARTUP_CHECK,

@@ -3,7 +3,7 @@
 
 from .base_history_view import BaseHistoryView
 
-from accelerator.models import Organization
+from mc.models import Organization
 from ..events import (
     OrganizationBecameEntrantEvent,
     OrganizationBecameFinalistEvent,

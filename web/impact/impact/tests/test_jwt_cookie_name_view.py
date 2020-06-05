@@ -6,9 +6,9 @@ from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework.test import APIClient
 
-from .tests.api_test_case import APITestCase
-from .tests.factories import UserFactory
-from .views import JWTCookieNameView
+from .api_test_case import APITestCase
+from .factories import UserFactory
+from ..views import JWTCookieNameView
 
 User = get_user_model()  # pylint: disable=invalid-name
 

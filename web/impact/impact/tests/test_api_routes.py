@@ -2,23 +2,23 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 import json
-from accelerator.models import ProgramRole
+from mc.models import ProgramRole
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.test import APIClient
 from test_plus.test import TestCase
 
-from .tests.factories import (
+from .factories import (
     ProgramRoleFactory,
     StartupStatusFactory,
     UserFactory,
 )
-from .tests.factories import (
+from .factories import (
     PermissionFactory,
     StartupFactory,
 )
 
-from .v1.views.user_detail_view import UserDetailView
+from ..v1.views.user_detail_view import UserDetailView
 
 
 class TestApiRoute(TestCase):

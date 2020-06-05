@@ -7,8 +7,8 @@ from jsonschema import Draft4Validator
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
-from .tests.contexts import UserContext
-from .tests.factories import (
+from .contexts import UserContext
+from .factories import (
     ExpertCategoryFactory,
     FunctionalExpertiseFactory,
     IndustryFactory,
@@ -16,20 +16,20 @@ from .tests.factories import (
     ProgramFamilyFactory,
     ProgramRoleGrantFactory,
 )
-from .tests.api_test_case import APITestCase
-from .tests.utils import (
+from .api_test_case import APITestCase
+from .utils import (
     assert_fields,
     assert_fields_missing,
     assert_fields_not_required,
     assert_fields_required,
 )
-from ...utils import get_profile
+from ..utils import get_profile
 from ..v1.helpers import (
     INVALID_ID_ERROR,
     MISSING_SUBJECT_ERROR,
     UserHelper,
 )
-from .v1.views.utils import VALID_KEYS_NOTE
+from ..v1.views.utils import VALID_KEYS_NOTE
 from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
 from accelerator_abstract.models.base_base_profile import (
     ENTREPRENEUR_USER_TYPE,
@@ -38,7 +38,7 @@ from accelerator_abstract.models.base_base_profile import (
     PHONE_MAX_LENGTH,
     TWITTER_HANDLE_MAX_LENGTH,
 )
-from .v1.views.user_detail_view import (
+from ..v1.views.user_detail_view import (
     MISSING_PROFILE_ERROR,
     NO_USER_ERROR,
     UserDetailView,

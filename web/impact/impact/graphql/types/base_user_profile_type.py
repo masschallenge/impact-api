@@ -3,7 +3,7 @@ from graphene_django import DjangoObjectType
 from itertools import chain
 import graphene
 
-from accelerator.models import (
+from mc.models import (
     BaseProfile,
     StartupRole,
     Clearance,

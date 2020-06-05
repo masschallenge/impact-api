@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from test_plus.test import TestCase
-from .tests.factories import ReferenceFactory
+from .factories import ReferenceFactory
 
 
 class TestReference(TestCase):

@@ -5,12 +5,10 @@ from django.template import loader
 
 from rest_framework.response import Response
 
-from impact.minimal_email_handler import MinimalEmailHandler as email_handler
-from impact.v1.views.impact_view import ImpactView
-from impact.permissions.v1_api_permissions import (
-    OfficeHourFinalistPermission,
-)
-from accelerator.models import MentorProgramOfficeHour
+from ...minimal_email_handler import MinimalEmailHandler as email_handler
+from ...permissions.v1_api_permissions import OfficeHourFinalistPermission
+from .impact_view import ImpactView
+from mc.models import MentorProgramOfficeHour
 from accelerator_abstract.models.base_user_utils import is_employee
 
 User = get_user_model()

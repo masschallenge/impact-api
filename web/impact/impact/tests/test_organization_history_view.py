@@ -6,11 +6,11 @@ from jsonschema import Draft4Validator
 
 from django.urls import reverse
 
-from accelerator.models import (
+from mc.models import (
     SUBMITTED_APP_STATUS,
     StartupRole,
 )
-from .tests.factories import (
+from .factories import (
     ApplicationFactory,
     OrganizationFactory,
     PartnerFactory,
@@ -21,20 +21,20 @@ from .tests.factories import (
     StartupStatusFactory,
 )
 
-from .tests.api_test_case import APITestCase
-from .tests.utils import (
+from .api_test_case import APITestCase
+from .utils import (
     assert_fields,
     days_from_now,
     find_events,
 )
-from .utils import DAWN_OF_TIME
-from .v1.events import (
+from ..utils import DAWN_OF_TIME
+from ..v1.events import (
     OrganizationBecameEntrantEvent,
     OrganizationBecameFinalistEvent,
     OrganizationBecameWinnerEvent,
     OrganizationCreatedEvent,
 )
-from .v1.views import OrganizationHistoryView
+from ..v1.views import OrganizationHistoryView
 
 
 class TestOrganizationHistoryView(APITestCase):

@@ -10,7 +10,7 @@ from collections import namedtuple
 from itertools import chain
 from django.urls import reverse
 
-from accelerator.models import (
+from mc.models import (
     Application,
     JUDGING_FEEDBACK_STATUS_CONFLICT,
     JUDGING_STATUS_CONFLICT,
@@ -31,8 +31,8 @@ from accelerator.tests.contexts import (
     AnalyzeJudgingContext,
     JudgeFeedbackContext,
 )
-from .tests.api_test_case import APITestCase
-from .v1.views import (
+from .api_test_case import APITestCase
+from ..v1.views import (
     ALREADY_ASSIGNED_ERROR,
     AllocateApplicationsView,
     JUDGING_ROUND_INACTIVE_ERROR,

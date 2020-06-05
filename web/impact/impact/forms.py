@@ -2,7 +2,7 @@
 # Copyright (c) 2017 MassChallenge, Inc.
 
 from django.contrib.auth import get_user_model
-from registration.forms import RegistrationForm
+from django_registration.forms import RegistrationForm
 
 
 class ImpactUserForm(RegistrationForm):

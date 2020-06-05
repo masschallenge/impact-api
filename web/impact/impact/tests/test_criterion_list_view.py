@@ -3,15 +3,15 @@ import json
 from django.urls import reverse
 
 from accelerator.models import Criterion
-from .tests.api_test_case import APITestCase
-from .tests.factories import (
+from .api_test_case import APITestCase
+from .factories import (
     CriterionFactory,
     JudgingRoundFactory,
 )
-from .tests.utils import assert_data_is_consistent_with_instance
-from .v1.helpers import INVALID_INTEGER_ERROR
-from .v1.views import CriterionListView
-from .v1.views.utils import valid_keys_note
+from .utils import assert_data_is_consistent_with_instance
+from ..v1.helpers import INVALID_INTEGER_ERROR
+from ..v1.views import CriterionListView
+from ..v1.views.utils import valid_keys_note
 
 
 class TestCriterionListView(APITestCase):
