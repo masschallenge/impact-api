@@ -27,7 +27,7 @@ class TestReserveOfficeHourView(APITestCase):
         finalist = _finalist()
         response = self.post_response(office_hour.id,
                                       request_user=finalist)
-#        self.assert_response_contains_session_details(response)
+        self.assert_response_contains_session_details(response, office_hour)
 
     def test_finalist_reserves_office_hour_gets_confirmation_email(self):
         # a finalist reserves and office hour, gets a confirmation email
@@ -36,7 +36,6 @@ class TestReserveOfficeHourView(APITestCase):
         response = self.post_response(office_hour.id,
                                       request_user=finalist)
         self.assert_notified(finalist)
-
     
     def test_previously_reserved_office_hour_gets_failure(self):
         # a finalist reserves a reserved office hour, gets failure response
@@ -46,8 +45,7 @@ class TestReserveOfficeHourView(APITestCase):
                                       request_user=finalist)
         self.assert_ui_notification(response,
                                     False,
-                                    self.view.OFFICE_HOUR_ALREADY_RESERVED)
-        
+                                    self.view.OFFICE_HOUR_ALREADY_RESERVED)        
 
     def test_reserve_on_behalf_of_success(self):
         # staff reserves a session on behalf of finalist, gets success
@@ -87,7 +85,14 @@ class TestReserveOfficeHourView(APITestCase):
                                     DEFAULT_PERMISSION_DENIED_DETAIL)
 
         
-
+    def assert_response_contains_session_details(self, response, office_hour):
+        office_hour.refresh_from_db()
+        timecard = response.data['timecard_info']
+        oh_details = {'finalist_first_name': office_hour.finalist.first_name,
+                      'finalist_last_name': office_hour.finalist.last_name,
+                      'topics': office_hour.description}
+        self.assertDictEqual(timecard, oh_details)
+        
     def post_response(self,
                       office_hour_id,
                       user_id=None,
