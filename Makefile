@@ -59,10 +59,6 @@ deprecated_targets = \
   stop \
   superuser \
 
-
-DEFAULT_DB_NAME = initial_schema
-db_name ?= $(DEFAULT_DB_NAME)
-
 lower_target_help = \
 
 
@@ -117,25 +113,6 @@ target_help = \
   'bash-shell - Access to bash shell.' \
   'db-shell - Access to running database server.' \
   'django-shell - Access to Django shell.' \
-  ' ' \
-  '-- Database targets --' \
-  'Database targets use the make variables db_name and gz_file.' \
-  'db_name defaults to $(DEFAULT_DB_NAME)' \
-  'gz_file defaults to db_cache/$$(db_name).sql.gz' \
-  ' ' \
-  'load-db - Load gzipped database file.' \
-  '\tIf $S$(gz_file) does not exist, then try to download from S3' \
-  '\tusing the key "$$(db_name).sql.gz".' \
-  'clean-db-cache - Delete $$(gz_file) if it exists.' \
-  'load-remote-db - Delete $$(gz_file) if it exists, then run load-db.' \
-  'dump-db - Create a gzipped db dump.' \
-  '\tCreates db_cache/$$(db_name).sql.gz.' \
-  '\tNote that dump-db ignores $$(gz_file).' \
-  'upload-db - Upload db dump to S3.' \
-  '\tS3 key is always $$(db_name).sql.gz' \
-  '\tUploads $$(gz_file) and make it publicly accessible. The command uses' \
-  'the AWS KEY and SECRET specified in .dev.env, make sure they are ' \
-  'configured with a user who has upload permissions prior to execution.' \
   ' ' \
   'release-list - List all releases that are ready to be deployed.' \
   'release - Create named release of releated servers.' \
