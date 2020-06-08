@@ -45,10 +45,10 @@ class TestOrganizationUsersView(APITestCase):
             self.assertFalse(partner_user["partner_administrator"])
 
     def test_options(self):
-        stm = StartupTeamMemberFactory(startup_administrator=True)
         with self.login(email=self.basic_user().email):
-            url = reverse(OrganizationUsersView.view_name,
-                          args=[stm.startup.id])
+            stm = StartupTeamMemberFactory(startup_administrator=True)
+            url = reverse(OrganizationUsersView.view_name, args=[
+                stm.startup.organization.id])
             response = self.client.options(url)
             assert response.status_code == 200
             get_options = response.data["actions"]["GET"]["properties"]
@@ -60,7 +60,7 @@ class TestOrganizationUsersView(APITestCase):
         stm = StartupTeamMemberFactory(startup_administrator=True)
         with self.login(email=self.basic_user().email):
             url = reverse(OrganizationUsersView.view_name,
-                          args=[stm.startup.id])
+                          args=[stm.startup.organization.id])
 
             options_response = self.client.options(url)
             get_response = self.client.get(url)
