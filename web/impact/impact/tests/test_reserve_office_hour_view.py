@@ -1,7 +1,7 @@
 from django.urls import reverse
 
-from impact.tests.api_test_case import APITestCase
-from impact.v1.views import ReserveOfficeHourView
+from .api_test_case import APITestCase
+from ..v1.views import ReserveOfficeHourView
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from accelerator.tests.factories import MentorProgramOfficeHourFactory
 from accelerator.tests.contexts import UserRoleContext

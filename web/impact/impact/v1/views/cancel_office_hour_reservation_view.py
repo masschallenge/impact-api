@@ -66,12 +66,12 @@ class CancelOfficeHourReservationView(ImpactView):
             return True, formatted_success_notification(self.office_hour)
 
     def process_cancellation(self):
-        send_email(self.prepare_email_notification(self.office_hour.mentor,
-                                                    self.office_hour.finalist,
-                                                    mentor_template_name))
-        send_email(self.prepare_email_notification(self.office_hour.finalist,
-                                                    self.office_hour.mentor,
-                                                    finalist_template_name))
+        send_email(**self.prepare_email_notification(self.office_hour.mentor,
+                                                     self.office_hour.finalist,
+                                                     mentor_template_name))
+        send_email(**self.prepare_email_notification(self.office_hour.finalist,
+                                                     self.office_hour.mentor,
+                                                     finalist_template_name))
         self._cancel_reservation()
 
     def _cancel_reservation(self):
