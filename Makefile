@@ -214,23 +214,6 @@ code-check:
 
 
 
-# Database migration related targets
-
-data-migration migrations: .env
-	@cd $(DJANGO_ACCELERATOR) && $(MAKE) $@ \
-	  migration_name=$(migration_name) | \
-	  sed "s|accelerator/|$(DJANGO_ACCELERATOR)/accelerator/|" | \
-	  sed "s|simpleuser/|$(DJANGO_ACCELERATOR)/simpleuser/|"
-
-
-application ?= accelerator
-
-MIGRATE_CMD = docker-compose run --rm web ./manage.py migrate $(application) $(migration)
-migrate: .env
-	@$(MIGRATE_CMD)
-
-update-schema: migrations
-	@$(MIGRATE_CMD)
 
 # Cross repo targets
 
@@ -347,70 +330,6 @@ django-shell: .env ensure-mysql
 	@docker-compose run --rm web ./manage.py shell
 
 
-# Database dump related targets
-
-DB_CACHE_DIR = db_cache/
-s3_key = $(db_name).sql.gz
-gz_file ?= $(DB_CACHE_DIR)$(s3_key)
-intermediary_file = /tmp/sql_dump.sql
-
-load-db: $(DB_CACHE_DIR) $(gz_file) .env ensure-mysql
-	@echo "Loading $(gz_file)"
-	@echo "This will take a while, don't be alarmed if your console appears frozen."
-	@echo "drop database mc_dev; create database mc_dev; use mc_dev;" > $(intermediary_file)
-	@gzcat $(gz_file) >> $(intermediary_file)
-	@sed -i "" "s|\`masschallenge\`|\`mc_dev\`|g" $(intermediary_file)
-	@cat $(intermediary_file) | docker-compose run --rm web ./manage.py dbshell
-	@rm -rf $(intermediary_file)
-	@docker-compose run --rm web ./manage.py migrate --noinput
-
-%.sql.gz:
-	@echo downloading db...
-	@wget -P ${dir $@} https://s3.amazonaws.com/public-clean-saved-db-states/$(notdir $@)
-
-${DB_CACHE_DIR}:
-	mkdir -p ${DB_CACHE_DIR}
-
-clean-db-cache:
-	@rm -f $(gz_file)
-
-load-remote-db: clean-db-cache
-	$(MAKE) load-db gz_file=$(gz_file)
-
-mysql-container: run-detached-server
-
-dump-db: mysql-container
-	@echo Creating a new dump for $(DB_CACHE_DIR)$(s3_key)
-	@docker-compose run --rm web /usr/bin/mysqldump -h mysql -u root -proot mc_dev -r /$(DB_CACHE_DIR)$(db_name).sql
-	@rm -f $(DB_CACHE_DIR)$(s3_key)
-	@gzip $(DB_CACHE_DIR)$(db_name).sql
-	@echo Created $(DB_CACHE_DIR)$(s3_key)
-
-MAX_UPLOAD_SIZE = 160000000
-
-upload-db: build-aws
-	@if [ `wc -c < $(gz_file) | tr -d '[:space:]'` -gt $(MAX_UPLOAD_SIZE) ]; \
-	then \
-	  echo \\nError: Dump file exceeds $(MAX_UPLOAD_SIZE) bytes.; \
-	  echo This may indicate that this dump contains sensitive data \\n; \
-	else \
-	  echo Uploading $(gz_file) as $(s3_key); \
-	  read -r -p "Are you sure? [y/N] " response; \
-	  if [[ "$$response" =~ ^([yY][eE][sS]|[yY])+$$ ]]; \
-	  then \
-	    echo Uploading $(gz_file) as $(s3_key)...; \
-		docker run -v $$PWD/$(gz_file):/data/$(notdir $(gz_file)) --rm  \
-		--env-file .dev.env \
-		masschallenge/aws \
-		aws s3 cp $(notdir $(gz_file)) \
-		s3://public-clean-saved-db-states/$(s3_key) --acl public-read; \
-	  else \
-	    echo Cancelled upload successfully.; \
-	  fi \
-	fi
-
-build-aws:
-	docker build -f Dockerfile.aws db_cache/ -t masschallenge/aws:latest
 
 
 TARGET ?= staging
