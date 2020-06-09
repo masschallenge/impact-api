@@ -3,7 +3,10 @@ from django.urls import reverse
 from .api_test_case import APITestCase
 from ..v1.views import ReserveOfficeHourView
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
-from accelerator.tests.factories import MentorProgramOfficeHourFactory
+from accelerator.tests.factories import (
+    MentorProgramOfficeHourFactory,
+    StartupFactory,
+)
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.models import UserRole
 
@@ -23,9 +26,11 @@ class TestReserveOfficeHourView(APITestCase):
 
     def test_finalist_reserves_office_hour_timecard(self):
         # a finalist reserves an office hour, gets timecard details in response
+        startup = StartupFactory()
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         finalist = _finalist()
         response = self.post_response(office_hour.id,
+                                      startup_id=startup.id,
                                       request_user=finalist)
         self.assert_response_contains_session_details(response, office_hour)
 
@@ -88,6 +93,10 @@ class TestReserveOfficeHourView(APITestCase):
     def assert_response_contains_session_details(self, response, office_hour):
         office_hour.refresh_from_db()
         timecard = response.data['timecard_info']
+        if office_hour.startup:
+            startup_name = office_hour.startup.organization.name
+        else:
+            startup_name = ""
         oh_details = {'finalist_first_name': office_hour.finalist.first_name,
                       'finalist_last_name': office_hour.finalist.last_name,
                       'topics': office_hour.description}
