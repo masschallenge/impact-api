@@ -11,8 +11,8 @@ from mc.models import (
     Location
 )
 
-from impact.graphql.types import LocationType
 from accelerator_abstract.models.base_user_utils import is_employee
+from .location_type import LocationType
 from ...utils import get_user_program_and_startup_roles
 
 
