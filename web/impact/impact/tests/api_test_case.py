@@ -124,10 +124,11 @@ class APITestCase(TestCase):
                 self.assertTrue(any([_message_included_in_email_alternative(
                     email, message) for email in emails]))
             else:
-                self.assertTrue(any([message in email.body for email in emails]))
+                self.assertTrue(any([
+                    message in email.body for email in emails]))
         if subject:
             self.assertIn(subject, [email.subject for email in emails])
-    
+
     def assert_not_notified(self, user):
         '''Assert that the specified user did not receive a notification.
         '''
@@ -138,4 +139,3 @@ class APITestCase(TestCase):
 
 def _message_included_in_email_alternative(email, message):
     return any([message in alt[0] for alt in email.alternatives])
-            

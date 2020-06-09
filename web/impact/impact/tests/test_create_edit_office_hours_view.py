@@ -1,6 +1,8 @@
 from contextlib import contextmanager
-from datetime import datetime, timedelta
-from django.core import mail
+from datetime import (
+    datetime,
+    timedelta,
+)
 from django.urls import reverse
 
 from accelerator.models import MentorProgramOfficeHour, UserRole
