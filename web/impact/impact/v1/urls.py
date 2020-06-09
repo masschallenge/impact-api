@@ -1,4 +1,5 @@
 from django.conf.urls import url
+from rest_framework import routers
 
 from impact.v1.views import (
     AllocateApplicationsView,
@@ -23,6 +24,7 @@ from impact.v1.views import (
     JudgingRoundListView,
     MentorProgramOfficeHourListView,
     OfficeHoursCalendarView,
+    OfficeHourViewSet,
     OrganizationDetailView,
     OrganizationHistoryView,
     OrganizationListView,
@@ -40,6 +42,9 @@ from impact.v1.views import (
     UserOrganizationsView,
     MentorParticipationView,
 )
+
+router = routers.SimpleRouter()
+router.register('office_hour', OfficeHourViewSet, OfficeHourViewSet.view_name)
 
 v1_urlpatterns = [
     url(r"^allocate_applications/(?P<round_id>[0-9]+)/(?P<judge_id>[0-9]+)/$",
@@ -157,3 +162,5 @@ v1_urlpatterns = [
         MentorParticipationView.as_view(),
         name=MentorParticipationView.view_name),
 ]
+
+v1_urlpatterns += router.urls
