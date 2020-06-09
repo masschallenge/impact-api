@@ -31,9 +31,9 @@ def map_data(klass, query, order, data_keys, output_keys):
 def email_template_path(template_name):
     return "emails/{}".format(template_name)
 
+
 # Note: this function should be replaced with calls to
 # office_hour.local_start once the re-monolith is complete
 def localized_office_hour_start_time(office_hour):
     tz = timezone(office_hour.location.timezone)
     return office_hour.start_date_time.astimezone(tz)
-    

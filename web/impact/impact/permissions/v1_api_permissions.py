@@ -16,6 +16,7 @@ from impact.permissions import (
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 DEFAULT_PERMISSION_DENIED_DETAIL = ("You do not have permission to perform "
                                     "this action.")
+OFFICE_HOUR_RESERVERS = [UserRole.FINALIST, UserRole.AIR, UserRole.ALUM]
 
 
 def can_view_user_details_page(request):
@@ -60,16 +61,16 @@ class IsExpertUser(IsAuthenticated):
         return (super().has_permission(request, view) and
                 is_expert(request.user))
 
-    
+
 class ReserveOfficeHourPermission(V1APIPermissions):
     def has_permission(self, request, view):
         return (super().has_permission(request, view) or
                 can_reserve_office_hour(request.user))
 
-    
+
 def can_reserve_office_hour(user):
     return user.programrolegrant_set.filter(
-        program_role__user_role__name__in=[UserRole.FINALIST, UserRole.AIR, UserRole.ALUM],
+        program_role__user_role__name__in=OFFICE_HOUR_RESERVERS,
         program_role__program__program_status=ACTIVE_PROGRAM_STATUS).exists()
 
 
@@ -87,4 +88,3 @@ class OfficeHourPermission(IsAuthenticated):
         is_reserved = office_hour.finalist
         return (is_employee(request.user) or
                 office_hour.mentor == request.user and not is_reserved)
-

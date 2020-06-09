@@ -79,4 +79,3 @@ def nonexistent_object_id(object_factory):
     object_id = object.id
     object.delete()
     return object_id
-        

@@ -25,13 +25,9 @@ mentor_template_name = "reserve_office_hour_email_to_mentor.html"
 finalist_template_name = "reserve_office_hour_email_to_finalist.html"
 
 
-
-
-
 class ReserveOfficeHourView(ImpactView):
     view_name = "reserve_office_hour"
-    permission_classes=[ReserveOfficeHourPermission]
-
+    permission_classes = [ReserveOfficeHourPermission]
 
     SUCCESS_HEADER = "SUCCESS"
     SUCCESS_DETAIL = "You have reserved this office hour session"
@@ -66,7 +62,7 @@ class ReserveOfficeHourView(ImpactView):
     def _extract_office_hour(self, request):
         office_hour_id = request.data.get("office_hour_id", None)
         if office_hour_id is None:
-            self.fail(self.NO_OFFICE_HOUR_SPECIFIED) 
+            self.fail(self.NO_OFFICE_HOUR_SPECIFIED)
             return False
         try:
             self.office_hour = MentorProgramOfficeHour.objects.get(

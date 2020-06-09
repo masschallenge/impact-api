@@ -109,15 +109,14 @@ class APITestCase(TestCase):
         ]), msg='Notification data was not as expected')
 
     def assert_notified(self, user, message=""):
-        '''Assert that the user received a notification. 
-        If `message` is specified, assert that the message appears in one of 
+        '''Assert that the user received a notification.
+        If `message` is specified, assert that the message appears in one of
         the outgoing emails to this user
         '''
         emails = [email for email in mail.outbox if user.email in email.to]
         self.assertGreater(len(emails), 0)
-        if message:    
+        if message:
             self.assertTrue(any([message in email.body for email in emails]))
-
 
     def assert_not_notified(self, user):
         '''Assert that the specified user did not receive a notification.
@@ -125,5 +124,3 @@ class APITestCase(TestCase):
         if mail.outbox:
             self.assertNotIn(user.email, [email.to for email in mail.outbox],
                              msg="Found an email sent to user")
-
-        

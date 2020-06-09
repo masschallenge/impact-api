@@ -29,6 +29,7 @@ from ..v1.views import (
 from .factories import UserFactory
 from .utils import nonexistent_object_id
 
+
 class TestOfficeHoursCalendarView(APITestCase):
     view = OfficeHoursCalendarView
 
