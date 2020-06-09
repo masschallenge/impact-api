@@ -92,7 +92,7 @@ urlpatterns = [
         }),
         name='object-detail'),
     url(r'^simpleuser/', include(simpleuser_router.urls)),
-    url(r'^accelerator/', include(schema_router.urls),
+    url(r'^mc/', include(schema_router.urls),
         name='api-root'),
     url(r'^sso/', include(sso_urlpatterns)),
     url(r'^graphql/$',

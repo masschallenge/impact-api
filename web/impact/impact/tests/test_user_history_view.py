@@ -23,6 +23,8 @@ from .utils import (
     days_from_now,
     find_events,
 )
+import factory
+from django.db.models import signals
 from ..v1.events import (
     UserBecameConfirmedJudgeEvent,
     UserBecameConfirmedMentorEvent,
@@ -62,6 +64,7 @@ class TestUserHistoryView(APITestCase):
                 id=startup.organization.id)
             self.assertEqual(startup_str, events[0]["description"])
 
+    @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def test_user_joined_startup_no_created_at(self):
         join_date = days_from_now(-10)
         stm = StartupTeamMemberFactory(user__date_joined=join_date)
@@ -153,10 +156,10 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             format_string = UserBecameConfirmedJudgeEvent.PROGRAM_ROLE_FORMAT
             self.assertEqual(format_string.format(
-                    role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
-                    name=prg.program_role.name,
-                    id=prg.program_role.id),
-                    events[0]["description"])
+                role_name=UserBecameConfirmedJudgeEvent.ROLE_NAME,
+                name=prg.program_role.name,
+                id=prg.program_role.id),
+                events[0]["description"])
 
     def test_user_became_confirmed_judge_with_missing_label(self):
         _judge = get_user_role_by_name(UserRole.JUDGE)
