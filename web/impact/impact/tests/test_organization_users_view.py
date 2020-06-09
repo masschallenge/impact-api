@@ -35,7 +35,7 @@ class TestOrganizationUsersView(APITestCase):
                           args=[startup_team_member.startup.organization.id])
             response = self.client.get(url)
             users = response.data["users"]
-            self.assertEqual(len(users), 2)
+            self.assertEqual(len(users), 3)
             startup_user = [user for user in users
                             if user["id"] == startup_user_id][0]
             self.assertTrue(startup_user["startup_administrator"])
