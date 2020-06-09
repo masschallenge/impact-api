@@ -3,10 +3,13 @@ from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 
 from accelerator_abstract.models.base_user_utils import is_employee
-from accelerator.models import MentorProgramOfficeHour
+from accelerator.models import (
+    MentorProgramOfficeHour,
+    Startup,
+)
 
-from impact.permissions.v1_api_permissions import (
-    DEFAULT_PERMISSION_DENIED_DETAIL,    
+from ...permissions.v1_api_permissions import (
+    DEFAULT_PERMISSION_DENIED_DETAIL,
     ReserveOfficeHourPermission,
 )
 from .impact_view import ImpactView
@@ -26,10 +29,10 @@ finalist_template_name = "reserve_office_hour_email_to_finalist.html"
 
 
 class ReserveOfficeHourView(ImpactView):
-    view_name = "reserve_office_hour"        
+    view_name = "reserve_office_hour"
     permission_classes=[ReserveOfficeHourPermission]
 
-    
+
     SUCCESS_HEADER = "SUCCESS"
     SUCCESS_DETAIL = "You have reserved this office hour session"
     FAIL_HEADER = "Fail header"
@@ -38,14 +41,14 @@ class ReserveOfficeHourView(ImpactView):
     NO_SUCH_STARTUP = "No such startup exists"
     OFFICE_HOUR_ALREADY_RESERVED = "That session has already been reserved"
     SUBJECT = "Office Hours Reservation Notification"
-    
+
     def post(self, request):
         '''
-        params: 
+        params:
         office_hour_id (required)
         user_id (optional, defaults to request.user)
         startup_id (optional)
-        
+
         '''
         (self._extract_request_data(request) and
          self._reserve_office_hour())
@@ -55,7 +58,7 @@ class ReserveOfficeHourView(ImpactView):
         if not (self._extract_office_hour(request) and
                 self._extract_user(request) and
                 self._extract_startup(request)):
-            return False        
+            return False
         self.message = request.data.get("message", "")
         return True
 
@@ -71,14 +74,14 @@ class ReserveOfficeHourView(ImpactView):
             self.fail(NO_SUCH_OFFICE_HOUR)
             return False
         return True
-            
+
     def _extract_user(self, request):
         user_id = request.data.get("user_id", None)
         if user_id is not None and user_id != request.user.id:
             try:
                 self.target_user = User.objects.get(pk=user_id)
             except User.DoesNotExist:
-                self.fail(NO_SUCH_USER)
+                self.fail(self.NO_SUCH_USER)
                 return False
             if is_employee(request.user):
                 self.on_behalf_of = True
@@ -101,7 +104,7 @@ class ReserveOfficeHourView(ImpactView):
                 self.fail(self.NO_SUCH_STARTUP)
                 return False
         return True
-                             
+
     def _reserve_office_hour(self):
         if self.office_hour.finalist is not None:
             self.fail(self.OFFICE_HOUR_ALREADY_RESERVED)
@@ -110,7 +113,7 @@ class ReserveOfficeHourView(ImpactView):
         self._send_confirmation_emails()
         self._succeed()
         return True
-            
+
     def _update_office_hour_data(self):
         self.office_hour.finalist = self.target_user
         self.office_hour.description = self.message
@@ -124,7 +127,7 @@ class ReserveOfficeHourView(ImpactView):
                                                      mentor_template_name))
         send_email(**self.prepare_email_notification(finalist,
                                                      mentor,
-                                                     finalist_template_name))        
+                                                     finalist_template_name))
 
     def prepare_email_notification(self,
                                    recipient,
@@ -132,10 +135,10 @@ class ReserveOfficeHourView(ImpactView):
                                    template_name):
         template_path = email_template_path(template_name)
         if self.startup:
-            startup_name=self.startup.organization.name
+            startup_name = self.startup.organization.name
         else:
-            startup_name=""
-        
+            startup_name = ""
+
         start_time = localized_office_hour_start_time(self.office_hour)
         context = {"recipient": recipient,
                    "counterpart": counterpart,
@@ -146,8 +149,7 @@ class ReserveOfficeHourView(ImpactView):
         return {"to": [recipient.email],
                 "subject": self.SUBJECT,
                 "body": body}
-        
-        
+
     def _succeed(self):
         self.success = True
         self.header = self.SUCCESS_HEADER
@@ -162,16 +164,15 @@ class ReserveOfficeHourView(ImpactView):
         self.header = self.FAIL_HEADER
         self.detail = detail
         self.timecard_info = {}
-        
+
     def _response(self):
         return Response({
             'success': self.success,
             'header': self.header,
             'detail': self.detail,
             'timecard_info': self.timecard_info})
-        
-                            
-        
+
+
 def _variable_name(field_name):
     '''derive an instance variable name from a field name
     by stripping off the "_id" part if it exists'''
