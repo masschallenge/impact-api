@@ -330,7 +330,8 @@ class TestOrganizationHistoryView(APITestCase):
     def test_options_against_get(self):
         startup = StartupFactory()
         with self.login(email=self.basic_user().email):
-            url = reverse(OrganizationHistoryView.view_name, args=[startup.id])
+            url = reverse(OrganizationHistoryView.view_name, args=[
+                startup.organization.id])
 
             options_response = self.client.options(url)
             get_response = self.client.get(url)
