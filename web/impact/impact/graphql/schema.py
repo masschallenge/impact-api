@@ -1,10 +1,10 @@
 import graphene
 import graphql_jwt
 
-from . import query
+from .query import Query as BaseQuery
 
 
-class Query(query.Query, graphene.ObjectType):
+class Query(BaseQuery, graphene.ObjectType):
     pass
 
 

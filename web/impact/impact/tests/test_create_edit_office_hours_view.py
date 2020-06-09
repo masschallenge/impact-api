@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from django.core import mail
 from django.urls import reverse
 
-from accelerator.models import MentorProgramOfficeHour, UserRole
+from mc.models import MentorProgramOfficeHour, UserRole
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.factories import (
     MentorProgramOfficeHourFactory,
