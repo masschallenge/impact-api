@@ -151,8 +151,6 @@ FRONTEND_MAKE = cd $(FRONT_END) && $(MAKE)
 .PHONY: $(targets) $(deprecated_targets)
 
 
-.env:
-	@touch .env
 
 help:
 	@echo "Valid targets are:\n"
