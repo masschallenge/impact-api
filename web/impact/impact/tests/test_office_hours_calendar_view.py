@@ -26,7 +26,8 @@ from ..v1.views import (
     ISO_8601_DATE_FORMAT,
     OfficeHoursCalendarView,
 )
-from .utils import nonexistent_user_id
+from .factories import UserFactory
+from .utils import nonexistent_object_id
 
 class TestOfficeHoursCalendarView(APITestCase):
     view = OfficeHoursCalendarView
@@ -135,7 +136,7 @@ class TestOfficeHoursCalendarView(APITestCase):
         self.assert_failure(response, self.view.BAD_DATE_SPEC)
 
     def test_nonexistent_user_gets_fail_response(self):
-        bad_user_id = nonexistent_user_id()
+        bad_user_id = nonexistent_object_id(UserFactory)
         response = self.get_response(target_user_id=bad_user_id)
         self.assert_failure(response, self.view.NO_SUCH_USER)
 

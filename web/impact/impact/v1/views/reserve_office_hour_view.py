@@ -39,6 +39,7 @@ class ReserveOfficeHourView(ImpactView):
     NO_OFFICE_HOUR_SPECIFIED = "No office hour was specified"
     NO_SUCH_OFFICE_HOUR = "No such office hour exists."
     NO_SUCH_STARTUP = "No such startup exists"
+    NO_SUCH_USER = "No such user exists"
     OFFICE_HOUR_ALREADY_RESERVED = "That session has already been reserved"
     SUBJECT = "Office Hours Reservation Notification"
 
@@ -71,7 +72,7 @@ class ReserveOfficeHourView(ImpactView):
             self.office_hour = MentorProgramOfficeHour.objects.get(
                 pk=office_hour_id)
         except MentorProgramOfficeHour.DoesNotExist:
-            self.fail(NO_SUCH_OFFICE_HOUR)
+            self.fail(self.NO_SUCH_OFFICE_HOUR)
             return False
         return True
 

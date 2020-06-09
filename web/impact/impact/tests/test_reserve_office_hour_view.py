@@ -3,6 +3,8 @@ from django.urls import reverse
 from .api_test_case import APITestCase
 from ..v1.views import ReserveOfficeHourView
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
+from .factories import UserFactory
+from .utils import nonexistent_object_id
 from accelerator.tests.factories import (
     MentorProgramOfficeHourFactory,
     StartupFactory,
@@ -63,10 +65,18 @@ class TestReserveOfficeHourView(APITestCase):
     def test_reserve_on_behalf_of_nonexistent_user(self):
         # staff reserves a session on behalf of finalist, gets success
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
-        finalist_id = nonexistent_user_id()
+        finalist_id = nonexistent_object_id(UserFactory)
         response = self.post_response(office_hour.id,
                                       finalist_id)
         self.assert_ui_notification(response, False, self.view.NO_SUCH_USER)
+
+    def test_nonexistent_office_hour(self):
+        # staff reserves a session on behalf of finalist, gets success
+        office_hour_id = nonexistent_object_id(MentorProgramOfficeHourFactory)
+        finalist = _finalist()
+        response = self.post_response(office_hour_id,
+                                      finalist.id)
+        self.assert_ui_notification(response, False, self.view.NO_SUCH_OFFICE_HOUR)
         
     def test_reserve_on_behalf_of_finalist_gets_email_notification(self):    
         # staff reserves a session on behalf of finalist, finalist is
