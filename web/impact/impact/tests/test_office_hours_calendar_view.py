@@ -21,13 +21,12 @@ from accelerator.tests.factories import (
 from accelerator.tests.contexts.context_utils import get_user_role_by_name
 from accelerator.tests.utils import days_from_now
 
-from impact.tests.api_test_case import APITestCase
-from impact.tests.factories import UserFactory
-from impact.v1.views import (
+from .api_test_case import APITestCase
+from ..v1.views import (
     ISO_8601_DATE_FORMAT,
     OfficeHoursCalendarView,
 )
-
+from .utils import nonexistent_user_id
 
 class TestOfficeHoursCalendarView(APITestCase):
     view = OfficeHoursCalendarView
@@ -136,7 +135,7 @@ class TestOfficeHoursCalendarView(APITestCase):
         self.assert_failure(response, self.view.BAD_DATE_SPEC)
 
     def test_nonexistent_user_gets_fail_response(self):
-        bad_user_id = _nonexistent_user_id()
+        bad_user_id = nonexistent_user_id()
         response = self.get_response(target_user_id=bad_user_id)
         self.assert_failure(response, self.view.NO_SUCH_USER)
 
@@ -222,10 +221,3 @@ def check_hour_in_response(response, hour):
     response_data = response.data['calendar_data']
     return hour.id in [response_hour['id']
                        for response_hour in response_data]
-
-
-def _nonexistent_user_id():
-    user = UserFactory()
-    user_id = user.id
-    user.delete()
-    return user_id

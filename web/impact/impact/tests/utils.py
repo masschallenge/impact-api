@@ -7,6 +7,7 @@ from datetime import (
     timedelta,
 )
 from io import StringIO
+from .factories import UserFactory
 
 from pytz import utc
 
@@ -72,3 +73,11 @@ def capture_stderr(command, *args, **kwargs):
         yield result, sys.stderr.read()
     finally:
         sys.stderr = err
+
+
+def nonexistent_user_id():
+    user = UserFactory()
+    user_id = user.id
+    user.delete()
+    return user_id
+        
