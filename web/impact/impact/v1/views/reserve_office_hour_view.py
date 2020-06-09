@@ -66,7 +66,7 @@ class ReserveOfficeHourView(ImpactView):
     def _extract_office_hour(self, request):
         office_hour_id = request.data.get("office_hour_id", None)
         if office_hour_id is None:
-            self.fail(NO_OFFICE_HOUR_SPECIFIED)
+            self.fail(self.NO_OFFICE_HOUR_SPECIFIED) 
             return False
         try:
             self.office_hour = MentorProgramOfficeHour.objects.get(
@@ -152,13 +152,18 @@ class ReserveOfficeHourView(ImpactView):
                 "body": body}
 
     def _succeed(self):
+        if self.office_hour.startup:
+            startup_name = self.office_hour.startup.organization.name
+        else:
+            startup_name = ""
         self.success = True
         self.header = self.SUCCESS_HEADER
         self.detail = self.SUCCESS_DETAIL
         self.timecard_info = {
             "finalist_first_name": self.target_user.first_name,
             "finalist_last_name": self.target_user.last_name,
-            "topics": self.message}
+            "topics": self.message,
+            "startup": startup_name}
 
     def fail(self, detail):
         self.success = False
