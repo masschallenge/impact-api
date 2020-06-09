@@ -58,19 +58,19 @@ sso_urlpatterns = [
 
 
 urlpatterns = [
-    url(r'^api/sso/token_name/', JWTCookieNameView.as_view(),
+    url(r'^sso/token_name/', JWTCookieNameView.as_view(),
         name=JWTCookieNameView.view_name),
-    url(r'^api/algolia/api_key/$', AlgoliaApiKeyView.as_view(),
+    url(r'^algolia/api_key/$', AlgoliaApiKeyView.as_view(),
         name=AlgoliaApiKeyView.view_name),
-    url(r'^api/calendar/reminder/$', CalendarReminderView.as_view(),
+    url(r'^calendar/reminder/$', CalendarReminderView.as_view(),
         name=CalendarReminderView.view_name),
-    url(r'^api/v0/', include(v0_urlpatterns)),
-    url(r'^api/v1/', include(v1_urlpatterns)),
-    url(r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/'
+    url(r'^v0/', include(v0_urlpatterns)),
+    url(r'^v1/', include(v1_urlpatterns)),
+    url(r'^(?P<app>\w+)/(?P<model>[a-z_]+)/'
         r'(?P<related_model>[a-z_]+)/$',
         GeneralViewSet.as_view({'get': 'list', 'post': 'create'}),
         name='related-object-list'),
-    url(r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/'
+    url(r'^(?P<app>\w+)/(?P<model>[a-z_]+)/'
         r'(?P<related_model>[a-z_]+)/'
         r'(?P<pk>[0-9]+)/$',
         GeneralViewSet.as_view({
@@ -80,10 +80,10 @@ urlpatterns = [
             'delete': 'destroy'
         }),
         name='related-object-detail'),
-    url(r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/$',
+    url(r'^(?P<app>\w+)/(?P<model>[a-z_]+)/$',
         GeneralViewSet.as_view({'get': 'list', 'post': 'create'}),
         name='object-list'),
-    url(r'^api/(?P<app>\w+)/(?P<model>[a-z_]+)/(?P<pk>[0-9]+)/$',
+    url(r'^(?P<app>\w+)/(?P<model>[a-z_]+)/(?P<pk>[0-9]+)/$',
         GeneralViewSet.as_view({
             'get': 'retrieve',
             'put': 'update',
@@ -91,8 +91,8 @@ urlpatterns = [
             'delete': 'destroy'
         }),
         name='object-detail'),
-    url(r'^api/simpleuser/', include(simpleuser_router.urls)),
-    url(r'^api/accelerator/', include(schema_router.urls),
+    url(r'^simpleuser/', include(simpleuser_router.urls)),
+    url(r'^accelerator/', include(schema_router.urls),
         name='api-root'),
     url(r'^sso/', include(sso_urlpatterns)),
     url(r'^graphql/$',
