@@ -1,14 +1,8 @@
-<<<<<<< HEAD
+
 from rest_framework.permissions import IsAuthenticated
+
 
 from accelerator_abstract.models.base_program import ACTIVE_PROGRAM_STATUS
-from accelerator.models.user_role import UserRole
-
-||||||| merged common ancestors
-=======
-from rest_framework.permissions import IsAuthenticated
-
->>>>>>> development
 from accelerator_abstract.models.base_user_utils import (
     is_employee,
     is_expert,
@@ -18,12 +12,6 @@ from impact.permissions import (
     settings,
     BasePermission,
 )
-<<<<<<< HEAD
-
-||||||| merged common ancestors
-from rest_framework.permissions import IsAuthenticated
-=======
->>>>>>> development
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 DEFAULT_PERMISSION_DENIED_DETAIL = ("You do not have permission to perform "
