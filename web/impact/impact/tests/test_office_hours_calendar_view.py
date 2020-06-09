@@ -163,6 +163,12 @@ class TestOfficeHoursCalendarView(APITestCase):
         with self.assertNumQueries(total_queries):
             self.get_response(target_user_id=office_hour.mentor_id)
 
+    def test_meeting_info_returned_in_response(self):
+        office_hour = self.create_office_hour()
+        response = self.get_response(target_user_id=office_hour.mentor_id)
+        calendar_data = response.data['calendar_data'][0]
+        self.assertIn("meeting_info", calendar_data)
+
     def create_office_hour(self,
                            mentor=None,
                            finalist=None,
