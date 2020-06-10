@@ -18,6 +18,7 @@ from accelerator.tests.factories import (
     ProgramFamilyFactory,
     ProgramRoleGrantFactory,
 )
+from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.contexts.context_utils import get_user_role_by_name
 from accelerator.tests.utils import days_from_now
 
@@ -74,7 +75,7 @@ class TestOfficeHoursCalendarView(APITestCase):
         self.assert_sessions_sorted_by_date(response)
 
     def test_user_with_no_hours_sees_empty_response(self):
-        user = self.basic_user()
+        user = _finalist()
         self.create_office_hour()
         response = self.get_response(user=user)
         sessions = response.data['calendar_data']
@@ -175,14 +176,15 @@ class TestOfficeHoursCalendarView(APITestCase):
                            duration_minutes=30,
                            timezone="America/New_York"):
         create_params = {}
-        if mentor:
-            create_params['mentor'] = mentor
+        mentor = mentor or _mentor()
+        create_params['mentor'] = mentor
         duration = timedelta(duration_minutes)
         start_date_time = start_date_time or utc.localize(datetime.now())
         end_date_time = start_date_time + duration
         create_params['start_date_time'] = start_date_time
         create_params['end_date_time'] = end_date_time
         create_params['location__timezone'] = timezone
+        create_params['finalist'] = finalist
         return MentorProgramOfficeHourFactory(**create_params)
 
     def assert_hour_in_response(self, response, hour):
@@ -235,3 +237,9 @@ def _nonexistent_user_id():
     user_id = user.id
     user.delete()
     return user_id
+
+def _finalist():
+    return UserRoleContext(UserRole.FINALIST).user
+
+def _mentor():
+    return UserRoleContext(UserRole.MENTOR).user

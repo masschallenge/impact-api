@@ -18,21 +18,30 @@ from django.db.models import (
     Value,
 )
 from . import ImpactView
+from ...permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from accelerator.models import (
     MentorProgramOfficeHour,
+    ProgramRoleGrant,
     UserRole,
 )
-
+from accelerator_abstract.models.base_user_utils import is_employee
 User = get_user_model()
 
 ISO_8601_DATE_FORMAT = "%Y-%m-%d"
 ONE_DAY = timedelta(1)
 ONE_WEEK = timedelta(8)
 
-OFFICE_HOUR_HOLDER_ROLES = [UserRole.MENTOR, UserRole.AIR]
+STAFF = "staff"
+MENTOR = "mentor"      
+FINALIST = "finalist" 
+NOT_ALLOWED = "not_allowed"
 
+OFFICE_HOUR_HOLDER_ROLES = [UserRole.MENTOR, UserRole.AIR]
+OFFICE_HOUR_RESERVER_ROLES = [UserRole.FINALIST, UserRole.ALUM]
 OFFICE_HOURS_HOLDER = Q(
     program_role__user_role__name__in=OFFICE_HOUR_HOLDER_ROLES)
+OFFICE_HOURS_RESERVER = Q(
+    program_role__user_role__name__in=OFFICE_HOUR_RESERVER_ROLES)
 ACTIVE_PROGRAM = Q(program_role__program__program_status='active')
 
 
@@ -43,16 +52,16 @@ class OfficeHoursCalendarView(ImpactView):
     FAILURE_HEADER = "Office hours could not be fetched"
     BAD_DATE_SPEC = "We were unable to parse the date specifier"
     NO_SUCH_USER = "We were not able to locate that user"
+    NOT_OFFICE_HOURS_VIEWER = ("You are not able to view office hours at this "
+                               "time. Please see MassChallenge staff.")
 
-    def fail(self, detail):
-        self.response_elements['success'] = False
-        self.response_elements['header'] = self.FAILURE_HEADER
-        self.response_elements['detail'] = detail
-        self.response_elements['calendar_data'] = None
-
-    def succeed(self):
-        self.response_elements['success'] = True
-        self.response_elements['header'] = self.SUCCESS_HEADER
+    def get(self, request):
+        self.response_elements = {}
+        (self._get_target_user(request) and
+         self._check_request_user_type(request) and
+         self._get_start_date(request) and
+         self._get_office_hours_data())
+        return Response(self.response_elements)
 
     def _get_target_user(self, request):
         user_id = request.query_params.get("user_id", None)
@@ -64,8 +73,26 @@ class OfficeHoursCalendarView(ImpactView):
             except User.DoesNotExist:
                 self.fail(self.NO_SUCH_USER)
                 return False
+            if not is_employee(request.user) and target_user != request.user:
+                # non-staff may not view on behalf of another user
+                self.fail(DEFAULT_PERMISSION_DENIED_DETAIL)
         return True
 
+    def _check_request_user_type(self, request):
+        """
+        determine whether we are viewing as "staff", "mentor", or "finalist"
+        if we pursue AC-7778, this will be modified to read from request data
+        """
+        if is_employee(self.target_user):
+            self.request_user_type = STAFF
+        elif _is_mentor(self.target_user):
+            self.request_user_type = MENTOR
+        elif _is_finalist(self.target_user):
+            self.request_user_type = FINALIST
+        else:
+            self.request_user_type = NOT_ALLOWED
+        return True
+        
     def _get_start_date(self, request):
         date_spec = request.query_params.get("date_spec", None)
 
@@ -76,11 +103,41 @@ class OfficeHoursCalendarView(ImpactView):
             return False
         return True
 
-    def _get_office_hours_data(self):
-        end_date = self.start_date + ONE_WEEK + 2 * ONE_DAY
-        office_hours = MentorProgramOfficeHour.objects.filter(
-             mentor=self.target_user,
-             start_date_time__range=[self.start_date, end_date]).order_by(
+    def _office_hours_queryset(self):
+        if self.request_user_type == STAFF:
+            return self.staff_office_hours_queryset()
+        elif self.request_user_type == MENTOR:
+            
+            return self._mentor_office_hours_queryset()
+        elif self.request_user_type == FINALIST:
+            return self._finalist_office_hours_queryset()
+
+        else:
+            self.fail(self.NOT_OFFICE_HOURS_VIEWER)
+            return self._null_office_hours_queryset()
+    
+        # if staff and target user != request_user:
+        #   return all hours in given time range for user's staff programs
+
+        # if current mentor:
+        #  return existing qset
+
+        # else is finalist, so
+        #  return all open hours plus all hours that the finalist currently has booked
+    def _staff_office_hours_queryset(self):
+        staff_programs = Clearance.objects.clearances_for_user(
+            self.target_user).values_list(
+                "program_family", flat=True)
+        in_visible_program_family = Q(
+            program_role__program_program_family__in=staff_programs)
+        program_mentors = ProgramRoleGrant.objects.filter(
+            ACTIVE_PROGRAM and
+            OFFICE_HOURS_HOLDER and
+            in_visible_program_family).values_list(
+                person__id, flat=True)
+        active_mentors = Q(mentor__in=program_mentors)
+        return MentorProgramOfficeHour.objects.filter(
+             start_date_time__range=[self.start_date, self.end_date]).order_by(
                  'start_date_time').annotate(
                      finalist_count=Count("finalist")).annotate(
                          reserved=Case(
@@ -88,7 +145,36 @@ class OfficeHoursCalendarView(ImpactView):
                              default=Value(False),
                              output_field=BooleanField()))
 
+    def _mentor_office_hours_queryset(self):
+        return MentorProgramOfficeHour.objects.filter(
+             mentor=self.target_user,
+             start_date_time__range=[self.start_date, self.end_date]).order_by(
+                 'start_date_time').annotate(
+                     finalist_count=Count("finalist")).annotate(
+                         reserved=Case(
+                             When(finalist_count__gt=0, then=Value(True)),
+                             default=Value(False),
+                             output_field=BooleanField()))
+
+    def _finalist_office_hours_queryset(self):
+        reserved_by_user = Q(finalist=self.target_user)
+        unreserved = Q(finalist__isnull=True)
+        return MentorProgramOfficeHour.objects.filter(
+            reserved_by_user or unreserved,  
+            start_date_time__range=[self.start_date, self.end_date]).order_by(
+                 'start_date_time').annotate(
+                     finalist_count=Count("finalist")).annotate(
+                         reserved=Case(
+                             When(finalist_count__gt=0, then=Value(True)),
+                             default=Value(False),
+                             output_field=BooleanField()))
+
+    
+    def _get_office_hours_data(self):
+        self.end_date = self.start_date + ONE_WEEK + 2 * ONE_DAY
         primary_industry_key = "mentor__expertprofile__primary_industry__name"
+        office_hours = self._office_hours_queryset()
+        
         self.response_elements['calendar_data'] = office_hours.values(
             "id",
             "mentor_id",
@@ -139,13 +225,18 @@ class OfficeHoursCalendarView(ImpactView):
             ACTIVE_PROGRAM).values_list(
                 location_name, location_id)
         return location_choices.distinct()
+    
+    def fail(self, detail):
+        self.response_elements['success'] = False
+        self.response_elements['header'] = self.FAILURE_HEADER
+        self.response_elements['detail'] = detail
+        self.response_elements['calendar_data'] = None
 
-    def get(self, request):
-        self.response_elements = {}
-        (self._get_target_user(request) and
-         self._get_start_date(request) and
-         self._get_office_hours_data())
-        return Response(self.response_elements)
+    def succeed(self):
+        self.response_elements['success'] = True
+        self.response_elements['header'] = self.SUCCESS_HEADER
+
+    
 
 
 def start_date(date_spec=None):
@@ -165,3 +256,13 @@ def start_date(date_spec=None):
     start_date = initial_date - timedelta(initial_date.weekday())
     adjusted_start_date = start_date - ONE_DAY
     return utc.localize(adjusted_start_date)
+
+
+def _is_mentor(user):
+    return ProgramRoleGrant.objects.filter(
+        ACTIVE_PROGRAM and OFFICE_HOURS_HOLDER).exists()
+
+def _is_finalist(user):
+    return ProgramRoleGrant.objects.filter(
+        ACTIVE_PROGRAM and OFFICE_HOURS_RESERVER).exists()
+    
