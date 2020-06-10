@@ -273,14 +273,6 @@ run-server-1: run-detached-server watch-frontend ensure-mysql
 dev: run-server-0
 runserver: run-server-1
 
-
-initial-db-setup: CONTAINER_CREATED:=$(shell docker ps -a -q --filter ancestor=mysql --filter network=impactapi_default)
-initial-db-setup:
-	@if [ -z "$(CONTAINER_CREATED)" ]; then \
-		rm -f ./mysql_entrypoint/0002*; \
-		cp $(gz_file) ./mysql_entrypoint/0002_$(notdir $(gz_file)); \
-	fi;
-
 stop-server: .env stop-frontend
 	@docker-compose stop
 
@@ -321,26 +313,16 @@ build-all: build
 bash-shell: .env ensure-mysql
 	@docker-compose exec web /bin/bash || docker-compose run --rm web /bin/bash
 
-db-shell: .env ensure-mysql
-	@docker-compose run --rm web ./manage.py dbshell
-
 django-shell: .env ensure-mysql
 	@docker-compose run --rm web ./manage.py shell
 
-
-
-
 TARGET ?= staging
-
 
 release-list:
 	@git ls-remote --tags | grep -o 'refs/tags/v[0-9]*\.[0-9]*\.[0-9]*' | sort -r | grep -o '[^\/]*$$'
 
-
-
 release:
 	@bash create_release.sh
-
 
 travis-release: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
 travis-release:
@@ -376,16 +358,6 @@ deploy:
 	@sudo chmod +x /usr/bin/ecs-deploy
 	@ecs-deploy -c $$PRE_STAGING_ECS_CLUSTER -n $$PRE_STAGING_ECS_SERVICE -i $$DOCKER_REGISTRY/impact-api:$$IMAGE_TAG --force-new-deployment
 
-# Deprecated targets
-dbdump:
-	@echo ERROR: dbdump has been replaced by dump-db
-
-dbload:
-	@echo ERROR: dbload has been replaced by load-db
-
-dbshell:
-	@echo ERROR: dbshell has been replaced by db-shell
-
 
 comp-messages: .env
 	@docker-compose exec web python manage.py compilemessages
@@ -396,8 +368,6 @@ messages: .env
 lint: .env ensure-mysql
 	@docker-compose run --rm web pylint impact
 
-ensure-mysql: kill-exited-containers
-	@$(ACCELERATE_MAKE) ensure-mysql
 
 kill-exited-containers: containers-to-kill=$(shell docker ps -a -q --filter status=exited --filter name=impact)
 kill-exited-containers:
