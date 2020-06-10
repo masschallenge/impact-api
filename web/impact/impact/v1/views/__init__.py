@@ -83,3 +83,6 @@ from .cancel_office_hour_session_view import (
 from .mentor_participation_view import (
     MentorParticipationView
 )
+from .office_hour_view import (
+    OfficeHourViewSet
+)

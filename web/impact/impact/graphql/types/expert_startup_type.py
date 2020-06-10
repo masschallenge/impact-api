@@ -1,5 +1,5 @@
 from mc.models import Startup
-from . import StartupType
+from .startup_type import StartupType
 
 
 class ExpertStartupType(StartupType):

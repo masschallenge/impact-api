@@ -31,7 +31,10 @@ from .factories import (
     ProgramRoleGrantFactory,
     ProgramStartupStatusFactory,
     StartupMentorRelationshipFactory,
-    StartupStatusFactory
+    ProgramFamilyLocationFactory,
+    StartupStatusFactory,
+    ProgramFamilyFactory,
+    LocationFactory,
 )
 from .utils import capture_stderr
 from ..utils import get_user_program_and_startup_roles
@@ -150,7 +153,7 @@ class TestGraphQL(APITestCase):
             program_role__user_role=_mentor, person=user)
         program = mentor_role_grant.program_role.program
         program_overview_link = program.program_overview_link
-        judge_role_grant = ProgramRoleGrantFactory.create(
+        ProgramRoleGrantFactory.create(
             program_role__user_role=_judge, person=user)
 
         query = MENTOR_PRG_QUERY.format(id=user.id)
@@ -486,7 +489,6 @@ class TestGraphQL(APITestCase):
 
     def test_query_program_roles_program_role_names_are_normalized(self):
         program_role_name = "BEST IN SHOW (BOS)"
-        user_role_name = UserRole.FINALIST
         _finalist = get_user_role_by_name(UserRole.FINALIST)
         user = ExpertFactory()
         ProgramRoleGrantFactory(
@@ -751,6 +753,63 @@ class TestGraphQL(APITestCase):
         query, expected_json = _user_query(user, "entrepreneurProfile")
         self._assert_response_equals_json(
             query, expected_json, email=user.email)
+
+    def test_assert_office_hour_location_is_returned(self):
+
+        program_family = ProgramFamilyFactory()
+        desired_user_roles = [
+            UserRole.MENTOR, UserRole.FINALIST, UserRole.AIR]
+
+        user = UserContext(
+            user_type='EXPERT',
+            program_role_names=desired_user_roles,
+            program_families=[program_family]
+        ).user
+
+        program_role = user.programrolegrant_set.filter(
+            program_role__program__program_status="active",
+            program_role__user_role__name__in=desired_user_roles
+        ).first().program_role
+
+        program_family = program_role.program.program_family
+
+        location = LocationFactory(
+            name='Nigeria', street_address='18 pius eze', city='Ago')
+
+        location1 = LocationFactory(
+            name='Remote', street_address='18 pius eze', city='Ago')
+
+        ProgramFamilyLocationFactory.create(
+            program_family=program_family, location=location)
+
+        ProgramFamilyLocationFactory.create(
+            program_family=program_family, location=location1)
+
+        query = """
+            query{{
+                expertProfile(id:{id})  {{
+                    officeHourLocations{{name}}
+                }}
+            }}
+        """.format(id=user.id)
+
+        expected_json = {
+            'data': {
+                'expertProfile': {
+                    'officeHourLocations': [
+                        {
+                            'name': location.name
+                        },
+                        {
+                            'name': 'Remote'
+                        }
+                    ]
+                }
+            }
+        }
+
+        self._assert_response_equals_json(
+            query=query, expected_json=expected_json)
 
     def _assert_expert_can_view_profile(self, expert_role, profile_user_role):
         current_user = expert_user(expert_role)

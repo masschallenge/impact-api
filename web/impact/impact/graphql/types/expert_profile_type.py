@@ -13,10 +13,8 @@ from mc.models import (
     ProgramRoleGrant
 )
 
-from . import (
-    BaseUserProfileType,
-    StartupMentorRelationshipType,
-)
+from .base_user_profile_type import BaseUserProfileType
+from .startup_mentor_relationship_type import StartupMentorRelationshipType
 from accelerator_abstract.models import (
     ACTIVE_PROGRAM_STATUS,
     ENDED_PROGRAM_STATUS,

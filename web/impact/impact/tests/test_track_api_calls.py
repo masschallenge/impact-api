@@ -4,7 +4,7 @@ from .api_test_case import APITestCase
 
 
 class TestTrackAPICalls(APITestCase):
-    @patch('api.web.impact.impact.middleware.track_api_calls.logger')
+    @patch('impact.middleware.track_api_calls.logger')
     def test_when_user_authenticated(self, logger_patch):
         email = self.basic_user().email
         expected = {
@@ -18,7 +18,7 @@ class TestTrackAPICalls(APITestCase):
             self.client.get('/api/')
             logger_patch.info.assert_called_with(expected)
 
-    @patch('api.web.impact.impact.middleware.track_api_calls.logger')
+    @patch('impact.middleware.track_api_calls.logger')
     def test_when_no_user_authenticated(self, logger_patch):
         expected = {
             'user': None,

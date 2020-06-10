@@ -4,10 +4,8 @@ from mc.models import (
     StartupStatus,
     Startup,
 )
-from . import (
-    StartupType,
-    ProgramType,
-)
+from .startup_type import StartupType
+from .program_type import ProgramType
 
 
 class EntrepreneurStartupType(StartupType):
