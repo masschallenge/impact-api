@@ -3,7 +3,6 @@ from django.urls import reverse
 
 from accelerator.tests.factories import MentorProgramOfficeHourFactory
 from .api_test_case import APITestCase
-from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from ..v1.views import (
     CancelOfficeHourReservationView,
     formatted_success_notification,
@@ -114,8 +113,12 @@ class TestCancelOfficeHourReservationView(APITestCase):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         response = self._submit_cancellation(office_hour,
                                              user=self.make_user())
-        notification = {'detail': DEFAULT_PERMISSION_DENIED_DETAIL}
-        self.assertEqual(response.data, notification)
+        self.assert_ui_notification(response, False, NO_SUCH_RESERVATION)
+
+    def test_user_attempts_to_cancel_non_existent_hour(self):
+        response = self._submit_cancellation(None,
+                                             user=self.make_user())
+        self.assert_ui_notification(response, False, NO_SUCH_OFFICE_HOUR)
 
     def test_user_cancels_non_existent_reservation_no_notification(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
