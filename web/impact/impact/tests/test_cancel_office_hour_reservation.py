@@ -4,15 +4,15 @@ from django.urls import reverse
 from accelerator.tests.factories import (
     MentorProgramOfficeHourFactory,
 )
-from impact.tests.api_test_case import APITestCase
-from impact.v1.views import (
+from ..tests.api_test_case import APITestCase
+from ..v1.views import (
     CancelOfficeHourReservationView,
     formatted_success_notification,
     NO_SUCH_RESERVATION,
     NO_SUCH_OFFICE_HOUR,
 )
 
-from impact.v1.views.cancel_office_hour_reservation_view import (
+from ..v1.views.cancel_office_hour_reservation_view import (
     FAIL_HEADER,
     SUCCESS_HEADER,
 )
