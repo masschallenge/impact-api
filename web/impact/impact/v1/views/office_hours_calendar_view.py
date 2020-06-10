@@ -97,7 +97,7 @@ class OfficeHoursCalendarView(ImpactView):
             "end_date_time",
             "description",
             "topics",
-            "startup_id",
+            # "startup_id",
             "reserved",
             "meeting_info",
             location_name=F("location__name"),
