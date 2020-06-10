@@ -79,14 +79,14 @@ class OfficeHoursCalendarView(ImpactView):
     def _get_office_hours_data(self):
         end_date = self.start_date + ONE_WEEK + 2 * ONE_DAY
         office_hours = MentorProgramOfficeHour.objects.filter(
-             mentor=self.target_user,
-             start_date_time__range=[self.start_date, end_date]).order_by(
-                 'start_date_time').annotate(
-                     finalist_count=Count("finalist")).annotate(
-                         reserved=Case(
-                             When(finalist_count__gt=0, then=Value(True)),
-                             default=Value(False),
-                             output_field=BooleanField()))
+            mentor=self.target_user,
+            start_date_time__range=[self.start_date, end_date]).order_by(
+            'start_date_time').annotate(
+            finalist_count=Count("finalist")).annotate(
+            reserved=Case(
+                When(finalist_count__gt=0, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()))
 
         primary_industry_key = "mentor__expertprofile__primary_industry__name"
         self.response_elements['calendar_data'] = office_hours.values(
@@ -97,7 +97,6 @@ class OfficeHoursCalendarView(ImpactView):
             "end_date_time",
             "description",
             "topics",
-            # "startup_id",
             "reserved",
             "meeting_info",
             location_name=F("location__name"),
