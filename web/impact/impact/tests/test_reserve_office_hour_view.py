@@ -48,7 +48,6 @@ class TestReserveOfficeHourView(APITestCase):
         self.assert_response_contains_session_details(response, office_hour)
 
     def test_finalist_reserves_office_hour_with_nonexistent_startup(self):
-        # a finalist reserves an office hour, gets timecard details in response
         startup_id = nonexistent_object_id(StartupFactory)
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         finalist = _finalist()
@@ -59,6 +58,18 @@ class TestReserveOfficeHourView(APITestCase):
                                     False,
                                     self.view.NO_SUCH_STARTUP)
 
+    def test_finalist_reserves_office_hour_with_unrelated_startup(self):
+        startup_id = StartupFactory().id
+        office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        finalist = _finalist()
+        response = self.post_response(office_hour.id,
+                                      startup_id=startup_id,
+                                      request_user=finalist)
+        self.assert_ui_notification(
+            response,
+            False,
+            self.view.STARTUP_NOT_ASSOCIATED_WITH_USER.format(finalist.email))
+        
     def test_non_finalist_attempts_to_reserve_office_hour_notification(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         non_finalist = self.basic_user()
