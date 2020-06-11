@@ -72,7 +72,7 @@ class TestReserveOfficeHourView(APITestCase):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         non_finalist = self.basic_user()
         self.post_response(office_hour.id,
-                                      request_user=non_finalist)
+                           request_user=non_finalist)
         self.assert_not_reserved(office_hour)
 
     def test_finalist_reserves_office_hour_gets_confirmation_email(self):
