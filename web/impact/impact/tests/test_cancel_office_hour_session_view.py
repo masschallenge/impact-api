@@ -15,7 +15,6 @@ from ..v1.views.cancel_office_hour_session_view import (
     FAIL_HEADER,
     OFFICE_HOUR_SESSION_404,
     MENTOR_NOTIFICATION,
-    PERMISSION_DENIED,
     STAFF_NOTIFICATION,
     SUCCESS_HEADER,
     CancelOfficeHourSessionView,
@@ -53,13 +52,6 @@ class TestCancelOfficeHourSession(APITestCase):
             office_hour, response
         )
 
-    def test_mentor_cannot_cancel_their_own_reserved_office_hour(self):
-        mentor = self._expert_user(UserRole.MENTOR)
-        office_hour = MentorProgramOfficeHourFactory(
-            mentor=mentor)
-        response = self._cancel_office_hour_session(office_hour.id, mentor)
-        self.assert_ui_notification(response, False, PERMISSION_DENIED)
-
     def test_mentor_cannot_cancel_someone_else_unreserved_office_hour(self):
         mentor = self._expert_user(UserRole.MENTOR)
         mentor2 = self._expert_user(UserRole.MENTOR)
@@ -84,7 +76,8 @@ class TestCancelOfficeHourSession(APITestCase):
         self._cancel_office_hour_session(office_hour.id, self.staff_user())
         self.assert_office_hour_session_was_cancelled(office_hour)
 
-    def test_mail_is_sent_to_attendees_on_reserved_session_cancellation(self):
+    def test_mail_sent_to_mentor_finalist_when_admin_cancels_reserved_session(
+            self):
         office_hour = MentorProgramOfficeHourFactory()
         self._cancel_office_hour_session(office_hour.id, self.staff_user())
         attendees_email = [email.to[0] for email in mail.outbox]
@@ -118,6 +111,29 @@ class TestCancelOfficeHourSession(APITestCase):
     def test_office_hour_session_not_existing_ui_notification(self):
         response = self._cancel_office_hour_session(0, self.staff_user())
         self.assert_ui_notification(response, False, OFFICE_HOUR_SESSION_404)
+
+    def test_mentor_cancel_their_own_reserved_office_hour(self):
+        mentor = self._expert_user(UserRole.MENTOR)
+        office_hour = MentorProgramOfficeHourFactory(mentor=mentor)
+        self._cancel_office_hour_session(office_hour.id, mentor)
+        self.assert_office_hour_session_was_cancelled(office_hour)
+
+    def test_mentor_cancel_own_reserved_office_hour_ui_notification(self):
+        mentor = self._expert_user(UserRole.MENTOR)
+        office_hour = MentorProgramOfficeHourFactory(mentor=mentor)
+        response = self._cancel_office_hour_session(office_hour.id, mentor)
+        self.assert_mentor_cancel_reservation_ui_notification(
+            office_hour, response)
+
+    def test_mail_sent_to_mentor_finalist_when_mentor_cancels_reserved_session(
+            self):
+        mentor = self._expert_user(UserRole.MENTOR)
+        office_hour = MentorProgramOfficeHourFactory(mentor=mentor)
+        self._cancel_office_hour_session(office_hour.id, mentor)
+        attendees_email = [email.to[0] for email in mail.outbox]
+        to_addresses = [office_hour.mentor.email,
+                        office_hour.finalist.email]
+        self.assertEqual(set(attendees_email), set(to_addresses))
 
     def test_none_staff_or_none_mentor_ui_notification(self):
         office_hour = MentorProgramOfficeHourFactory()

@@ -19,7 +19,6 @@ SUBJECT = '[Office Hours] Canceled: {date}, {start_time}'
 STAFF_NOTIFICATION = ('on behalf of {mentor_name} at {start_time} '
                       '- {end_time} on {date}')
 MENTOR_NOTIFICATION = 'at {start_time} - {end_time} on {date}'
-PERMISSION_DENIED = 'You do not have permission to cancel that session'
 OFFICE_HOUR_SESSION_404 = ("The office hour session you are trying to cancel "
                            "doesn't exist")
 SUCCESS_HEADER = 'Canceled office hour session'
@@ -64,6 +63,16 @@ def get_response(success, detail):
     })
 
 
+def get_cancelled_by(mentor_name=None, staff=False):
+    to_finalist, to_mentor = mentor_name, 'You have'
+    if staff:
+        to_finalist = to_mentor = 'MassChallenge has'
+    return {
+        'mentor': to_mentor,
+        'finalist': to_finalist,
+    }
+
+
 class CancelOfficeHourSessionView(ImpactView):
     permission_classes = (OfficeHourMentorPermission,)
     view_name = 'cancel_office_hour_session_view'
@@ -71,15 +80,14 @@ class CancelOfficeHourSessionView(ImpactView):
     def cancel_office_hour_session(self, office_hour, user, message):
         shared_context = get_office_hour_shared_context(office_hour, message)
         if user == office_hour.mentor:
-            if office_hour.finalist:
-                return PERMISSION_DENIED, False
-            self.handle_notification(office_hour, shared_context, 'You have')
+            cancelled_by = get_cancelled_by(shared_context['mentor_name'])
+            self.handle_notification(office_hour, shared_context, cancelled_by)
             ui_notification = get_ui_notification(shared_context)
             office_hour.delete()
             return ui_notification, True
         else:
             self.handle_notification(
-                office_hour, shared_context, 'MassChallenge has')
+                office_hour, shared_context, get_cancelled_by(staff=True))
             ui_notification = get_ui_notification(shared_context, staff=True)
             office_hour.delete()
             return ui_notification, True
@@ -116,7 +124,7 @@ class CancelOfficeHourSessionView(ImpactView):
                 office_hour, context['mentor_name']).get(addressee, None)
             if addressee_info:
                 local_context = {
-                    'cancelled_by': cancelled_by,
+                    'cancelled_by': cancelled_by[addressee],
                     'hours_with': addressee_info['hours_with'],
                     'dashboard_username': addressee_info['to_addrs'][0],
                 }
