@@ -46,9 +46,9 @@ class CancelOfficeHourReservationView(ImpactView):
         self.user = request.user
         self.office_hour = MentorProgramOfficeHour.objects.filter(
                 pk=self.office_hour_id).first()
-        self.check_object_permissions(request, self.office_hour)
         can_cancel, detail = self.check_can_cancel()
         if can_cancel:
+            self.check_object_permissions(request, self.office_hour)
             self.process_cancellation()
         return Response({
             "success": can_cancel,
