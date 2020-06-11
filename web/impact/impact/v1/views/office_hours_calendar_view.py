@@ -99,6 +99,7 @@ class OfficeHoursCalendarView(ImpactView):
             "topics",
             "startup_id",
             "reserved",
+            "meeting_info",
             location_name=F("location__name"),
             location_timezone=F("location__timezone"),
             finalist_first_name=F("finalist__first_name"),
