@@ -8,6 +8,7 @@ from .utils import nonexistent_object_id
 from accelerator.tests.factories import (
     MentorProgramOfficeHourFactory,
     StartupFactory,
+    StartupTeamMemberFactory,
 )
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.models import UserRole
@@ -37,14 +38,44 @@ class TestReserveOfficeHourView(APITestCase):
 
     def test_finalist_reserves_office_hour_timecard(self):
         # a finalist reserves an office hour, gets timecard details in response
-        startup = StartupFactory()
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         finalist = _finalist()
+        stm = StartupTeamMemberFactory(user=finalist)
+
         response = self.post_response(office_hour.id,
-                                      startup_id=startup.id,
+                                      startup_id=stm.startup.id,
                                       request_user=finalist)
         self.assert_response_contains_session_details(response, office_hour)
 
+    def test_finalist_reserves_office_hour_with_nonexistent_startup(self):
+        # a finalist reserves an office hour, gets timecard details in response
+        startup_id = nonexistent_object_id(StartupFactory)
+        office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        finalist = _finalist()
+        response = self.post_response(office_hour.id,
+                                      startup_id=startup_id,
+                                      request_user=finalist)
+        self.assert_ui_notification(response,
+                                    False,
+                                    self.view.NO_SUCH_STARTUP)
+
+    def test_non_finalist_attempts_to_reserve_office_hour_notification(self):
+        office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        non_finalist = self.basic_user()
+        response = self.post_response(office_hour.id,
+                                      request_user=non_finalist)
+        self.assert_ui_notification(response,
+                                    False,
+                                    self.view.USER_CANNOT_RESERVE_OFFICE_HOURS)
+        
+
+    def test_non_finalist_attempts_to_reserve_office_hour_and_fails(self):
+        office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        non_finalist = self.basic_user()
+        response = self.post_response(office_hour.id,
+                                      request_user=non_finalist)
+        self.assert_not_reserved(office_hour)
+        
     def test_finalist_reserves_office_hour_gets_confirmation_email(self):
         # a finalist reserves and office hour, gets a confirmation email
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
@@ -131,6 +162,19 @@ class TestReserveOfficeHourView(APITestCase):
                       'startup': startup_name}
         self.assertDictEqual(timecard, oh_details)
 
+    def assert_reserved_by(self, office_hour, finalist):
+        office_hour.refresh_from_db()
+        self.assertEqual(office_hour.finalist, finalist)
+
+    def assert_not_reserved_by(self, office_hour, finalist):
+        office_hour.refresh_from_db()
+        self.assertNotEqual(office_hour.finalist, finalist)
+        
+    def assert_not_reserved(self, office_hour):
+        office_hour.refresh_from_db()
+        self.assertIsNone(office_hour.finalist)
+    
+    
     def post_response(self,
                       office_hour_id,
                       user_id=None,

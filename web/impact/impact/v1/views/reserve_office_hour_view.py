@@ -15,6 +15,7 @@ from ...permissions.v1_api_permissions import (
 from .impact_view import ImpactView
 from .utils import (
     email_template_path,
+    is_office_hour_reserver,
     localized_office_hour_start_time,
 )
 from ...minimal_email_handler import send_email
@@ -29,7 +30,7 @@ class ReserveOfficeHourView(ImpactView):
     view_name = "reserve_office_hour"
     permission_classes = [ReserveOfficeHourPermission]
 
-    SUCCESS_HEADER = "SUCCESS"
+    SUCCESS_HEADER = "Office Hours session reserved"
     SUCCESS_DETAIL = "You have reserved this office hour session"
     FAIL_HEADER = "Fail header"
     NO_OFFICE_HOUR_SPECIFIED = "No office hour was specified"
@@ -38,7 +39,10 @@ class ReserveOfficeHourView(ImpactView):
     NO_SUCH_USER = "No such user exists"
     OFFICE_HOUR_ALREADY_RESERVED = "That session has already been reserved"
     SUBJECT = "Office Hours Reservation Notification"
-
+    STARTUP_NOT_ASSOCIATED_WITH_USER = ("The selected startup is not a valid "
+                                        "choice for {}")
+    USER_CANNOT_RESERVE_OFFICE_HOURS = ("The selected user is not allowed to "
+                                        "reserve office hour sessions.")
     def post(self, request):
         '''
         params:
@@ -88,6 +92,9 @@ class ReserveOfficeHourView(ImpactView):
         else:
             self.target_user = request.user
             self.on_behalf_of = False
+        if not is_office_hour_reserver(self.target_user):
+            self.fail(self.USER_CANNOT_RESERVE_OFFICE_HOURS)
+            return False
         return True
 
     def _extract_startup(self, request):
@@ -99,6 +106,11 @@ class ReserveOfficeHourView(ImpactView):
                 self.startup = Startup.objects.get(pk=startup_id)
             except Startup.DoesNotExist:
                 self.fail(self.NO_SUCH_STARTUP)
+                return False
+            if not self.target_user.startupteammember_set.filter(
+                    startup=self.startup).exists():
+                self.fail(self.STARTUP_NOT_ASSOCIATED_WITH_USER.format(
+                    self.target_user.email))
                 return False
         return True
 
@@ -114,6 +126,7 @@ class ReserveOfficeHourView(ImpactView):
     def _update_office_hour_data(self):
         self.office_hour.finalist = self.target_user
         self.office_hour.description = self.message
+        self.office_hour.startup = self.startup
         self.office_hour.save()
 
     def _send_confirmation_emails(self):
@@ -173,12 +186,3 @@ class ReserveOfficeHourView(ImpactView):
             'header': self.header,
             'detail': self.detail,
             'timecard_info': self.timecard_info})
-
-
-def _variable_name(field_name):
-    '''derive an instance variable name from a field name
-    by stripping off the "_id" part if it exists'''
-    if field_name.endswith("_id"):
-        return field_name.strip("_id")
-    else:
-        return field_name
