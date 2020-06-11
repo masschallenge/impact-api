@@ -1,5 +1,6 @@
 from pytz import timezone
 
+from django.core import mail
 from django.urls import reverse
 
 from accelerator.models import UserRole
