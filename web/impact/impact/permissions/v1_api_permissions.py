@@ -65,6 +65,7 @@ class IsExpertUser(IsAuthenticated):
 class ReserveOfficeHourPermission(IsAuthenticated):
     def has_permission(self, request, view):
         return (super().has_permission(request, view) or
+                is_employee(request.user) or
                 can_reserve_office_hour(request.user))
 
 
