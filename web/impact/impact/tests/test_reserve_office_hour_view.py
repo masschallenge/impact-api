@@ -69,7 +69,7 @@ class TestReserveOfficeHourView(APITestCase):
             response,
             False,
             self.view.STARTUP_NOT_ASSOCIATED_WITH_USER.format(finalist.email))
-        
+
     def test_non_finalist_attempts_to_reserve_office_hour_notification(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         non_finalist = self.basic_user()
