@@ -62,7 +62,7 @@ class IsExpertUser(IsAuthenticated):
                 is_expert(request.user))
 
 
-class ReserveOfficeHourPermission(V1APIPermissions):
+class ReserveOfficeHourPermission(IsAuthenticated):
     def has_permission(self, request, view):
         return (super().has_permission(request, view) or
                 can_reserve_office_hour(request.user))
