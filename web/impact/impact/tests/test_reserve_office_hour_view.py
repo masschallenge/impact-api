@@ -67,15 +67,14 @@ class TestReserveOfficeHourView(APITestCase):
         self.assert_ui_notification(response,
                                     False,
                                     self.view.USER_CANNOT_RESERVE_OFFICE_HOURS)
-        
 
     def test_non_finalist_attempts_to_reserve_office_hour_and_fails(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         non_finalist = self.basic_user()
-        response = self.post_response(office_hour.id,
+        self.post_response(office_hour.id,
                                       request_user=non_finalist)
         self.assert_not_reserved(office_hour)
-        
+
     def test_finalist_reserves_office_hour_gets_confirmation_email(self):
         # a finalist reserves and office hour, gets a confirmation email
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
@@ -169,12 +168,11 @@ class TestReserveOfficeHourView(APITestCase):
     def assert_not_reserved_by(self, office_hour, finalist):
         office_hour.refresh_from_db()
         self.assertNotEqual(office_hour.finalist, finalist)
-        
+
     def assert_not_reserved(self, office_hour):
         office_hour.refresh_from_db()
         self.assertIsNone(office_hour.finalist)
-    
-    
+
     def post_response(self,
                       office_hour_id,
                       user_id=None,

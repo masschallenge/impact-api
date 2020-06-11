@@ -43,6 +43,7 @@ class ReserveOfficeHourView(ImpactView):
                                         "choice for {}")
     USER_CANNOT_RESERVE_OFFICE_HOURS = ("The selected user is not allowed to "
                                         "reserve office hour sessions.")
+
     def post(self, request):
         '''
         params:
