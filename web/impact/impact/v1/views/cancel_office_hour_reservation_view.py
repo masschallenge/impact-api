@@ -5,10 +5,11 @@ from django.template import loader
 
 from rest_framework.response import Response
 
-from ...minimal_email_handler import MinimalEmailHandler as email_handler
 from ...permissions.v1_api_permissions import OfficeHourFinalistPermission
 from .impact_view import ImpactView
-from mc.models import MentorProgramOfficeHour
+from .utils import email_template_path
+from ...minimal_email_handler import send_email
+from accelerator.models import MentorProgramOfficeHour
 from accelerator_abstract.models.base_user_utils import is_employee
 
 User = get_user_model()
@@ -62,12 +63,12 @@ class CancelOfficeHourReservationView(ImpactView):
             return True, formatted_success_notification(self.office_hour)
 
     def process_cancellation(self):
-        _send_email(self.prepare_email_notification(self.office_hour.mentor,
-                                                    self.office_hour.finalist,
-                                                    mentor_template_name))
-        _send_email(self.prepare_email_notification(self.office_hour.finalist,
-                                                    self.office_hour.mentor,
-                                                    finalist_template_name))
+        send_email(**self.prepare_email_notification(self.office_hour.mentor,
+                                                     self.office_hour.finalist,
+                                                     mentor_template_name))
+        send_email(**self.prepare_email_notification(self.office_hour.finalist,
+                                                     self.office_hour.mentor,
+                                                     finalist_template_name))
         self._cancel_reservation()
 
     def _cancel_reservation(self):
@@ -78,7 +79,7 @@ class CancelOfficeHourReservationView(ImpactView):
                                    recipient,
                                    counterpart,
                                    template_name):
-        template_path = _template_path(template_name)
+        template_path = email_template_path(template_name)
         office_hour_date_time = _localize_start_time(self.office_hour)
         cancelling_party = self._cancelling_party_name()
         template_context = {"recipient": recipient,
@@ -101,17 +102,9 @@ class CancelOfficeHourReservationView(ImpactView):
             return self.user.full_name()
 
 
-def _send_email(email_details):
-    email_handler(**email_details).send()
-
-
 def _localize_start_time(office_hour):
     tz = timezone(office_hour.location.timezone)
     return office_hour.start_date_time.astimezone(tz)
-
-
-def _template_path(template_name):
-    return "emails/{}".format(template_name)
 
 
 def formatted_success_notification(office_hour):

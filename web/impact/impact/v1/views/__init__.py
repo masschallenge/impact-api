@@ -69,6 +69,7 @@ from .program_detail_view import ProgramDetailView
 from .program_family_detail_view import ProgramFamilyDetailView
 from .program_family_list_view import ProgramFamilyListView
 from .program_list_view import ProgramListView
+from .reserve_office_hour_view import ReserveOfficeHourView
 from .user_confidential_view import UserConfidentialView
 from .user_detail_view import UserDetailView
 from .user_history_view import UserHistoryView

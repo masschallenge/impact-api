@@ -1,6 +1,8 @@
 from contextlib import contextmanager
-from datetime import datetime, timedelta
-from django.core import mail
+from datetime import (
+    datetime,
+    timedelta,
+)
 from django.urls import reverse
 
 from mc.models import MentorProgramOfficeHour, UserRole
@@ -106,14 +108,14 @@ class TestCreateEditOfficeHourView(APITestCase):
         mentor = self._expert_user(UserRole.MENTOR)
         data = self._get_post_request_data(mentor)
         self._create_office_hour_session(self.staff_user(), data)
-        self.assertEqual(mail.outbox[0].to, [mentor.email])
+        self.assert_notified(mentor)
 
     def test_mail_to_mentor_when_staff_updates_office_hour_session(self):
         mentor = self._expert_user(UserRole.MENTOR)
         office_hour = self._create_office_hour_obj(mentor)
         data = {'topics': self.updated_topics}
         self._edit_office_hour_session(self.staff_user(), office_hour, data)
-        self.assertEqual(mail.outbox[0].to, [mentor.email])
+        self.assert_notified(mentor)
 
     def test_mentor_not_in_active_program_cannot_create_office_hour(self):
         mentor = self._expert_with_inactive_program(UserRole.MENTOR)

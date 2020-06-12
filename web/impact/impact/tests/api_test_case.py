@@ -6,6 +6,7 @@ from oauth2_provider.models import get_application_model
 from rest_framework.test import APIClient
 from test_plus.test import TestCase
 
+from django.core import mail
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.urls import reverse
@@ -106,3 +107,35 @@ class APITestCase(TestCase):
             data['header'] == header,
             data['detail'] == notification
         ]), msg='Notification data was not as expected')
+
+    def assert_notified(self,
+                        user,
+                        message="",
+                        subject="",
+                        check_alternative=False):
+        '''Assert that the user received a notification.
+        If `message` is specified, assert that the message appears in one of
+        the outgoing emails to this user
+        '''
+        emails = [email for email in mail.outbox if user.email in email.to]
+        self.assertGreater(len(emails), 0)
+        if message:
+            if check_alternative:
+                self.assertTrue(any([_message_included_in_email_alternative(
+                    email, message) for email in emails]))
+            else:
+                self.assertTrue(any([
+                    message in email.body for email in emails]))
+        if subject:
+            self.assertIn(subject, [email.subject for email in emails])
+
+    def assert_not_notified(self, user):
+        '''Assert that the specified user did not receive a notification.
+        '''
+        if mail.outbox:
+            self.assertNotIn(user.email, [email.to for email in mail.outbox],
+                             msg="Found an email sent to user")
+
+
+def _message_included_in_email_alternative(email, message):
+    return any([message in alt[0] for alt in email.alternatives])
