@@ -33,3 +33,7 @@ class MinimalEmailHandler:
 
     def send(self):
         self.email.send()
+
+
+def send_email(**email_details):
+    MinimalEmailHandler(**email_details).send()
