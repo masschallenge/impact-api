@@ -18,7 +18,10 @@ from django.db.models import (
     Value,
 )
 from . import ImpactView
-from ...permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
+from ...permissions.v1_api_permissions import (
+    DEFAULT_PERMISSION_DENIED_DETAIL,
+    IsAuthenticated,
+)
 from accelerator.models import (
     MentorProgramOfficeHour,
     ProgramRoleGrant,
@@ -46,7 +49,7 @@ ACTIVE_PROGRAM = Q(program_role__program__program_status='active')
 
 
 class OfficeHoursCalendarView(ImpactView):
-    permission_classes = []
+    permission_classes = [IsAuthenticated]
     view_name = "office_hours_calendar_view"
     SUCCESS_HEADER = "Office hours fetched successfully"
     FAILURE_HEADER = "Office hours could not be fetched"
@@ -213,17 +216,9 @@ class OfficeHoursCalendarView(ImpactView):
                 flat=True).distinct()
 
     def location_choices(self):
-        location_path = "__".join(["program_role",
-                                   "program",
-                                   "program_family",
-                                   "programfamilylocation",
-                                   "location"])
-        location_name = location_path + "__name"
-        location_id = location_path + "__id"
         location_choices = self.target_user.programrolegrant_set.filter(
             OFFICE_HOURS_HOLDER and
-            ACTIVE_PROGRAM).values_list(
-                location_name, location_id)
+            ACTIVE_PROGRAM).values(**_location_lookups())
         return location_choices.distinct()
     
     def fail(self, detail):
@@ -237,7 +232,25 @@ class OfficeHoursCalendarView(ImpactView):
         self.response_elements['header'] = self.SUCCESS_HEADER
 
     
-
+def _location_lookups():
+        location_path = "__".join(["program_role",
+                                   "program",
+                                   "program_family",
+                                   "programfamilylocation",
+                                   "location"]) 
+        location_fields = (
+            'id',
+            'street_address',
+            'timezone',
+            'country',
+            'state',
+            'name',
+            'city',
+        )
+        return dict([("location_" + field, F("{}__{}".format(
+            location_path, field)))
+                     for field in location_fields])
+    
 
 def start_date(date_spec=None):
     # return the latest monday that is less than or equal to today

@@ -126,10 +126,12 @@ class TestOfficeHoursCalendarView(APITestCase):
             program_role__program__program_status="active",
             program_role__program__program_family=program_family)
          for program_family in program_families]
-
+        
         response = self.get_response(user=office_hour.mentor)
-        response_locations = response.data['location_choices']
-        self.assertTrue(all([(loc.name, loc.id) in response_locations
+        response_locations = response.data['location_choices']        
+        response_location_names = response_locations.values_list("location_name",
+                                                                 flat=True)
+        self.assertTrue(all([loc.name in response_location_names
                              for loc in locations]))
 
     def test_bad_date_spec_gets_fail_response(self):
