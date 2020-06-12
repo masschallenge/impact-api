@@ -8,7 +8,7 @@ from accelerator_abstract.models.base_user_utils import (
     is_expert,
 )
 from accelerator.models import UserRole
-from impact.permissions import (
+from . import (
     settings,
     BasePermission,
 )

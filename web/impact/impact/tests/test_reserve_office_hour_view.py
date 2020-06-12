@@ -72,12 +72,10 @@ class TestReserveOfficeHourView(APITestCase):
 
     def test_non_finalist_attempts_to_reserve_office_hour_notification(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
-        non_finalist = self.basic_user()
+        non_finalist = _mentor()
         response = self.post_response(office_hour.id,
                                       request_user=non_finalist)
-        self.assert_ui_notification(response,
-                                    False,
-                                    self.view.USER_CANNOT_RESERVE_OFFICE_HOURS)
+        self.response_403(response, msg=DEFAULT_PERMISSION_DENIED_DETAIL)
 
     def test_non_finalist_attempts_to_reserve_office_hour_and_fails(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)

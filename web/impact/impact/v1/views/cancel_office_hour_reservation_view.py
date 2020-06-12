@@ -5,8 +5,8 @@ from django.template import loader
 
 from rest_framework.response import Response
 
-from impact.v1.views.impact_view import ImpactView
-from impact.permissions.v1_api_permissions import (
+from .impact_view import ImpactView
+from ...permissions.v1_api_permissions import (
     OfficeHourFinalistPermission,
 )
 from .utils import email_template_path
