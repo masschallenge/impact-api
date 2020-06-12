@@ -62,19 +62,6 @@ class IsExpertUser(IsAuthenticated):
                 is_expert(request.user))
 
 
-class ReserveOfficeHourPermission(IsAuthenticated):
-    def has_permission(self, request, view):
-        return (super().has_permission(request, view) and
-                (is_employee(request.user) or
-                 can_reserve_office_hour(request.user)))
-
-
-def can_reserve_office_hour(user):
-    return user.programrolegrant_set.filter(
-        program_role__user_role__name__in=OFFICE_HOUR_RESERVERS,
-        program_role__program__program_status=ACTIVE_PROGRAM_STATUS).exists()
-
-
 class OfficeHourPermission(IsAuthenticated):
     def has_permission(self, request, view):
         roles = [UserRole.MENTOR, UserRole.AIR]

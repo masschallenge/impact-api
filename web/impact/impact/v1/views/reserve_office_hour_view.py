@@ -10,7 +10,7 @@ from accelerator.models import (
 
 from ...permissions.v1_api_permissions import (
     DEFAULT_PERMISSION_DENIED_DETAIL,
-    ReserveOfficeHourPermission,
+    IsAuthenticated,
 )
 from .impact_view import ImpactView
 from .utils import (
@@ -28,7 +28,7 @@ finalist_template_name = "reserve_office_hour_email_to_finalist.html"
 
 class ReserveOfficeHourView(ImpactView):
     view_name = "reserve_office_hour"
-    permission_classes = [ReserveOfficeHourPermission]
+    permission_classes = [IsAuthenticated]
 
     SUCCESS_HEADER = "Office Hours session reserved"
     SUCCESS_DETAIL = "You have reserved this office hour session"
