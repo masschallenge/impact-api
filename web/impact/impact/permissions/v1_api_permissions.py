@@ -1,5 +1,8 @@
+
 from rest_framework.permissions import IsAuthenticated
 
+
+from accelerator_abstract.models.base_program import ACTIVE_PROGRAM_STATUS
 from accelerator_abstract.models.base_user_utils import (
     is_employee,
     is_expert,
@@ -13,6 +16,7 @@ from . import (
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 DEFAULT_PERMISSION_DENIED_DETAIL = ("You do not have permission to perform "
                                     "this action.")
+OFFICE_HOUR_RESERVERS = [UserRole.FINALIST, UserRole.AIR, UserRole.ALUM]
 
 
 def can_view_user_details_page(request):

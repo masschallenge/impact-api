@@ -1,4 +1,3 @@
-from django.core import mail
 from django.urls import reverse
 
 from accelerator.tests.factories import MentorProgramOfficeHourFactory
@@ -142,18 +141,6 @@ class TestCancelOfficeHourReservationView(APITestCase):
                     "message": message}
             response = self.client.post(url, data=data)
         return response
-
-    def assert_notified(self, user, message=""):
-        emails = [email for email in mail.outbox if user.email in email.to]
-        self.assertGreater(len(emails), 0)
-        email = emails[0]
-        if message:
-            self.assertIn(message, email.body)
-
-    def assert_not_notified(self, user):
-        if mail.outbox:
-            self.assertNotIn(user.email, [email.to for email in mail.outbox],
-                             msg="Found an email sent to user")
 
     def assert_reservation_cancelled(self, office_hour):
         office_hour.refresh_from_db()
