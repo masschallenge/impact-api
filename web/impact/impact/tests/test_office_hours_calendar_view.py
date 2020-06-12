@@ -9,14 +9,14 @@ from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
 from accelerator.models import UserRole
-from accelerator.tests.factories.location_factory import LocationFactory
-from accelerator.tests.factories.program_family_location_factory import (
-    ProgramFamilyLocationFactory,
-)
+
 from accelerator.tests.factories import (
+    LocationFactory,    
     MentorProgramOfficeHourFactory,
     ProgramFamilyFactory,
+    ProgramFamilyLocationFactory,    
     ProgramRoleGrantFactory,
+    StartupTeamMemberFactory,
 )
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.contexts.context_utils import get_user_role_by_name
@@ -134,6 +134,20 @@ class TestOfficeHoursCalendarView(APITestCase):
         self.assertTrue(all([loc.name in response_location_names
                              for loc in locations]))
 
+
+    def test_response_data_includes_user_startups(self):
+        office_hour = self.create_office_hour()
+        finalist = _finalist()
+        stms = StartupTeamMemberFactory.create_batch(5, user=finalist)
+        startup_names = [stm.startup.name for stm in stms]
+        response = self.get_response(user=finalist)
+        response_startup_names = response.data['user_startups'].values_list(
+            "name",
+            flat=True)
+        self.assertTrue(all([name in response_startup_names
+                             for name in startup_names]))
+        
+                             
     def test_bad_date_spec_gets_fail_response(self):
         bad_date_spec = "2020-20-20"  # this cannot be parsed as a date
         response = self.get_response(date_spec=bad_date_spec)

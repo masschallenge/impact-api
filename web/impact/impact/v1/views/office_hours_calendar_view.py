@@ -62,7 +62,7 @@ class OfficeHoursCalendarView(ImpactView):
         self.response_elements = {}
         (self._get_target_user(request) and
          self._check_request_user_type(request) and
-         self._get_start_date(request) and
+         self._get_date_range(request) and
          self._get_office_hours_data())
         return Response(self.response_elements)
 
@@ -96,11 +96,12 @@ class OfficeHoursCalendarView(ImpactView):
             self.request_user_type = NOT_ALLOWED
         return True
         
-    def _get_start_date(self, request):
+    def _get_date_range(self, request):
         date_spec = request.query_params.get("date_spec", None)
 
         try:
-            self.start_date = start_date(date_spec)
+            self.start_date, self.end_date = _date_range(date_spec)
+
         except ValueError:
             self.fail(self.BAD_DATE_SPEC)
             return False
@@ -117,16 +118,8 @@ class OfficeHoursCalendarView(ImpactView):
 
         else:
             self.fail(self.NOT_OFFICE_HOURS_VIEWER)
-            return self._null_office_hours_queryset()
+            return False
     
-        # if staff and target user != request_user:
-        #   return all hours in given time range for user's staff programs
-
-        # if current mentor:
-        #  return existing qset
-
-        # else is finalist, so
-        #  return all open hours plus all hours that the finalist currently has booked
     def _staff_office_hours_queryset(self):
         staff_programs = Clearance.objects.clearances_for_user(
             self.target_user).values_list(
@@ -134,49 +127,43 @@ class OfficeHoursCalendarView(ImpactView):
         in_visible_program_family = Q(
             program_role__program_program_family__in=staff_programs)
         program_mentors = ProgramRoleGrant.objects.filter(
-            ACTIVE_PROGRAM and
-            OFFICE_HOURS_HOLDER and
+            ACTIVE_PROGRAM &
+            OFFICE_HOURS_HOLDER &
             in_visible_program_family).values_list(
                 person__id, flat=True)
         active_mentors = Q(mentor__in=program_mentors)
         return MentorProgramOfficeHour.objects.filter(
              start_date_time__range=[self.start_date, self.end_date]).order_by(
                  'start_date_time').annotate(
-                     finalist_count=Count("finalist")).annotate(
-                         reserved=Case(
-                             When(finalist_count__gt=0, then=Value(True)),
-                             default=Value(False),
-                             output_field=BooleanField()))
+                     finalist_count=Count("finalist"))
 
     def _mentor_office_hours_queryset(self):
         return MentorProgramOfficeHour.objects.filter(
              mentor=self.target_user,
              start_date_time__range=[self.start_date, self.end_date]).order_by(
                  'start_date_time').annotate(
-                     finalist_count=Count("finalist")).annotate(
-                         reserved=Case(
-                             When(finalist_count__gt=0, then=Value(True)),
-                             default=Value(False),
-                             output_field=BooleanField()))
+                     finalist_count=Count("finalist"))
 
     def _finalist_office_hours_queryset(self):
         reserved_by_user = Q(finalist=self.target_user)
         unreserved = Q(finalist__isnull=True)
         return MentorProgramOfficeHour.objects.filter(
-            reserved_by_user or unreserved,  
-            start_date_time__range=[self.start_date, self.end_date]).order_by(
+            reserved_by_user | unreserved,  
+            start_date_time__range=[self.start_date, self.end_date])
+
+    def _null_office_hours_queryset(self):
+        return MentorProgramOfficeHour.objects.none()
+    
+    def _get_office_hours_data(self):
+        primary_industry_key = "mentor__expertprofile__primary_industry__name"
+        office_hours = self._office_hours_queryset().filter(
+            program__isnull=True).order_by(
                  'start_date_time').annotate(
                      finalist_count=Count("finalist")).annotate(
                          reserved=Case(
                              When(finalist_count__gt=0, then=Value(True)),
                              default=Value(False),
                              output_field=BooleanField()))
-
-    
-    def _get_office_hours_data(self):
-        self.end_date = self.start_date + ONE_WEEK + 2 * ONE_DAY
-        primary_industry_key = "mentor__expertprofile__primary_industry__name"
-        office_hours = self._office_hours_queryset()
         
         self.response_elements['calendar_data'] = office_hours.values(
             "id",
@@ -207,17 +194,24 @@ class OfficeHoursCalendarView(ImpactView):
         self.response_elements['location_choices'] = self.location_choices()
         program_families = self.mentor_program_families()
         self.response_elements['mentor_program_families'] = program_families
+        self.response_elements['user_startups'] = self._user_startups()
         self.succeed()
 
+    def _user_startups(self):
+        return self.target_user.startupteammember_set.order_by(
+            '-id').values(
+                "id",
+                name=F("startup__organization__name"))            
+    
     def mentor_program_families(self):
         return self.target_user.programrolegrant_set.filter(
-            OFFICE_HOURS_HOLDER and ACTIVE_PROGRAM).values_list(
+            OFFICE_HOURS_HOLDER & ACTIVE_PROGRAM).values_list(
                 "program_role__program__program_family__name",
                 flat=True).distinct()
 
     def location_choices(self):
         location_choices = self.target_user.programrolegrant_set.filter(
-            OFFICE_HOURS_HOLDER and
+            OFFICE_HOURS_HOLDER &
             ACTIVE_PROGRAM).values(**_location_lookups())
         return location_choices.distinct()
     
@@ -252,30 +246,31 @@ def _location_lookups():
                      for field in location_fields])
     
 
-def start_date(date_spec=None):
-    # return the latest monday that is less than or equal to today
+def _date_range(date_spec=None):
+    # returns (start_date, end_date)
+    # start_date is the latest monday that is less than or equal to today,
+    # end_date is start_date + seven days
+    # both values are then padded by 24 hours to allow for TZ differences
+    
     # throws ValueError if date_spec is not in ISO-8601 format
-
-    # note: this function will become more involved when we allow for
-    # user-specified start-of-week
 
     if date_spec:
         initial_date = datetime.strptime(date_spec, ISO_8601_DATE_FORMAT)
     else:
         initial_date = datetime.now()
-
+    initial_date = utc.localize(initial_date)
     # This calculation depends on the fact that monday == 0 in python
-
     start_date = initial_date - timedelta(initial_date.weekday())
+    end_date = start_date + ONE_WEEK + ONE_DAY
     adjusted_start_date = start_date - ONE_DAY
-    return utc.localize(adjusted_start_date)
+    return adjusted_start_date, end_date
 
 
 def _is_mentor(user):
-    return ProgramRoleGrant.objects.filter(
-        ACTIVE_PROGRAM and OFFICE_HOURS_HOLDER).exists()
+    return user.programrolegrant_set.filter(
+        ACTIVE_PROGRAM & OFFICE_HOURS_HOLDER).exists()
 
 def _is_finalist(user):
-    return ProgramRoleGrant.objects.filter(
-        ACTIVE_PROGRAM and OFFICE_HOURS_RESERVER).exists()
+    return user.programrolegrant_set.filter(
+        ACTIVE_PROGRAM & OFFICE_HOURS_RESERVER).exists()
     
