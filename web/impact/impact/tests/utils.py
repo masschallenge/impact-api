@@ -72,3 +72,10 @@ def capture_stderr(command, *args, **kwargs):
         yield result, sys.stderr.read()
     finally:
         sys.stderr = err
+
+
+def nonexistent_object_id(object_factory):
+    object = object_factory()
+    object_id = object.id
+    object.delete()
+    return object_id
