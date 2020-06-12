@@ -95,6 +95,7 @@ class TestMentorParticipationView(APITestCase):
             self.client.post(self.url, {
                 'confirmed': [self.program.pk],
             })
+        self.assert_notified(user, subject=SUBJECT)
         self.assertEqual(mail.outbox[0].subject, SUBJECT)
 
     def test_non_expert_cannot_post_participation(self):

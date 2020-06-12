@@ -70,28 +70,31 @@ class TestCancelOfficeHourSession(APITestCase):
     def test_mentor_receives_email_when_admin_cancels_unreserved_session(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         self._cancel_office_hour_session(office_hour.id, self.staff_user())
-        self.assertEqual(mail.outbox[0].to, [office_hour.mentor.email])
+        self.assert_notified(office_hour.mentor)
 
     def test_staff_can_cancel_reserved_office_hour(self):
         office_hour = MentorProgramOfficeHourFactory()
         self._cancel_office_hour_session(office_hour.id, self.staff_user())
         self.assert_office_hour_session_was_cancelled(office_hour)
 
-    def test_mail_sent_to_mentor_finalist_when_admin_cancels_reserved_session(
-            self):
+    def test_mail_is_sent_to_mentor_on_reserved_session_cancellation(self):
         office_hour = MentorProgramOfficeHourFactory()
         self._cancel_office_hour_session(office_hour.id, self.staff_user())
-        attendees_email = [email.to[0] for email in mail.outbox]
-        to_addresses = [office_hour.mentor.email,
-                        office_hour.finalist.email]
-        self.assertEqual(set(attendees_email), set(to_addresses))
+        self.assert_notified(office_hour.mentor)
+
+    def test_mail_is_sent_to_finalist_on_reserved_session_cancellation(self):
+        office_hour = MentorProgramOfficeHourFactory()
+        self._cancel_office_hour_session(office_hour.id, self.staff_user())
+        self.assert_notified(office_hour.finalist)
 
     def test_mail_includes_message_when_cancelled_session_has_message(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         message = 'cancelled due to conflicting meetings'
         self._cancel_office_hour_session(office_hour.id,
                                          self.staff_user(), message)
-        self.assertIn(message, mail.outbox[0].alternatives[0][0])
+        self.assert_notified(office_hour.mentor,
+                             message,
+                             check_alternative=True)
 
     def test_mentor_received_email_when_they_cancel_their_session(self):
         mentor = self._expert_user(UserRole.MENTOR)
@@ -99,7 +102,7 @@ class TestCancelOfficeHourSession(APITestCase):
             mentor=mentor, finalist=None
         )
         self._cancel_office_hour_session(office_hour.id, mentor)
-        self.assertEqual(mail.outbox[0].to, [mentor.email])
+        self.assert_notified(mentor)
 
     def test_staff_cancel_office_hour_session_ui_notification(self):
         office_hour = MentorProgramOfficeHourFactory()
