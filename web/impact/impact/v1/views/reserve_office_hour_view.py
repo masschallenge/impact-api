@@ -15,6 +15,7 @@ from ...permissions.v1_api_permissions import (
 from .impact_view import ImpactView
 from .utils import (
     email_template_path,
+    is_office_hour_reserver,
     localized_office_hour_start_time,
 )
 from ...minimal_email_handler import send_email
@@ -40,6 +41,8 @@ class ReserveOfficeHourView(ImpactView):
     SUBJECT = "Office Hours Reservation Notification"
     STARTUP_NOT_ASSOCIATED_WITH_USER = ("The selected startup is not a valid "
                                         "choice for {}")
+    USER_CANNOT_RESERVE_OFFICE_HOURS = ("The selected user is not allowed to "
+                                        "reserve office hour sessions.")
 
     def post(self, request):
         '''
@@ -90,6 +93,9 @@ class ReserveOfficeHourView(ImpactView):
         else:
             self.target_user = request.user
             self.on_behalf_of = False
+        if not is_office_hour_reserver(self.target_user):
+            self.fail(self.USER_CANNOT_RESERVE_OFFICE_HOURS)
+            return False
         return True
 
     def _extract_startup(self, request):
