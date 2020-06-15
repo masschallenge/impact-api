@@ -64,6 +64,11 @@ class TestUserHistoryView(APITestCase):
                 id=startup.organization.id)
             self.assertEqual(startup_str, events[0]["description"])
 
+    '''
+    signal muting is necessary when running impact tests in accelerate
+    since we ported this test from impact api where we dont expect
+    recievers in accelerate's receivers.py to run.
+    '''
     @factory.django.mute_signals(signals.pre_save, signals.post_save)
     def test_user_joined_startup_no_created_at(self):
         join_date = days_from_now(-10)
