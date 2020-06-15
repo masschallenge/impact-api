@@ -11,10 +11,10 @@ from django.urls import reverse
 from accelerator.models import UserRole
 
 from accelerator.tests.factories import (
-    LocationFactory,    
+    LocationFactory,
     MentorProgramOfficeHourFactory,
     ProgramFamilyFactory,
-    ProgramFamilyLocationFactory,    
+    ProgramFamilyLocationFactory,
     ProgramRoleGrantFactory,
     StartupTeamMemberFactory,
 )
@@ -76,14 +76,14 @@ class TestOfficeHoursCalendarView(APITestCase):
         self.assert_sessions_sorted_by_date(response)
 
     def test_user_with_no_hours_sees_empty_response(self):
-        user = _finalist()
+        user = _mentor()
         self.create_office_hour()
         response = self.get_response(user=user)
         sessions = response.data['calendar_data']
         self.assertEqual(len(sessions), 0)
 
     def test_user_with_no_hours_gets_success_response(self):
-        user = self.basic_user()
+        user = _mentor()
         self.create_office_hour()
         response = self.get_response(user=user)
         self.assert_success(response)
@@ -107,7 +107,7 @@ class TestOfficeHoursCalendarView(APITestCase):
         for tz in timezones:
             self.create_office_hour(timezone=tz,
                                     mentor=office_hour.mentor)
-        response = self.get_response(target_user_id=office_hour.mentor_id)
+        response = self.get_response(user=office_hour.mentor)
         response_timezones = set(response.data['timezones'])
         self.assertSetEqual(response_timezones, set(timezones))
 
@@ -126,9 +126,9 @@ class TestOfficeHoursCalendarView(APITestCase):
             program_role__program__program_status="active",
             program_role__program__program_family=program_family)
          for program_family in program_families]
-        
+
         response = self.get_response(user=office_hour.mentor)
-        response_locations = response.data['location_choices']        
+        response_locations = response.data['location_choices']
         response_location_names = response_locations.values_list("location_name",
                                                                  flat=True)
         self.assertTrue(all([loc.name in response_location_names
@@ -146,8 +146,8 @@ class TestOfficeHoursCalendarView(APITestCase):
             flat=True)
         self.assertTrue(all([name in response_startup_names
                              for name in startup_names]))
-        
-                             
+
+
     def test_bad_date_spec_gets_fail_response(self):
         bad_date_spec = "2020-20-20"  # this cannot be parsed as a date
         response = self.get_response(date_spec=bad_date_spec)
@@ -191,7 +191,8 @@ class TestOfficeHoursCalendarView(APITestCase):
                            finalist=None,
                            start_date_time=None,
                            duration_minutes=30,
-                           timezone="America/New_York"):
+                           timezone="America/New_York",
+                           program=None):
         create_params = {}
         mentor = mentor or _mentor()
         create_params['mentor'] = mentor
@@ -202,6 +203,7 @@ class TestOfficeHoursCalendarView(APITestCase):
         create_params['end_date_time'] = end_date_time
         create_params['location__timezone'] = timezone
         create_params['finalist'] = finalist
+        create_params['program'] = program
         return MentorProgramOfficeHourFactory(**create_params)
 
     def assert_hour_in_response(self, response, hour):
