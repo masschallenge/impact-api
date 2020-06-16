@@ -31,7 +31,7 @@ class BaseUserProfileType(DjangoObjectType):
         without changing GraphQL queries on the front end.
         """
         user_roles_of_interest = [UserRole.FINALIST, UserRole.ALUM]
-        startup_roles_of_interest = StartupRole.WINNER_STARTUP_ROLES
+        startup_roles_of_interest = StartupRole.WINNER_STARTUP_ROLES.copy()
         if is_employee(info.context.user):
             startup_roles_of_interest += [StartupRole.ENTRANT]
         return get_user_program_and_startup_roles(

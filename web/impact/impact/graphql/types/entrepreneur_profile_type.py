@@ -4,7 +4,7 @@ from mc.models import (
     Startup,
     StartupTeamMember
 )
-from . import BaseUserProfileType
+from .base_user_profile_type import BaseUserProfileType
 from .entrepreneur_startup_type import EntrepreneurStartupType
 
 

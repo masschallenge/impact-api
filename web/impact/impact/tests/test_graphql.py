@@ -34,7 +34,6 @@ from .factories import (
     ProgramFamilyLocationFactory,
     StartupStatusFactory,
     ProgramFamilyFactory,
-    UserRoleFactory,
     LocationFactory,
 )
 from .utils import capture_stderr
@@ -154,7 +153,7 @@ class TestGraphQL(APITestCase):
             program_role__user_role=_mentor, person=user)
         program = mentor_role_grant.program_role.program
         program_overview_link = program.program_overview_link
-        judge_role_grant = ProgramRoleGrantFactory.create(
+        ProgramRoleGrantFactory.create(
             program_role__user_role=_judge, person=user)
 
         query = MENTOR_PRG_QUERY.format(id=user.id)
@@ -490,7 +489,6 @@ class TestGraphQL(APITestCase):
 
     def test_query_program_roles_program_role_names_are_normalized(self):
         program_role_name = "BEST IN SHOW (BOS)"
-        user_role_name = UserRole.FINALIST
         _finalist = get_user_role_by_name(UserRole.FINALIST)
         user = ExpertFactory()
         ProgramRoleGrantFactory(
@@ -766,7 +764,7 @@ class TestGraphQL(APITestCase):
             user_type='EXPERT',
             program_role_names=desired_user_roles,
             program_families=[program_family]
-            ).user
+        ).user
 
         program_role = user.programrolegrant_set.filter(
             program_role__program__program_status="active",

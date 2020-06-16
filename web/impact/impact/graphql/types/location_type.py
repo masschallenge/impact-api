@@ -1,7 +1,7 @@
 from graphene_django import DjangoObjectType
 
 
-from accelerator.models import Location
+from mc.models import Location
 
 
 class LocationType(DjangoObjectType):

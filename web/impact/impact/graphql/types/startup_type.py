@@ -2,7 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 
 from mc.models import Startup
-from . import ProgramType
+from .program_type import ProgramType
 
 
 class StartupType(DjangoObjectType):
