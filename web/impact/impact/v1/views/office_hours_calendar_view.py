@@ -78,11 +78,12 @@ class OfficeHoursCalendarView(ImpactView):
             except User.DoesNotExist:
                 self.fail(self.NO_SUCH_USER)
                 return False
-            if (not is_employee(request.user) and
-                self.target_user != request.user):
-                # non-staff may not view on behalf of another user
-                self.fail(DEFAULT_PERMISSION_DENIED_DETAIL)
-                return False
+
+            if not is_employee(request.user):
+                if self.target_user != request.user:
+                    # non-staff may not view on behalf of another user
+                    self.fail(DEFAULT_PERMISSION_DENIED_DETAIL)
+                    return False
         return True
 
     def _check_request_user_type(self, request):

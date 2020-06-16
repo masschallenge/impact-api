@@ -131,9 +131,9 @@ class TestOfficeHoursCalendarView(APITestCase):
         finalist = _finalist()
         response = self.get_response(user=user,
                                      target_user_id=finalist.id)
-        self.assert_failure(response,                            
+        self.assert_failure(response,
                             DEFAULT_PERMISSION_DENIED_DETAIL)
-        
+
     def test_mentor_with_no_hours_in_range_sees_empty_response(self):
         two_weeks_ago = days_from_now(-14)
         session = self.create_office_hour(start_date_time=two_weeks_ago)
@@ -175,14 +175,14 @@ class TestOfficeHoursCalendarView(APITestCase):
 
         response = self.get_response(user=office_hour.mentor)
         response_locations = response.data['location_choices']
-        response_location_names = response_locations.values_list("location_name",
-                                                                 flat=True)
+        response_location_names = response_locations.values_list(
+            "location_name",
+            flat=True)
         self.assertTrue(all([loc.name in response_location_names
                              for loc in locations]))
 
-
     def test_response_data_includes_user_startups(self):
-        office_hour = self.create_office_hour()
+        self.create_office_hour()
         finalist = _finalist()
         stms = StartupTeamMemberFactory.create_batch(5, user=finalist)
         startup_names = [stm.startup.name for stm in stms]
@@ -192,7 +192,6 @@ class TestOfficeHoursCalendarView(APITestCase):
             flat=True)
         self.assertTrue(all([name in response_startup_names
                              for name in startup_names]))
-
 
     def test_bad_date_spec_gets_fail_response(self):
         bad_date_spec = "2020-20-20"  # this cannot be parsed as a date
@@ -296,9 +295,11 @@ def check_hour_in_response(response, hour):
     return hour.id in [response_hour['id']
                        for response_hour in response_data]
 
+
 def _finalist(program=None):
     program = program or ProgramFactory()
     return UserRoleContext(UserRole.FINALIST, program=program).user
+
 
 def _mentor(program=None):
     program = program or ProgramFactory()
