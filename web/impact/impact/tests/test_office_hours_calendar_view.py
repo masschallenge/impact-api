@@ -216,6 +216,12 @@ class TestOfficeHoursCalendarView(APITestCase):
                              in response_program_families
                              for prg in prgs]))
 
+    def test_non_office_hour_viewer_user_sees_no_hours(self):
+        user = _judge()  # judges are not office hour viewers
+        office_hour = self.create_office_hour()
+        response = self.get_response(user=user)
+        self.assert_hour_not_in_response(response, office_hour)
+        
     def test_no_n_plus_one_queries(self):
         office_hour = self.create_office_hour()
         with CaptureQueriesContext(connection) as captured_queries:
@@ -296,11 +302,19 @@ def check_hour_in_response(response, hour):
                        for response_hour in response_data]
 
 
-def _finalist(program=None):
+def _user_with_role(role_name, program):
     program = program or ProgramFactory()
-    return UserRoleContext(UserRole.FINALIST, program=program).user
+    return UserRoleContext(role_name, program=program).user
+
+
+def _finalist(program=None):
+    return _user_with_role(UserRole.FINALIST, program)
 
 
 def _mentor(program=None):
-    program = program or ProgramFactory()
-    return UserRoleContext(UserRole.MENTOR, program=program).user
+    return _user_with_role(UserRole.MENTOR, program)    
+
+
+def _judge(program=None):
+    return _user_with_role(UserRole.JUDGE, program)    
+

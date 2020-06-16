@@ -120,11 +120,10 @@ class OfficeHoursCalendarView(ImpactView):
             return self._mentor_office_hours_queryset()
         elif self.request_user_type == FINALIST:
             return self._finalist_office_hours_queryset()
-
         else:
-            self.fail(self.NOT_OFFICE_HOURS_VIEWER)
-            return False
-
+            self.response_elements['detail'] = self.NOT_OFFICE_HOURS_VIEWER
+            return self._null_office_hours_queryset()
+        
     def _staff_office_hours_queryset(self):
         staff_programs = Clearance.objects.clearances_for_user(
             self.target_user).values_list(
