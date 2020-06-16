@@ -69,6 +69,7 @@ from impact.v1.views.program_detail_view import ProgramDetailView
 from impact.v1.views.program_family_detail_view import ProgramFamilyDetailView
 from impact.v1.views.program_family_list_view import ProgramFamilyListView
 from impact.v1.views.program_list_view import ProgramListView
+from impact.v1.views.reserve_office_hour_view import ReserveOfficeHourView
 from impact.v1.views.user_confidential_view import UserConfidentialView
 from impact.v1.views.user_detail_view import UserDetailView
 from impact.v1.views.user_history_view import UserHistoryView
@@ -82,4 +83,7 @@ from impact.v1.views.cancel_office_hour_session_view import (
 )
 from impact.v1.views.mentor_participation_view import (
     MentorParticipationView
+)
+from impact.v1.views.office_hour_view import (
+    OfficeHourViewSet
 )

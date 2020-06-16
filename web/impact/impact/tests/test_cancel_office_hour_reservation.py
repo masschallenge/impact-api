@@ -1,21 +1,17 @@
-from django.core import mail
 from django.urls import reverse
 
 from accelerator.tests.factories import (
     MentorProgramOfficeHourFactory,
 )
-from impact.permissions.v1_api_permissions import (
-    DEFAULT_PERMISSION_DENIED_DETAIL,
-)
-from impact.tests.api_test_case import APITestCase
-from impact.v1.views import (
+from ..tests.api_test_case import APITestCase
+from ..v1.views import (
     CancelOfficeHourReservationView,
     formatted_success_notification,
     NO_SUCH_RESERVATION,
     NO_SUCH_OFFICE_HOUR,
 )
 
-from impact.v1.views.cancel_office_hour_reservation_view import (
+from ..v1.views.cancel_office_hour_reservation_view import (
     FAIL_HEADER,
     SUCCESS_HEADER,
 )
@@ -119,8 +115,12 @@ class TestCancelOfficeHourReservationView(APITestCase):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         response = self._submit_cancellation(office_hour,
                                              user=self.make_user())
-        notification = {'detail': DEFAULT_PERMISSION_DENIED_DETAIL}
-        self.assertEqual(response.data, notification)
+        self.assert_ui_notification(response, False, NO_SUCH_RESERVATION)
+
+    def test_user_attempts_to_cancel_non_existent_hour(self):
+        response = self._submit_cancellation(None,
+                                             user=self.make_user())
+        self.assert_ui_notification(response, False, NO_SUCH_OFFICE_HOUR)
 
     def test_user_cancels_non_existent_reservation_no_notification(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
@@ -144,18 +144,6 @@ class TestCancelOfficeHourReservationView(APITestCase):
                     "message": message}
             response = self.client.post(url, data=data)
         return response
-
-    def assert_notified(self, user, message=""):
-        emails = [email for email in mail.outbox if user.email in email.to]
-        self.assertGreater(len(emails), 0)
-        email = emails[0]
-        if message:
-            self.assertIn(message, email.body)
-
-    def assert_not_notified(self, user):
-        if mail.outbox:
-            self.assertNotIn(user.email, [email.to for email in mail.outbox],
-                             msg="Found an email sent to user")
 
     def assert_reservation_cancelled(self, office_hour):
         office_hour.refresh_from_db()
