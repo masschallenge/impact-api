@@ -28,6 +28,7 @@ from ..v1.views import (
     ISO_8601_DATE_FORMAT,
     OfficeHoursCalendarView,
 )
+from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from .factories import UserFactory
 from .utils import nonexistent_object_id
 
@@ -102,7 +103,7 @@ class TestOfficeHoursCalendarView(APITestCase):
         office_hour = self.create_office_hour(mentor=mentor)
         response = self.get_response(user=finalist)
         self.assert_hour_in_response(response, office_hour)
-        
+
     def test_current_finalist_sees_only_relevant_open_hours(self):
         program = ProgramFactory()
         finalist = _finalist(program=program)
@@ -112,18 +113,26 @@ class TestOfficeHoursCalendarView(APITestCase):
 
     def test_staff_sees_current_open_hours_for_their_program(self):
         program = ProgramFactory()
-        staff_user = self.staff_user(program_family=program.program_family)        
+        staff_user = self.staff_user(program_family=program.program_family)
         mentor = _mentor(program=program)
         office_hour = self.create_office_hour(mentor=mentor)
         response = self.get_response(user=staff_user)
         self.assert_hour_in_response(response, office_hour)
-        
+
     def test_staff_sees_only_relevant_open_hours(self):
         program = ProgramFactory()
         staff_user = self.staff_user(program_family=program.program_family)
         office_hour = self.create_office_hour()
         response = self.get_response(staff_user)
         self.assert_hour_not_in_response(response, office_hour)
+
+    def test_non_staff_cannot_view_on_behalf_of(self):
+        user = self.basic_user()
+        finalist = _finalist()
+        response = self.get_response(user=user,
+                                     target_user_id=finalist.id)
+        self.assert_failure(response,                            
+                            DEFAULT_PERMISSION_DENIED_DETAIL)
         
     def test_mentor_with_no_hours_in_range_sees_empty_response(self):
         two_weeks_ago = days_from_now(-14)
@@ -262,7 +271,7 @@ class TestOfficeHoursCalendarView(APITestCase):
     def assert_failure(self, response, failure_message):
         data = response.data
         self.assertFalse(data['success'])
-        self.assertEqual(data['header'], self.view.FAILURE_HEADER)
+        self.assertEqual(data['header'], self.view.FAIL_HEADER)
         self.assertEqual(data['detail'], failure_message)
 
     def get_response(self,
@@ -292,5 +301,5 @@ def _finalist(program=None):
     return UserRoleContext(UserRole.FINALIST, program=program).user
 
 def _mentor(program=None):
-    program = program or ProgramFactory()    
+    program = program or ProgramFactory()
     return UserRoleContext(UserRole.MENTOR, program=program).user

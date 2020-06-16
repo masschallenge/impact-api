@@ -18,12 +18,13 @@ from django.db.models import (
     Value,
 )
 from . import ImpactView
+from ...utils import compose_filter
 from ...permissions.v1_api_permissions import (
     DEFAULT_PERMISSION_DENIED_DETAIL,
     IsAuthenticated,
 )
 from accelerator.models import (
-    Clearance, 
+    Clearance,
     MentorProgramOfficeHour,
     ProgramRoleGrant,
     UserRole,
@@ -36,8 +37,8 @@ ONE_DAY = timedelta(1)
 ONE_WEEK = timedelta(8)
 
 STAFF = "staff"
-MENTOR = "mentor"      
-FINALIST = "finalist" 
+MENTOR = "mentor"
+FINALIST = "finalist"
 NOT_ALLOWED = "not_allowed"
 
 OFFICE_HOUR_HOLDER_ROLES = [UserRole.MENTOR, UserRole.AIR]
@@ -53,7 +54,7 @@ class OfficeHoursCalendarView(ImpactView):
     permission_classes = [IsAuthenticated]
     view_name = "office_hours_calendar_view"
     SUCCESS_HEADER = "Office hours fetched successfully"
-    FAILURE_HEADER = "Office hours could not be fetched"
+    FAIL_HEADER = "Office hours could not be fetched"
     BAD_DATE_SPEC = "We were unable to parse the date specifier"
     NO_SUCH_USER = "We were not able to locate that user"
     NOT_OFFICE_HOURS_VIEWER = ("You are not able to view office hours at this "
@@ -77,9 +78,11 @@ class OfficeHoursCalendarView(ImpactView):
             except User.DoesNotExist:
                 self.fail(self.NO_SUCH_USER)
                 return False
-            if not is_employee(request.user) and target_user != request.user:
+            if (not is_employee(request.user) and
+                self.target_user != request.user):
                 # non-staff may not view on behalf of another user
                 self.fail(DEFAULT_PERMISSION_DENIED_DETAIL)
+                return False
         return True
 
     def _check_request_user_type(self, request):
@@ -96,7 +99,7 @@ class OfficeHoursCalendarView(ImpactView):
         else:
             self.request_user_type = NOT_ALLOWED
         return True
-        
+
     def _get_date_range(self, request):
         date_spec = request.query_params.get("date_spec", None)
 
@@ -112,7 +115,7 @@ class OfficeHoursCalendarView(ImpactView):
         if self.request_user_type == STAFF:
             return self._staff_office_hours_queryset()
         elif self.request_user_type == MENTOR:
-            
+
             return self._mentor_office_hours_queryset()
         elif self.request_user_type == FINALIST:
             return self._finalist_office_hours_queryset()
@@ -120,7 +123,7 @@ class OfficeHoursCalendarView(ImpactView):
         else:
             self.fail(self.NOT_OFFICE_HOURS_VIEWER)
             return False
-    
+
     def _staff_office_hours_queryset(self):
         staff_programs = Clearance.objects.clearances_for_user(
             self.target_user).values_list(
@@ -146,20 +149,25 @@ class OfficeHoursCalendarView(ImpactView):
                  'start_date_time').annotate(
                      finalist_count=Count("finalist"))
 
-    def _finalist_office_hours_queryset(self):        
+    def _finalist_office_hours_queryset(self):
         reserved_by_user = Q(finalist=self.target_user)
         unreserved = Q(finalist__isnull=True)
         user_programs = self.target_user.programrolegrant_set.filter(
             ACTIVE_PROGRAM & OFFICE_HOURS_RESERVER).values_list(
                 "program_role__program_id", flat=True)
-        relevant_mentors = Q(mentor__programrolegrant__program_role__program__in=user_programs)
+        relevant_mentors = Q(**compose_filter(("mentor",
+                                               "programrolegrant",
+                                               "program_role",
+                                               "program",
+                                               "in"),
+                                              user_programs))
         return MentorProgramOfficeHour.objects.filter(
-            reserved_by_user | unreserved & relevant_mentors,  
+            reserved_by_user | unreserved & relevant_mentors,
             start_date_time__range=[self.start_date, self.end_date])
 
     def _null_office_hours_queryset(self):
         return MentorProgramOfficeHour.objects.none()
-    
+
     def _get_office_hours_data(self):
         primary_industry_key = "mentor__expertprofile__primary_industry__name"
         office_hours = self._office_hours_queryset().filter(
@@ -170,7 +178,7 @@ class OfficeHoursCalendarView(ImpactView):
                              When(finalist_count__gt=0, then=Value(True)),
                              default=Value(False),
                              output_field=BooleanField()))
-        
+
         self.response_elements['calendar_data'] = office_hours.values(
             "id",
             "mentor_id",
@@ -207,8 +215,8 @@ class OfficeHoursCalendarView(ImpactView):
         return self.target_user.startupteammember_set.order_by(
             '-id').values(
                 "id",
-                name=F("startup__organization__name"))            
-    
+                name=F("startup__organization__name"))
+
     def mentor_program_families(self):
         return self.target_user.programrolegrant_set.filter(
             OFFICE_HOURS_HOLDER & ACTIVE_PROGRAM).values_list(
@@ -220,10 +228,10 @@ class OfficeHoursCalendarView(ImpactView):
             OFFICE_HOURS_HOLDER &
             ACTIVE_PROGRAM).values(**_location_lookups())
         return location_choices.distinct()
-    
+
     def fail(self, detail):
         self.response_elements['success'] = False
-        self.response_elements['header'] = self.FAILURE_HEADER
+        self.response_elements['header'] = self.FAIL_HEADER
         self.response_elements['detail'] = detail
         self.response_elements['calendar_data'] = None
 
@@ -231,13 +239,13 @@ class OfficeHoursCalendarView(ImpactView):
         self.response_elements['success'] = True
         self.response_elements['header'] = self.SUCCESS_HEADER
 
-    
+
 def _location_lookups():
         location_path = "__".join(["program_role",
                                    "program",
                                    "program_family",
                                    "programfamilylocation",
-                                   "location"]) 
+                                   "location"])
         location_fields = (
             'id',
             'street_address',
@@ -250,14 +258,14 @@ def _location_lookups():
         return dict([("location_" + field, F("{}__{}".format(
             location_path, field)))
                      for field in location_fields])
-    
+
 
 def _date_range(date_spec=None):
     # returns (start_date, end_date)
     # start_date is the latest monday that is less than or equal to today,
     # end_date is start_date + seven days
     # both values are then padded by 24 hours to allow for TZ differences
-    
+
     # throws ValueError if date_spec is not in ISO-8601 format
 
     if date_spec:
@@ -276,7 +284,7 @@ def _is_mentor(user):
     return user.programrolegrant_set.filter(
         ACTIVE_PROGRAM & OFFICE_HOURS_HOLDER).exists()
 
+
 def _is_finalist(user):
     return user.programrolegrant_set.filter(
         ACTIVE_PROGRAM & OFFICE_HOURS_RESERVER).exists()
-    
