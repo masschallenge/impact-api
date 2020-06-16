@@ -55,13 +55,13 @@ class TestAcceleratorRoutes(TestCase):
         url_name = "object-list"
         StartupStatusFactory()
         view_kwargs = {
-            'app': 'accelerator',
+            'app': 'mc',
             "model": "startup",
         }
         self.response_401(self.get(url_name, **view_kwargs))
         startup_add_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='accelerator',
+                app_label='mc',
                 model='startup'),
             codename='add_startup',
         )
@@ -96,7 +96,7 @@ class TestAcceleratorRoutes(TestCase):
     def test_api_object_list(self):
         StartupFactory.create_batch(size=4, is_visible=1)
         url_name = "object-list"
-        view_kwargs = {'app': 'accelerator', "model": "startup"}
+        view_kwargs = {'app': 'mc', "model": "startup"}
         self.response_401(self.get(url_name, **view_kwargs))
 
         basic_user = self.make_user('basic_user@test.com')
@@ -121,14 +121,14 @@ class TestAcceleratorRoutes(TestCase):
         industry = IndustryFactory()
         StartupFactory(id=1, primary_industry_id=industry.id)
         view_kwargs = {
-            'app': 'accelerator',
+            'app': 'mc',
             "model": "startup",
             "pk": 1,
         }
         self.response_401(self.get(url_name, **view_kwargs))
         startup_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='accelerator',
+                app_label='mc',
                 model='startup'),
             codename='view_startup',
         )
@@ -153,8 +153,8 @@ class TestAcceleratorRoutes(TestCase):
             url.name != 'api-root')]
         url_count = len(urls)
         accelerate_models = [
-            model for model in apps.get_models('accelerator') if (
-                model._meta.app_label == 'accelerator' and hasattr(
+            model for model in apps.get_models('mc') if (
+                model._meta.app_label == 'mc' and hasattr(
                     model, "Meta") and
                 model.__name__ not in MODELS_TO_EXCLUDE_FROM_URL_BINDING)]
         model_count = len(accelerate_models)

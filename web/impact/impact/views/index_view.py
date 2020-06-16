@@ -9,7 +9,7 @@ from django.views import View
 
 class IndexView(View):
 
-    template_name = 'base.html'
+    template_name = 'mc_apply/base_semantic.html'
 
     def get(self, request, *args, **kwargs):
         if request.user and request.user.is_authenticated:
