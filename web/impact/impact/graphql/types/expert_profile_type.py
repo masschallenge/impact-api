@@ -13,14 +13,14 @@ from mc.models import (
     ProgramRoleGrant
 )
 
+from .base_user_profile_type import BaseUserProfileType
+from .startup_mentor_relationship_type import StartupMentorRelationshipType
 from accelerator_abstract.models import (
     ACTIVE_PROGRAM_STATUS,
     ENDED_PROGRAM_STATUS,
     HIDDEN_PROGRAM_STATUS,
     UPCOMING_PROGRAM_STATUS
 )
-from .base_user_profile_type import BaseUserProfileType
-from .startup_mentor_relationship_type import StartupMentorRelationshipType
 from ...utils import compose_filter
 from ...v1.views.utils import map_data
 from ...v1.helpers.profile_helper import (
