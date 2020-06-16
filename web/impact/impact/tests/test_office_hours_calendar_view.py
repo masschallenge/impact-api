@@ -13,6 +13,7 @@ from accelerator.models import UserRole
 from accelerator.tests.factories import (
     LocationFactory,
     MentorProgramOfficeHourFactory,
+    ProgramFactory,
     ProgramFamilyFactory,
     ProgramFamilyLocationFactory,
     ProgramRoleGrantFactory,
@@ -88,14 +89,50 @@ class TestOfficeHoursCalendarView(APITestCase):
         response = self.get_response(user=user)
         self.assert_success(response)
 
-    def test_user_with_no_hours_in_range_sees_empty_response(self):
+    def test_current_finalist_sees_current_reserved_hours(self):
+        finalist = _finalist()
+        office_hour = self.create_office_hour(finalist=finalist)
+        response = self.get_response(user=finalist)
+        self.assert_hour_in_response(response, office_hour)
+
+    def test_current_finalist_sees_current_open_hours(self):
+        program = ProgramFactory()
+        finalist = _finalist(program=program)
+        mentor = _mentor(program=program)
+        office_hour = self.create_office_hour(mentor=mentor)
+        response = self.get_response(user=finalist)
+        self.assert_hour_in_response(response, office_hour)
+        
+    def test_current_finalist_sees_only_relevant_open_hours(self):
+        program = ProgramFactory()
+        finalist = _finalist(program=program)
+        office_hour = self.create_office_hour()
+        response = self.get_response(user=finalist)
+        self.assert_hour_not_in_response(response, office_hour)
+
+    def test_staff_sees_current_open_hours_for_their_program(self):
+        program = ProgramFactory()
+        staff_user = self.staff_user(program_family=program.program_family)        
+        mentor = _mentor(program=program)
+        office_hour = self.create_office_hour(mentor=mentor)
+        response = self.get_response(user=staff_user)
+        self.assert_hour_in_response(response, office_hour)
+        
+    def test_staff_sees_only_relevant_open_hours(self):
+        program = ProgramFactory()
+        staff_user = self.staff_user(program_family=program.program_family)
+        office_hour = self.create_office_hour()
+        response = self.get_response(staff_user)
+        self.assert_hour_not_in_response(response, office_hour)
+        
+    def test_mentor_with_no_hours_in_range_sees_empty_response(self):
         two_weeks_ago = days_from_now(-14)
         session = self.create_office_hour(start_date_time=two_weeks_ago)
         response = self.get_response(user=session.mentor)
         sessions = response.data['calendar_data']
         self.assertEqual(len(sessions), 0)
 
-    def test_user_with_no_hours_in_range_sees_success_response(self):
+    def test_mentor_with_no_hours_in_range_sees_success_response(self):
         two_weeks_ago = days_from_now(-14)
         session = self.create_office_hour(start_date_time=two_weeks_ago)
         response = self.get_response(user=session.mentor)
@@ -194,7 +231,7 @@ class TestOfficeHoursCalendarView(APITestCase):
                            timezone="America/New_York",
                            program=None):
         create_params = {}
-        mentor = mentor or _mentor()
+        mentor = mentor or _mentor(program)
         create_params['mentor'] = mentor
         duration = timedelta(duration_minutes)
         start_date_time = start_date_time or utc.localize(datetime.now())
@@ -250,8 +287,10 @@ def check_hour_in_response(response, hour):
     return hour.id in [response_hour['id']
                        for response_hour in response_data]
 
-def _finalist():
-    return UserRoleContext(UserRole.FINALIST).user
+def _finalist(program=None):
+    program = program or ProgramFactory()
+    return UserRoleContext(UserRole.FINALIST, program=program).user
 
-def _mentor():
-    return UserRoleContext(UserRole.MENTOR).user
+def _mentor(program=None):
+    program = program or ProgramFactory()    
+    return UserRoleContext(UserRole.MENTOR, program=program).user

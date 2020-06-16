@@ -23,6 +23,7 @@ from ...permissions.v1_api_permissions import (
     IsAuthenticated,
 )
 from accelerator.models import (
+    Clearance, 
     MentorProgramOfficeHour,
     ProgramRoleGrant,
     UserRole,
@@ -109,7 +110,7 @@ class OfficeHoursCalendarView(ImpactView):
 
     def _office_hours_queryset(self):
         if self.request_user_type == STAFF:
-            return self.staff_office_hours_queryset()
+            return self._staff_office_hours_queryset()
         elif self.request_user_type == MENTOR:
             
             return self._mentor_office_hours_queryset()
@@ -125,17 +126,18 @@ class OfficeHoursCalendarView(ImpactView):
             self.target_user).values_list(
                 "program_family", flat=True)
         in_visible_program_family = Q(
-            program_role__program_program_family__in=staff_programs)
+            program_role__program__program_family__in=staff_programs)
         program_mentors = ProgramRoleGrant.objects.filter(
             ACTIVE_PROGRAM &
             OFFICE_HOURS_HOLDER &
             in_visible_program_family).values_list(
-                person__id, flat=True)
+                "person__id", flat=True)
         active_mentors = Q(mentor__in=program_mentors)
         return MentorProgramOfficeHour.objects.filter(
-             start_date_time__range=[self.start_date, self.end_date]).order_by(
-                 'start_date_time').annotate(
-                     finalist_count=Count("finalist"))
+            active_mentors,
+            start_date_time__range=[self.start_date, self.end_date]).order_by(
+                'start_date_time').annotate(
+                    finalist_count=Count("finalist"))
 
     def _mentor_office_hours_queryset(self):
         return MentorProgramOfficeHour.objects.filter(
@@ -144,11 +146,15 @@ class OfficeHoursCalendarView(ImpactView):
                  'start_date_time').annotate(
                      finalist_count=Count("finalist"))
 
-    def _finalist_office_hours_queryset(self):
+    def _finalist_office_hours_queryset(self):        
         reserved_by_user = Q(finalist=self.target_user)
         unreserved = Q(finalist__isnull=True)
+        user_programs = self.target_user.programrolegrant_set.filter(
+            ACTIVE_PROGRAM & OFFICE_HOURS_RESERVER).values_list(
+                "program_role__program_id", flat=True)
+        relevant_mentors = Q(mentor__programrolegrant__program_role__program__in=user_programs)
         return MentorProgramOfficeHour.objects.filter(
-            reserved_by_user | unreserved,  
+            reserved_by_user | unreserved & relevant_mentors,  
             start_date_time__range=[self.start_date, self.end_date])
 
     def _null_office_hours_queryset(self):
