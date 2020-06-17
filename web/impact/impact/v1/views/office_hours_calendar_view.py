@@ -18,10 +18,11 @@ from django.db.models import (
     Value,
 )
 from . import ImpactView
-from mc.models import (
-    MentorProgramOfficeHour,
-    UserRole,
-)
+
+import swapper
+from accelerator.apps import AcceleratorConfig
+MentorProgramOfficeHour = swapper.load_model(AcceleratorConfig.name, 'MentorProgramOfficeHour')
+UserRole = swapper.load_model(AcceleratorConfig.name, 'UserRole')
 
 User = get_user_model()
 

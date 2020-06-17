@@ -1,7 +1,10 @@
 # MIT License
 # Copyright (c) 2019 MassChallenge, Inc.
 
-from mc.models import MentorProgramOfficeHour
+import swapper
+from accelerator.apps import AcceleratorConfig
+MentorProgramOfficeHour = swapper.load_model(AcceleratorConfig.name, 'MentorProgramOfficeHour')
+
 from .model_helper import (
     ModelHelper,
     BOOLEAN_FIELD,

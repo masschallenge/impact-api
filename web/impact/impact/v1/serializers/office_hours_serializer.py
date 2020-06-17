@@ -1,10 +1,10 @@
 from rest_framework import serializers
 
 from accelerator_abstract.models.base_user_utils import is_employee
-from accelerator.models import (
-    MentorProgramOfficeHour,
-    UserRole
-)
+import swapper
+from accelerator.apps import AcceleratorConfig
+MentorProgramOfficeHour = swapper.load_model(AcceleratorConfig.name, 'MentorProgramOfficeHour')
+UserRole = swapper.load_model(AcceleratorConfig.name, 'UserRole')
 from .location_serializer import LocationSerializer
 from .user_serializer import UserSerializer
 

@@ -4,8 +4,12 @@ from datetime import (
     timedelta,
 )
 from django.urls import reverse
+
 import swapper
-from accelerator.models import MentorProgramOfficeHour, UserRole
+from accelerator.apps import AcceleratorConfig
+MentorProgramOfficeHour = swapper.load_model(AcceleratorConfig.name, 'MentorProgramOfficeHour')
+UserRole = swapper.load_model(AcceleratorConfig.name, 'UserRole')
+
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.factories import (
     MentorProgramOfficeHourFactory,

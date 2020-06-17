@@ -3,10 +3,10 @@ from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 
 from accelerator_abstract.models.base_user_utils import is_employee
-from accelerator.models import (
-    MentorProgramOfficeHour,
-    Startup,
-)
+import swapper
+from accelerator.apps import AcceleratorConfig
+MentorProgramOfficeHour = swapper.load_model(AcceleratorConfig.name, 'MentorProgramOfficeHour')
+Startup = swapper.load_model(AcceleratorConfig.name, 'Startup')
 
 from ...permissions.v1_api_permissions import (
     DEFAULT_PERMISSION_DENIED_DETAIL,

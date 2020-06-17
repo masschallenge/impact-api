@@ -6,7 +6,10 @@ from django.template import loader
 
 from rest_framework.response import Response
 
-from mc.models import MentorProgramOfficeHour
+import swapper
+from accelerator.apps import AcceleratorConfig
+MentorProgramOfficeHour = swapper.load_model(AcceleratorConfig.name, 'MentorProgramOfficeHour')
+
 from ...minimal_email_handler import MinimalEmailHandler
 from ...permissions.v1_api_permissions import OfficeHourMentorPermission
 from .impact_view import ImpactView

@@ -9,10 +9,14 @@ from ...permissions.v1_api_permissions import OfficeHourFinalistPermission
 from .impact_view import ImpactView
 from .utils import email_template_path
 from ...minimal_email_handler import send_email
-from accelerator.models import MentorProgramOfficeHour
 from accelerator_abstract.models.base_user_utils import is_employee
 
+import swapper
+from accelerator.apps import AcceleratorConfig
+MentorProgramOfficeHour = swapper.load_model(AcceleratorConfig.name, 'MentorProgramOfficeHour')
+
 User = get_user_model()
+
 
 mentor_template_name = "cancel_office_hour_reservation_email_to_mentor.html"
 finalist_template_name = ("cancel_office_hour_reservation_email_to_finalist."
