@@ -142,12 +142,10 @@ class OfficeHoursCalendarView(ImpactView):
                 'start_date_time').annotate(
                     finalist_count=Count("finalist")).annotate(
                         own_office_hour=Case(
-                            When(mentor_id=self.target_user.id, then=Value(True)),
+                            When(mentor_id=self.target_user.id,
+                                 then=Value(True)),
                             default=Value(False),
                             output_field=BooleanField()))
-
-
-
 
     def _mentor_office_hours_queryset(self):
         return MentorProgramOfficeHour.objects.filter(
@@ -176,12 +174,13 @@ class OfficeHoursCalendarView(ImpactView):
             start_date_time__range=[self.start_date, self.end_date]).annotate(
                 own_office_hour=Case(
                     default=Value(False),
-                    output_field=BooleanField()))                
+                    output_field=BooleanField()))
 
     def _null_office_hours_queryset(self):
         return MentorProgramOfficeHour.objects.none().annotate(
                         own_office_hour=Case(
-                            When(mentor_id=self.target_user.id, then=Value(True)),
+                            When(mentor_id=self.target_user.id,
+                                 then=Value(True)),
                             default=Value(False),
                             output_field=BooleanField()))
 
