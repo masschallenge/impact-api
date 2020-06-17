@@ -214,8 +214,8 @@ class OfficeHoursCalendarView(ImpactView):
     def _user_startups(self):
         return self.target_user.startupteammember_set.order_by(
             '-id').values(
-                "id",
-                name=F("startup__organization__name"))
+                "startup_id",
+                name=F("startup__organization__name")).distinct()
 
     def mentor_program_families(self):
         return self.target_user.programrolegrant_set.filter(
