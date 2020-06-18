@@ -1,4 +1,7 @@
+from datetime import timedelta
+from dateutil.parser import isoparse
 from django.conf import settings
+from itertools import chain
 from pytz import timezone
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -112,13 +115,24 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(
                 instance, data=request.data, partial=True)
             save_operation = self.perform_update
-        else:
-            serializer = self.get_serializer(data=request.data)
-            save_operation = self.perform_create
         return self.perform_save(request, serializer, save_operation)
 
     def create(self, request, *args, **kwargs):
-        return self.handle_response(request)
+        data_sets = parse_date_specs(request.data)
+        serializers = [self.get_serializer(data=data) for data in data_sets]
+        if not all([serializer.is_valid() for serializer in serializers]):
+            errors = chain([serializer.errors for serializer in serializers])
+            return handle_fail(errors)
+        for serializer in serializers:
+            self.perform_create(serializer)
+        if serializers:
+            office_hour = serializer.instance
+            if request.user != office_hour.mentor:
+                self.handle_send_mail(office_hour)
+        else:
+            pass  # what does it mean if no serializers exist?    
+            
+        return handle_success(serializer.data)
 
     def update(self, request, *args, **kwargs):
         return self.handle_response(request)
@@ -130,5 +144,20 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
             to=[office_hour.mentor.email],
             subject=SUBJECT.format(**context),
             body=body.format(**context),
-            from_email=settings.NO_REPLY_EMAIL,
-        ).send()
+            from_email=settings.NO_REPLY_EMAIL).send()
+        
+
+def parse_date_specs(data):
+    datasets = []
+    thirty_minutes = timedelta(minutes=30)
+    start_date_time = isoparse(data['start_date_time'])
+    end_date_time = isoparse(data['end_date_time'])
+    current_session_end = start_date_time + thirty_minutes
+    while current_session_end < end_date_time:
+        dataset = data.copy()
+        dataset['start_date_time'] = start_date_time
+        dataset['end_date_time'] = current_session_end
+        datasets.append(dataset)
+        start_date_time = current_session_end
+        current_session_end += thirty_minutes
+    return datasets
