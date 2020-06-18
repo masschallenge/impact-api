@@ -48,6 +48,7 @@ class ExpertProfileType(BaseUserProfileType):
     class Meta:
         model = ExpertProfile
         only_fields = (
+            'id',
             'title',
             'company',
             'phone',
