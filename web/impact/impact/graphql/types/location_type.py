@@ -14,4 +14,5 @@ class LocationType(DjangoObjectType):
             'state',
             'name',
             'city',
+            'id'
         )
