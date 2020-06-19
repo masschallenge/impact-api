@@ -16,14 +16,14 @@ from accelerator.tests.factories.location_factory import LocationFactory
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from ..v1.serializers.office_hours_serializer import (
     INVALID_END_DATE,
-    INVALID_USER
+    INVALID_USER,
 )
 from ..v1.views.office_hour_view import (
     FAIL_CREATE_HEADER,
     FAIL_EDIT_HEADER,
     SUCCESS_CREATE_HEADER,
     SUCCESS_EDIT_HEADER,
-    OfficeHourViewSet
+    OfficeHourViewSet,
 )
 from .api_test_case import APITestCase
 
@@ -135,8 +135,7 @@ class TestCreateEditOfficeHourView(APITestCase):
         start_time = datetime.now()
         data = self._get_post_request_data(mentor, get_data={
             'start_date_time': start_time,
-            'end_date_time': start_time + timedelta(minutes=-30),
-        })
+            'end_date_time': start_time + timedelta(minutes=-30)})
         response = self._create_office_hour_session(mentor, data)
         self._assert_error_response(response.data,
                                     key='end_date_time',
