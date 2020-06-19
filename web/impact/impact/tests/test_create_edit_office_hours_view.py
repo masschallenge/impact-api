@@ -190,7 +190,7 @@ class TestCreateEditOfficeHourView(APITestCase):
                                minutes_from_now=0,
                                get_data=None):
         location = LocationFactory()
-        start_time = datetime.now() + timedelta(minutes=minutes_from_now)
+        start_time = _now() + timedelta(minutes=minutes_from_now)
         data = {
             'mentor': mentor.id,
             'start_date_time': start_time,
@@ -224,7 +224,7 @@ class TestCreateEditOfficeHourView(APITestCase):
                                 mentor,
                                 minutes_from_now=0,
                                 finalist=None):
-        start_time = datetime.now() + timedelta(minutes=minutes_from_now)
+        start_time = _now() + timedelta(minutes=minutes_from_now)
         end_time = start_time + timedelta(minutes=30)
         return MentorProgramOfficeHourFactory(
             mentor=mentor,
