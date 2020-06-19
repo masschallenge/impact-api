@@ -3,13 +3,15 @@ from datetime import (
     datetime,
     timedelta,
 )
+from pytz import utc
+
 from django.urls import reverse
 
 from accelerator.models import MentorProgramOfficeHour, UserRole
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.factories import (
     MentorProgramOfficeHourFactory,
-    ProgramFactory
+    ProgramFactory,
 )
 from accelerator.tests.factories.location_factory import LocationFactory
 
@@ -36,6 +38,16 @@ class TestCreateEditOfficeHourView(APITestCase):
         mentor = self._expert_user(UserRole.MENTOR)
         data = self._get_post_request_data(mentor)
         with self._assert_office_hour_created():
+            self._create_office_hour_session(mentor, data)
+
+    def test_mentor_can_create_multi_session_office_hour_block(self):
+        mentor = self._expert_user(UserRole.MENTOR)
+        now = _now()
+        data = self._get_post_request_data(
+            mentor,
+            get_data={'start_date_time': now,
+                      'end_date_time': now+timedelta(hours=2)})
+        with self._assert_office_hour_created(count=4):
             self._create_office_hour_session(mentor, data)
 
     def test_mentor_can_create_office_hour_session_for_date_prior_to_now(self):
@@ -244,11 +256,19 @@ class TestCreateEditOfficeHourView(APITestCase):
         return user
 
     @contextmanager
-    def _assert_office_hour_created(self, created=True):
+    def _assert_office_hour_created(self, created=True, count=1):
         count_before = MentorProgramOfficeHour.objects.count()
         yield
         count_after = MentorProgramOfficeHour.objects.count()
         if not created:
             self.assertEqual(count_after, count_before)
         else:
-            self.assertEqual(count_after, count_before + 1)
+            self.assertEqual(count_after, count_before + count)
+
+
+def _now():
+    return utc.localize(datetime.utcnow())
+            
+
+            
+            
