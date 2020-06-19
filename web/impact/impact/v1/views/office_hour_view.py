@@ -16,7 +16,7 @@ DEFAULT_TIMEZONE = 'UTC'
 
 FAIL_CREATE_HEADER = 'Office hour session could not be created'
 FAIL_EDIT_HEADER = 'Office hour session could not be modified'
-SUCCESS_CREATE_HEADER = 'Office hour session created'
+SUCCESS_CREATE_HEADER = 'Office hour session(s) created'
 SUCCESS_EDIT_HEADER = 'Office hour session modified'
 
 SUBJECT = ("[Office Hours] Confirmation of Office Hours on {date} "
@@ -120,9 +120,9 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         data_sets = parse_date_specs(request.data)
         serializers = [self.get_serializer(data=data) for data in data_sets]
-        if not all([serializer.is_valid() for serializer in serializers]):
-            errors = chain([serializer.errors for serializer in serializers])
-            return handle_fail(errors)
+        invalid_serializers = [s for s in serializers if not s.is_valid()]
+        if invalid_serializers:            
+            return handle_fail(invalid_serializers[0].errors)
         for serializer in serializers:
             self.perform_create(serializer)
         if serializers:
@@ -130,7 +130,7 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
             if request.user != office_hour.mentor:
                 self.handle_send_mail(office_hour)
         else:
-            pass  # what does it mean if no serializers exist?    
+            pass # what does this mean?
             
         return handle_success(serializer.data)
 
@@ -152,8 +152,10 @@ def parse_date_specs(data):
     thirty_minutes = timedelta(minutes=30)
     start_date_time = isoparse(data['start_date_time'])
     end_date_time = isoparse(data['end_date_time'])
+    if end_date_time < start_date_time:
+        return [data]  # let serializer handle this error
     current_session_end = start_date_time + thirty_minutes
-    while current_session_end < end_date_time:
+    while current_session_end <= end_date_time:
         dataset = data.copy()
         dataset['start_date_time'] = start_date_time
         dataset['end_date_time'] = current_session_end
