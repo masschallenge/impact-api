@@ -1,13 +1,19 @@
 import graphene
 
+from .startup_type import StartupType
+from .program_type import ProgramType
 from mc.models import (
     StartupStatus,
     Startup,
 )
-from . import (
-    StartupType,
-    ProgramType,
-)
+
+import os 
+dir_path = os.path.dirname(os.path.realpath(__file__))
+print(">>>>>>>>>>>>>>>>>>>>>", dir_path)
+
+cwd = os.getcwd()
+print(".........................", cwd)
+
 
 
 class EntrepreneurStartupType(StartupType):

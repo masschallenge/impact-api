@@ -15,8 +15,9 @@ from mc.models import (
 
 from . import (
     BaseUserProfileType,
-    StartupMentorRelationshipType,
+    #StartupMentorRelationshipType,
 )
+from .startup_mentor_relationship_type import StartupMentorRelationshipType
 from accelerator_abstract.models import (
     ACTIVE_PROGRAM_STATUS,
     ENDED_PROGRAM_STATUS,

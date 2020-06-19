@@ -22,13 +22,17 @@ class GeneralViewSet(viewsets.ModelViewSet):
     )
 
     @property
-    def model(self):
+    def model(self): 
         model = snake_to_model_name(self.kwargs.get('model', ''))
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.hellooooooooooo", model)
         related_model = self.kwargs.get('related_model', '')
+        print("*******************************.hellooooooooooo", self.kwargs)
         model_name = model_name_case(model, related_model)
+        print("############## ", dir(apps), "\n\n======\n\n", apps.all_models.keys(), "\n\n======\n\n", MODELS_TO_EXCLUDE_FROM_URL_BINDING)
         model = apps.get_model(app_label='mc', model_name=model_name)
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.hellooooooooooo", model)
         if model.__name__ in MODELS_TO_EXCLUDE_FROM_URL_BINDING:
-            raise LookupError("'%s' is not available" % (model_name))
+            raise LookupError("'%s' is not available=============" % (model_name))
         return model
 
     def get_queryset(self):
