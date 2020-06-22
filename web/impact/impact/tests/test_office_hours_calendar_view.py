@@ -119,6 +119,15 @@ class TestOfficeHoursCalendarView(APITestCase):
         response = self.get_response(user=staff_user)
         self.assert_hour_in_response(response, office_hour)
 
+    def test_staff_sees_own_office_hour_flag_for_their_hours(self):
+        program = ProgramFactory()
+        staff_user = self.staff_user(program_family=program.program_family)
+        _mentor(program=program, user=staff_user)
+        self.create_office_hour(mentor=staff_user)
+        response = self.get_response(user=staff_user)
+        office_hour_data = response.data['calendar_data'][0]
+        self.assertTrue(office_hour_data['own_office_hour'])
+
     def test_staff_sees_only_relevant_open_hours(self):
         program = ProgramFactory()
         staff_user = self.staff_user(program_family=program.program_family)
@@ -302,18 +311,18 @@ def check_hour_in_response(response, hour):
                        for response_hour in response_data]
 
 
-def _user_with_role(role_name, program):
+def _user_with_role(role_name, program, user):
     program = program or ProgramFactory()
-    return UserRoleContext(role_name, program=program).user
+    return UserRoleContext(role_name, program=program, user=user).user
 
 
-def _finalist(program=None):
-    return _user_with_role(UserRole.FINALIST, program)
+def _finalist(program=None, user=None):
+    return _user_with_role(UserRole.FINALIST, program, user)
 
 
-def _mentor(program=None):
-    return _user_with_role(UserRole.MENTOR, program)
+def _mentor(program=None, user=None):
+    return _user_with_role(UserRole.MENTOR, program, user)
 
 
-def _judge(program=None):
-    return _user_with_role(UserRole.JUDGE, program)
+def _judge(program=None, user=None):
+    return _user_with_role(UserRole.JUDGE, program, user)
