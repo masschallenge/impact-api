@@ -20,7 +20,7 @@ class TestCriterionDetailView(APITestCase):
         criterion = CriterionFactory()
         data = {'name': 'Patched Criterion',
                 'type': 'sans serif',
-                'judging_round_id': 1}
+                'judging_round_id': criterion.judging_round.id}
         with self.login(email=self.basic_user().email):
             url = reverse(self.view.view_name, args=[criterion.id])
             self.client.patch(url, data)
@@ -30,10 +30,11 @@ class TestCriterionDetailView(APITestCase):
     def test_patch_no_such_object(self):
         criterion = CriterionFactory()
         criterion_id = criterion.id
+        judging_round_id = criterion.judging_round.id
         criterion.delete()
         data = {'name': 'Patched Criterion',
                 'type': 'sans serif',
-                'judging_round_id': 1}
+                'judging_round_id': judging_round_id}
         with self.login(email=self.basic_user().email):
             url = reverse(self.view.view_name, args=[criterion_id])
             response = self.client.patch(url, data)
@@ -43,7 +44,7 @@ class TestCriterionDetailView(APITestCase):
         criterion = CriterionFactory()
         data = {'name': 'Patched Criterion',
                 'type': 'sans serif',
-                'judging_round_id': 1,
+                'judging_round_id': criterion.judging_round.id,
                 'bad_key': 'B flat minor'}
         with self.login(email=self.basic_user().email):
             url = reverse(self.view.view_name, args=[criterion.id])

@@ -48,12 +48,14 @@ class APITestCase(TestCase):
         user.save()
         return user
 
-    def staff_user(self):
+    def staff_user(self, program_family=None):
         user = self.make_user('basic_user{}@test.com'.format(self._user_count))
         self._user_count += 1
-        clearance = ClearanceFactory(
-            level=CLEARANCE_LEVEL_STAFF,
-            user=user)
+        kwargs = {"level": CLEARANCE_LEVEL_STAFF,
+                  "user": user}
+        if program_family:
+            kwargs['program_family'] = program_family
+        clearance = ClearanceFactory(**kwargs)
         return clearance.user
 
     def global_operations_manager(self, program_family):

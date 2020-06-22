@@ -22,7 +22,7 @@ INVALID_INPUT_ERROR = "'{}' must be a list of numbers."
 
 def extract_values(request, key):
     try:
-        return [int(i) for i in request.data.get(key, [])]
+        return [int(i) for i in request.data.getlist(key, [])]
     except ValueError:
         raise ParseError(INVALID_INPUT_ERROR.format(key))
 

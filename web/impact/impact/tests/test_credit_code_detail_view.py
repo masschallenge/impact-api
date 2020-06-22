@@ -32,9 +32,10 @@ class TestCreditCodeDetailView(APITestCase):
             response = self.client.get(url)
             self.assertEqual(response.data["discount"], code.discount)
             self.assertEqual(response.data[
-                "issued_to"], code.issued_to.organization.id)
+                "issued_to"], code.issued_to.id)
             self.assertEqual(response.data["unique_code"], code.unique_code)
-            self.assertEqual(response.data["programs"],
+            self.assertEqual(
+                response.data["programs"],
                 [program.pk for program in code.programs.all()])
 
     def test_options(self):

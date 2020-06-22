@@ -3,15 +3,15 @@ from pytz import timezone
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-import swapper
 from accelerator.apps import AcceleratorConfig
-MentorProgramOfficeHour = swapper.load_model(AcceleratorConfig.name,
-                                         'MentorProgramOfficeHour')
-#from accelerator.models import MentorProgramOfficeHour
-
 from ...minimal_email_handler import MinimalEmailHandler
 from ...permissions.v1_api_permissions import OfficeHourPermission
 from ..serializers.office_hours_serializer import OfficeHourSerializer
+import swapper
+
+
+MentorProgramOfficeHour = swapper.load_model(
+    AcceleratorConfig.name, 'MentorProgramOfficeHour')
 
 DEFAULT_TIMEZONE = 'UTC'
 

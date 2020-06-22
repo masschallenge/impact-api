@@ -11,3 +11,4 @@ from .program_family_type import ProgramFamilyType
 from .program_type import ProgramType
 from .startup_mentor_relationship_type import StartupMentorRelationshipType
 from .startup_type import StartupType
+from .user_type import UserType

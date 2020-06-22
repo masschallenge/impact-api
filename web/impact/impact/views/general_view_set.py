@@ -28,9 +28,9 @@ class GeneralViewSet(viewsets.ModelViewSet):
         related_model = self.kwargs.get('related_model', '')
         print("*******************************.hellooooooooooo", self.kwargs)
         model_name = model_name_case(model, related_model)
-        print("############## ", dir(apps), "\n\n======\n\n", apps.all_models.keys(), "\n\n======\n\n", MODELS_TO_EXCLUDE_FROM_URL_BINDING)
-        model = apps.get_model(app_label='mc', model_name=model_name)
-        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>.hellooooooooooo", model)
+        model = apps.get_model(
+            app_label=self.kwargs['app'],
+            model_name=model_name)
         if model.__name__ in MODELS_TO_EXCLUDE_FROM_URL_BINDING:
             raise LookupError("'%s' is not available=============" % (model_name))
         return model
