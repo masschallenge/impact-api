@@ -72,7 +72,7 @@ class TestCreateEditOfficeHourView(APITestCase):
         self._assert_error_response(response.data,
                                     key='end_date_time',
                                     expected=INVALID_SESSION_DURATION)
-            
+
     def test_mentor_can_create_office_hour_session_for_date_prior_to_now(self):
         mentor = self._expert_user(UserRole.MENTOR)
         data = self._get_post_request_data(mentor, minutes_from_now=-120)
@@ -91,6 +91,19 @@ class TestCreateEditOfficeHourView(APITestCase):
         data = {'topics': self.updated_topics}
         self._edit_office_hour_session(mentor, office_hour, data)
         self._assert_update_office_hour(office_hour)
+
+    def test_mentor_cannot_edit__office_hour_session_to_end_before_starting(self):
+        mentor = self._expert_user(UserRole.MENTOR)
+        office_hour = self._create_office_hour_obj(mentor)
+        bad_end_date_time = office_hour.start_date_time-timedelta(minutes=30)
+        data = {
+            "start_date_time": office_hour.start_date_time,
+            "end_date_time": bad_end_date_time}
+        response = self._edit_office_hour_session(mentor, office_hour, data)
+        self._assert_error_response(response.data,
+                                    key="end_date_time",
+                                    expected=INVALID_END_DATE)
+
 
     def test_mentor_can_edit_office_hour_session_for_date_prior_to_now(self):
         mentor = self._expert_user(UserRole.MENTOR)
@@ -228,17 +241,13 @@ class TestCreateEditOfficeHourView(APITestCase):
 
     def _assert_success_response(self, data, edit=False):
         header = SUCCESS_EDIT_HEADER if edit else SUCCESS_CREATE_HEADER
-        self.assertTrue(all([
-            data['success'],
-            data['header'] == header,
-        ]))
+        self.assertTrue(data['success'])
+        self.assertEqual(data['header'], header)
 
     def _assert_fail_response(self, data, edit=False):
         header = FAIL_EDIT_HEADER if edit else FAIL_CREATE_HEADER
-        self.assertTrue(all([
-            not data['success'],
-            data['header'] == header,
-        ]))
+        self.assertFalse(data['success'])
+        self.assertEqual(data['header'], header)
 
     def _assert_error_response(self, data, key, expected):
         self.assertIn(expected, data['errors'][key])
@@ -291,7 +300,3 @@ class TestCreateEditOfficeHourView(APITestCase):
 
 def _now():
     return utc.localize(datetime.utcnow())
-            
-
-            
-            
