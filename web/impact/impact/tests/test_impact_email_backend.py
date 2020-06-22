@@ -4,16 +4,13 @@ from django.test import TestCase
 from ..minimal_email_handler import MinimalEmailHandler
 
 
-IMPACT_BACKEND_PATH = 'api.web.impact.impact.impact_email_backend.ImpactEmailBackend'
-# Note that this definition, which duplicates a value in settings.py,
-# is necessary since the value is not included in the settings for test
-# See AC-7670 for a ticket aimed at resolving this and other issues
-# around testing email backends
-
-ADD_LOGGING_HEADERS = ".".join(["api.web.impact.impact",
+# This definition of IMPACT_EMAIL_BACKEND duplicates a value in settings.py,
+# but is necessary since the value is not included in the settings for test.
+# See AC-7670 for more.
+IMPACT_BACKEND_PATH = ".".join(["api.web.impact.impact",
                                 "impact_email_backend",
-                                "ImpactEmailBackend",
-                                "_add_logging_headers"])
+                                "ImpactEmailBackend"])
+ADD_LOGGING_HEADERS = IMPACT_BACKEND_PATH + "._add_logging_headers"
 
 
 class TestEmailBackend(TestCase):

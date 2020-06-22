@@ -129,10 +129,11 @@ class ExpertProfileType(BaseUserProfileType):
         """
         roles = [UserRole.MENTOR, UserRole.DESIRED_MENTOR,
                  UserRole.DEFERRED_MENTOR]
+        statuses = ['active', 'upcoming']
         results = map_data(
             ProgramRoleGrant,
             Q(person_id=self.user.pk, program_role__user_role__name__in=roles,
-              program_role__program__program_status__in=['active', 'upcoming']),
+              program_role__program__program_status__in=statuses),
             '-program_role__program__start_date',
             [
                 'id',

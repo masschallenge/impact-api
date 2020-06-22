@@ -4,16 +4,12 @@ from datetime import (
     timedelta,
 )
 from django.urls import reverse
-import swapper
-from accelerator.models import MentorProgramOfficeHour, UserRole
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.factories import (
     MentorProgramOfficeHourFactory,
     ProgramFactory
 )
-from accelerator.apps import AcceleratorConfig
 from accelerator.tests.factories.location_factory import LocationFactory
-
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from ..v1.serializers.office_hours_serializer import (
     INVALID_END_DATE,
@@ -27,12 +23,9 @@ from ..v1.views.office_hour_view import (
     OfficeHourViewSet
 )
 from .api_test_case import APITestCase
-
-
-MentorProgramOfficeHour = swapper.load_model(
-    AcceleratorConfig.name,
-    'MentorProgramOfficeHour')
-UserRole = swapper.load_model(AcceleratorConfig.name, 'UserRole')
+from mc.utils import swapper_model
+MentorProgramOfficeHour = swapper_model('MentorProgramOfficeHour')
+UserRole = swapper_model('UserRole')
 
 
 class TestCreateEditOfficeHourView(APITestCase):

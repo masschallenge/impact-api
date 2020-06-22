@@ -1,17 +1,15 @@
-from django.conf import settings
 from pytz import timezone
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-from accelerator.apps import AcceleratorConfig
+from django.conf import settings
+
 from ...minimal_email_handler import MinimalEmailHandler
 from ...permissions.v1_api_permissions import OfficeHourPermission
 from ..serializers.office_hours_serializer import OfficeHourSerializer
-import swapper
+from mc.utils import swapper_model
+MentorProgramOfficeHour = swapper_model('MentorProgramOfficeHour')
 
-
-MentorProgramOfficeHour = swapper.load_model(
-    AcceleratorConfig.name, 'MentorProgramOfficeHour')
 
 DEFAULT_TIMEZONE = 'UTC'
 

@@ -2,7 +2,6 @@
 from rest_framework.permissions import IsAuthenticated
 
 
-from accelerator_abstract.models.base_program import ACTIVE_PROGRAM_STATUS
 from accelerator_abstract.models.base_user_utils import (
     is_employee,
     is_expert,

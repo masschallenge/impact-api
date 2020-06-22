@@ -53,7 +53,8 @@ class UserContext(object):
             self.user.memberprofile = self.profile
         self.user.save()
         self.program_role_grants = [
-            ProgramRoleGrantFactory(person=self.user,
+            ProgramRoleGrantFactory(
+                person=self.user,
                 program_role__user_role=get_user_role_by_name(role_name))
             for role_name in self.program_role_names]
         self.startup_role_grants = [

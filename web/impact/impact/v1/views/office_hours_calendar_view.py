@@ -23,14 +23,14 @@ from ...permissions.v1_api_permissions import (
     DEFAULT_PERMISSION_DENIED_DETAIL,
     IsAuthenticated,
 )
-from accelerator.models import (
-    Clearance,
-    MentorProgramOfficeHour,
-    ProgramRoleGrant,
-    UserRole,
-)
 from accelerator_abstract.models.base_user_utils import is_employee
+from mc.utils import swapper_model
+Clearance = swapper_model("Clearance")
+MentorProgramOfficeHour = swapper_model("MentorProgramOfficeHour")
+ProgramRoleGrant = swapper_model("ProgramRoleGrant")
+UserRole = swapper_model("UserRole")
 User = get_user_model()
+
 
 ISO_8601_DATE_FORMAT = "%Y-%m-%d"
 ONE_DAY = timedelta(1)

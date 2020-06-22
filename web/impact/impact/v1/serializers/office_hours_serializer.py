@@ -1,12 +1,12 @@
 from rest_framework import serializers
 
-from accelerator_abstract.models.base_user_utils import is_employee
-from accelerator.models import (
-    MentorProgramOfficeHour,
-    UserRole
-)
 from .location_serializer import LocationSerializer
 from .user_serializer import UserSerializer
+from accelerator_abstract.models.base_user_utils import is_employee
+from mc.utils import swapper_model
+MentorProgramOfficeHour = swapper_model("MentorProgramOfficeHour")
+UserRole = swapper_model("UserRole")
+
 
 INVALID_END_DATE = 'office hour end time must be later than the start time'
 INVALID_USER = ('must be of type Mentor or Alumni in residence '

@@ -31,7 +31,7 @@ class TestOrganizationListView(APITestCase):
         startups = StartupFactory.create_batch(count)
         with self.login(email=self.basic_user().email):
             response = self.client.get(self.url)
-            assert response.data['count'] == count
+            self.assertEqual(response.data['count'], count)
             assert all([OrganizationListView.serialize(startup.organization)
                         in response.data['results']
                         for startup in startups])
@@ -41,7 +41,7 @@ class TestOrganizationListView(APITestCase):
         partners = PartnerFactory.create_batch(count)
         with self.login(email=self.basic_user().email):
             response = self.client.get(self.url)
-            assert response.data['count'] == count
+            self.assertEqual(response.data['count'], count)
             assert all([OrganizationListView.serialize(partner.organization)
                         in response.data['results']
                         for partner in partners])
@@ -51,18 +51,18 @@ class TestOrganizationListView(APITestCase):
         PartnerFactory.create_batch(count)
         with self.login(email=self.basic_user().email):
             response = self.client.get(self.url)
-            [self.assertTrue(
-                result.get('partner_id') > 0
-            ) for result in response.data['results']]
+            for result in response.data['results']:
+                _partner_id = result.get('partner_id', 0)
+                self.assertGreater(_partner_id, 0)
 
     def test_startup_organization_has_startup_id(self):
         count = 5
         StartupFactory.create_batch(count)
         with self.login(email=self.basic_user().email):
             response = self.client.get(self.url)
-            [self.assertTrue(
-                result.get('startup_id') > 0
-            ) for result in response.data['results']]
+            for result in response.data['results']:
+                _startup_id = result.get('startup_id', 0)
+                self.assertGreater(_startup_id, 0)
 
     def test_get_with_limit(self):
         count = 5
@@ -71,8 +71,8 @@ class TestOrganizationListView(APITestCase):
             limit = 2
             url = self.url + "?limit=%s" % limit
             response = self.client.get(url)
-            assert response.data['count'] == count
-            assert len(response.data['results']) == limit
+            self.assertEqual(response.data['count'], count)
+            self.assertEqual(len(response.data['results']), limit)
 
     def test_updated_at_before_datetime_filter(self):
         updated_none = _org_for_date(None)
@@ -111,7 +111,7 @@ class TestOrganizationListView(APITestCase):
     def test_options(self):
         with self.login(email=self.basic_user().email):
             response = self.client.options(self.url)
-            assert response.status_code == 200
+            self.assertEqual(response.status_code, 200)
             results = response.data["actions"]["GET"]["properties"]["results"]
             get_options = results["item"]["properties"]
             assert_fields(PARTNER_GET_FIELDS, get_options)
@@ -134,7 +134,7 @@ class TestOrganizationListView(APITestCase):
         with self.login(email=self.basic_user().email):
             url = self.url + "?name=%s" % name
             response = self.client.get(url)
-            assert response.data['count'] == 1
+            self.assertEqual(response.data['count'], 1)
             assert _contains_org(startup.organization, response.data)
             assert not _contains_org(other_startup.organization, response.data)
 

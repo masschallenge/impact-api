@@ -8,8 +8,14 @@ from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
-from accelerator.models import UserRole
-
+from .api_test_case import APITestCase
+from ..v1.views import (
+    ISO_8601_DATE_FORMAT,
+    OfficeHoursCalendarView,
+)
+from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
+from .factories import UserFactory
+from .utils import nonexistent_object_id
 from accelerator.tests.factories import (
     LocationFactory,
     MentorProgramOfficeHourFactory,
@@ -23,14 +29,9 @@ from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.contexts.context_utils import get_user_role_by_name
 from accelerator.tests.utils import days_from_now
 
-from .api_test_case import APITestCase
-from ..v1.views import (
-    ISO_8601_DATE_FORMAT,
-    OfficeHoursCalendarView,
-)
-from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
-from .factories import UserFactory
-from .utils import nonexistent_object_id
+from mc.utils import swapper_model
+
+UserRole = swapper_model("UserRole")
 
 
 class TestOfficeHoursCalendarView(APITestCase):

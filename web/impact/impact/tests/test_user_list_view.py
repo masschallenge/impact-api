@@ -9,11 +9,6 @@ import pytz
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 
-from mc.models import (
-    EntrepreneurProfile,
-    ExpertProfile,
-    MemberProfile,
-)
 from .api_test_case import APITestCase
 from .contexts import UserContext
 from .factories import (
@@ -58,6 +53,11 @@ from ..v1.views.user_list_view import (
     UNSUPPORTED_KEY_ERROR,
     UserListView,
 )
+from mc.utils import swapper_model
+EntrepreneurProfile = swapper_model("EntrepreneurProfile")
+ExpertProfile = swapper_model("ExpertProfile")
+MemberProfile = swapper_model("MemberProfile")
+
 
 EXAMPLE_ENTREPRENEUR = {
     "email": "entrepreneur@example.com",
@@ -111,11 +111,11 @@ class TestUserListView(APITestCase):
             user_count = User.objects.count()
             response = self.client.get(self.url)
             results = response.data["results"]
-            assert user_count == min(len(results), 10)
+            self.assertEqual(user_count, min(len(results), 10))
             emails = [result["email"] for result in response.data["results"]]
             assert user1.email in emails
             assert user2.email in emails
-            assert user_count == response.data["count"]
+            self.assertEqual(user_count, response.data["count"])
 
     def test_get_returns_correct_count_attribute(self):
         for _ in range(10):
@@ -123,7 +123,7 @@ class TestUserListView(APITestCase):
         with self.login(email=self.basic_user().email):
             user_count = User.objects.count()
             response = self.client.get(self.url)
-            assert user_count == response.data["count"]
+            self.assertEqual(user_count, response.data["count"])
 
     def test_get_with_limit_returns_correct_number_of_results(self):
         limit = 1
@@ -133,7 +133,7 @@ class TestUserListView(APITestCase):
             url = self.url + "?limit={}".format(limit)
             response = self.client.get(url)
             results = response.data["results"]
-            assert limit == len(results)
+            self.assertEqual(limit, len(results))
 
     def test_get_correct_pagination_attributes_for_offset_zero(self):
         limit = 3
@@ -145,7 +145,7 @@ class TestUserListView(APITestCase):
             url = self.url + "?" + limit_arg
             response = self.client.get(url)
             results = response.data["results"]
-            assert limit == len(results)
+            self.assertEqual(limit, len(results))
             assert response.data["previous"] is None
             assert limit_arg in response.data["next"]
             next_offset_arg = "offset={}".format(
@@ -163,7 +163,7 @@ class TestUserListView(APITestCase):
             url = self.url + "?" + limit_arg + "&" + offset_arg
             response = self.client.get(url)
             results = response.data["results"]
-            assert limit == len(results)
+            self.assertEqual(limit, len(results))
 
             assert response.data["previous"] is not None
             assert "offset" not in response.data["previous"]
@@ -183,7 +183,7 @@ class TestUserListView(APITestCase):
             url = self.url + "?" + limit_arg + "&" + offset_arg
             response = self.client.get(url)
             results = response.data["results"]
-            assert limit == len(results)
+            self.assertEqual(limit, len(results))
 
             prev_offset_arg = "offset={}".format(current_offset - limit)
             assert prev_offset_arg in response.data["previous"]
