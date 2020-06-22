@@ -107,7 +107,7 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
         office_hour = serializer.instance
         if request.user != office_hour.mentor:
             self.handle_send_mail(office_hour)
-        return handle_success(serializer.data)
+        return handle_success([serializer.data])
 
     def handle_response(self, request):
         if request.method == 'PATCH':
@@ -129,7 +129,7 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
         if request.user != office_hour.mentor:
             self.handle_send_mail(office_hour)
 
-        return handle_success(serializers[0].data)
+        return handle_success([serializer.data for serializer in serializers])
 
     def update(self, request, *args, **kwargs):
         return self.handle_response(request)

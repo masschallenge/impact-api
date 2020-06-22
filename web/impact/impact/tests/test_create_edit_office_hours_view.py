@@ -201,7 +201,7 @@ class TestCreateEditOfficeHourView(APITestCase):
         data = self._get_post_request_data(mentor,
                                            get_data={'mentor': mentor2.id})
         response = self._create_office_hour_session(mentor, data)
-        self.assertEqual(response.data['data']['mentor']['id'], mentor.id)
+        self.assertEqual(response.data['data'][0]['mentor']['id'], mentor.id)
 
     def test_admin_cant_create_office_hour_for_non_mentor_user_response(self):
         user = self._expert_user(UserRole.JUDGE)
