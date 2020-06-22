@@ -18,6 +18,7 @@ from accelerator.tests.factories.location_factory import LocationFactory
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from ..v1.serializers.office_hours_serializer import (
     INVALID_END_DATE,
+    INVALID_SESSION_DURATION,
     INVALID_USER,
 )
 from ..v1.views.office_hour_view import (
@@ -50,6 +51,28 @@ class TestCreateEditOfficeHourView(APITestCase):
         with self._assert_office_hour_created(count=4):
             self._create_office_hour_session(mentor, data)
 
+    def test_mentor_cannot_create_short_session(self):
+        mentor = self._expert_user(UserRole.MENTOR)
+        now = _now()
+        data = self._get_post_request_data(
+            mentor,
+            get_data={'start_date_time': now,
+                      'end_date_time': now+timedelta(minutes=20)})
+        with self._assert_office_hour_created(created=False):
+            self._create_office_hour_session(mentor, data)
+
+    def test_mentor_cannot_create_short_session_ui(self):
+        mentor = self._expert_user(UserRole.MENTOR)
+        now = _now()
+        data = self._get_post_request_data(
+            mentor,
+            get_data={'start_date_time': now,
+                      'end_date_time': now+timedelta(minutes=20)})
+        response = self._create_office_hour_session(mentor, data)
+        self._assert_error_response(response.data,
+                                    key='end_date_time',
+                                    expected=INVALID_SESSION_DURATION)
+            
     def test_mentor_can_create_office_hour_session_for_date_prior_to_now(self):
         mentor = self._expert_user(UserRole.MENTOR)
         data = self._get_post_request_data(mentor, minutes_from_now=-120)

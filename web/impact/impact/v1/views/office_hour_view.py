@@ -130,7 +130,7 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
             if request.user != office_hour.mentor:
                 self.handle_send_mail(office_hour)
         else:
-            pass # what does this mean?
+            pass
             
         return handle_success(serializer.data)
 
@@ -152,7 +152,7 @@ def parse_date_specs(data):
     thirty_minutes = timedelta(minutes=30)
     start_date_time = isoparse(data['start_date_time'])
     end_date_time = isoparse(data['end_date_time'])
-    if end_date_time < start_date_time:
+    if end_date_time < start_date_time + thirty_minutes:
         return [data]  # let serializer handle this error
     current_session_end = start_date_time + thirty_minutes
     while current_session_end <= end_date_time:

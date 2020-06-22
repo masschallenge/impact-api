@@ -13,7 +13,7 @@ from .user_serializer import UserSerializer
 INVALID_END_DATE = 'office hour end time must be later than the start time'
 INVALID_USER = ('must be of type Mentor or Alumni in residence '
                 'in an active program')
-INVALID_SESSION_TIME = 'Please specify a duration of 30 minutes or more.'
+INVALID_SESSION_DURATION = 'Please specify a duration of 30 minutes or more.'
 THIRTY_MINUTES = timedelta(minutes=30)
 
 
