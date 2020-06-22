@@ -92,7 +92,7 @@ class TestCreateEditOfficeHourView(APITestCase):
         self._edit_office_hour_session(mentor, office_hour, data)
         self._assert_update_office_hour(office_hour)
 
-    def test_mentor_cannot_edit__office_hour_session_to_end_before_starting(self):
+    def test_mentor_cannot_edit_office_hour_session_to_end_before_start(self):
         mentor = self._expert_user(UserRole.MENTOR)
         office_hour = self._create_office_hour_obj(mentor)
         bad_end_date_time = office_hour.start_date_time-timedelta(minutes=30)
@@ -103,7 +103,6 @@ class TestCreateEditOfficeHourView(APITestCase):
         self._assert_error_response(response,
                                     key="end_date_time",
                                     expected=INVALID_END_DATE)
-
 
     def test_mentor_can_edit_office_hour_session_for_date_prior_to_now(self):
         mentor = self._expert_user(UserRole.MENTOR)

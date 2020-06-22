@@ -117,22 +117,19 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
             save_operation = self.perform_update
         return self.perform_save(request, serializer, save_operation)
 
-    def create(self, request, *args, **kwargs):        
+    def create(self, request, *args, **kwargs):
         data_sets = parse_date_specs(request.data)
         serializers = [self.get_serializer(data=data) for data in data_sets]
         invalid_serializers = [s for s in serializers if not s.is_valid()]
-        if invalid_serializers:            
+        if invalid_serializers:
             return handle_fail(invalid_serializers[0].errors)
         for serializer in serializers:
             self.perform_create(serializer)
-        if serializers:
-            office_hour = serializer.instance
-            if request.user != office_hour.mentor:
-                self.handle_send_mail(office_hour)
-        else:
-            pass
-            
-        return handle_success(serializer.data)
+        office_hour = serializers[0].instance
+        if request.user != office_hour.mentor:
+            self.handle_send_mail(office_hour)
+
+        return handle_success(serializers[0].data)
 
     def update(self, request, *args, **kwargs):
         return self.handle_response(request)
@@ -145,7 +142,7 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
             subject=SUBJECT.format(**context),
             body=body.format(**context),
             from_email=settings.NO_REPLY_EMAIL).send()
-        
+
 
 def parse_date_specs(data):
     datasets = []
