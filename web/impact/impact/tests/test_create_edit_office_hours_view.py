@@ -69,7 +69,7 @@ class TestCreateEditOfficeHourView(APITestCase):
             get_data={'start_date_time': now,
                       'end_date_time': now+timedelta(minutes=20)})
         response = self._create_office_hour_session(mentor, data)
-        self._assert_error_response(response.data,
+        self._assert_error_response(response,
                                     key='end_date_time',
                                     expected=INVALID_SESSION_DURATION)
 
@@ -83,7 +83,7 @@ class TestCreateEditOfficeHourView(APITestCase):
         mentor = self._expert_user(UserRole.MENTOR)
         data = self._get_post_request_data(mentor)
         response = self._create_office_hour_session(mentor, data)
-        self._assert_success_response(response.data)
+        self._assert_success_response(response)
 
     def test_mentor_can_edit_own_office_hour_session(self):
         mentor = self._expert_user(UserRole.MENTOR)
@@ -100,7 +100,7 @@ class TestCreateEditOfficeHourView(APITestCase):
             "start_date_time": office_hour.start_date_time,
             "end_date_time": bad_end_date_time}
         response = self._edit_office_hour_session(mentor, office_hour, data)
-        self._assert_error_response(response.data,
+        self._assert_error_response(response,
                                     key="end_date_time",
                                     expected=INVALID_END_DATE)
 
@@ -117,7 +117,7 @@ class TestCreateEditOfficeHourView(APITestCase):
         mentor = self._expert_user(UserRole.MENTOR)
         data = self._get_post_request_data(mentor)
         response = self._create_office_hour_session(mentor, data)
-        self._assert_success_response(response.data)
+        self._assert_success_response(response)
 
     def test_staff_can_create_office_hour_session_on_behalf_of_mentor(self):
         mentor = self._expert_user(UserRole.MENTOR)
@@ -135,7 +135,7 @@ class TestCreateEditOfficeHourView(APITestCase):
         mentor = self._expert_user(UserRole.MENTOR)
         data = self._get_post_request_data(mentor)
         response = self._create_office_hour_session(self.staff_user(), data)
-        self._assert_success_response(response.data)
+        self._assert_success_response(response)
 
     def test_staff_can_edit_office_hour_session_on_behalf_of_mentor(self):
         mentor = self._expert_user(UserRole.MENTOR)
@@ -185,7 +185,7 @@ class TestCreateEditOfficeHourView(APITestCase):
             'start_date_time': start_time,
             'end_date_time': start_time + timedelta(minutes=-30)})
         response = self._create_office_hour_session(mentor, data)
-        self._assert_error_response(response.data,
+        self._assert_error_response(response,
                                     key='end_date_time',
                                     expected=INVALID_END_DATE)
 
@@ -208,7 +208,7 @@ class TestCreateEditOfficeHourView(APITestCase):
         user = self._expert_user(UserRole.JUDGE)
         data = self._get_post_request_data(user)
         response = self._create_office_hour_session(self.staff_user(), data)
-        self._assert_error_response(response.data,
+        self._assert_error_response(response,
                                     key='mentor', expected=INVALID_USER)
 
     def test_admin_cant_create_office_hour_for_non_mentor_user(self):
@@ -239,18 +239,18 @@ class TestCreateEditOfficeHourView(APITestCase):
             data.update(get_data)
         return data
 
-    def _assert_success_response(self, data, edit=False):
+    def _assert_success_response(self, response, edit=False):
         header = SUCCESS_EDIT_HEADER if edit else SUCCESS_CREATE_HEADER
-        self.assertTrue(data['success'])
-        self.assertEqual(data['header'], header)
+        self.assertTrue(response.data['success'])
+        self.assertEqual(response.data['header'], header)
 
-    def _assert_fail_response(self, data, edit=False):
+    def _assert_fail_response(self, response, edit=False):
         header = FAIL_EDIT_HEADER if edit else FAIL_CREATE_HEADER
-        self.assertFalse(data['success'])
-        self.assertEqual(data['header'], header)
+        self.assertFalse(response.data['success'])
+        self.assertEqual(response.data['header'], header)
 
-    def _assert_error_response(self, data, key, expected):
-        self.assertIn(expected, data['errors'][key])
+    def _assert_error_response(self, response, key, expected):
+        self.assertIn(expected, response.data['errors'][key])
 
     def _create_office_hour_obj(self,
                                 mentor,
