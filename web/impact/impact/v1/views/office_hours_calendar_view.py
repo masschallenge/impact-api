@@ -140,14 +140,22 @@ class OfficeHoursCalendarView(ImpactView):
             active_mentors,
             start_date_time__range=[self.start_date, self.end_date]).order_by(
                 'start_date_time').annotate(
-                    finalist_count=Count("finalist"))
+                    finalist_count=Count("finalist")).annotate(
+                        own_office_hour=Case(
+                            When(mentor_id=self.target_user.id,
+                                 then=Value(True)),
+                            default=Value(False),
+                            output_field=BooleanField()))
 
     def _mentor_office_hours_queryset(self):
         return MentorProgramOfficeHour.objects.filter(
              mentor=self.target_user,
              start_date_time__range=[self.start_date, self.end_date]).order_by(
                  'start_date_time').annotate(
-                     finalist_count=Count("finalist"))
+                     finalist_count=Count("finalist")).annotate(
+                        own_office_hour=Case(
+                            default=Value(False),
+                            output_field=BooleanField()))
 
     def _finalist_office_hours_queryset(self):
         reserved_by_user = Q(finalist=self.target_user)
@@ -163,10 +171,16 @@ class OfficeHoursCalendarView(ImpactView):
                                               user_programs))
         return MentorProgramOfficeHour.objects.filter(
             reserved_by_user | unreserved & relevant_mentors,
-            start_date_time__range=[self.start_date, self.end_date])
+            start_date_time__range=[self.start_date, self.end_date]).annotate(
+                own_office_hour=Case(
+                    default=Value(False),
+                    output_field=BooleanField()))
 
     def _null_office_hours_queryset(self):
-        return MentorProgramOfficeHour.objects.none()
+        return MentorProgramOfficeHour.objects.none().annotate(
+                        own_office_hour=Case(
+                            default=Value(False),
+                            output_field=BooleanField()))
 
     def _get_office_hours_data(self):
         primary_industry_key = "mentor__expertprofile__primary_industry__name"
@@ -190,6 +204,7 @@ class OfficeHoursCalendarView(ImpactView):
             "startup_id",
             "reserved",
             "meeting_info",
+            "own_office_hour",
             location_name=F("location__name"),
             location_timezone=F("location__timezone"),
             finalist_first_name=F("finalist__first_name"),
