@@ -604,23 +604,6 @@ class TestGraphQL(APITestCase):
             self.assertEqual(expert_profile["confirmedMentorProgramFamilies"],
                              [])
 
-    def test_user_cannot_view_profile_with_non_current_allowed_roles(self):
-        allowed_user = expert_user(UserRole.FINALIST)
-        with self.login(email=allowed_user.email):
-            user = EntrepreneurFactory()
-            UserRoleContext(
-                UserRole.MENTOR,
-                user=user,
-                program=ProgramFactory(program_status=ENDED_PROGRAM_STATUS))
-            query = """
-                        query{{
-                            entrepreneurProfile(id:{id}) {{
-                                programRoles
-                            }}
-                        }}
-                    """.format(id=user.id)
-
-            self._assert_error_in_response(query, NOT_ALLOWED_ACCESS_MESSAGE)
 
     def test_allowed_user_with_non_current_user_role_cannot_view_profile(self):
         current_user = expert_user(
