@@ -1,4 +1,9 @@
-from rest_framework import serializers
+from datetime import timedelta
+
+from rest_framework.serializers import (
+    ModelSerializer,
+    ValidationError,
+)
 
 from .location_serializer import LocationSerializer
 from .user_serializer import UserSerializer
@@ -11,9 +16,13 @@ UserRole = swapper_model("UserRole")
 INVALID_END_DATE = 'office hour end time must be later than the start time'
 INVALID_USER = ('must be of type Mentor or Alumni in residence '
                 'in an active program')
+INVALID_SESSION_DURATION = 'Please specify a duration of 30 minutes or more.'
+THIRTY_MINUTES = timedelta(minutes=30)
+NO_START_DATE_TIME = "start_date_time must be specified"
+NO_END_DATE_TIME = "end_date_time must be specified"
 
 
-class OfficeHourSerializer(serializers.ModelSerializer):
+class OfficeHourSerializer(ModelSerializer):
     class Meta:
         model = MentorProgramOfficeHour
         fields = [
@@ -22,14 +31,30 @@ class OfficeHourSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, attrs):
-        start_datetime = attrs.get('start_date_time', None)
-        end_datetime = attrs.get('end_date_time', None)
-        if start_datetime and end_datetime and start_datetime > end_datetime:
-            raise serializers.ValidationError({
-                'end_date_time': INVALID_END_DATE,
-            })
-        return attrs
+        start_date_time = None
+        end_date_time = None
+        if self.instance is not None:
+            start_date_time = self.instance.start_date_time
+            end_date_time = self.instance.end_date_time
+        
+        start_date_time = attrs.get('start_date_time') or start_date_time
+        end_date_time = attrs.get('end_date_time') or end_date_time
+        if not start_date_time:
+            raise ValidationError({
+                'start_date_time': NO_START_DATE_TIME})
+        if not end_date_time:
+            raise ValidationError({
+                'end_date_time': NO_END_DATE_TIME})
+        
+        if start_date_time > end_date_time:
+            raise ValidationError({
+                'end_date_time': INVALID_END_DATE})
+        if end_date_time - start_date_time < THIRTY_MINUTES:
+            raise ValidationError({
+                'end_date_time': INVALID_SESSION_DURATION})
 
+        return attrs
+        
     def validate_mentor(self, mentor):
         user = self.context['request'].user
         if not is_employee(user):
@@ -40,7 +65,7 @@ class OfficeHourSerializer(serializers.ModelSerializer):
             program_role__program__program_status='active',
         ).exists()
         if not is_allowed_mentor:
-            raise serializers.ValidationError(INVALID_USER)
+            raise ValidationError(INVALID_USER)
         return mentor
 
     def to_representation(self, instance):
