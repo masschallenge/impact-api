@@ -11,7 +11,8 @@ from accelerator.tests.factories import (
     StartupTeamMemberFactory,
 )
 from accelerator.tests.contexts import UserRoleContext
-from accelerator.models import UserRole
+from mc.utils import swapper_model
+UserRole = swapper_model("UserRole")
 
 
 class TestReserveOfficeHourView(APITestCase):

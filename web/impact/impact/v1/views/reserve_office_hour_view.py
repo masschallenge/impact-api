@@ -3,11 +3,6 @@ from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 
 from accelerator_abstract.models.base_user_utils import is_employee
-from accelerator.models import (
-    MentorProgramOfficeHour,
-    Startup,
-)
-
 from ...permissions.v1_api_permissions import (
     DEFAULT_PERMISSION_DENIED_DETAIL,
     IsAuthenticated,
@@ -19,6 +14,9 @@ from .utils import (
     localized_office_hour_start_time,
 )
 from ...minimal_email_handler import send_email
+from mc.utils import swapper_model
+MentorProgramOfficeHour = swapper_model("MentorProgramOfficeHour")
+Startup = swapper_model("Startup")
 User = get_user_model()
 
 

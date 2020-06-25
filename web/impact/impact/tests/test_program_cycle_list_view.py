@@ -22,7 +22,7 @@ class TestProgramCycleListView(APITestCase):
         cycles = ProgramCycleFactory.create_batch(count)
         with self.login(email=self.basic_user().email):
             response = self.client.get(self.url)
-            assert response.data["count"] == count
+            self.assertEqual(response.data["count"], count)
             assert all([ProgramCycleListView.serialize(cycle)
                         in response.data["results"]
                         for cycle in cycles])
@@ -30,7 +30,7 @@ class TestProgramCycleListView(APITestCase):
     def test_options(self):
         with self.login(email=self.basic_user().email):
             response = self.client.options(self.url)
-            assert response.status_code == 200
+            self.assertEqual(response.status_code, 200)
             results = response.data["actions"]["GET"]["properties"]["results"]
             get_options = results["item"]["properties"]
             assert_fields(PROGRAM_CYCLE_GET_FIELDS, get_options)

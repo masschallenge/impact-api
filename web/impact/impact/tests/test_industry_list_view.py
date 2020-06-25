@@ -5,6 +5,7 @@ import json
 from jsonschema import Draft4Validator
 
 from django.urls import reverse
+
 from .factories import IndustryFactory
 from .api_test_case import APITestCase
 from .utils import assert_fields
@@ -20,7 +21,7 @@ class TestIndustryListView(APITestCase):
         industries = IndustryFactory.create_batch(count)
         with self.login(email=self.basic_user().email):
             response = self.client.get(self.url)
-            assert response.data['count'] == count
+            self.assertEqual(response.data['count'], count)
             assert all([IndustryListView.serialize(industry)
                         in response.data['results']
                         for industry in industries])
@@ -28,7 +29,7 @@ class TestIndustryListView(APITestCase):
     def test_options(self):
         with self.login(email=self.basic_user().email):
             response = self.client.options(self.url)
-            assert response.status_code == 200
+            self.assertEqual(response.status_code, 200)
             results = response.data["actions"]["GET"]["properties"]["results"]
             get_options = results["item"]["properties"]
             assert_fields(MPTT_FIELDS.keys(), get_options)

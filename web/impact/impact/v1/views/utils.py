@@ -1,12 +1,11 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
-
 from pytz import timezone
 
-from accelerator.models import (
-    ACTIVE_PROGRAM_STATUS,
-    UserRole,
-)
+from accelerator.models import ACTIVE_PROGRAM_STATUS
+from mc.utils import swapper_model
+UserRole = swapper_model("UserRole")
+
 
 VALID_KEYS_NOTE = "Valid keys are: {}"
 

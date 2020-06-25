@@ -1,14 +1,15 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
-
 import logging
 from django.contrib.auth import get_user_model
-from mc.models import Clearance
+
 from accelerator_abstract.models.base_clearance import (
     CLEARANCE_LEVEL_GLOBAL_MANAGER,
     CLEARANCE_LOGGER_FAILED_INSUFFICIENT_CLEARANCE_MSG,
     CLEARANCE_LOGGER_SUCCESS_MSG,
 )
+from mc.utils import swapper_model
+Clearance = swapper_model("Clearance")
 
 logger = logging.getLogger(__file__)
 User = get_user_model()

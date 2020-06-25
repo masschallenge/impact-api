@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
-from accelerator.models import Location
+from mc.utils import swapper_model
+Location = swapper_model("Location")
 
 
 class LocationSerializer(serializers.ModelSerializer):
