@@ -139,7 +139,8 @@ class OfficeHoursCalendarView(ImpactView):
             OFFICE_HOURS_HOLDER &
             in_visible_program_family).values_list(
                 "person__id", flat=True)
-        active_mentors = Q(mentor__in=program_mentors)
+        mentors = list(program_mentors) + [self.target_user.id]
+        active_mentors = Q(mentor__in=mentors)
         return MentorProgramOfficeHour.objects.filter(
             active_mentors,
             start_date_time__range=[self.start_date, self.end_date]).order_by(
