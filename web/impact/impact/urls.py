@@ -64,6 +64,7 @@ urlpatterns = [
         name=AlgoliaApiKeyView.view_name),
     url(r'^calendar/reminder/$', CalendarReminderView.as_view(),
         name=CalendarReminderView.view_name),
+    url(r'^$', IndexView.as_view()),
     url(r'^v0/', include(v0_urlpatterns)),
     url(r'^v1/', include(v1_urlpatterns)),
     url(r'^(?P<app>\w+)/(?P<model>[a-z_]+)/'
@@ -110,20 +111,4 @@ urlpatterns = [
     url(r'^oauth/', include('oauth2_provider.urls',
         namespace='oauth2_provider')),
     url(r'^schema/$', schema_view, name='schema'),
-    url(r'^directory/(?:.*)$', TemplateView.as_view(
-        template_name='front-end.html'),
-        name="directory"),
-    url(r'^allocator/(?:.*)$', TemplateView.as_view(
-        template_name='front-end.html'),
-        name="allocator"),
-    url(r'^people/$', TemplateView.as_view(
-        template_name='front-end.html'),
-        name="entreprenuer_directory"),
-    url(r'^people/(.*)/$', TemplateView.as_view(
-        template_name='front-end.html'),
-        name="entreprenuer_profile"),
-    url(r'^startups/$', TemplateView.as_view(
-        template_name='front-end.html'),
-        name="startup_directory"),
-    url(r'^$', IndexView.as_view()),
 ]
