@@ -20,6 +20,7 @@ INVALID_SESSION_DURATION = 'Please specify a duration of 30 minutes or more.'
 THIRTY_MINUTES = timedelta(minutes=30)
 NO_START_DATE_TIME = "start_date_time must be specified"
 NO_END_DATE_TIME = "end_date_time must be specified"
+CONFLICTING_SESSIONS = "There are conflicts with existing office hours"
 
 
 class OfficeHourSerializer(ModelSerializer):
@@ -30,13 +31,27 @@ class OfficeHourSerializer(ModelSerializer):
             'topics', 'description', 'location',
         ]
 
+    def handle_conflicting_sessions(self, attrs):
+        office_hour = self.instance
+        start_date_time = attrs.get('start_date_time', None)
+        skip_check = (office_hour and
+                      office_hour.start_date_time == start_date_time)
+        if start_date_time and not skip_check:
+            conflicting_sessions = MentorProgramOfficeHour.objects.filter(
+                mentor=attrs.get('mentor', None) or office_hour.mentor,
+                start_date_time__lte=start_date_time,
+                end_date_time__gt=start_date_time).exists()
+            if conflicting_sessions:
+                raise ValidationError({
+                    'start_date_time': CONFLICTING_SESSIONS})
+
     def validate(self, attrs):
         start_date_time = None
         end_date_time = None
         if self.instance is not None:
             start_date_time = self.instance.start_date_time
             end_date_time = self.instance.end_date_time
-        
+
         start_date_time = attrs.get('start_date_time') or start_date_time
         end_date_time = attrs.get('end_date_time') or end_date_time
         if not start_date_time:
@@ -45,16 +60,17 @@ class OfficeHourSerializer(ModelSerializer):
         if not end_date_time:
             raise ValidationError({
                 'end_date_time': NO_END_DATE_TIME})
-        
+
         if start_date_time > end_date_time:
             raise ValidationError({
                 'end_date_time': INVALID_END_DATE})
         if end_date_time - start_date_time < THIRTY_MINUTES:
             raise ValidationError({
                 'end_date_time': INVALID_SESSION_DURATION})
+        self.handle_conflicting_sessions(attrs)
 
         return attrs
-        
+
     def validate_mentor(self, mentor):
         user = self.context['request'].user
         if not is_employee(user):
