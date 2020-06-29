@@ -275,6 +275,18 @@ class TestCreateEditOfficeHourView(APITestCase):
         with self._assert_office_hour_created(created=True):
             self._create_office_hour_session(mentor, data)
 
+    def test_cant_create_session_when_conflict_exists_in_the_block(self):
+        mentor = self._expert_user(UserRole.MENTOR)
+        start_time = _now()
+        self._create_office_hour_obj(
+            mentor, start_date_time=start_time, block_duration=120)
+        data = self._get_post_request_data(
+            mentor,
+            get_data={'start_date_time': start_time + timedelta(minutes=60),
+                      'end_date_time': start_time + timedelta(minutes=150)})
+        with self._assert_office_hour_created(count=0):
+            self._create_office_hour_session(mentor, data)
+
     def _expert_with_inactive_program(self, role):
         program = ProgramFactory(program_status='ended')
         return self._expert_user(role, program)
@@ -315,10 +327,11 @@ class TestCreateEditOfficeHourView(APITestCase):
                                 minutes_from_now=0,
                                 finalist=None,
                                 start_date_time=None,
+                                block_duration=30,
                                 ):
         start_time = start_date_time or _now() + timedelta(
             minutes=minutes_from_now)
-        end_time = start_time + timedelta(minutes=30)
+        end_time = start_time + timedelta(minutes=block_duration)
         return MentorProgramOfficeHourFactory(
             mentor=mentor,
             start_date_time=start_time,
