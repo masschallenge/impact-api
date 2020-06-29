@@ -58,10 +58,10 @@ class OfficeHourSerializer(ModelSerializer):
         return attrs
 
     def is_allowed_mentor(self, mentor):
-        staff_user = self.context['request'].user
+        user = self.context['request'].user
         roles = [UserRole.MENTOR, UserRole.AIR]
-        if staff_user == mentor:
-            return staff_user.clearances.filter(
+        if user == mentor:
+            return user.clearances.filter(
                 level=CLEARANCE_LEVEL_STAFF,
                 program_family__programs__program_status='active'
             ).exists()
