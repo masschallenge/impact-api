@@ -246,13 +246,20 @@ class TestOfficeHoursCalendarView(APITestCase):
         calendar_data = response.data['calendar_data'][0]
         self.assertIn("meeting_info", calendar_data)
 
+    def test_timezone_response_data_excludes_null_values(self):
+        office_hour = self.create_office_hour(timezone=None)
+        response = self.get_response(target_user_id=office_hour.mentor_id)
+        timezone_data = response.data['timezones']
+        self.assertEqual(timezone_data.count(), 0)
+
     def create_office_hour(self,
                            mentor=None,
                            finalist=None,
                            start_date_time=None,
                            duration_minutes=30,
                            timezone="America/New_York",
-                           program=None):
+                           program=None,
+                           location=None):
         create_params = {}
         mentor = mentor or _mentor(program)
         create_params['mentor'] = mentor
@@ -264,6 +271,8 @@ class TestOfficeHoursCalendarView(APITestCase):
         create_params['location__timezone'] = timezone
         create_params['finalist'] = finalist
         create_params['program'] = program
+        if not timezone:
+            create_params['location'] = location
         return MentorProgramOfficeHourFactory(**create_params)
 
     def assert_hour_in_response(self, response, hour):
