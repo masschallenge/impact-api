@@ -62,6 +62,22 @@ class TestReserveOfficeHourView(APITestCase):
         self.post_response(new_office_hour.id, request_user=finalist)
         self.assert_not_reserved(new_office_hour)
 
+    def test_finalist_reserves_office_hour_with_enclosing_conflict(self):
+        # "enclosing conflict": existing hour starts before and ends after
+        # new hour
+        
+        finalist = _finalist()
+        MentorProgramOfficeHourFactory(
+            finalist=finalist,
+            start_date_time=minutes_from_now(30),
+            end_date_time=minutes_from_now(120))
+        new_office_hour = MentorProgramOfficeHourFactory(
+            finalist=None,
+            start_date_time=minutes_from_now(60),
+            end_date_time=minutes_from_now(90))
+        self.post_response(new_office_hour.id, request_user=finalist)
+        self.assert_not_reserved(new_office_hour)
+        
     def test_finalist_reserves_unspecified_office_hour(self):
         # a finalist reserves an office hour, gets success response
         finalist = _finalist()
