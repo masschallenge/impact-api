@@ -216,6 +216,13 @@ class TestCreateEditOfficeHourView(APITestCase):
         with self._assert_office_hour_created(created=False):
             self._create_office_hour_session(self.staff_user(), data)
 
+    def test_staff_with_clearance_can_create_office_hours(self):
+        program_family = ProgramFactory().program_family
+        staff_user = self.staff_user(program_family=program_family)
+        data = self._get_post_request_data(staff_user)
+        with self._assert_office_hour_created():
+            self._create_office_hour_session(staff_user, data)
+
     def _expert_with_inactive_program(self, role):
         program = ProgramFactory(program_status='ended')
         return self._expert_user(role, program)
