@@ -29,7 +29,7 @@ class OfficeHourSerializer(ModelSerializer):
         model = MentorProgramOfficeHour
         fields = [
             'id', 'mentor', 'start_date_time', 'end_date_time',
-            'topics', 'description', 'location',
+            'topics', 'description', 'location', 'meeting_info'
         ]
 
     def validate(self, attrs):
