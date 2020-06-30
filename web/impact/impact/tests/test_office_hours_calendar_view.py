@@ -28,6 +28,7 @@ from ..v1.views import (
     ISO_8601_DATE_FORMAT,
     OfficeHoursCalendarView,
 )
+from ..v1.views.office_hours_calendar_view import FINALIST, MENTOR, STAFF
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from .factories import UserFactory
 from .utils import nonexistent_object_id
@@ -246,13 +247,61 @@ class TestOfficeHoursCalendarView(APITestCase):
         calendar_data = response.data['calendar_data'][0]
         self.assertIn("meeting_info", calendar_data)
 
+    def test_staff_with_clearance_sees_own_office_hour(self):
+        program = ProgramFactory()
+        staff_user = self.staff_user(program_family=program.program_family)
+        office_hour = self.create_office_hour(mentor=staff_user)
+        response = self.get_response(user=staff_user)
+        self.assert_hour_in_response(response, office_hour)
+
+    def test_location_choices_for_staff_with_clearance_in_response(self):
+        program_family_location = ProgramFamilyLocationFactory()
+        program_family = program_family_location.program_family
+        location = program_family_location.location
+        ProgramFactory(program_family=program_family)
+        staff_user = self.staff_user(program_family=program_family)
+        self.create_office_hour(mentor=staff_user)
+        response = self.get_response(user=staff_user)
+        location_choices = response.data['location_choices']
+        response_location_names = location_choices.values_list(
+            'location_name', flat=True
+        )
+        self.assertTrue(location.name in response_location_names)
+
+    def test_program_family_for_staff_with_clearance_in_response(self):
+        program_family = ProgramFactory().program_family
+        staff_user = self.staff_user(program_family=program_family)
+        self.create_office_hour(mentor=staff_user)
+        response = self.get_response(user=staff_user)
+        mentor_program_families = response.data['mentor_program_families']
+        self.assertTrue(program_family.name in mentor_program_families)
+
+    def test_mentor_user_type_is_returned_in_response(self):
+        response = self.get_response(user=_mentor())
+        self.assert_correct_user_type(response, MENTOR)
+
+    def test_finalist_user_type_is_returned_in_response(self):
+        response = self.get_response(user=_finalist())
+        self.assert_correct_user_type(response, FINALIST)
+
+    def test_staff_user_type_is_returned_in_response(self):
+        response = self.get_response()
+        self.assert_correct_user_type(response, STAFF)
+
+    def test_timezone_response_data_excludes_null_values(self):
+        office_hour = self.create_office_hour(timezone=None)
+        response = self.get_response(target_user_id=office_hour.mentor_id)
+        timezone_data = response.data['timezones']
+        self.assertEqual(timezone_data.count(), 0)
+
     def create_office_hour(self,
                            mentor=None,
                            finalist=None,
                            start_date_time=None,
                            duration_minutes=30,
                            timezone="America/New_York",
-                           program=None):
+                           program=None,
+                           location=None):
         create_params = {}
         mentor = mentor or _mentor(program)
         create_params['mentor'] = mentor
@@ -264,6 +313,8 @@ class TestOfficeHoursCalendarView(APITestCase):
         create_params['location__timezone'] = timezone
         create_params['finalist'] = finalist
         create_params['program'] = program
+        if not timezone:
+            create_params['location'] = location
         return MentorProgramOfficeHourFactory(**create_params)
 
     def assert_hour_in_response(self, response, hour):
@@ -287,6 +338,9 @@ class TestOfficeHoursCalendarView(APITestCase):
         self.assertFalse(data['success'])
         self.assertEqual(data['header'], self.view.FAIL_HEADER)
         self.assertEqual(data['detail'], failure_message)
+
+    def assert_correct_user_type(self, response, user_type):
+        self.assertEqual(response.data['user_type'], user_type)
 
     def get_response(self,
                      user=None,

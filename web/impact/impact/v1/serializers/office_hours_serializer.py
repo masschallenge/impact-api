@@ -4,7 +4,9 @@ from rest_framework.serializers import (
     ModelSerializer,
     ValidationError,
 )
-
+from accelerator_abstract.models.base_clearance import (
+    CLEARANCE_LEVEL_STAFF
+)
 from accelerator_abstract.models.base_user_utils import is_employee
 from accelerator.models import (
     MentorProgramOfficeHour,
@@ -14,8 +16,8 @@ from .location_serializer import LocationSerializer
 from .user_serializer import UserSerializer
 
 INVALID_END_DATE = 'office hour end time must be later than the start time'
-INVALID_USER = ('must be of type Mentor or Alumni in residence '
-                'in an active program')
+INVALID_USER = ('must have clearance or be of type Mentor or Alumni in '
+                'residence in an active program')
 INVALID_SESSION_DURATION = 'Please specify a duration of 30 minutes or more.'
 THIRTY_MINUTES = timedelta(minutes=30)
 NO_START_DATE_TIME = "start_date_time must be specified"
@@ -71,16 +73,24 @@ class OfficeHourSerializer(ModelSerializer):
 
         return attrs
 
+    def is_allowed_mentor(self, mentor):
+        user = self.context['request'].user
+        roles = [UserRole.MENTOR, UserRole.AIR]
+        if user == mentor:
+            return user.clearances.filter(
+                level=CLEARANCE_LEVEL_STAFF,
+                program_family__programs__program_status='active'
+            ).exists()
+        return mentor.programrolegrant_set.filter(
+            program_role__user_role__name__in=roles,
+            program_role__program__program_status='active',
+        ).exists()
+
     def validate_mentor(self, mentor):
         user = self.context['request'].user
         if not is_employee(user):
             return user
-        roles = [UserRole.MENTOR, UserRole.AIR]
-        is_allowed_mentor = mentor.programrolegrant_set.filter(
-            program_role__user_role__name__in=roles,
-            program_role__program__program_status='active',
-        ).exists()
-        if not is_allowed_mentor:
+        if not self.is_allowed_mentor(mentor):
             raise ValidationError(INVALID_USER)
         return mentor
 
