@@ -28,6 +28,7 @@ from accelerator.models import (
     MentorProgramOfficeHour,
     ProgramRoleGrant,
     UserRole,
+    Location,
 )
 from accelerator_abstract.models.base_clearance import (
     CLEARANCE_LEVEL_STAFF
@@ -43,6 +44,15 @@ STAFF = "staff"
 MENTOR = "mentor"
 FINALIST = "finalist"
 NOT_ALLOWED = "not_allowed"
+LOCATION_FIELDS = (
+    'id',
+    'street_address',
+    'timezone',
+    'country',
+    'state',
+    'name',
+    'city',
+)
 
 OFFICE_HOUR_HOLDER_ROLES = [UserRole.MENTOR, UserRole.AIR]
 OFFICE_HOUR_RESERVER_ROLES = [UserRole.FINALIST, UserRole.ALUM]
@@ -154,13 +164,13 @@ class OfficeHoursCalendarView(ImpactView):
 
     def _mentor_office_hours_queryset(self):
         return MentorProgramOfficeHour.objects.filter(
-             mentor=self.target_user,
-             start_date_time__range=[self.start_date, self.end_date]).order_by(
-                 'start_date_time').annotate(
-                     finalist_count=Count("finalist")).annotate(
-                        own_office_hour=Case(
-                            default=Value(False),
-                            output_field=BooleanField()))
+            mentor=self.target_user,
+            start_date_time__range=[self.start_date, self.end_date]).order_by(
+            'start_date_time').annotate(
+            finalist_count=Count("finalist")).annotate(
+            own_office_hour=Case(
+                default=Value(False),
+                output_field=BooleanField()))
 
     def _finalist_office_hours_queryset(self):
         reserved_by_user = Q(finalist=self.target_user)
@@ -183,9 +193,9 @@ class OfficeHoursCalendarView(ImpactView):
 
     def _null_office_hours_queryset(self):
         return MentorProgramOfficeHour.objects.none().annotate(
-                        own_office_hour=Case(
-                            default=Value(False),
-                            output_field=BooleanField()))
+            own_office_hour=Case(
+                default=Value(False),
+                output_field=BooleanField()))
 
     def _set_user_query(self):
         if self.request_user_type == STAFF:
@@ -215,12 +225,12 @@ class OfficeHoursCalendarView(ImpactView):
         primary_industry_key = "mentor__expertprofile__primary_industry__name"
         office_hours = self._office_hours_queryset().filter(
             program__isnull=True).order_by(
-                 'start_date_time').annotate(
-                     finalist_count=Count("finalist")).annotate(
-                         reserved=Case(
-                             When(finalist_count__gt=0, then=Value(True)),
-                             default=Value(False),
-                             output_field=BooleanField()))
+            'start_date_time').annotate(
+            finalist_count=Count("finalist")).annotate(
+            reserved=Case(
+                When(finalist_count__gt=0, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()))
 
         self.response_elements['calendar_data'] = office_hours.values(
             "id",
@@ -268,8 +278,15 @@ class OfficeHoursCalendarView(ImpactView):
             self.program_family, flat=True).distinct()
 
     def location_choices(self):
-        return self.user_query.values(
+        locations = self.user_query.values(
             **_location_lookups(self.location_path)).distinct()
+        remote_location_fields = dict([("location_" + field, F(field))
+                                       for field in LOCATION_FIELDS])
+        remote_location = Location.objects.filter(
+            name="Remote").values(**remote_location_fields).first()
+        locations_list = list(locations)
+        locations_list.append(remote_location)
+        return locations_list
 
     def fail(self, detail):
         self.response_elements['success'] = False
@@ -283,18 +300,9 @@ class OfficeHoursCalendarView(ImpactView):
 
 
 def _location_lookups(location_path):
-    location_fields = (
-        'id',
-        'street_address',
-        'timezone',
-        'country',
-        'state',
-        'name',
-        'city',
-    )
     return dict([("location_" + field, F("{}__{}".format(
         location_path, field)))
-                 for field in location_fields])
+        for field in LOCATION_FIELDS])
 
 
 def _date_range(date_spec=None):
