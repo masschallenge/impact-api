@@ -247,7 +247,6 @@ class TestCreateEditOfficeHourView(APITestCase):
         self._create_office_hour_obj(mentor, start_date_time=start_time)
         office_hour = self._create_office_hour_obj(mentor)
         data = {
-            'topics': self.updated_topics,
             'start_date_time': start_time,
             'end_date_time': start_time + timedelta(minutes=30)}
         self._edit_office_hour_session(mentor, office_hour, data)
@@ -286,7 +285,7 @@ class TestCreateEditOfficeHourView(APITestCase):
                       'end_date_time': start_time + timedelta(minutes=150)})
         with self._assert_office_hour_created(count=0):
             self._create_office_hour_session(mentor, data)
-    
+
     def test_staff_with_clearance_can_create_office_hours(self):
         program_family = ProgramFactory().program_family
         staff_user = self.staff_user(program_family=program_family)
@@ -354,7 +353,14 @@ class TestCreateEditOfficeHourView(APITestCase):
     def _assert_office_hour_not_updated(self, office_hour):
         updated_office_hour = MentorProgramOfficeHour.objects.get(
             pk=office_hour.id)
-        self.assertEqual(updated_office_hour.topics, office_hour.topics)
+        self.assertTrue(all([
+            updated_office_hour.topics == office_hour.topics,
+            updated_office_hour.description == office_hour.description,
+            updated_office_hour.mentor == office_hour.mentor,
+            updated_office_hour.start_date_time == office_hour.start_date_time,
+            updated_office_hour.end_date_time == office_hour.end_date_time,
+            updated_office_hour.location == office_hour.location,
+        ]))
 
     def _create_office_hour_session(self, user, data):
         with self.login(email=user.email):
