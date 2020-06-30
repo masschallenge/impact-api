@@ -246,9 +246,10 @@ class OfficeHoursCalendarView(ImpactView):
             startup_name=F("startup__organization__name"),
         )
         self.response_elements['location_choices'] = self.location_choices()
-        self.response_elements['timezones'] = office_hours.order_by(
-            "location__timezone").values_list(
-                "location__timezone", flat=True).distinct()
+        self.response_elements['timezones'] = office_hours.filter(
+            location__isnull=False).order_by(
+                "location__timezone").values_list("location__timezone",
+                                                  flat=True).distinct()
         self.response_elements['location_choices'] = self.location_choices()
         program_families = self.mentor_program_families()
         self.response_elements['mentor_program_families'] = program_families
