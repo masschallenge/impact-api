@@ -27,6 +27,25 @@ class TestReserveOfficeHourView(APITestCase):
                                       request_user=finalist)
         self.assert_ui_notification(response, True, self.view.SUCCESS_DETAIL)
 
+    def test_finalist_reserves_office_hour_with_conflict_fail_message(self):
+        finalist = _finalist()
+        conflicting_office_hour = MentorProgramOfficeHourFactory(
+            finalist=finalist)
+        new_office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        response = self.post_response(new_office_hour.id,
+                                      request_user=finalist)
+        self.assert_ui_notification(response, False, self.view.CONFLICT_EXISTS)
+
+
+    def test_finalist_reserves_office_hour_with_conflict_reserve_fails(self):
+        finalist = _finalist()
+        conflicting_office_hour = MentorProgramOfficeHourFactory(
+            finalist=finalist)
+        new_office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        response = self.post_response(new_office_hour.id,
+                                      request_user=finalist)
+        self.assert_not_reserved(new_office_hour)
+        
     def test_finalist_reserves_unspecified_office_hour(self):
         # a finalist reserves an office hour, gets success response
         finalist = _finalist()
