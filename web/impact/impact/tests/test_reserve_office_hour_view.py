@@ -4,7 +4,10 @@ from .api_test_case import APITestCase
 from ..v1.views import ReserveOfficeHourView
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from .factories import UserFactory
-from .utils import nonexistent_object_id
+from .utils import (
+    minutes_from_now,
+    nonexistent_object_id,
+)
 from accelerator.tests.factories import (
     MentorProgramOfficeHourFactory,
     StartupFactory,
@@ -28,24 +31,37 @@ class TestReserveOfficeHourView(APITestCase):
         self.assert_ui_notification(response, True, self.view.SUCCESS_DETAIL)
 
     def test_finalist_reserves_office_hour_with_conflict_fail_message(self):
+        start_time = minutes_from_now(60)
+        end_time = minutes_from_now(90)
+
         finalist = _finalist()
-        conflicting_office_hour = MentorProgramOfficeHourFactory(
-            finalist=finalist)
-        new_office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        MentorProgramOfficeHourFactory(
+            finalist=finalist,
+            start_date_time=start_time,
+            end_date_time=end_time)
+
+        new_office_hour = MentorProgramOfficeHourFactory(
+            finalist=None,
+            start_date_time=start_time,
+            end_date_time=end_time)
         response = self.post_response(new_office_hour.id,
                                       request_user=finalist)
         self.assert_ui_notification(response, False, self.view.CONFLICT_EXISTS)
 
-
     def test_finalist_reserves_office_hour_with_conflict_reserve_fails(self):
+        start_time = minutes_from_now(60)
+        end_time = minutes_from_now(90)
         finalist = _finalist()
-        conflicting_office_hour = MentorProgramOfficeHourFactory(
-            finalist=finalist)
-        new_office_hour = MentorProgramOfficeHourFactory(finalist=None)
-        response = self.post_response(new_office_hour.id,
-                                      request_user=finalist)
+        MentorProgramOfficeHourFactory(finalist=finalist,
+                                       start_date_time=start_time,
+                                       end_date_time=end_time)
+        new_office_hour = MentorProgramOfficeHourFactory(
+            finalist=None,
+            start_date_time=start_time,
+            end_date_time=end_time)
+        self.post_response(new_office_hour.id, request_user=finalist)
         self.assert_not_reserved(new_office_hour)
-        
+
     def test_finalist_reserves_unspecified_office_hour(self):
         # a finalist reserves an office hour, gets success response
         finalist = _finalist()
