@@ -29,6 +29,9 @@ from accelerator.models import (
     ProgramRoleGrant,
     UserRole,
 )
+from accelerator_abstract.models.base_clearance import (
+    CLEARANCE_LEVEL_STAFF
+)
 from accelerator_abstract.models.base_user_utils import is_employee
 User = get_user_model()
 
@@ -65,6 +68,7 @@ class OfficeHoursCalendarView(ImpactView):
         (self._get_target_user(request) and
          self._check_request_user_type(request) and
          self._get_date_range(request) and
+         self._set_user_query() and
          self._get_office_hours_data())
         return Response(self.response_elements)
 
@@ -135,7 +139,8 @@ class OfficeHoursCalendarView(ImpactView):
             OFFICE_HOURS_HOLDER &
             in_visible_program_family).values_list(
                 "person__id", flat=True)
-        active_mentors = Q(mentor__in=program_mentors)
+        mentors = list(program_mentors) + [self.target_user.id]
+        active_mentors = Q(mentor__in=mentors)
         return MentorProgramOfficeHour.objects.filter(
             active_mentors,
             start_date_time__range=[self.start_date, self.end_date]).order_by(
@@ -182,6 +187,30 @@ class OfficeHoursCalendarView(ImpactView):
                             default=Value(False),
                             output_field=BooleanField()))
 
+    def _set_user_query(self):
+        if self.request_user_type == STAFF:
+            self.user_query = self.target_user.clearances.filter(
+                level=CLEARANCE_LEVEL_STAFF,
+                program_family__programs__program_status='active'
+            )
+            self.location_path = "__".join(["program_family",
+                                            "programfamilylocation",
+                                            "location"])
+            self.program_family = "__".join(["program_family", "name"])
+        else:
+            self.user_query = self.target_user.programrolegrant_set.filter(
+                OFFICE_HOURS_HOLDER & ACTIVE_PROGRAM)
+            self.location_path = "__".join(["program_role",
+                                            "program",
+                                            "program_family",
+                                            "programfamilylocation",
+                                            "location"])
+            self.program_family = "__".join(["program_role",
+                                             "program",
+                                             "program_family",
+                                             "name"])
+        return True
+
     def _get_office_hours_data(self):
         primary_industry_key = "mentor__expertprofile__primary_industry__name"
         office_hours = self._office_hours_queryset().filter(
@@ -217,13 +246,15 @@ class OfficeHoursCalendarView(ImpactView):
             startup_name=F("startup__organization__name"),
         )
         self.response_elements['location_choices'] = self.location_choices()
-        self.response_elements['timezones'] = office_hours.order_by(
-            "location__timezone").values_list(
-                "location__timezone", flat=True).distinct()
+        self.response_elements['timezones'] = office_hours.filter(
+            location__isnull=False).order_by(
+                "location__timezone").values_list("location__timezone",
+                                                  flat=True).distinct()
         self.response_elements['location_choices'] = self.location_choices()
         program_families = self.mentor_program_families()
         self.response_elements['mentor_program_families'] = program_families
         self.response_elements['user_startups'] = self._user_startups()
+        self.response_elements['user_type'] = self.request_user_type
         self.succeed()
 
     def _user_startups(self):
@@ -233,16 +264,12 @@ class OfficeHoursCalendarView(ImpactView):
                 name=F("startup__organization__name")).distinct()
 
     def mentor_program_families(self):
-        return self.target_user.programrolegrant_set.filter(
-            OFFICE_HOURS_HOLDER & ACTIVE_PROGRAM).values_list(
-                "program_role__program__program_family__name",
-                flat=True).distinct()
+        return self.user_query.values_list(
+            self.program_family, flat=True).distinct()
 
     def location_choices(self):
-        location_choices = self.target_user.programrolegrant_set.filter(
-            OFFICE_HOURS_HOLDER &
-            ACTIVE_PROGRAM).values(**_location_lookups())
-        return location_choices.distinct()
+        return self.user_query.values(
+            **_location_lookups(self.location_path)).distinct()
 
     def fail(self, detail):
         self.response_elements['success'] = False
@@ -255,24 +282,19 @@ class OfficeHoursCalendarView(ImpactView):
         self.response_elements['header'] = self.SUCCESS_HEADER
 
 
-def _location_lookups():
-        location_path = "__".join(["program_role",
-                                   "program",
-                                   "program_family",
-                                   "programfamilylocation",
-                                   "location"])
-        location_fields = (
-            'id',
-            'street_address',
-            'timezone',
-            'country',
-            'state',
-            'name',
-            'city',
-        )
-        return dict([("location_" + field, F("{}__{}".format(
-            location_path, field)))
-                     for field in location_fields])
+def _location_lookups(location_path):
+    location_fields = (
+        'id',
+        'street_address',
+        'timezone',
+        'country',
+        'state',
+        'name',
+        'city',
+    )
+    return dict([("location_" + field, F("{}__{}".format(
+        location_path, field)))
+                 for field in location_fields])
 
 
 def _date_range(date_spec=None):
