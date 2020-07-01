@@ -286,6 +286,32 @@ class TestCreateEditOfficeHourView(APITestCase):
         with self._assert_office_hour_created(count=0):
             self._create_office_hour_session(mentor, data)
 
+    def test_cant_create_session_with_enclosing_conflict(self):
+        mentor = self._expert_user(UserRole.MENTOR)
+        start_time = _now()
+        self._create_office_hour_obj(
+            mentor, start_date_time=start_time, block_duration=120)
+        data = self._get_post_request_data(
+            mentor,
+            get_data={'start_date_time': start_time + timedelta(minutes=60),
+                      'end_date_time': start_time + timedelta(minutes=90)})
+        with self._assert_office_hour_created(count=0):
+            self._create_office_hour_session(mentor, data)
+
+    def test_mentor_cant_update_session_with_enclosing_conflicts(self):
+        mentor = self._expert_user(UserRole.MENTOR)
+        start_time = _now()
+        self._create_office_hour_obj(
+            mentor,
+            start_date_time=start_time + timedelta(minutes=-30),
+            block_duration=120)
+        office_hour = self._create_office_hour_obj(mentor)
+        data = {
+            'start_date_time': start_time,
+            'end_date_time': start_time + timedelta(minutes=30)}
+        self._edit_office_hour_session(mentor, office_hour, data)
+        self._assert_office_hour_not_updated(office_hour)
+
     def test_staff_with_clearance_can_create_office_hours(self):
         program_family = ProgramFactory().program_family
         staff_user = self.staff_user(program_family=program_family)

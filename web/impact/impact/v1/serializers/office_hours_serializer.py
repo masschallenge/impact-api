@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+from django.db.models import Q
 from rest_framework.serializers import (
     ModelSerializer,
     ValidationError,
@@ -35,15 +36,24 @@ class OfficeHourSerializer(ModelSerializer):
 
     def handle_conflicting_sessions(self, attrs):
         office_hour = self.instance
-        start_date_time = attrs.get('start_date_time', None)
-        skip_check = (office_hour and
-                      office_hour.start_date_time == start_date_time)
-        if start_date_time and not skip_check:
-            conflicting_sessions = MentorProgramOfficeHour.objects.filter(
-                mentor=attrs.get('mentor', None) or office_hour.mentor,
-                start_date_time__lte=start_date_time,
-                end_date_time__gt=start_date_time).exists()
-            if conflicting_sessions:
+        start_time = attrs.get('start_date_time', None)
+        end_time = attrs.get('end_date_time', None)
+        time_unchanged = (office_hour and
+                        (office_hour.start_date_time == start_time and
+                         office_hour.end_date_time == end_time))
+        if (start_time or end_time) and not time_unchanged:
+            mentor = attrs.get('mentor', None) or office_hour.mentor
+            start_conflict = (Q(start_date_time__gt=start_time) &
+                              Q(start_date_time__lt=end_time))
+            end_conflict = (Q(end_date_time__gt=start_time) &
+                            Q(end_date_time__lt=end_time))
+            enclosing_conflict = (Q(start_date_time__lte=start_time) &
+                                  Q(end_date_time__gte=end_time))
+            conflict = mentor.mentor_officehours.filter(
+                start_conflict | end_conflict | enclosing_conflict
+            ).exists()
+
+            if conflict:
                 raise ValidationError({
                     'start_date_time': CONFLICTING_SESSIONS})
 
