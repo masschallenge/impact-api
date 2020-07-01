@@ -185,9 +185,8 @@ class TestOfficeHoursCalendarView(APITestCase):
 
         response = self.get_response(user=office_hour.mentor)
         response_locations = response.data['location_choices']
-        response_location_names = response_locations.values_list(
-            "location_name",
-            flat=True)
+        response_location_names = [
+            location['location_name'] for location in response_locations]
         self.assertTrue(all([loc.name in response_location_names
                              for loc in locations]))
 
@@ -263,9 +262,8 @@ class TestOfficeHoursCalendarView(APITestCase):
         self.create_office_hour(mentor=staff_user)
         response = self.get_response(user=staff_user)
         location_choices = response.data['location_choices']
-        response_location_names = location_choices.values_list(
-            'location_name', flat=True
-        )
+        response_location_names = [
+            location['location_name'] for location in location_choices]
         self.assertTrue(location.name in response_location_names)
 
     def test_program_family_for_staff_with_clearance_in_response(self):

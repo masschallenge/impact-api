@@ -166,11 +166,11 @@ class OfficeHoursCalendarView(ImpactView):
         return MentorProgramOfficeHour.objects.filter(
              mentor=self.target_user,
              start_date_time__range=[self.start_date, self.end_date]).order_by(
-                'start_date_time').annotate(
-                    finalist_count=Count("finalist")).annotate(
-                        own_office_hour=Case(
-                            default=Value(False),
-                            output_field=BooleanField()))
+                 'start_date_time').annotate(
+                 finalist_count=Count("finalist")).annotate(
+                 own_office_hour=Case(
+                     default=Value(False),
+                     output_field=BooleanField()))
 
     def _finalist_office_hours_queryset(self):
         reserved_by_user = Q(finalist=self.target_user)
@@ -285,8 +285,8 @@ class OfficeHoursCalendarView(ImpactView):
         remote_location = Location.objects.filter(
             name="Remote").values(**remote_location_fields).first()
         locations_list = list(locations)
-        locations_list.append(remote_location)
-        return locations_list
+        return locations_list.append(
+            remote_location) if remote_location else locations_list
 
     def fail(self, detail):
         self.response_elements['success'] = False
@@ -303,11 +303,14 @@ def _location_lookups(location_path):
     return dict([_location_dict_pair(field, location_path)
                  for field in LOCATION_FIELDS])
 
+
 def _location_dict_pair(field, location_path):
     return (_format_key(field), _make_f_expression(field, location_path))
 
+
 def _format_key(field):
     return "location_" + field
+
 
 def _make_f_expression(field, location_path):
     return F("{}__{}".format(location_path, field))
