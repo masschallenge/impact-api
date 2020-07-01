@@ -38,10 +38,10 @@ class OfficeHourSerializer(ModelSerializer):
         office_hour = self.instance
         start_time = attrs.get('start_date_time', None)
         end_time = attrs.get('end_date_time', None)
-        time_unchanged = (office_hour and
-                        (office_hour.start_date_time == start_time and
-                         office_hour.end_date_time == end_time))
-        if (start_time or end_time) and not time_unchanged:
+        skip_check = (office_hour and
+                      (office_hour.start_date_time == start_time and
+                       office_hour.end_date_time == end_time))
+        if (start_time or end_time) and not skip_check:
             mentor = attrs.get('mentor', None) or office_hour.mentor
             start_conflict = (Q(start_date_time__gt=start_time) &
                               Q(start_date_time__lt=end_time))
