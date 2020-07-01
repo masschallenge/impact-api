@@ -48,6 +48,25 @@ class TestReserveOfficeHourView(APITestCase):
                                       request_user=finalist)
         self.assert_ui_notification(response, False, self.view.CONFLICT_EXISTS)
 
+    def test_finalist_can_reserve_adjacecent_office_hour_session(self):
+        start_time = minutes_from_now(30)
+        shared_midpoint = minutes_from_now(60)
+        end_time = minutes_from_now(90)
+        
+        finalist = _finalist()
+        MentorProgramOfficeHourFactory(
+            finalist=finalist,
+            start_date_time=start_time,
+            end_date_time=shared_midpoint)
+
+        new_office_hour = MentorProgramOfficeHourFactory(
+            finalist=None,
+            start_date_time=shared_midpoint,
+            end_date_time=end_time)
+        response = self.post_response(new_office_hour.id,
+                                      request_user=finalist)
+        self.assert_reserved_by(new_office_hour, finalist)
+        
     def test_finalist_reserves_office_hour_with_conflict_reserve_fails(self):
         start_time = minutes_from_now(60)
         end_time = minutes_from_now(90)

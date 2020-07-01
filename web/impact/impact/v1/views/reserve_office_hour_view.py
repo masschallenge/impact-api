@@ -135,11 +135,13 @@ class ReserveOfficeHourView(ImpactView):
         start = self.office_hour.start_date_time
         end = self.office_hour.end_date_time
 
-        start_conflict = Q(start_date_time__range=(start, end))
-        end_conflict = Q(end_date_time__range=(start, end))
+        start_conflict = (Q(start_date_time__gt=start) &
+                          Q(start_date_time__lt=end))
+        end_conflict = (Q(end_date_time__gt=start) &
+                        Q(end_date_time__lt=end))        
         enclosing_conflict = (Q(start_date_time__lte=start) &
                               Q(end_date_time__gte=end))
-
+        
         if self.target_user.finalist_officehours.filter(
                 start_conflict | end_conflict | enclosing_conflict).exists():
             return True
