@@ -13,6 +13,7 @@ from ..v1.views import (
     ISO_8601_DATE_FORMAT,
     OfficeHoursCalendarView,
 )
+from ..v1.views.office_hours_calendar_view import FINALIST, MENTOR, STAFF
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from .factories import UserFactory
 from .utils import nonexistent_object_id
