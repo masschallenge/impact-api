@@ -11,8 +11,12 @@ from io import StringIO
 from pytz import utc
 
 
+def minutes_from_now(minutes):
+    return utc.localize(datetime.utcnow() + timedelta(minutes=minutes))
+
+
 def days_from_now(days):
-    return utc.localize(datetime.now() + timedelta(days))
+    return utc.localize(datetime.utcnow() + timedelta(days))
 
 
 def months_from_now(months):
