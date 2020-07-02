@@ -285,8 +285,10 @@ class OfficeHoursCalendarView(ImpactView):
         remote_location = Location.objects.filter(
             name="Remote").values(**remote_location_fields).first()
         locations_list = list(locations)
-        return locations_list.append(
-            remote_location) if remote_location else locations_list
+        has_remote_location = _check_remote_location(locations_list)
+        if remote_location and not has_remote_location: locations_list.append(
+            remote_location)
+        return locations_list
 
     def fail(self, detail):
         self.response_elements['success'] = False
@@ -297,6 +299,13 @@ class OfficeHoursCalendarView(ImpactView):
     def succeed(self):
         self.response_elements['success'] = True
         self.response_elements['header'] = self.SUCCESS_HEADER
+
+
+def _check_remote_location(locations_list):
+    remote_location_list = [
+        loc for loc in locations_list if location['location_name']=='Remote']
+    return len(remote_location_list) > 0
+
 
 
 def _location_lookups(location_path):
