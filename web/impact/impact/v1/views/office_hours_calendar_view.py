@@ -167,10 +167,10 @@ class OfficeHoursCalendarView(ImpactView):
              mentor=self.target_user,
              start_date_time__range=[self.start_date, self.end_date]).order_by(
                  'start_date_time').annotate(
-                 finalist_count=Count("finalist")).annotate(
-                 own_office_hour=Case(
-                     default=Value(False),
-                     output_field=BooleanField()))
+                     finalist_count=Count("finalist")).annotate(
+                         own_office_hour=Case(
+                             default=Value(False),
+                             output_field=BooleanField()))
 
     def _finalist_office_hours_queryset(self):
         reserved_by_user = Q(finalist=self.target_user)
