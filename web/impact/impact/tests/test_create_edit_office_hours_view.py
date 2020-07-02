@@ -377,16 +377,9 @@ class TestCreateEditOfficeHourView(APITestCase):
         self.assertEqual(updated_office_hour.topics, self.updated_topics)
 
     def _assert_office_hour_not_updated(self, office_hour):
-        updated_office_hour = MentorProgramOfficeHour.objects.get(
-            pk=office_hour.id)
-        self.assertTrue(all([
-            updated_office_hour.topics == office_hour.topics,
-            updated_office_hour.description == office_hour.description,
-            updated_office_hour.mentor == office_hour.mentor,
-            updated_office_hour.start_date_time == office_hour.start_date_time,
-            updated_office_hour.end_date_time == office_hour.end_date_time,
-            updated_office_hour.location == office_hour.location,
-        ]))
+        previously_updated_at = office_hour.updated_at
+        office_hour.refresh_from_db()
+        self.assertEqual(previously_updated_at, office_hour.updated_at)
 
     def _create_office_hour_session(self, user, data):
         with self.login(email=user.email):

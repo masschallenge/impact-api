@@ -34,7 +34,22 @@ class OfficeHourSerializer(ModelSerializer):
             'topics', 'description', 'location',
         ]
 
-    def handle_conflicting_sessions(self, attrs):
+    def handle_conflicting_session(self, attrs, start_time, end_time):
+        mentor = attrs.get('mentor', None) or self.instance.mentor
+        start_conflict = (Q(start_date_time__gt=start_time) &
+                          Q(start_date_time__lt=end_time))
+        end_conflict = (Q(end_date_time__gt=start_time) &
+                        Q(end_date_time__lt=end_time))
+        enclosing_conflict = (Q(start_date_time__lte=start_time) &
+                              Q(end_date_time__gte=end_time))
+        conflict = mentor.mentor_officehours.filter(
+            start_conflict | end_conflict | enclosing_conflict
+        ).exists()
+        if conflict:
+            raise ValidationError({
+                'start_date_time': CONFLICTING_SESSIONS})
+
+    def validate_office_hour_session(self, attrs):
         office_hour = self.instance
         start_time = attrs.get('start_date_time', None)
         end_time = attrs.get('end_date_time', None)
@@ -42,20 +57,7 @@ class OfficeHourSerializer(ModelSerializer):
                       (office_hour.start_date_time == start_time and
                        office_hour.end_date_time == end_time))
         if (start_time or end_time) and not skip_check:
-            mentor = attrs.get('mentor', None) or office_hour.mentor
-            start_conflict = (Q(start_date_time__gt=start_time) &
-                              Q(start_date_time__lt=end_time))
-            end_conflict = (Q(end_date_time__gt=start_time) &
-                            Q(end_date_time__lt=end_time))
-            enclosing_conflict = (Q(start_date_time__lte=start_time) &
-                                  Q(end_date_time__gte=end_time))
-            conflict = mentor.mentor_officehours.filter(
-                start_conflict | end_conflict | enclosing_conflict
-            ).exists()
-
-            if conflict:
-                raise ValidationError({
-                    'start_date_time': CONFLICTING_SESSIONS})
+            self.handle_conflicting_session(attrs, start_time, end_time)
 
     def validate(self, attrs):
         start_date_time = None
@@ -79,7 +81,7 @@ class OfficeHourSerializer(ModelSerializer):
         if end_date_time - start_date_time < THIRTY_MINUTES:
             raise ValidationError({
                 'end_date_time': INVALID_SESSION_DURATION})
-        self.handle_conflicting_sessions(attrs)
+        self.validate_office_hour_session(attrs)
 
         return attrs
 
