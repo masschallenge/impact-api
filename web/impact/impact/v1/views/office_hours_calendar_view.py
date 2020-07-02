@@ -303,9 +303,8 @@ class OfficeHoursCalendarView(ImpactView):
 
 def _check_remote_location(locations_list):
     remote_location_list = [
-        loc for loc in locations_list if location['location_name']=='Remote']
+        loc for loc in locations_list if loc['location_name']=='Remote']
     return len(remote_location_list) > 0
-
 
 
 def _location_lookups(location_path):

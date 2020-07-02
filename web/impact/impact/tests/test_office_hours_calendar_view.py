@@ -292,6 +292,20 @@ class TestOfficeHoursCalendarView(APITestCase):
         timezone_data = response.data['timezones']
         self.assertEqual(timezone_data.count(), 0)
 
+    def test_location_always_include_remote_location(self):
+        program_family_location = ProgramFamilyLocationFactory()
+        program_family = program_family_location.program_family
+        location = program_family_location.location
+        remote_location = LocationFactory(name="Remote")
+        ProgramFactory(program_family=program_family)
+        staff_user = self.staff_user(program_family=program_family)
+        self.create_office_hour(mentor=staff_user)
+        response = self.get_response(user=staff_user)
+        location_choices = response.data['location_choices']
+        response_location_names = [
+            location['location_name'] for location in location_choices]
+        self.assertTrue(remote_location.name in response_location_names)
+
     def create_office_hour(self,
                            mentor=None,
                            finalist=None,
