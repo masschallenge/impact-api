@@ -193,9 +193,9 @@ class OfficeHoursCalendarView(ImpactView):
 
     def _null_office_hours_queryset(self):
         return MentorProgramOfficeHour.objects.none().annotate(
-                    own_office_hour=Case(
-                        default=Value(False),
-                        output_field=BooleanField()))
+                        own_office_hour=Case(
+                            default=Value(False),
+                            output_field=BooleanField()))
 
     def _set_user_query(self):
         if self.request_user_type == STAFF:
