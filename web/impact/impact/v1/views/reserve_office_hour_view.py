@@ -1,5 +1,7 @@
-from django.template import loader
 from django.contrib.auth import get_user_model
+from django.db.models import Q
+from django.template import loader
+
 from rest_framework.response import Response
 
 from accelerator_abstract.models.base_user_utils import is_employee
@@ -41,6 +43,8 @@ class ReserveOfficeHourView(ImpactView):
                                         "choice for {}")
     USER_CANNOT_RESERVE_OFFICE_HOURS = ("The selected user is not allowed to "
                                         "reserve office hour sessions.")
+    CONFLICT_EXISTS = ("There is a conflict with an existing office hour "
+                       "reservation")
 
     def post(self, request):
         '''
@@ -117,10 +121,29 @@ class ReserveOfficeHourView(ImpactView):
         if self.office_hour.finalist is not None:
             self.fail(self.OFFICE_HOUR_ALREADY_RESERVED)
             return False
+        if self._conflict_exists():
+            self.fail(self.CONFLICT_EXISTS)
+            return False
         self._update_office_hour_data()
         self._send_confirmation_emails()
         self._succeed()
         return True
+
+    def _conflict_exists(self):
+        start = self.office_hour.start_date_time
+        end = self.office_hour.end_date_time
+
+        start_conflict = (Q(start_date_time__gt=start) &
+                          Q(start_date_time__lt=end))
+        end_conflict = (Q(end_date_time__gt=start) &
+                        Q(end_date_time__lt=end))        
+        enclosing_conflict = (Q(start_date_time__lte=start) &
+                              Q(end_date_time__gte=end))
+        
+        if self.target_user.finalist_officehours.filter(
+                start_conflict | end_conflict | enclosing_conflict).exists():
+            return True
+        return False
 
     def _update_office_hour_data(self):
         self.office_hour.finalist = self.target_user
