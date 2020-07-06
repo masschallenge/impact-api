@@ -301,7 +301,6 @@ class TestOfficeHoursCalendarView(APITestCase):
     def test_location_always_include_remote_location(self):
         program_family_location = ProgramFamilyLocationFactory()
         program_family = program_family_location.program_family
-        location = program_family_location.location
         remote_location = LocationFactory(name="Remote")
         ProgramFactory(program_family=program_family)
         staff_user = self.staff_user(program_family=program_family)
