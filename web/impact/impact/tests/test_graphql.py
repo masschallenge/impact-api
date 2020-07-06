@@ -604,23 +604,24 @@ class TestGraphQL(APITestCase):
             self.assertEqual(expert_profile["confirmedMentorProgramFamilies"],
                              [])
 
-    def test_user_cannot_view_profile_with_non_current_allowed_roles(self):
+    def test_user_can_view_profile_with_non_current_allowed_roles(self):
         allowed_user = expert_user(UserRole.FINALIST)
-        with self.login(email=allowed_user.email):
-            user = EntrepreneurFactory()
-            UserRoleContext(
-                UserRole.MENTOR,
-                user=user,
-                program=ProgramFactory(program_status=ENDED_PROGRAM_STATUS))
-            query = """
-                        query{{
-                            entrepreneurProfile(id:{id}) {{
-                                programRoles
-                            }}
+        user = EntrepreneurFactory()
+        UserRoleContext(
+            UserRole.MENTOR,
+            user=user,
+            program=ProgramFactory(program_status=ENDED_PROGRAM_STATUS))
+        query = """
+                    query{{
+                        entrepreneurProfile(id:{id}) {{
+                            programRoles
                         }}
-                    """.format(id=user.id)
+                    }}
+                """.format(id=user.id)
 
-            self._assert_error_in_response(query, NOT_ALLOWED_ACCESS_MESSAGE)
+        expected_json={'data': {'entrepreneurProfile': {'programRoles': {}}}}
+        self._assert_response_equals_json(
+            query, expected_json, email=allowed_user.email)
 
     def test_allowed_user_with_non_current_user_role_cannot_view_profile(self):
         current_user = expert_user(
@@ -760,7 +761,7 @@ class TestGraphQL(APITestCase):
             user_type='EXPERT',
             program_role_names=desired_user_roles,
             program_families=[program_family]
-            ).user
+        ).user
 
         program_role = user.programrolegrant_set.filter(
             program_role__program__program_status="active",
