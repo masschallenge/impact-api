@@ -4,6 +4,8 @@ from django.template import loader
 
 from rest_framework.response import Response
 
+from add2cal import Add2Cal
+
 from accelerator_abstract.models.base_user_utils import is_employee
 from accelerator.models import (
     MentorProgramOfficeHour,
@@ -20,6 +22,7 @@ from .utils import (
     is_office_hour_reserver,
     localized_office_hour_start_time,
 )
+from ...views import ADD2CAL_DATE_FORMAT
 from ...minimal_email_handler import send_email
 User = get_user_model()
 
@@ -32,6 +35,7 @@ class ReserveOfficeHourView(ImpactView):
     view_name = "reserve_office_hour"
     permission_classes = [IsAuthenticated]
 
+    OFFICE_HOUR_TITLE = "Office Hours Session with {}"
     SUCCESS_HEADER = "Office Hours session reserved"
     SUCCESS_DETAIL = "You have reserved this office hour session"
     FAIL_HEADER = "Fail header"
@@ -155,7 +159,7 @@ class ReserveOfficeHourView(ImpactView):
 
     def _send_confirmation_emails(self):
         mentor = self.office_hour.mentor
-        finalist = self.target_user
+        finalist = self.target_user            
         send_email(**self.prepare_email_notification(mentor,
                                                      finalist,
                                                      mentor_template_name))
@@ -172,13 +176,14 @@ class ReserveOfficeHourView(ImpactView):
             startup_name = self.startup.organization.name
         else:
             startup_name = ""
-
+        calendar_data = self.get_calendar_data(counterpart)
         start_time = localized_office_hour_start_time(self.office_hour)
         context = {"recipient": recipient,
                    "counterpart": counterpart,
                    "office_hour_date_time": start_time,
                    "startup": startup_name,
-                   "message": self.message}
+                   "message": self.message,
+                   "calendar_data": calendar_data}
         body = loader.render_to_string(template_path, context)
         return {"to": [recipient.email],
                 "subject": self.SUBJECT,
@@ -210,3 +215,23 @@ class ReserveOfficeHourView(ImpactView):
             'header': self.header,
             'detail': self.detail,
             'timecard_info': self.timecard_info})
+
+    def get_calendar_data(self, counterpart_name):
+        title = self.OFFICE_HOUR_TITLE.format(counterpart_name)
+        office_hour = self.office_hour
+        if office_hour.location is None:
+            timezone = "UTC"
+            location = "Unspecified"
+        else:
+            timezone = office_hour.location.timezone
+            location = office_hour.location
+        return Add2Cal(
+            start=office_hour.start_date_time.strftime(
+                ADD2CAL_DATE_FORMAT),
+            end=office_hour.end_date_time.strftime(
+                ADD2CAL_DATE_FORMAT),
+            title=title,
+            description=office_hour.topics,
+            location=location,
+            timezone=timezone).as_dict()
+    
