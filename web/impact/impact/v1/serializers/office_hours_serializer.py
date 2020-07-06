@@ -5,11 +5,9 @@ from rest_framework.serializers import (
     ModelSerializer,
     ValidationError,
 )
-from accelerator_abstract.models.base_clearance import (
-    CLEARANCE_LEVEL_STAFF
-)
 from accelerator_abstract.models.base_user_utils import is_employee
 from accelerator.models import (
+    Clearance,
     MentorProgramOfficeHour,
     UserRole
 )
@@ -89,10 +87,8 @@ class OfficeHourSerializer(ModelSerializer):
         user = self.context['request'].user
         roles = [UserRole.MENTOR, UserRole.AIR]
         if user == mentor:
-            return user.clearances.filter(
-                level=CLEARANCE_LEVEL_STAFF,
-                program_family__programs__program_status='active'
-            ).exists()
+            return Clearance.objects.clearances_for_user(user).filter(
+                program_family__programs__program_status='active').exists()
         return mentor.programrolegrant_set.filter(
             program_role__user_role__name__in=roles,
             program_role__program__program_status='active',
