@@ -8,6 +8,12 @@ from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
+from accelerator_abstract.models.base_clearance import (
+    CLEARANCE_LEVEL_EXEC_MD,
+    CLEARANCE_LEVEL_GLOBAL_MANAGER,
+    CLEARANCE_LEVEL_POM,
+)
+
 from accelerator.models import UserRole
 
 from accelerator.tests.factories import (
@@ -246,7 +252,7 @@ class TestOfficeHoursCalendarView(APITestCase):
         calendar_data = response.data['calendar_data'][0]
         self.assertIn("meeting_info", calendar_data)
 
-    def test_staff_with_clearance_sees_own_office_hour(self):
+    def test_user_with_staff_clearance_sees_own_office_hour(self):
         program = ProgramFactory()
         staff_user = self.staff_user(program_family=program.program_family)
         office_hour = self.create_office_hour(mentor=staff_user)
@@ -305,6 +311,30 @@ class TestOfficeHoursCalendarView(APITestCase):
         response_location_names = [
             location['location_name'] for location in location_choices]
         self.assertTrue(remote_location.name in response_location_names)
+
+    def test_user_with_pom_clearance_sees_own_office_hour(self):
+        program = ProgramFactory()
+        staff_user = self.staff_user(program_family=program.program_family,
+                                     level=CLEARANCE_LEVEL_POM)
+        office_hour = self.create_office_hour(mentor=staff_user)
+        response = self.get_response(user=staff_user)
+        self.assert_hour_in_response(response, office_hour)
+
+    def test_user_with_exec_md_clearance_sees_own_office_hour(self):
+        program = ProgramFactory()
+        staff_user = self.staff_user(program_family=program.program_family,
+                                     level=CLEARANCE_LEVEL_EXEC_MD)
+        office_hour = self.create_office_hour(mentor=staff_user)
+        response = self.get_response(user=staff_user)
+        self.assert_hour_in_response(response, office_hour)
+
+    def test_global_manager_sees_own_office_hour(self):
+        program = ProgramFactory()
+        staff_user = self.staff_user(program_family=program.program_family,
+                                     level=CLEARANCE_LEVEL_GLOBAL_MANAGER)
+        office_hour = self.create_office_hour(mentor=staff_user)
+        response = self.get_response(user=staff_user)
+        self.assert_hour_in_response(response, office_hour)
 
     def create_office_hour(self,
                            mentor=None,

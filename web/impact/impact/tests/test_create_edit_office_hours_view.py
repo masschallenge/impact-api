@@ -7,6 +7,11 @@ from pytz import utc
 
 from django.urls import reverse
 
+from accelerator_abstract.models.base_clearance import (
+    CLEARANCE_LEVEL_EXEC_MD,
+    CLEARANCE_LEVEL_GLOBAL_MANAGER,
+    CLEARANCE_LEVEL_POM,
+)
 from accelerator.models import MentorProgramOfficeHour, UserRole
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.factories import (
@@ -312,9 +317,33 @@ class TestCreateEditOfficeHourView(APITestCase):
         self._edit_office_hour_session(mentor, office_hour, data)
         self._assert_office_hour_not_updated(office_hour)
 
-    def test_staff_with_clearance_can_create_office_hours(self):
+    def test_user_with_staff_clearance_can_create_office_hours(self):
         program_family = ProgramFactory().program_family
         staff_user = self.staff_user(program_family=program_family)
+        data = self._get_post_request_data(staff_user)
+        with self._assert_office_hour_created():
+            self._create_office_hour_session(staff_user, data)
+
+    def test_user_with_pom_clearance_can_create_office_hours(self):
+        program_family = ProgramFactory().program_family
+        staff_user = self.staff_user(program_family=program_family,
+                                     level=CLEARANCE_LEVEL_POM)
+        data = self._get_post_request_data(staff_user)
+        with self._assert_office_hour_created():
+            self._create_office_hour_session(staff_user, data)
+
+    def test_user_with_exec_md_clearance_can_create_office_hours(self):
+        program_family = ProgramFactory().program_family
+        staff_user = self.staff_user(program_family=program_family,
+                                     level=CLEARANCE_LEVEL_EXEC_MD)
+        data = self._get_post_request_data(staff_user)
+        with self._assert_office_hour_created():
+            self._create_office_hour_session(staff_user, data)
+
+    def test_global_manager_can_create_office_hours(self):
+        program_family = ProgramFactory().program_family
+        staff_user = self.staff_user(program_family=program_family,
+                                     level=CLEARANCE_LEVEL_GLOBAL_MANAGER)
         data = self._get_post_request_data(staff_user)
         with self._assert_office_hour_created():
             self._create_office_hour_session(staff_user, data)
