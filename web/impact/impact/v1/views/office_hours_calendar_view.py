@@ -164,13 +164,13 @@ class OfficeHoursCalendarView(ImpactView):
 
     def _mentor_office_hours_queryset(self):
         return MentorProgramOfficeHour.objects.filter(
-             mentor=self.target_user,
-             start_date_time__range=[self.start_date, self.end_date]).order_by(
-                 'start_date_time').annotate(
-                     finalist_count=Count("finalist")).annotate(
-                        own_office_hour=Case(
-                            default=Value(False),
-                            output_field=BooleanField()))
+            mentor=self.target_user,
+            start_date_time__range=[self.start_date, self.end_date]).order_by(
+            'start_date_time').annotate(
+            finalist_count=Count("finalist")).annotate(
+            own_office_hour=Case(
+                default=Value(False),
+                output_field=BooleanField()))
 
     def _finalist_office_hours_queryset(self):
         reserved_by_user = Q(finalist=self.target_user)
@@ -193,9 +193,9 @@ class OfficeHoursCalendarView(ImpactView):
 
     def _null_office_hours_queryset(self):
         return MentorProgramOfficeHour.objects.none().annotate(
-                        own_office_hour=Case(
-                            default=Value(False),
-                            output_field=BooleanField()))
+            own_office_hour=Case(
+                default=Value(False),
+                output_field=BooleanField()))
 
     def _set_user_query(self):
         if self.request_user_type == STAFF:
@@ -225,12 +225,12 @@ class OfficeHoursCalendarView(ImpactView):
         primary_industry_key = "mentor__expertprofile__primary_industry__name"
         office_hours = self._office_hours_queryset().filter(
             program__isnull=True).order_by(
-                 'start_date_time').annotate(
-                     finalist_count=Count("finalist")).annotate(
-                         reserved=Case(
-                             When(finalist_count__gt=0, then=Value(True)),
-                             default=Value(False),
-                             output_field=BooleanField()))
+            'start_date_time').annotate(
+            finalist_count=Count("finalist")).annotate(
+            reserved=Case(
+                When(finalist_count__gt=0, then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField()))
 
         self.response_elements['calendar_data'] = office_hours.values(
             "id",
@@ -280,14 +280,15 @@ class OfficeHoursCalendarView(ImpactView):
     def location_choices(self):
         locations = self.user_query.values(
             **_location_lookups(self.location_path)).distinct()
-        remote_location_fields = dict([("location_" + field, F(field))
-                                       for field in LOCATION_FIELDS])
-        remote_location = Location.objects.filter(
-            name="Remote").values(**remote_location_fields).first()
         locations_list = list(locations)
         has_remote_location = _check_remote_location(locations_list)
-        if remote_location and not has_remote_location: locations_list.append(
-            remote_location)
+
+        if not has_remote_location:
+            remote_location_fields = dict([("location_" + field, F(field))
+                                           for field in LOCATION_FIELDS])
+            remote_loc = Location.objects.filter(
+                name="Remote").values(**remote_location_fields).first()
+            locations_list.append(remote_loc) if remote_loc else locations_list
         return locations_list
 
     def fail(self, detail):
@@ -302,9 +303,7 @@ class OfficeHoursCalendarView(ImpactView):
 
 
 def _check_remote_location(locations_list):
-    remote_location_list = [
-        loc for loc in locations_list if loc['location_name']=='Remote']
-    return len(remote_location_list) > 0
+    return any([loc['location_name'] == 'Remote' for loc in locations_list])
 
 
 def _location_lookups(location_path):
