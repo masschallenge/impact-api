@@ -16,8 +16,8 @@ from ..helpers.model_helper import (
     READ_ONLY_OBJECT_FIELD,
     READ_ONLY_STRING_FIELD,
 )
-from ...permissions import global_operations_manager_check
 from accelerator.models import CriterionOptionSpec
+from mc.permission_checks import global_manager_check
 from mc.utils import swapper_model
 Application = swapper_model("Application")
 JudgePanelAssignment = swapper_model("JudgePanelAssignment")
@@ -58,8 +58,7 @@ class AnalyzeJudgingRoundView(ImpactView):
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
         program_family = self.instance.program.program_family
-        if not global_operations_manager_check(request.user, program_family):
-            return Response(status=403)
+        global_manager_check(request.user, program_family)
         options = CriterionOptionSpec.objects.filter(
             criterion__judging_round=self.instance).prefetch_related(
                 'criterion')

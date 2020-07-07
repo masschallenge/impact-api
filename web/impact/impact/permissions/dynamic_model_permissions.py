@@ -1,11 +1,15 @@
-from . import BasePermission
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
-from accelerator.apps import AcceleratorConfig
-from ..utils import model_name_case
-from django.contrib.auth import get_user
-from django.contrib.auth.models import PermissionDenied
 from ast import literal_eval
+
+from django.contrib.auth import get_user
+from django.contrib.auth.models import (
+    Permission,
+    PermissionDenied,
+)
+from django.contrib.contenttypes.models import ContentType
+from rest_framework.permissions import BasePermission
+
+from ..utils import model_name_case
+from accelerator.apps import AcceleratorConfig
 
 
 METHOD_TO_ACTION = {

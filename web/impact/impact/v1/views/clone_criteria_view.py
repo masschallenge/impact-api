@@ -3,12 +3,12 @@
 from rest_framework.response import Response
 
 from mc.models import JudgingRound
+from mc.permission_checks import global_manager_check
 from .impact_view import ImpactView
 from ..helpers import (
     CriterionHelper,
     CriterionOptionSpecHelper,
 )
-from ...permissions import global_operations_manager_check
 
 ROUND_DOES_NOT_EXIST_ERROR = "Judging Round {} does not exist"
 SOURCE_JUDGING_ROUND_KEY = 'source_judging_round_id'
@@ -37,9 +37,7 @@ class CloneCriteriaView(ImpactView):
             return Response(status=401, data=self.errors)
         target_round = JudgingRound.objects.get(pk=target_pk)
         program_family = target_round.program.program_family
-        cleared = global_operations_manager_check(request.user, program_family)
-        if not cleared:
-            return Response(status=403)
+        global_manager_check(request.user, program_family)
         clones = CriterionHelper.clone_criteria(source_pk, target_pk)
         CriterionOptionSpecHelper.clone_option_specs(clones)
         return Response(status=204)

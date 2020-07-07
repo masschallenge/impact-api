@@ -1,16 +1,15 @@
-
-from rest_framework.permissions import IsAuthenticated
-
+from django.conf import settings
+from rest_framework.permissions import (
+    BasePermission,
+    IsAuthenticated,
+)
 
 from accelerator_abstract.models.base_user_utils import (
     is_employee,
     is_expert,
 )
 from mc.models import UserRole
-from . import (
-    settings,
-    BasePermission,
-)
+
 
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 DEFAULT_PERMISSION_DENIED_DETAIL = ("You do not have permission to perform "
