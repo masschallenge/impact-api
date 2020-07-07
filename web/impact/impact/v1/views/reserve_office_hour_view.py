@@ -27,6 +27,8 @@ from ...minimal_email_handler import send_email
 User = get_user_model()
 
 
+ICS_FILENAME = 'reminder.ics'
+ICS_FILETYPE = 'text/calendar'
 mentor_template_name = "reserve_office_hour_email_to_mentor.html"
 finalist_template_name = "reserve_office_hour_email_to_finalist.html"
 
@@ -159,7 +161,7 @@ class ReserveOfficeHourView(ImpactView):
 
     def _send_confirmation_emails(self):
         mentor = self.office_hour.mentor
-        finalist = self.target_user            
+        finalist = self.target_user
         send_email(**self.prepare_email_notification(mentor,
                                                      finalist,
                                                      mentor_template_name))
@@ -187,7 +189,10 @@ class ReserveOfficeHourView(ImpactView):
         body = loader.render_to_string(template_path, context)
         return {"to": [recipient.email],
                 "subject": self.SUBJECT,
-                "body": body}
+                "body": body,
+                "attachment": (ICS_FILENAME,
+                               calendar_data['ical_content'],
+                               ICS_FILETYPE)}
 
     def _succeed(self):
         if self.office_hour.startup:

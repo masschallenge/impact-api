@@ -209,6 +209,7 @@ class TestReserveOfficeHourView(APITestCase):
                            finalist.id)
         self.assert_notified(finalist)
 
+    
     def test_reserve_on_behalf_of_mentor_gets_email_notification(self):
         # staff reserves a session on behalf of finalist, mentor is
         # notified by email
@@ -228,6 +229,7 @@ class TestReserveOfficeHourView(APITestCase):
         self.assert_ui_notification(response,
                                     False,
                                     DEFAULT_PERMISSION_DENIED_DETAIL)
+
 
     def assert_response_contains_session_details(self, response, office_hour):
         office_hour.refresh_from_db()
