@@ -40,8 +40,7 @@ def visible_roles(current_user):
 
 def can_view_profile(profile_user, roles):
     return profile_user.programrolegrant_set.filter(
-        program_role__user_role__name__in=roles,
-        program_role__program__program_status=ACTIVE_PROGRAM_STATUS
+        program_role__user_role__name__in=roles
     ).exists()
 
 
