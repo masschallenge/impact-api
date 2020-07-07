@@ -155,7 +155,7 @@ URL_SLUG_FIELD = merge_fields(
         "json-schema": {"pattern": "^[a-zA-Z0-9_-]+$"},
     })
 
-TWITTER_PATTERN = '^\S{{0,{}}}$'.format(TWITTER_HANDLE_MAX_LENGTH)
+TWITTER_PATTERN = r'^\S{{0,{}}}$'.format(TWITTER_HANDLE_MAX_LENGTH)
 TWITTER_REGEX = re.compile(TWITTER_PATTERN)
 TWITTER_FIELD = merge_fields(
     OPTIONAL_STRING_FIELD,

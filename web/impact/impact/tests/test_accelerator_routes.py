@@ -159,6 +159,4 @@ class TestAcceleratorRoutes(TestCase):
                 model.__name__ not in MODELS_TO_EXCLUDE_FROM_URL_BINDING)]
         model_count = len(accelerate_models)
         # we should have two detail and list views per model
-        self.assertEquals(
-            model_count * VIEWS_PER_MODEL,
-            url_count)
+        self.assertEqual(model_count * VIEWS_PER_MODEL, url_count)

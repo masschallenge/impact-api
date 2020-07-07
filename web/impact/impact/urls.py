@@ -40,7 +40,7 @@ from .views.general_view_set import MODELS_TO_EXCLUDE_FROM_URL_BINDING
 
 accelerator_router = routers.DefaultRouter()
 simpleuser_router = routers.DefaultRouter()
-simpleuser_router.register('User', GeneralViewSet, base_name='User')
+simpleuser_router.register('User', GeneralViewSet, basename='User')
 
 if len(schema_router.registry) == 0:
     for model in apps.get_models('mc'):
