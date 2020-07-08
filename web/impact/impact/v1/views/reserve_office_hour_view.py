@@ -190,7 +190,7 @@ class ReserveOfficeHourView(ImpactView):
         body = loader.render_to_string(template_path, context)
         return {"to": [recipient.email],
                 "subject": self.SUBJECT,
-                "body": body
+                "body": body,
                 "attachment": (ICS_FILENAME, calendar_data['ical_content'],
                                ICS_FILETYPE)}
 
