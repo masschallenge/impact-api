@@ -19,6 +19,8 @@ from .utils import (
     email_template_path,
     is_office_hour_reserver,
     localized_office_hour_start_time,
+    generate_calendar_links,
+    generate_ical_content
 )
 from ...minimal_email_handler import send_email
 User = get_user_model()
@@ -26,6 +28,8 @@ User = get_user_model()
 
 mentor_template_name = "reserve_office_hour_email_to_mentor.html"
 finalist_template_name = "reserve_office_hour_email_to_finalist.html"
+ICS_FILENAME = 'reminder.ics'
+ICS_FILETYPE = 'text/calendar'
 
 
 class ReserveOfficeHourView(ImpactView):
@@ -174,11 +178,15 @@ class ReserveOfficeHourView(ImpactView):
             startup_name = ""
 
         start_time = localized_office_hour_start_time(self.office_hour)
+        ical_content = generate_ical_content(self.hour)
         context = {"recipient": recipient,
                    "counterpart": counterpart,
                    "office_hour_date_time": start_time,
                    "startup": startup_name,
-                   "message": self.message}
+                   "message": self.message,
+                   "attachment": [ICS_FILENAME, ical_content, ICS_FILETYPE]
+                   }
+        context.update(generate_calendar_links(self.hour))
         body = loader.render_to_string(template_path, context)
         return {"to": [recipient.email],
                 "subject": self.SUBJECT,
