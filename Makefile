@@ -439,13 +439,8 @@ build-aws:
 TARGET ?= staging
 
 
-release-list:
-	@git ls-remote --tags | grep -o 'refs/tags/v[0-9]*\.[0-9]*\.[0-9]*' | sort -r | grep -o '[^\/]*$$'
-
-
-
-release:
-	@bash create_release.sh
+release release-list:
+	@$(ACCELERATE_MAKE) $@
 
 
 travis-release: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
