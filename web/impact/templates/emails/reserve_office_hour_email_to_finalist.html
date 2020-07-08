@@ -4,8 +4,9 @@ You have an office hour session at {{ office_hour_date_time | date:"h:m" }} on
 {{ office_hour_date_time | date }} ({{ office_hour_date_time | date:"e" }})
 with {{ counterpart.full_name }} 
 
-Google Calendar: {{google_reminder}}
-Yahoo: {{yahoo_reminder}}
+Google Calendar: {{calendar_data.gcal_link}}
+Yahoo: {{calendar_data.yahoo_link}}
+Outlook: {{calendar_data.outlook_link}}
 
 {% if message %}
   {{ message }}

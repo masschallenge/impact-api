@@ -3,7 +3,6 @@
 
 import datetime
 import os
-import socket
 
 from configurations import (
     Configuration,
@@ -15,7 +14,7 @@ from django.urls import reverse_lazy
 
 
 LOG_FORMAT = 'host: localhost  %(name)s[%(process)d]: ' \
-    '%(levelname)s %(message)s'
+                '%(levelname)s %(message)s'
 
 
 class Base(Configuration):
@@ -211,12 +210,6 @@ class Base(Configuration):
         'IMPACT_API_V1_API_GROUP', 'v1_clients')
 
     V1_CONFIDENTIAL_API_GROUP = bytes('v1_confidential', 'utf-8')
-
-    IMPACT_HOST = ""
-    try:
-        IMPACT_HOST = socket.gethostname()
-    except:
-        IMPACT_HOST = 'localhost:8000'
 
     OAUTH2_PROVIDER = {
         # this is the list of available scopes

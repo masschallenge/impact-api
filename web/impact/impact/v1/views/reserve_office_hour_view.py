@@ -14,13 +14,12 @@ from ...permissions.v1_api_permissions import (
     DEFAULT_PERMISSION_DENIED_DETAIL,
     IsAuthenticated,
 )
+from ...views import ADD2CAL_DATE_FORMAT
 from .impact_view import ImpactView
 from .utils import (
     email_template_path,
     is_office_hour_reserver,
     localized_office_hour_start_time,
-    generate_calendar_links,
-    generate_ical_content
 )
 from ...minimal_email_handler import send_email
 User = get_user_model()
@@ -36,6 +35,7 @@ class ReserveOfficeHourView(ImpactView):
     view_name = "reserve_office_hour"
     permission_classes = [IsAuthenticated]
 
+    OFFICE_HOUR_TITLE = "Office Hours Session with {}"
     SUCCESS_HEADER = "Office Hours session reserved"
     SUCCESS_DETAIL = "You have reserved this office hour session"
     FAIL_HEADER = "Fail header"
@@ -142,10 +142,10 @@ class ReserveOfficeHourView(ImpactView):
         start_conflict = (Q(start_date_time__gt=start) &
                           Q(start_date_time__lt=end))
         end_conflict = (Q(end_date_time__gt=start) &
-                        Q(end_date_time__lt=end))        
+                        Q(end_date_time__lt=end))
         enclosing_conflict = (Q(start_date_time__lte=start) &
                               Q(end_date_time__gte=end))
-        
+
         if self.target_user.finalist_officehours.filter(
                 start_conflict | end_conflict | enclosing_conflict).exists():
             return True
@@ -176,7 +176,7 @@ class ReserveOfficeHourView(ImpactView):
             startup_name = self.startup.organization.name
         else:
             startup_name = ""
-
+        calendar_data = self.get_calendar_data(counterpart)
         start_time = localized_office_hour_start_time(self.office_hour)
         ical_content = generate_ical_content(self.hour)
         context = {"recipient": recipient,
@@ -184,13 +184,15 @@ class ReserveOfficeHourView(ImpactView):
                    "office_hour_date_time": start_time,
                    "startup": startup_name,
                    "message": self.message,
-                   "attachment": [ICS_FILENAME, ical_content, ICS_FILETYPE]
+                   "calendar_data": calendar_data
                    }
         context.update(generate_calendar_links(self.hour))
         body = loader.render_to_string(template_path, context)
         return {"to": [recipient.email],
                 "subject": self.SUBJECT,
-                "body": body}
+                "body": body
+                "attachment": (ICS_FILENAME, calendar_data['ical_content'],
+                               ICS_FILETYPE)}
 
     def _succeed(self):
         if self.office_hour.startup:
@@ -218,3 +220,22 @@ class ReserveOfficeHourView(ImpactView):
             'header': self.header,
             'detail': self.detail,
             'timecard_info': self.timecard_info})
+
+    def get_calendar_data(self, counterpart_name):
+        title = self.OFFICE_HOUR_TITLE.format(counterpart_name)
+        office_hour = self.office_hour
+        if office_hour.location is None:
+            timezone = "UTC"
+            location = "MassChallenge"
+        else:
+            timezone = office_hour.location.timezone
+            location = office_hour.location
+        return Add2Cal(
+            start=office_hour.start_date_time.strftime(
+                ADD2CAL_DATE_FORMAT),
+            end=office_hour.end_date_time.strftime(
+                ADD2CAL_DATE_FORMAT),
+            title=title,
+            description=office_hour.topics,
+            location=location,
+            timezone=timezone).as_dict()
