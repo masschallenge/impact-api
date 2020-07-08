@@ -30,9 +30,6 @@ from accelerator.models import (
     UserRole,
     Location,
 )
-from accelerator_abstract.models.base_clearance import (
-    CLEARANCE_LEVEL_STAFF
-)
 from accelerator_abstract.models.base_user_utils import is_employee
 User = get_user_model()
 
@@ -199,10 +196,9 @@ class OfficeHoursCalendarView(ImpactView):
 
     def _set_user_query(self):
         if self.request_user_type == STAFF:
-            self.user_query = self.target_user.clearances.filter(
-                level=CLEARANCE_LEVEL_STAFF,
-                program_family__programs__program_status='active'
-            )
+            self.user_query = Clearance.objects.clearances_for_user(
+                self.target_user).filter(
+                program_family__programs__program_status='active')
             self.location_path = "__".join(["program_family",
                                             "programfamilylocation",
                                             "location"])
