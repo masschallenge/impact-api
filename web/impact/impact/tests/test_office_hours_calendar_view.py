@@ -8,6 +8,13 @@ from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
+from accelerator_abstract.models.base_clearance import (
+    CLEARANCE_LEVEL_EXEC_MD,
+    CLEARANCE_LEVEL_GLOBAL_MANAGER,
+    CLEARANCE_LEVEL_POM,
+    CLEARANCE_LEVEL_STAFF
+)
+
 from accelerator.models import UserRole
 
 from accelerator.tests.factories import (
@@ -246,12 +253,9 @@ class TestOfficeHoursCalendarView(APITestCase):
         calendar_data = response.data['calendar_data'][0]
         self.assertIn("meeting_info", calendar_data)
 
-    def test_staff_with_clearance_sees_own_office_hour(self):
-        program = ProgramFactory()
-        staff_user = self.staff_user(program_family=program.program_family)
-        office_hour = self.create_office_hour(mentor=staff_user)
-        response = self.get_response(user=staff_user)
-        self.assert_hour_in_response(response, office_hour)
+    def test_user_with_staff_clearance_sees_own_office_hour(self):
+        self.assert_user_with_clearance_sees_own_office_hour(
+            CLEARANCE_LEVEL_STAFF)
 
     def test_location_choices_for_staff_with_clearance_in_response(self):
         program_family_location = ProgramFamilyLocationFactory()
@@ -295,7 +299,6 @@ class TestOfficeHoursCalendarView(APITestCase):
     def test_location_always_include_remote_location(self):
         program_family_location = ProgramFamilyLocationFactory()
         program_family = program_family_location.program_family
-        location = program_family_location.location
         remote_location = LocationFactory(name="Remote")
         ProgramFactory(program_family=program_family)
         staff_user = self.staff_user(program_family=program_family)
@@ -305,6 +308,18 @@ class TestOfficeHoursCalendarView(APITestCase):
         response_location_names = [
             location['location_name'] for location in location_choices]
         self.assertTrue(remote_location.name in response_location_names)
+
+    def test_user_with_pom_clearance_sees_own_office_hour(self):
+        self.assert_user_with_clearance_sees_own_office_hour(
+            CLEARANCE_LEVEL_POM)
+
+    def test_user_with_exec_md_clearance_sees_own_office_hour(self):
+        self.assert_user_with_clearance_sees_own_office_hour(
+            CLEARANCE_LEVEL_EXEC_MD)
+
+    def test_global_manager_sees_own_office_hour(self):
+        self.assert_user_with_clearance_sees_own_office_hour(
+            CLEARANCE_LEVEL_GLOBAL_MANAGER)
 
     def create_office_hour(self,
                            mentor=None,
@@ -353,6 +368,14 @@ class TestOfficeHoursCalendarView(APITestCase):
 
     def assert_correct_user_type(self, response, user_type):
         self.assertEqual(response.data['user_type'], user_type)
+
+    def assert_user_with_clearance_sees_own_office_hour(self, clearance_level):
+        program = ProgramFactory()
+        staff_user = self.staff_user(program_family=program.program_family,
+                                     level=clearance_level)
+        office_hour = self.create_office_hour(mentor=staff_user)
+        response = self.get_response(user=staff_user)
+        self.assert_hour_in_response(response, office_hour)
 
     def get_response(self,
                      user=None,
