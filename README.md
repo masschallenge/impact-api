@@ -211,6 +211,7 @@ _N.B._ --rm flag Removes the container after execution run.
 
 To see which containers are running, you may use the `docker-compose ps`
 command, which will yield a list of containers like those below:
+
 ```
 MC-DEV-YMANOR:impact-api yotammanor$ docker-compose ps
              Name                           Command               State                                 Ports                              
