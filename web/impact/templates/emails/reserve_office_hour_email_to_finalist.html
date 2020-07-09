@@ -1,8 +1,7 @@
 Hi {{ recipient.first_name }},
 
-You have an office hour session at {{ office_hour_date_time | date:"h:i" }} on
-{{ office_hour_date_time | date }} ({{ office_hour_date_time | date:"e" }})
-with {{ counterpart.full_name }} 
+You have an office hour session at {{ start_time }} on
+{{ date }} ({{ timezone }}) with {{ counterpart.full_name }} 
 
 
 {% if message %}

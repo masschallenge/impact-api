@@ -54,3 +54,4 @@ def is_office_hour_reserver(user):
     return user.programrolegrant_set.filter(
         program_role__user_role__name__in=reserver_roles,
         program_role__program__program_status=ACTIVE_PROGRAM_STATUS).exists()
+

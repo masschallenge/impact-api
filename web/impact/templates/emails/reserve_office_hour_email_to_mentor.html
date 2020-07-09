@@ -1,7 +1,6 @@
 Hi {{ recipient.first_name }},
 
-Your office hour session at {{ office_hour_date_time | date:"h:i" }} on
-{{ office_hour_date_time | date }} ({{ office_hour_date_time | date:"e" }})
+Your office hour session at {{ start_time }} on {{ date }} ({{ timezone }})
 is reserved for {{ counterpart.full_name }} 
 {% if startup %} of {{ startup }} {% endif %}
 
