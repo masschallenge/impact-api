@@ -191,7 +191,8 @@ class ReserveOfficeHourView(ImpactView):
         return {"to": [recipient.email],
                 "subject": self.SUBJECT,
                 "body": body,
-                "attachment": (ICS_FILENAME, calendar_data['ical_content'],
+                "attachment": (ICS_FILENAME,
+                               calendar_data['ical_content'],
                                ICS_FILETYPE)}
 
     def _succeed(self):
@@ -224,12 +225,15 @@ class ReserveOfficeHourView(ImpactView):
     def get_calendar_data(self, counterpart_name):
         title = self.OFFICE_HOUR_TITLE.format(counterpart_name)
         office_hour = self.office_hour
+        location = "{location};{meeting_info}"
         if office_hour.location is None:
             timezone = "UTC"
-            location = "MassChallenge"
+            location.format(location="MassChallenge")
         else:
             timezone = office_hour.location.timezone
-            location = office_hour.location
+            location.format(location=office_hour.location)
+        if office_hour.meeting_info:
+            location.format(meeting_info=office_hour.meeting_info)
         return Add2Cal(
             start=office_hour.start_date_time.strftime(
                 ADD2CAL_DATE_FORMAT),
@@ -245,14 +249,5 @@ class ReserveOfficeHourView(ImpactView):
             topics_block = "Topics: {topics}".format(
                 topics=self.office_hour.topics)
 
-        if self.office_hour.meeting_info:
-            info_block = "Meeting info: {info}".format(
-                info=self.office_hour.meeting_info)
-
-        description = """
-        {description}
-        {topics}
-        {info}
-        """.format(description=self.office_hour.description, topics=topics_block,
-                   info=info_block)
+        description = "{topics}".format(topics=topics_block)
         return description
