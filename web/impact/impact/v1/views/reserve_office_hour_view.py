@@ -186,7 +186,6 @@ class ReserveOfficeHourView(ImpactView):
                    "message": self.message,
                    "calendar_data": calendar_data
                    }
-        context.update(generate_calendar_links(self.hour))
         body = loader.render_to_string(template_path, context)
         return {"to": [recipient.email],
                 "subject": self.SUBJECT,
