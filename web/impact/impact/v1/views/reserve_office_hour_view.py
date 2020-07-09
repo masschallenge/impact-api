@@ -3,6 +3,7 @@ from django.db.models import Q
 from django.template import loader
 
 from rest_framework.response import Response
+from add2cal import Add2Cal
 
 from accelerator_abstract.models.base_user_utils import is_employee
 from accelerator.models import (
@@ -178,7 +179,6 @@ class ReserveOfficeHourView(ImpactView):
             startup_name = ""
         calendar_data = self.get_calendar_data(counterpart)
         start_time = localized_office_hour_start_time(self.office_hour)
-        ical_content = generate_ical_content(self.hour)
         context = {"recipient": recipient,
                    "counterpart": counterpart,
                    "office_hour_date_time": start_time,
