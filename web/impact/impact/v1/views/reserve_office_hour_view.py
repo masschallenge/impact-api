@@ -24,7 +24,6 @@ from ...minimal_email_handler import send_email
 User = get_user_model()
 
 
-
 HOUR_MINUTE_FORMAT = "%I:%M"
 MONTH_DAY_FORMAT = "%m:%d"
 DEFAULT_TIMEZONE = "UTC"
@@ -143,10 +142,10 @@ class ReserveOfficeHourView(ImpactView):
         start_conflict = (Q(start_date_time__gt=start) &
                           Q(start_date_time__lt=end))
         end_conflict = (Q(end_date_time__gt=start) &
-                        Q(end_date_time__lt=end))        
+                        Q(end_date_time__lt=end))
         enclosing_conflict = (Q(start_date_time__lte=start) &
                               Q(end_date_time__gte=end))
-        
+
         if self.target_user.finalist_officehours.filter(
                 start_conflict | end_conflict | enclosing_conflict).exists():
             return True
@@ -197,7 +196,7 @@ class ReserveOfficeHourView(ImpactView):
         return (start_time.strftime(HOUR_MINUTE_FORMAT),
                 start_time.strftime(MONTH_DAY_FORMAT),
                 get_timezone(self.office_hour))
-    
+
     def _succeed(self):
         if self.office_hour.startup:
             startup_name = self.office_hour.startup.organization.name
@@ -225,7 +224,8 @@ class ReserveOfficeHourView(ImpactView):
             'detail': self.detail,
             'timecard_info': self.timecard_info})
 
+
 def get_timezone(office_hour):
-    if  office_hour.location and office_hour.location.timezone:
+    if office_hour.location and office_hour.location.timezone:
         return office_hour.location.timezone
     return DEFAULT_TIMEZONE
