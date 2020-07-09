@@ -8,9 +8,9 @@ from rest_framework.serializers import (
 
 from .location_serializer import LocationSerializer
 from .user_serializer import UserSerializer
-from accelerator_abstract.models.base_clearance import CLEARANCE_LEVEL_STAFF
 from accelerator_abstract.models.base_user_utils import is_employee
 from mc.utils import swapper_model
+Clearance = swapper_model("Clearance")
 MentorProgramOfficeHour = swapper_model("MentorProgramOfficeHour")
 UserRole = swapper_model("UserRole")
 
@@ -88,10 +88,8 @@ class OfficeHourSerializer(ModelSerializer):
         user = self.context['request'].user
         roles = [UserRole.MENTOR, UserRole.AIR]
         if user == mentor:
-            return user.clearances.filter(
-                level=CLEARANCE_LEVEL_STAFF,
-                program_family__programs__program_status='active'
-            ).exists()
+            return Clearance.objects.clearances_for_user(user).filter(
+                program_family__programs__program_status='active').exists()
         return mentor.programrolegrant_set.filter(
             program_role__user_role__name__in=roles,
             program_role__program__program_status='active',

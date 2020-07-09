@@ -22,7 +22,8 @@ STAFF_NOTIFICATION = ('on behalf of {mentor_name} at {start_time} '
 MENTOR_NOTIFICATION = 'at {start_time} - {end_time} on {date}'
 OFFICE_HOUR_SESSION_404 = ("The office hour session you are trying to cancel "
                            "doesn't exist")
-SUCCESS_HEADER = 'Canceled office hour session'
+SESSION_SUCCESS_HEADER = 'Canceled office hour session'
+RESERVATION_SUCCESS_HEADER = 'Canceled office hour reservation'
 FAIL_HEADER = 'Office hour session could not be canceled'
 
 
@@ -56,14 +57,6 @@ def get_ui_notification(context, staff=False):
     return MENTOR_NOTIFICATION.format(**context)
 
 
-def get_response(success, detail):
-    return Response({
-        'success': success,
-        'header': SUCCESS_HEADER if success else FAIL_HEADER,
-        'detail': detail
-    })
-
-
 def get_cancelled_by(mentor_name=None, staff=False):
     to_finalist, to_mentor = mentor_name, 'You have'
     if staff:
@@ -80,6 +73,7 @@ class CancelOfficeHourSessionView(ImpactView):
 
     def cancel_office_hour_session(self, office_hour, user, message):
         shared_context = get_office_hour_shared_context(office_hour, message)
+        self._set_header(office_hour)
         if user == office_hour.mentor:
             cancelled_by = get_cancelled_by(shared_context['mentor_name'])
             self.handle_notification(office_hour, shared_context, cancelled_by)
@@ -99,11 +93,11 @@ class CancelOfficeHourSessionView(ImpactView):
         try:
             office_hour = MentorProgramOfficeHour.objects.get(pk=id)
         except MentorProgramOfficeHour.DoesNotExist:
-            return get_response(False, OFFICE_HOUR_SESSION_404)
+            return self.get_response(False, OFFICE_HOUR_SESSION_404)
         self.check_object_permissions(request, office_hour)
         response_detail, success = self.cancel_office_hour_session(
             office_hour, request.user, message)
-        return get_response(success, response_detail)
+        return self.get_response(success, response_detail)
 
     def get_addressee_info(self, office_hour, mentor_name):
         addressee_dict = {
@@ -144,3 +138,14 @@ class CancelOfficeHourSessionView(ImpactView):
             from_email=settings.NO_REPLY_EMAIL,
             attach_alternative=[html_email, 'text/html'],
         ).send()
+
+    def _set_header(self, office_hour):
+        self.header = (RESERVATION_SUCCESS_HEADER
+                       if office_hour.finalist else SESSION_SUCCESS_HEADER)
+
+    def get_response(self, success, detail):
+        return Response({
+            'success': success,
+            'header': self.header if success else FAIL_HEADER,
+            'detail': detail
+        })

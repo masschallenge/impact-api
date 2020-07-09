@@ -48,10 +48,10 @@ class APITestCase(TestCase):
         user.save()
         return user
 
-    def staff_user(self, program_family=None):
+    def staff_user(self, program_family=None, level=CLEARANCE_LEVEL_STAFF):
         user = self.make_user('basic_user{}@test.com'.format(self._user_count))
         self._user_count += 1
-        kwargs = {"level": CLEARANCE_LEVEL_STAFF,
+        kwargs = {"level": level,
                   "user": user}
         if program_family:
             kwargs['program_family'] = program_family

@@ -197,10 +197,9 @@ class OfficeHoursCalendarView(ImpactView):
 
     def _set_user_query(self):
         if self.request_user_type == STAFF:
-            self.user_query = self.target_user.clearances.filter(
-                level=CLEARANCE_LEVEL_STAFF,
-                program_family__programs__program_status='active'
-            )
+            self.user_query = Clearance.objects.clearances_for_user(
+                self.target_user).filter(
+                program_family__programs__program_status='active')
             self.location_path = "__".join(["program_family",
                                             "programfamilylocation",
                                             "location"])
@@ -252,6 +251,8 @@ class OfficeHoursCalendarView(ImpactView):
             mentor_last_name=F("mentor__last_name"),
             mentor_primary_industry=F(primary_industry_key),
             startup_name=F("startup__organization__name"),
+            finalist_email=F("finalist__email"),
+            mentor_email=F("mentor__email"),
         )
         self.response_elements['location_choices'] = self.location_choices()
         self.response_elements['timezones'] = office_hours.filter(
