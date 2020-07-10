@@ -44,7 +44,7 @@ STARTUP_INDUSTRY_FIELD = merge_fields(STARTUP_FIELD,
 STARTUP_INDUSTRY_ARRAY_FIELD = merge_fields(
     STARTUP_FIELD, json_schema(json_array(MPTT_TYPE)))
 ORGANIZATION_URL_SLUG_FIELD = merge_fields(
-    OPTIONAL_STRING_FIELD, {"json-schema": {"pattern": "^[\w-]+$"}})
+    OPTIONAL_STRING_FIELD, {"json-schema": {"pattern": r"^[\w-]+$"}})
 
 ORGANIZATION_FIELDS = {
     "id": PK_FIELD,

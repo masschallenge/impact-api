@@ -1,6 +1,5 @@
-from . import (
-    settings,
-    BasePermission)
+from django.conf import settings
+from rest_framework.permissions import BasePermission
 
 
 class V1ConfidentialAPIPermissions(BasePermission):

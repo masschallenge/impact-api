@@ -272,8 +272,8 @@ MPTT_ARRAY_FIELD = {
             "description": EXPERT_DESCRIPTION}}
 
 URL_SCHEMA = "^[hH][tT][tT][pP][sS]?://"
-NETLOC_ELEMENT = "([^/:@]+(:[^/@]+)?@)?([\w-]+)"
-DOT = "\."
+NETLOC_ELEMENT = r"([^/:@]+(:[^/@]+)?@)?([\w-]+)"
+DOT = r"\."
 URL_REGEX = "{schema}({netloc_element}{dot})+{netloc_element}".format(
     schema=URL_SCHEMA,
     netloc_element=NETLOC_ELEMENT,
