@@ -8,6 +8,11 @@ from accelerator.models import (
     UserRole,
 )
 
+HOUR_MINUTE_FORMAT = "%I:%M"
+MONTH_DAY_FORMAT = "%m:%d"
+DEFAULT_TIMEZONE = "UTC"
+
+
 VALID_KEYS_NOTE = "Valid keys are: {}"
 
 
@@ -54,3 +59,17 @@ def is_office_hour_reserver(user):
     return user.programrolegrant_set.filter(
         program_role__user_role__name__in=reserver_roles,
         program_role__program__program_status=ACTIVE_PROGRAM_STATUS).exists()
+
+
+def office_hour_time_info(office_hour):
+    start_time = localized_office_hour_start_time(office_hour)
+
+    return (start_time.strftime(HOUR_MINUTE_FORMAT),
+            start_time.strftime(MONTH_DAY_FORMAT),
+            get_timezone(office_hour))
+
+
+def get_timezone(office_hour):
+    if office_hour.location and office_hour.location.timezone:
+        return office_hour.location.timezone
+    return DEFAULT_TIMEZONE
