@@ -30,14 +30,12 @@ CREATE_BODY = (
     "A notification email will be sent to you when a finalist "
     "reserves any of your office hours.\n\n"
     "You can also visit "
-    "<a href='https://accelerate.masschallenge.org/officehours'>"
-    "accelerate.masschallenge.org/officehours</a> at any time to view"
+    "accelerate.masschallenge.org/newofficehours at any time to view"
     " and manage your office hours\n\n"
     "Thank you for volunteering your time to meet with MassChallenge "
     "Finalists! If you have questions, reach out to your community "
     "manager or contact us at any time via "
-    "<a href='https://masschallenge.org/contact'>"
-    "https://masschallenge.org/contact</a>\n\n"
+    "https://masschallenge.org/contact\n\n"
     "- The MassChallenge Team\n"
 )
 EDIT_BODY = (
@@ -49,14 +47,12 @@ EDIT_BODY = (
     "A notification email will be sent to you when a finalist "
     "reserves any of your office hours.\n\n"
     "You can also visit "
-    "<a href='https://accelerate.masschallenge.org/officehours'>"
-    "accelerate.masschallenge.org/officehours</a> at any time to view"
+    "accelerate.masschallenge.org/newofficehours at any time to view"
     " and manage your office hours\n\n"
     "Thank you for volunteering your time to meet with MassChallenge "
     "Finalists! If you have questions, reach out to your community "
     "manager or contact us at any time via "
-    "<a href='https://masschallenge.org/contact'>"
-    "https://masschallenge.org/contact</a>\n\n"
+    "https://masschallenge.org/contact\n\n"
     "- The MassChallenge Team\n"
 )
 
