@@ -232,7 +232,8 @@ class ReserveOfficeHourView(ImpactView):
             location = office_hour.location
         meeting_info = office_hour.meeting_info
         location_info = "{location};{meeting_info}"
-        location_info.format(location=location, meeting_info=meeting_info)
+        location_info = location_info.format(location=location,
+                                             meeting_info=meeting_info)
         return Add2Cal(
             start=office_hour.start_date_time.strftime(
                 ADD2CAL_DATE_FORMAT),
@@ -244,9 +245,8 @@ class ReserveOfficeHourView(ImpactView):
             timezone=timezone).as_dict()
 
     def _get_description(self):
+        topics_block = ""
         if self.office_hour.topics:
             topics_block = "Topics: {topics}".format(
                 topics=self.office_hour.topics)
-
-        description = "{topics}".format(topics=topics_block)
-        return description
+        return topics_block
