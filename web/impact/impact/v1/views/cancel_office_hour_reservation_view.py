@@ -9,7 +9,10 @@ from impact.v1.views.impact_view import ImpactView
 from impact.permissions.v1_api_permissions import (
     OfficeHourFinalistPermission,
 )
-from .utils import email_template_path
+from .utils import (
+    email_template_path,
+    office_hour_time_info,
+)
 from ...minimal_email_handler import send_email
 from accelerator.models import MentorProgramOfficeHour
 from accelerator_abstract.models.base_user_utils import is_employee
@@ -84,12 +87,15 @@ class CancelOfficeHourReservationView(ImpactView):
         template_path = email_template_path(template_name)
         office_hour_date_time = _localize_start_time(self.office_hour)
         cancelling_party = self._cancelling_party_name()
+        start_time, date, _ = office_hour_time_info(
+            self.office_hour)
         template_context = {"recipient": recipient,
                             "counterpart": counterpart,
                             "office_hour_date_time": office_hour_date_time,
                             "cancelling_party": cancelling_party,
-                            "custom_message": self.message}
-
+                            "custom_message": self.message,
+                            "start_time": start_time,
+                            "date": date}
         subject = SUBJECT_LINE.format(counterpart.first_name,
                                       counterpart.last_name)
         body = loader.render_to_string(template_path, template_context)

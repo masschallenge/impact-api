@@ -18,15 +18,11 @@ from .impact_view import ImpactView
 from .utils import (
     email_template_path,
     is_office_hour_reserver,
-    localized_office_hour_start_time,
+    office_hour_time_info,
 )
 from ...minimal_email_handler import send_email
 User = get_user_model()
 
-
-HOUR_MINUTE_FORMAT = "%I:%M"
-MONTH_DAY_FORMAT = "%m:%d"
-DEFAULT_TIMEZONE = "UTC"
 
 mentor_template_name = "reserve_office_hour_email_to_mentor.html"
 finalist_template_name = "reserve_office_hour_email_to_finalist.html"
@@ -177,7 +173,8 @@ class ReserveOfficeHourView(ImpactView):
         else:
             startup_name = ""
 
-        start_time, date, timezone = self.oh_time_info()
+        start_time, date, timezone = office_hour_time_info(
+            self.office_hour)
         context = {"recipient": recipient,
                    "counterpart": counterpart,
                    "start_time": start_time,
@@ -189,13 +186,6 @@ class ReserveOfficeHourView(ImpactView):
         return {"to": [recipient.email],
                 "subject": self.SUBJECT,
                 "body": body}
-
-    def oh_time_info(self):
-        start_time = localized_office_hour_start_time(self.office_hour)
-
-        return (start_time.strftime(HOUR_MINUTE_FORMAT),
-                start_time.strftime(MONTH_DAY_FORMAT),
-                get_timezone(self.office_hour))
 
     def _succeed(self):
         if self.office_hour.startup:
@@ -223,9 +213,3 @@ class ReserveOfficeHourView(ImpactView):
             'header': self.header,
             'detail': self.detail,
             'timecard_info': self.timecard_info})
-
-
-def get_timezone(office_hour):
-    if office_hour.location and office_hour.location.timezone:
-        return office_hour.location.timezone
-    return DEFAULT_TIMEZONE
