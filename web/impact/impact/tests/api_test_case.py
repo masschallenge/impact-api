@@ -22,6 +22,9 @@ from impact.tests.factories import (
 
 OAuth_App = get_application_model()
 API_GROUPS = [settings.V0_API_GROUP, settings.V1_API_GROUP]
+DESCRIPTION_CONTENT = 'DESCRIPTION:Topics: {topics}'
+LOCATION_CONTENT = 'LOCATION:{location}\\;'
+LOCATION_INFO = 'LOCATION:{location}\\;{meeting_info}'
 
 
 class APITestCase(TestCase):
@@ -129,7 +132,30 @@ class APITestCase(TestCase):
                 self.assertTrue(any([
                     message in email.body for email in emails]))
         if subject:
-            self.assertIn(subject, [email.subject for email in emails])
+            self.assertIn(subject, [email for email in emails])
+
+    def assert_email_attachments(self,
+                                 user,
+                                 location="",
+                                 meeting_info="",
+                                 topics=""):
+        '''Assert that the email attachments are working as expected
+        '''
+        emails = [email for email in mail.outbox if user.email in email.to]
+        attachments = [email.attachments[0][1] for email in emails]
+        for email in emails:
+            self.assertGreater(len(email.attachments), 0)
+        if topics:
+
+            self.assertIn(DESCRIPTION_CONTENT.format(
+                topics=topics), [attachment for attachment in attachments][0])
+        if location:
+            self.assertIn(LOCATION_CONTENT.format(location=location),
+                          [attachment for attachment in attachments][0])
+        if meeting_info:
+            self.assertIn(LOCATION_INFO.format(meeting_info=meeting_info,
+                                               location=location),
+                          [attachment for attachment in attachments][0])
 
     def assert_not_notified(self, user):
         '''Assert that the specified user did not receive a notification.

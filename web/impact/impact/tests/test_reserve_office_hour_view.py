@@ -52,7 +52,7 @@ class TestReserveOfficeHourView(APITestCase):
         start_time = minutes_from_now(30)
         shared_midpoint = minutes_from_now(60)
         end_time = minutes_from_now(90)
-        
+
         finalist = _finalist()
         MentorProgramOfficeHourFactory(
             finalist=finalist,
@@ -66,7 +66,7 @@ class TestReserveOfficeHourView(APITestCase):
         response = self.post_response(new_office_hour.id,
                                       request_user=finalist)
         self.assert_reserved_by(new_office_hour, finalist)
-        
+
     def test_finalist_reserves_office_hour_with_conflict_reserve_fails(self):
         start_time = minutes_from_now(60)
         end_time = minutes_from_now(90)
@@ -228,6 +228,35 @@ class TestReserveOfficeHourView(APITestCase):
         self.assert_ui_notification(response,
                                     False,
                                     DEFAULT_PERMISSION_DENIED_DETAIL)
+
+    def test_received_email_contains_attachment_with_description(self):
+        # Email contains a description
+        office_hour = MentorProgramOfficeHourFactory(finalist=None,
+                                                     topics="test description")
+        finalist = _finalist()
+        self.post_response(office_hour.id,
+                           finalist.id)
+        self.assert_email_attachments(finalist, topics=office_hour.topics)
+
+    def test_received_email_contains_attachment_with_location(self):
+         # Email contains a location
+        office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        office_hour.meeting_info = ""
+        finalist = _finalist()
+        self.post_response(office_hour.id,
+                           finalist.id)
+        self.assert_email_attachments(finalist, location=office_hour.location)
+
+    def test_received_email_contains_attachment_with_meeting_info(self):
+        # Email contains both location and meeting info
+        office_hour = MentorProgramOfficeHourFactory(finalist=None,
+                                                     meeting_info="test.meeting_link.com")
+        finalist = _finalist()
+        self.post_response(office_hour.id,
+                           finalist.id)
+        self.assert_email_attachments(finalist,
+                                      location=office_hour.location,
+                                      meeting_info=office_hour.meeting_info)
 
     def assert_response_contains_session_details(self, response, office_hour):
         office_hour.refresh_from_db()
