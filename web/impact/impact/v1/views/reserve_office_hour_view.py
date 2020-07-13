@@ -238,8 +238,10 @@ class ReserveOfficeHourView(ImpactView):
             timezone = office_hour.location.timezone
             location = office_hour.location
         meeting_info = office_hour.meeting_info
-        location_info = "{location};{meeting_info}"
+        separator = ';' if office_hour.location and meeting_info else ""
+        location_info = "{location}{separator}{meeting_info}"
         location_info = location_info.format(location=location,
+                                             separator=separator,
                                              meeting_info=meeting_info)
         return Add2Cal(
             start=office_hour.start_date_time.strftime(
