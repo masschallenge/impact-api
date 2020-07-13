@@ -149,7 +149,7 @@ class ReserveOfficeHourView(ImpactView):
 
     def _update_office_hour_data(self):
         self.office_hour.finalist = self.target_user
-        self.office_hour.description = self.message
+        self.office_hour.topics = self.message
         self.office_hour.startup = self.startup
         self.office_hour.save()
 
