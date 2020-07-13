@@ -238,7 +238,7 @@ class TestReserveOfficeHourView(APITestCase):
             startup_name = ""
         oh_details = {'finalist_first_name': office_hour.finalist.first_name,
                       'finalist_last_name': office_hour.finalist.last_name,
-                      'topics': office_hour.description,
+                      'topics': office_hour.topics,
                       'startup': startup_name}
         self.assertDictEqual(timecard, oh_details)
 
