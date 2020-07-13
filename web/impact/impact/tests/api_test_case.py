@@ -134,28 +134,16 @@ class APITestCase(TestCase):
         if subject:
             self.assertIn(subject, [email for email in emails])
 
-    def assert_email_attachments(self,
-                                 user,
-                                 location="",
-                                 meeting_info="",
-                                 topics=""):
+    def assert_email_attachments(self, user):
         '''Assert that the email attachments are working as expected
         '''
         emails = [email for email in mail.outbox if user.email in email.to]
-        attachments = [email.attachments[0][1] for email in emails]
         for email in emails:
+            attachments = email.attachments
+            print(attachments)
             self.assertGreater(len(email.attachments), 0)
-        if topics:
-
-            self.assertIn(DESCRIPTION_CONTENT.format(
-                topics=topics), [attachment for attachment in attachments][0])
-        if location:
-            self.assertIn(LOCATION_CONTENT.format(location=location),
-                          [attachment for attachment in attachments][0])
-        if meeting_info:
-            self.assertIn(LOCATION_INFO.format(meeting_info=meeting_info,
-                                               location=location),
-                          [attachment for attachment in attachments][0])
+            self.assertIn("reminder.ics", [attachment[0]
+                                           for attachment in attachments])
 
     def assert_not_notified(self, user):
         '''Assert that the specified user did not receive a notification.

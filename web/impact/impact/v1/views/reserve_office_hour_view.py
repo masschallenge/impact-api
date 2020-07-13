@@ -163,7 +163,8 @@ class ReserveOfficeHourView(ImpactView):
         finalist = self.target_user
         send_email(**self.prepare_email_notification(mentor,
                                                      finalist,
-                                                     mentor_template_name))
+                                                     mentor_template_name,
+                                                     True))
         send_email(**self.prepare_email_notification(finalist,
                                                      mentor,
                                                      finalist_template_name))
@@ -171,12 +172,14 @@ class ReserveOfficeHourView(ImpactView):
     def prepare_email_notification(self,
                                    recipient,
                                    counterpart,
-                                   template_name):
+                                   template_name,
+                                   mentor_recipient=False):
         template_path = email_template_path(template_name)
         if self.startup:
             startup_name = self.startup.organization.name
         else:
             startup_name = ""
+        self.mentor_recipient = mentor_recipient
         calendar_data = self.get_calendar_data(counterpart)
         start_time = localized_office_hour_start_time(self.office_hour)
         context = {"recipient": recipient,
@@ -222,7 +225,11 @@ class ReserveOfficeHourView(ImpactView):
             'timecard_info': self.timecard_info})
 
     def get_calendar_data(self, counterpart_name):
-        title = self.OFFICE_HOUR_TITLE.format(counterpart_name)
+        if self.mentor_recipient:
+            name = self.startup.name if self.startup else counterpart_name
+            title = self.OFFICE_HOUR_TITLE.format(counterpart_name)
+        else:
+            title = self.OFFICE_HOUR_TITLE.format(counterpart_name)
         office_hour = self.office_hour
         if office_hour.location is None:
             timezone = "UTC"
@@ -240,13 +247,26 @@ class ReserveOfficeHourView(ImpactView):
             end=office_hour.end_date_time.strftime(
                 ADD2CAL_DATE_FORMAT),
             title=title,
-            description=self._get_description(),
+            description=self._get_description(counterpart_name),
             location=location_info,
             timezone=timezone).as_dict()
 
-    def _get_description(self):
+    def _get_description(self, counterpart_name):
         topics_block = ""
+        attendees_block = """Attendees:\n - {mentor_email}\n- {finalist_email} - {finalist_phone}"""
+        finalist = self.startup if self.startup else counterpart_name
         if self.office_hour.topics:
-            topics_block = "Topics: {topics}".format(
-                topics=self.office_hour.topics)
-        return topics_block
+            topics_block = """Message from {finalist}:\n{topics}\n""".format(
+                topics=self.office_hour.topics, finalist=finalist)
+        mentor_email = self.office_hour.mentor.email
+        finalist_email = self.target_user.email
+        finalist_phone = self.target_user.user_phone()
+        attendees_block = attendees_block.format(mentor_email,
+                                                 finalist_email,
+                                                 finalist_phone)
+        description = """
+        {topics_block}
+        {attendees_block}
+        """
+        return description.format(topics_block=topics_block,
+                                  attendees_block=attendees_block)
