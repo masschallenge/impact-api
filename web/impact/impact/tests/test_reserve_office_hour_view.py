@@ -235,7 +235,7 @@ class TestReserveOfficeHourView(APITestCase):
         finalist = _finalist()
         self.post_response(office_hour.id,
                            finalist.id)
-        self.assert_email_attachments(finalist)
+        self.assert_email_attachments(finalist, True)
 
     def assert_response_contains_session_details(self, response, office_hour):
         office_hour.refresh_from_db()
