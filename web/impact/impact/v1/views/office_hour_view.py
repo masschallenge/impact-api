@@ -11,6 +11,7 @@ from accelerator.models import MentorProgramOfficeHour
 from ...minimal_email_handler import MinimalEmailHandler
 from ...permissions.v1_api_permissions import OfficeHourPermission
 from ..serializers.office_hours_serializer import OfficeHourSerializer
+from .utils import office_hour_time_info
 
 DEFAULT_TIMEZONE = 'UTC'
 
@@ -26,7 +27,7 @@ CREATE_BODY = (
     "We’re letting you know that a MassChallenge team member "
     "has created office hours on your behalf. You are scheduled "
     "to hold office hours on {date} at the following times:\n\n"
-    "Time: {start_time}-{end_time} Timezone / Location: {location}\n\n"
+    "Time: {start_time}-{end_time} ({timezone}) / Location: {location}\n\n"
     "A notification email will be sent to you when a finalist "
     "reserves any of your office hours.\n\n"
     "You can also visit "
@@ -43,7 +44,7 @@ EDIT_BODY = (
     "We’re letting you know that a MassChallenge team member "
     "has changed office hours on your behalf. You are now scheduled "
     "to hold office hours on {date} at the following times:\n\n"
-    "Time: {start_time}-{end_time} Timezone / Location: {location}\n\n"
+    "Time: {start_time}-{end_time} ({timezone}) / Location: {location}\n\n"
     "A notification email will be sent to you when a finalist "
     "reserves any of your office hours.\n\n"
     "You can also visit "
@@ -75,18 +76,13 @@ def handle_fail(errors, edit=False):
 
 def get_email_context(office_hour):
     location = office_hour.location
-    tz = timezone(location.timezone if location else DEFAULT_TIMEZONE)
-    date = office_hour.start_date_time.astimezone(tz).strftime('%A, %d %B, %Y')
-    start_time = office_hour.start_date_time.astimezone(tz).strftime('%I:%M%p')
-    end_time = office_hour.end_date_time.astimezone(tz).strftime('%I:%M%p')
-    return {
-        'date': date,
-        'start_time': start_time,
-        'end_time': end_time,
-        'location': office_hour.location.name if office_hour.location else '',
+    context = office_hour_time_info(office_hour)
+    context.update({
+        'location': location.name if location else '',
         'mentor_email': office_hour.mentor.email,
         'first_name': office_hour.mentor.first_name,
-    }
+    })
+    return context
 
 
 class OfficeHourViewSet(viewsets.ModelViewSet):

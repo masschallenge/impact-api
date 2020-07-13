@@ -50,6 +50,13 @@ def localized_office_hour_start_time(office_hour):
     return office_hour.start_date_time.astimezone(tz)
 
 
+# Note: this function should be replaced with calls to
+# office_hour.local_end once the re-monolith is complete
+def localized_office_hour_end_time(office_hour):
+    tz = timezone(office_hour.location.timezone)
+    return office_hour.end_date_time.astimezone(tz)
+
+
 def is_office_hour_reserver(user):
     """Returns True iff user has an office-hour reserver user role
     with respect to an active program
@@ -63,10 +70,11 @@ def is_office_hour_reserver(user):
 
 def office_hour_time_info(office_hour):
     start_time = localized_office_hour_start_time(office_hour)
-
-    return (start_time.strftime(HOUR_MINUTE_FORMAT),
-            start_time.strftime(MONTH_DAY_FORMAT),
-            get_timezone(office_hour))
+    end_time = localized_office_hour_end_time(office_hour)
+    return {"start_time": start_time.strftime(HOUR_MINUTE_FORMAT),
+            "end_time": end_time.strftime(HOUR_MINUTE_FORMAT),            
+            "date": start_time.strftime(MONTH_DAY_FORMAT),
+            "timezone": get_timezone(office_hour)}
 
 
 def get_timezone(office_hour):

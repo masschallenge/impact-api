@@ -87,15 +87,11 @@ class CancelOfficeHourReservationView(ImpactView):
         template_path = email_template_path(template_name)
         office_hour_date_time = _localize_start_time(self.office_hour)
         cancelling_party = self._cancelling_party_name()
-        start_time, date, _ = office_hour_time_info(
-            self.office_hour)
-        template_context = {"recipient": recipient,
-                            "counterpart": counterpart,
-                            "office_hour_date_time": office_hour_date_time,
-                            "cancelling_party": cancelling_party,
-                            "custom_message": self.message,
-                            "start_time": start_time,
-                            "date": date}
+        template_context = office_hour_time_info(self.office_hour)
+        template_context.update({"recipient": recipient,
+                                 "counterpart": counterpart,
+                                 "cancelling_party": cancelling_party,
+                                 "custom_message": self.message})
         subject = SUBJECT_LINE.format(counterpart.first_name,
                                       counterpart.last_name)
         body = loader.render_to_string(template_path, template_context)
