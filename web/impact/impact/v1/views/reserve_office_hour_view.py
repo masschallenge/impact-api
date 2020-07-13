@@ -261,9 +261,9 @@ class ReserveOfficeHourView(ImpactView):
         mentor_email = self.office_hour.mentor.email
         finalist_email = self.target_user.email
         finalist_phone = self.target_user.user_phone()
-        attendees_block = attendees_block.format(mentor_email,
-                                                 finalist_email,
-                                                 finalist_phone)
+        attendees_block = attendees_block.format(mentor_email=mentor_email,
+                                                 finalist_email=finalist_email,
+                                                 finalist_phone=finalist_phone)
         description = """
         {topics_block}
         {attendees_block}

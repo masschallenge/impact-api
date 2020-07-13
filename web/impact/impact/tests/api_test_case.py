@@ -140,7 +140,6 @@ class APITestCase(TestCase):
         emails = [email for email in mail.outbox if user.email in email.to]
         for email in emails:
             attachments = email.attachments
-            print(attachments)
             self.assertGreater(len(email.attachments), 0)
             self.assertIn("reminder.ics", [attachment[0]
                                            for attachment in attachments])
