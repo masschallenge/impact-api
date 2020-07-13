@@ -226,14 +226,14 @@ class ReserveOfficeHourView(ImpactView):
 
     def get_calendar_data(self, counterpart_name):
         if self.mentor_recipient:
-            name = self.startup.name if self.startup else counterpart_name
-            title = self.OFFICE_HOUR_TITLE.format(counterpart_name)
+            finalist = self.startup.name if self.startup else counterpart_name
+            title = self.OFFICE_HOUR_TITLE.format(finalist)
         else:
             title = self.OFFICE_HOUR_TITLE.format(counterpart_name)
         office_hour = self.office_hour
         if office_hour.location is None:
             timezone = "UTC"
-            location = "MassChallenge"
+            location = ""
         else:
             timezone = office_hour.location.timezone
             location = office_hour.location
