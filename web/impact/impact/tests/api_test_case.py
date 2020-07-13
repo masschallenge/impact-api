@@ -132,7 +132,7 @@ class APITestCase(TestCase):
                 self.assertTrue(any([
                     message in email.body for email in emails]))
         if subject:
-            self.assertIn(subject, [email for email in emails])
+            self.assertIn(subject, [email.subject for email in emails])
 
     def assert_email_attachments(self, user):
         '''Assert that the email attachments are working as expected
