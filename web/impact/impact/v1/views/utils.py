@@ -8,7 +8,7 @@ from accelerator.models import (
     UserRole,
 )
 
-HOUR_MINUTE_FORMAT = "%I:%M"
+HOUR_MINUTE_FORMAT = "%I:%M %p"
 MONTH_DAY_FORMAT = "%m:%d"
 DEFAULT_TIMEZONE = "UTC"
 
