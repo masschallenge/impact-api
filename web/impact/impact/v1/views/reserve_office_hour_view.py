@@ -255,11 +255,14 @@ class ReserveOfficeHourView(ImpactView):
 
     def _get_description(self, counterpart_name):
         topics_block = ""
-        attendees_block = """Attendees:\n - {mentor_email}\n- {finalist_email} - {finalist_phone}"""
+        attendees_block = """
+        Attendees:\n- {mentor_email}\n- {finalist_email} - {finalist_phone}\n
+        """
         finalist = self.startup if self.startup else counterpart_name
         if self.office_hour.topics:
-            topics_block = """Message from {finalist}:\n{topics}\n""".format(
-                topics=self.office_hour.topics, finalist=finalist)
+            topics_block = "Message from {finalist}:\n{topics}\n".format(
+                topics=self.office_hour.topics,
+                finalist=finalist)
         mentor_email = self.office_hour.mentor.email
         finalist_email = self.target_user.email
         finalist_phone = self.target_user.user_phone()
@@ -267,8 +270,9 @@ class ReserveOfficeHourView(ImpactView):
                                                  finalist_email=finalist_email,
                                                  finalist_phone=finalist_phone)
         description = """
-        {topics_block}
         {attendees_block}
+
+        {topics_block}
         """
         return description.format(topics_block=topics_block,
                                   attendees_block=attendees_block)
