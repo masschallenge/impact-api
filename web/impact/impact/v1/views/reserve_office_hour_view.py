@@ -237,8 +237,9 @@ class ReserveOfficeHourView(ImpactView):
         else:
             timezone = office_hour.location.timezone
             location = office_hour.location
-        meeting_info = office_hour.meeting_info
-        location_info = "{location};{meeting_info}"
+        meeting_info = ";%s" % (
+            office_hour.meeting_info) if office_hour.meeting_info else ""
+        location_info = "{location}{meeting_info}"
         location_info = location_info.format(location=location,
                                              meeting_info=meeting_info)
         return Add2Cal(
