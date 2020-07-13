@@ -229,34 +229,13 @@ class TestReserveOfficeHourView(APITestCase):
                                     False,
                                     DEFAULT_PERMISSION_DENIED_DETAIL)
 
-    def test_received_email_contains_attachment_with_description(self):
+    def test_received_email_contains_attachment(self):
         # Email contains a description
-        office_hour = MentorProgramOfficeHourFactory(finalist=None,
-                                                     topics="test description")
-        finalist = _finalist()
-        self.post_response(office_hour.id,
-                           finalist.id)
-        self.assert_email_attachments(finalist, topics=office_hour.topics)
-
-    def test_received_email_contains_attachment_with_location(self):
-         # Email contains a location
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
-        office_hour.meeting_info = ""
         finalist = _finalist()
         self.post_response(office_hour.id,
                            finalist.id)
-        self.assert_email_attachments(finalist, location=office_hour.location)
-
-    def test_received_email_contains_attachment_with_meeting_info(self):
-        # Email contains both location and meeting info
-        office_hour = MentorProgramOfficeHourFactory(finalist=None,
-                                                     meeting_info="test.meeting_link.com")
-        finalist = _finalist()
-        self.post_response(office_hour.id,
-                           finalist.id)
-        self.assert_email_attachments(finalist,
-                                      location=office_hour.location,
-                                      meeting_info=office_hour.meeting_info)
+        self.assert_email_attachments(finalist)
 
     def assert_response_contains_session_details(self, response, office_hour):
         office_hour.refresh_from_db()
