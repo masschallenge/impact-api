@@ -1,5 +1,3 @@
-from pytz import timezone
-
 from django.contrib.auth import get_user_model
 from django.template import loader
 
@@ -26,7 +24,7 @@ SUBJECT_LINE = "MassChallenge | Cancelled Office Hours with {} {}"
 NO_SUCH_RESERVATION = "That session is not reserved."
 NO_SUCH_OFFICE_HOUR = "The specified office hour was not found."
 SUCCESS_NOTIFICATION = ("Canceled reservation for {finalist_name} with "
-                        "{mentor_name} on {date}")
+                        "{mentor_name} on {date} at {time}")
 SUCCESS_HEADER = 'Canceled office hour reservation'
 FAIL_HEADER = 'Office hour reservation could not be canceled'
 
@@ -85,7 +83,6 @@ class CancelOfficeHourReservationView(ImpactView):
                                    counterpart,
                                    template_name):
         template_path = email_template_path(template_name)
-        office_hour_date_time = _localize_start_time(self.office_hour)
         cancelling_party = self._cancelling_party_name()
         template_context = office_hour_time_info(self.office_hour)
         template_context.update({"recipient": recipient,
@@ -106,15 +103,11 @@ class CancelOfficeHourReservationView(ImpactView):
             return self.user.full_name()
 
 
-def _localize_start_time(office_hour):
-    tz = timezone(office_hour.location.timezone)
-    return office_hour.start_date_time.astimezone(tz)
-
-
 def formatted_success_notification(office_hour):
     finalist_name = office_hour.finalist.full_name()
     mentor_name = office_hour.mentor.full_name()
-    date = _localize_start_time(office_hour).strftime("%b %d at %I:%M %p")
+    time_info = office_hour_time_info(office_hour)
     return SUCCESS_NOTIFICATION.format(finalist_name=finalist_name,
                                        mentor_name=mentor_name,
-                                       date=date)
+                                       date=time_info['date'],
+                                       time=time_info['start_time'])

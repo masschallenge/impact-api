@@ -72,7 +72,7 @@ def office_hour_time_info(office_hour):
     start_time = localized_office_hour_start_time(office_hour)
     end_time = localized_office_hour_end_time(office_hour)
     return {"start_time": start_time.strftime(HOUR_MINUTE_FORMAT),
-            "end_time": end_time.strftime(HOUR_MINUTE_FORMAT),            
+            "end_time": end_time.strftime(HOUR_MINUTE_FORMAT),
             "date": start_time.strftime(MONTH_DAY_FORMAT),
             "timezone": get_timezone(office_hour)}
 
