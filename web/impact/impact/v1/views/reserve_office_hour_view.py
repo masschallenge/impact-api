@@ -225,11 +225,10 @@ class ReserveOfficeHourView(ImpactView):
             'timecard_info': self.timecard_info})
 
     def get_calendar_data(self, counterpart_name):
+        name = ""
         if self.mentor_recipient:
-            finalist = self.startup.name if self.startup else counterpart_name
-            title = self.OFFICE_HOUR_TITLE.format(finalist)
-        else:
-            title = self.OFFICE_HOUR_TITLE.format(counterpart_name)
+            name = self.startup.name if self.startup else counterpart_name
+        title = self.OFFICE_HOUR_TITLE.format(name)
         office_hour = self.office_hour
         if office_hour.location is None:
             timezone = "UTC"
