@@ -22,7 +22,7 @@ from .impact_view import ImpactView
 from .utils import (
     email_template_path,
     is_office_hour_reserver,
-    localized_office_hour_start_time,
+    office_hour_time_info,
 )
 from ...minimal_email_handler import send_email
 User = get_user_model()
@@ -186,11 +186,11 @@ class ReserveOfficeHourView(ImpactView):
         start_time = localized_office_hour_start_time(self.office_hour)
         context = {"recipient": recipient,
                    "counterpart": counterpart,
-                   "office_hour_date_time": start_time,
                    "startup": startup_name,
                    "message": self.message,
                    "calendar_data": calendar_data
                    }
+        context.update(office_hour_time_info(self.office_hour))
         body = loader.render_to_string(template_path, context)
         return {"to": [recipient.email],
                 "subject": self.SUBJECT,
