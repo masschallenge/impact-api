@@ -1,7 +1,9 @@
+from django.core import mail
 from django.urls import reverse
 
 from .api_test_case import APITestCase
 from ..v1.views import ReserveOfficeHourView
+from ..v1.views.utils import localized_office_hour_start_time
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from .factories import UserFactory
 from .utils import (
@@ -52,7 +54,7 @@ class TestReserveOfficeHourView(APITestCase):
         start_time = minutes_from_now(30)
         shared_midpoint = minutes_from_now(60)
         end_time = minutes_from_now(90)
-        
+
         finalist = _finalist()
         MentorProgramOfficeHourFactory(
             finalist=finalist,
@@ -63,10 +65,10 @@ class TestReserveOfficeHourView(APITestCase):
             finalist=None,
             start_date_time=shared_midpoint,
             end_date_time=end_time)
-        response = self.post_response(new_office_hour.id,
-                                      request_user=finalist)
+        self.post_response(new_office_hour.id,
+                           request_user=finalist)
         self.assert_reserved_by(new_office_hour, finalist)
-        
+
     def test_finalist_reserves_office_hour_with_conflict_reserve_fails(self):
         start_time = minutes_from_now(60)
         end_time = minutes_from_now(90)
@@ -163,6 +165,17 @@ class TestReserveOfficeHourView(APITestCase):
         self.post_response(office_hour.id,
                            request_user=finalist)
         self.assert_notified(finalist)
+
+    def test_correct_date_format_in_confirmation_email(self):
+        # a finalist reserves and office hour, gets a confirmation email
+
+        office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        finalist = _finalist()
+        self.post_response(office_hour.id,
+                           request_user=finalist)
+        email = mail.outbox[0]
+        localized_time = localized_office_hour_start_time(office_hour)
+        self.assertIn(localized_time.strftime("%I:%M"), email.body)
 
     def test_previously_reserved_office_hour_gets_failure(self):
         # a finalist reserves a reserved office hour, gets failure response
