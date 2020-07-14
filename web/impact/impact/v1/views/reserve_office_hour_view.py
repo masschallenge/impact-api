@@ -173,15 +173,11 @@ class ReserveOfficeHourView(ImpactView):
         else:
             startup_name = ""
 
-        start_time, date, timezone = office_hour_time_info(
-            self.office_hour)
         context = {"recipient": recipient,
                    "counterpart": counterpart,
-                   "start_time": start_time,
-                   "date": date,
-                   "timezone": timezone,
                    "startup": startup_name,
                    "message": self.message}
+        context.update(office_hour_time_info(self.office_hour))
         body = loader.render_to_string(template_path, context)
         return {"to": [recipient.email],
                 "subject": self.SUBJECT,
