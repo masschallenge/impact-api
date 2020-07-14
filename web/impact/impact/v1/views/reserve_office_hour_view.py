@@ -18,7 +18,7 @@ from .impact_view import ImpactView
 from .utils import (
     email_template_path,
     is_office_hour_reserver,
-    localized_office_hour_start_time,
+    office_hour_time_info,
 )
 from ...minimal_email_handler import send_email
 User = get_user_model()
@@ -138,10 +138,10 @@ class ReserveOfficeHourView(ImpactView):
         start_conflict = (Q(start_date_time__gt=start) &
                           Q(start_date_time__lt=end))
         end_conflict = (Q(end_date_time__gt=start) &
-                        Q(end_date_time__lt=end))        
+                        Q(end_date_time__lt=end))
         enclosing_conflict = (Q(start_date_time__lte=start) &
                               Q(end_date_time__gte=end))
-        
+
         if self.target_user.finalist_officehours.filter(
                 start_conflict | end_conflict | enclosing_conflict).exists():
             return True
@@ -173,12 +173,11 @@ class ReserveOfficeHourView(ImpactView):
         else:
             startup_name = ""
 
-        start_time = localized_office_hour_start_time(self.office_hour)
         context = {"recipient": recipient,
                    "counterpart": counterpart,
-                   "office_hour_date_time": start_time,
                    "startup": startup_name,
                    "message": self.message}
+        context.update(office_hour_time_info(self.office_hour))
         body = loader.render_to_string(template_path, context)
         return {"to": [recipient.email],
                 "subject": self.SUBJECT,
