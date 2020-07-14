@@ -1,3 +1,5 @@
+from pytz import timezone
+
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.template import loader
@@ -230,12 +232,14 @@ class ReserveOfficeHourView(ImpactView):
             name = self.startup.name if self.startup else counterpart_name
         title = self.OFFICE_HOUR_TITLE.format(name)
         office_hour = self.office_hour
+        tz_str = ""
         if office_hour.location is None:
-            timezone = "UTC"
+            tz_str = "UTC"
             location = ""
         else:
-            timezone = office_hour.location.timezone
+            tz_str = office_hour.location.timezone
             location = office_hour.location
+        tz = timezone(tz_str)
         meeting_info = office_hour.meeting_info
         separator = ';' if office_hour.location and meeting_info else ""
         location_info = "{location}{separator}{meeting_info}"
@@ -243,14 +247,14 @@ class ReserveOfficeHourView(ImpactView):
                                              separator=separator,
                                              meeting_info=meeting_info)
         return Add2Cal(
-            start=office_hour.start_date_time.strftime(
+            start=office_hour.start_date_time.astimezone(tz).strftime(
                 ADD2CAL_DATE_FORMAT),
-            end=office_hour.end_date_time.strftime(
+            end=office_hour.end_date_time.astimezone(tz).strftime(
                 ADD2CAL_DATE_FORMAT),
             title=title,
             description=self._get_description(counterpart_name),
             location=location_info,
-            timezone=timezone).as_dict()
+            timezone=tz).as_dict()
 
     def _get_description(self, counterpart_name):
         topics_block = ""
