@@ -183,7 +183,6 @@ class ReserveOfficeHourView(ImpactView):
             startup_name = ""
         self.mentor_recipient = mentor_recipient
         calendar_data = self.get_calendar_data(counterpart)
-        start_time = localized_office_hour_start_time(self.office_hour)
         context = {"recipient": recipient,
                    "counterpart": counterpart,
                    "startup": startup_name,
