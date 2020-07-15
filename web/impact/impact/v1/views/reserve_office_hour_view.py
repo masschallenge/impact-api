@@ -226,7 +226,7 @@ class ReserveOfficeHourView(ImpactView):
             'timecard_info': self.timecard_info})
 
     def get_calendar_data(self, counterpart_name):
-        name = ""
+        name = counterpart_name
         if self.mentor_recipient:
             name = self.startup.name if self.startup else counterpart_name
         title = self.OFFICE_HOUR_TITLE.format(name)
