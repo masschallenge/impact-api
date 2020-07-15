@@ -10,6 +10,7 @@ from accelerator.models import MentorProgramOfficeHour
 from ...minimal_email_handler import MinimalEmailHandler
 from ...permissions.v1_api_permissions import OfficeHourMentorPermission
 from ...v1.views.impact_view import ImpactView
+from ...v1.views.utils import get_timezone
 
 User = get_user_model()
 
