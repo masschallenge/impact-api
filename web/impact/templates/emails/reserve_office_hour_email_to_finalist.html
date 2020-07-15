@@ -3,9 +3,10 @@ Hi {{ recipient.first_name }},
 You have an office hour session at {{ start_time }} on
 {{ date }} ({{ timezone }}) with {{ counterpart.full_name }} 
 
+Google Calendar: {{calendar_data.gcal_link}}
+Yahoo: {{calendar_data.yahoo_link}}
 
 {% if message %}
-  
   {{ message }}
 {% endif %}
 
