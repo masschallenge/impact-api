@@ -43,7 +43,7 @@ class OrganizationBecameEntrantEvent(BaseHistoryEvent):
         "program_id": OPTIONAL_INTEGER_FIELD,
         "program": OPTIONAL_STRING_FIELD,
         "program_preference": OPTIONAL_INTEGER_FIELD,
-       }
+    }
 
     def __init__(self, application, program_data):
         super().__init__()
@@ -78,10 +78,8 @@ class OrganizationBecameEntrantEvent(BaseHistoryEvent):
     @classmethod
     def programs_for_app(self, app):
         raw_data = app.startup.startupprograminterest_set.filter(
-            applying=True,
-            program__cycle=app.cycle
-            ).order_by("order").values_list("program_id",
-                                            "program__name")
+            applying=True, program__cycle=app.cycle
+        ).order_by("order").values_list("program_id", "program__name")
         result = []
         preference = 1
         for pk, name in raw_data:

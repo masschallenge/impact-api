@@ -23,7 +23,7 @@ class BaseUserBecameJudgeEvent(BaseUserRoleGrantEvent):
     CLASS_FIELDS = {
         "judging_round_id": OPTIONAL_INTEGER_FIELD,
         "judging_round_name": OPTIONAL_STRING_FIELD,
-        }
+    }
 
     def __init__(self, program_role_grant):
         super().__init__(program_role_grant)

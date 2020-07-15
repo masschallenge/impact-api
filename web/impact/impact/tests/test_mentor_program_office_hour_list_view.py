@@ -135,7 +135,7 @@ class TestMentorProgramOfficeHourListView(APITestCase):
         response = self._get_response_as_logged_in_user(
             {'user_name': finalist.first_name},
         )
-        self.assertEqual(response.data["count"], USER_OFFICE_HOUR_COUNT+1)
+        self.assertEqual(response.data["count"], USER_OFFICE_HOUR_COUNT + 1)
 
     def test_nonexistent_finalist_id_returns_nothing(self):
         finalist, finalist_office_hours = self._create_user_office_hours(
@@ -207,7 +207,7 @@ class TestMentorProgramOfficeHourListView(APITestCase):
             program=program,
             finalist=finalist,
             start_date_time=self._get_office_hour_date(offset, hour),
-            end_date_time=self._get_office_hour_date(offset, hour+1)
+            end_date_time=self._get_office_hour_date(offset, hour + 1)
         )
         return hour
 

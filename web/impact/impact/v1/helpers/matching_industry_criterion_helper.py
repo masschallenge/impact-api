@@ -95,7 +95,7 @@ def compute_top_level_industry_map():
     top_level_industry_map = {
         industry.id: (industry.parent_id, industry.parent.name)
         for industry in Industry.objects.filter(
-                parent_id__isnull=False).prefetch_related('parent')
+            parent_id__isnull=False).prefetch_related('parent')
     }
     top_level_industry_map.update({
         industry.id: (industry.id, industry.name)

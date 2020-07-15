@@ -66,8 +66,7 @@ class TestReserveOfficeHourView(APITestCase):
             finalist=None,
             start_date_time=shared_midpoint,
             end_date_time=end_time)
-        self.post_response(new_office_hour.id,
-                           request_user=finalist)
+        self.post_response(new_office_hour.id, request_user=finalist)
         self.assert_reserved_by(new_office_hour, finalist)
 
     def test_finalist_reserves_office_hour_with_conflict_reserve_fails(self):

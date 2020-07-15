@@ -84,7 +84,7 @@ class OptionAnalysis(object):
             option_spec, self.criterion_helpers)
         options = spec_helper.options(self.apps)
         return [
-            self.analysis(option,  criterion_helper, spec_helper)
+            self.analysis(option, criterion_helper, spec_helper)
             for option in options]
 
     def analysis(self, option_name, helper, spec_helper):
@@ -122,7 +122,7 @@ class OptionAnalysis(object):
             "needy_apps": sum(
                 [v for (k, v) in needs_dist.items() if k > 0]),
             "remaining_needed_reads": sum(
-                [v*k for (k, v) in needs_dist.items() if k > 0])
+                [v * k for (k, v) in needs_dist.items() if k > 0])
         }
 
     def calc_needs_distribution(self, option_name, spec_helper):
@@ -197,9 +197,7 @@ class OptionAnalysis(object):
             self.judge_capacity_cache = JudgeRoundCommitment.objects.filter(
                 judging_round=self.judging_round).values(
                     *self.get_criteria_fields("judge_id", "capacity")
-                ).annotate(
-                    **self.get_criteria_annotate_fields()
-                )
+            ).annotate(**self.get_criteria_annotate_fields())
 
     def remaining_capacity(self,
                            assignment_counts,

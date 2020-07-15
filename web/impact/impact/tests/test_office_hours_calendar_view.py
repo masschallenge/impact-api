@@ -30,11 +30,11 @@ from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.contexts.context_utils import get_user_role_by_name
 from accelerator.tests.utils import days_from_now
 from accelerator_abstract.models.base_clearance import (
-                                                        CLEARANCE_LEVEL_EXEC_MD,
-                                                        CLEARANCE_LEVEL_GLOBAL_MANAGER,
-                                                        CLEARANCE_LEVEL_POM,
-                                                        CLEARANCE_LEVEL_STAFF
-                                                        )
+    CLEARANCE_LEVEL_EXEC_MD,
+    CLEARANCE_LEVEL_GLOBAL_MANAGER,
+    CLEARANCE_LEVEL_POM,
+    CLEARANCE_LEVEL_STAFF
+)
 from mc.utils import swapper_model
 
 UserRole = swapper_model("UserRole")
@@ -76,9 +76,9 @@ class TestOfficeHoursCalendarView(APITestCase):
         wednesday = utc.localize(datetime(2020, 1, 31))
         date_spec = wednesday.strftime(ISO_8601_DATE_FORMAT)
         office_hour = self.create_office_hour(start_date_time=wednesday)
-        self.create_office_hour(start_date_time=wednesday-one_day,
+        self.create_office_hour(start_date_time=wednesday - one_day,
                                 mentor=office_hour.mentor)
-        self.create_office_hour(start_date_time=wednesday+one_day,
+        self.create_office_hour(start_date_time=wednesday + one_day,
                                 mentor=office_hour.mentor)
         response = self.get_response(user=office_hour.mentor,
                                      date_spec=date_spec)

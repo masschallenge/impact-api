@@ -64,11 +64,11 @@ class OfficeHourPermission(IsAuthenticated):
     def has_permission(self, request, view):
         roles = [UserRole.MENTOR, UserRole.AIR]
         return super().has_permission(request, view) and (
-                is_employee(request.user) or
-                request.user.programrolegrant_set.filter(
-                    program_role__user_role__name__in=roles,
-                    program_role__program__program_status='active',
-                ).exists())
+            is_employee(request.user) or
+            request.user.programrolegrant_set.filter(
+                program_role__user_role__name__in=roles,
+                program_role__program__program_status='active',
+            ).exists())
 
     def has_object_permission(self, request, view, office_hour):
         is_reserved = office_hour.finalist

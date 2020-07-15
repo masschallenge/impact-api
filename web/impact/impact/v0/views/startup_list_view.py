@@ -69,7 +69,7 @@ class StartupListView(APIView):
             return {
                 "status": first_pss.startup_list_tab_title,
                 "status_description": first_pss.startup_list_tab_description,
-                }
+            }
         return {}
 
     def _calc_result(self):
@@ -126,7 +126,7 @@ class StartupListView(APIView):
                                               statuses.get(startup.id, []),
                                               self.base_url)
                          for startup in startups]
-            }
+        }
 
     def _find_startups(self):
         startups = Startup.objects.filter(
@@ -180,7 +180,7 @@ def _startup_description(startup, statuses, base_url):
             "profile_url": base_url + startup.organization.url_slug,
             "logo_url": logo_url(startup),
             "statuses": [status_description(status) for status in statuses],
-            }
+        }
     else:
         return {
             "is_visible": False,
@@ -188,7 +188,7 @@ def _startup_description(startup, statuses, base_url):
             "profile_url": "",
             "logo_url": "",
             "statuses": [],
-            }
+        }
 
 
 def _top_level_industry(startup):
