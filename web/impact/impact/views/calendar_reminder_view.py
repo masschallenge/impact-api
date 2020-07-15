@@ -8,7 +8,7 @@ from django.http import (
     HttpResponse
 )
 
-DATE_FORMAT = "%Y%m%dT%H%M%S"
+ADD2CAL_DATE_FORMAT = "%Y%m%dT%H%M%S"
 CALENDAR_CONTENT_TYPE = 'text/calendar'
 OUTLOOK_LINK_TYPE = 'outlook'
 GOOGLE_LINK_TYPE = 'google'
@@ -23,8 +23,9 @@ class CalendarReminderView(View):
     def get(self, request, *args, **kwargs):
         params = self.request.GET
         start = params.get('start', datetime.datetime.now().strftime(
-            DATE_FORMAT))
-        end = params.get('end', datetime.datetime.now().strftime(DATE_FORMAT))
+            ADD2CAL_DATE_FORMAT))
+        end = params.get(
+            'end', datetime.datetime.now().strftime(ADD2CAL_DATE_FORMAT))
         title = params.get('title', 'new reminder')
         description = params.get('description', '')
         location = params.get('location', 'MassChallenge')

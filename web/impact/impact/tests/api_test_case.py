@@ -22,6 +22,9 @@ from .factories import (
 
 OAuth_App = get_application_model()
 API_GROUPS = [settings.V0_API_GROUP, settings.V1_API_GROUP]
+DESCRIPTION_CONTENT = 'DESCRIPTION:Topics: {topics}'
+LOCATION_CONTENT = 'LOCATION:{location}\\;'
+LOCATION_INFO = 'LOCATION:{location}\\;{meeting_info}'
 
 
 class APITestCase(TestCase):
@@ -130,6 +133,16 @@ class APITestCase(TestCase):
                     message in email.body for email in emails]))
         if subject:
             self.assertIn(subject, [email.subject for email in emails])
+
+    def assert_ics_email_attachments(self, user):
+        '''assert that the ics email attachment exists
+        '''
+        emails = [email for email in mail.outbox if user.email in email.to]
+        for email in emails:
+            attachments = email.attachments
+            self.assertGreater(len(email.attachments), 0)
+            self.assertIn("reminder.ics",
+                          [attachment[0] for attachment in attachments])
 
     def assert_not_notified(self, user):
         '''Assert that the specified user did not receive a notification.

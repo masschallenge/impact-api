@@ -6,4 +6,7 @@ from .api_registration_view import APIRegistrationView
 from .general_view_set import GeneralViewSet
 from .index_view import IndexView
 from .jwt_cookie_name_view import JWTCookieNameView
-from .calendar_reminder_view import CalendarReminderView
+from .calendar_reminder_view import (
+    ADD2CAL_DATE_FORMAT,
+    CalendarReminderView,
+)
