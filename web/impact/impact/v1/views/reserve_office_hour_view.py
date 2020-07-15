@@ -1,8 +1,11 @@
+from pytz import timezone
+
 from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.template import loader
 
 from rest_framework.response import Response
+from add2cal import Add2Cal
 
 from accelerator_abstract.models.base_user_utils import is_employee
 from accelerator.models import (
@@ -14,6 +17,7 @@ from ...permissions.v1_api_permissions import (
     DEFAULT_PERMISSION_DENIED_DETAIL,
     IsAuthenticated,
 )
+from ...views import ADD2CAL_DATE_FORMAT
 from .impact_view import ImpactView
 from .utils import (
     email_template_path,
@@ -26,12 +30,15 @@ User = get_user_model()
 
 mentor_template_name = "reserve_office_hour_email_to_mentor.html"
 finalist_template_name = "reserve_office_hour_email_to_finalist.html"
+ICS_FILENAME = 'reminder.ics'
+ICS_FILETYPE = 'text/calendar'
 
 
 class ReserveOfficeHourView(ImpactView):
     view_name = "reserve_office_hour"
     permission_classes = [IsAuthenticated]
 
+    OFFICE_HOUR_TITLE = "Office Hours Session with {}"
     SUCCESS_HEADER = "Office Hours session reserved"
     SUCCESS_DETAIL = "You have reserved this office hour session"
     FAIL_HEADER = "Fail header"
@@ -158,7 +165,8 @@ class ReserveOfficeHourView(ImpactView):
         finalist = self.target_user
         send_email(**self.prepare_email_notification(mentor,
                                                      finalist,
-                                                     mentor_template_name))
+                                                     mentor_template_name,
+                                                     True))
         send_email(**self.prepare_email_notification(finalist,
                                                      mentor,
                                                      finalist_template_name))
@@ -166,22 +174,29 @@ class ReserveOfficeHourView(ImpactView):
     def prepare_email_notification(self,
                                    recipient,
                                    counterpart,
-                                   template_name):
+                                   template_name,
+                                   mentor_recipient=False):
         template_path = email_template_path(template_name)
         if self.startup:
             startup_name = self.startup.organization.name
         else:
             startup_name = ""
-
+        self.mentor_recipient = mentor_recipient
+        calendar_data = self.get_calendar_data(counterpart)
         context = {"recipient": recipient,
                    "counterpart": counterpart,
                    "startup": startup_name,
-                   "message": self.message}
+                   "message": self.message,
+                   "calendar_data": calendar_data
+                   }
         context.update(office_hour_time_info(self.office_hour))
         body = loader.render_to_string(template_path, context)
         return {"to": [recipient.email],
                 "subject": self.SUBJECT,
-                "body": body}
+                "body": body,
+                "attachment": (ICS_FILENAME,
+                               calendar_data['ical_content'],
+                               ICS_FILETYPE)}
 
     def _succeed(self):
         if self.office_hour.startup:
@@ -209,3 +224,57 @@ class ReserveOfficeHourView(ImpactView):
             'header': self.header,
             'detail': self.detail,
             'timecard_info': self.timecard_info})
+
+    def get_calendar_data(self, counterpart_name):
+        name = counterpart_name
+        if self.mentor_recipient:
+            name = self.startup.name if self.startup else counterpart_name
+        title = self.OFFICE_HOUR_TITLE.format(name)
+        office_hour = self.office_hour
+        tz_str = ""
+        if office_hour.location is None:
+            tz_str = "UTC"
+            location = ""
+        else:
+            tz_str = office_hour.location.timezone
+            location = office_hour.location
+        tz = timezone(tz_str)
+        meeting_info = office_hour.meeting_info
+        separator = ';' if office_hour.location and meeting_info else ""
+        location_info = "{location}{separator}{meeting_info}"
+        location_info = location_info.format(location=location,
+                                             separator=separator,
+                                             meeting_info=meeting_info)
+        return Add2Cal(
+            start=office_hour.start_date_time.astimezone(tz).strftime(
+                ADD2CAL_DATE_FORMAT),
+            end=office_hour.end_date_time.astimezone(tz).strftime(
+                ADD2CAL_DATE_FORMAT),
+            title=title,
+            description=self._get_description(counterpart_name),
+            location=location_info,
+            timezone=tz).as_dict()
+
+    def _get_description(self, counterpart_name):
+        topics_block = ""
+        attendees_block = """
+        Attendees:\n- {mentor_email}\n- {finalist_email} - {finalist_phone}\n
+        """
+        finalist = self.startup if self.startup else counterpart_name
+        if self.office_hour.topics:
+            topics_block = "Message from {finalist}:\n{topics}\n".format(
+                topics=self.office_hour.topics,
+                finalist=finalist)
+        mentor_email = self.office_hour.mentor.email
+        finalist_email = self.target_user.email
+        finalist_phone = self.target_user.user_phone()
+        attendees_block = attendees_block.format(mentor_email=mentor_email,
+                                                 finalist_email=finalist_email,
+                                                 finalist_phone=finalist_phone)
+        description = """
+        {attendees_block}
+
+        {topics_block}
+        """
+        return description.format(topics_block=topics_block,
+                                  attendees_block=attendees_block)

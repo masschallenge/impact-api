@@ -242,6 +242,14 @@ class TestReserveOfficeHourView(APITestCase):
                                     False,
                                     DEFAULT_PERMISSION_DENIED_DETAIL)
 
+    def test_received_email_contains_attachment(self):
+        # email contains ics attachment
+        office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        finalist = _finalist()
+        self.post_response(office_hour.id,
+                           finalist.id)
+        self.assert_ics_email_attachments(finalist)
+
     def assert_response_contains_session_details(self, response, office_hour):
         office_hour.refresh_from_db()
         timecard = response.data['timecard_info']
