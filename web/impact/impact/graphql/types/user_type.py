@@ -15,7 +15,8 @@ class UserType(DjangoObjectType):
     def resolve_email(self, info, **kwargs):
         profile = self.get_profile()
         email = self.email
+        request_user = info.context.user
         if type(profile) is ExpertProfile:
-            if not can_view_private_data(info.context.user, profile.privacy_email):
+            if not can_view_private_data(request_user, profile.privacy_email):
                 email = ""
         return email
