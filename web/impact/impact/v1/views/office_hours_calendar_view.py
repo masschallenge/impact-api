@@ -23,7 +23,6 @@ from ...permissions.v1_api_permissions import (
     DEFAULT_PERMISSION_DENIED_DETAIL,
     IsAuthenticated,
 )
-from accelerator_abstract.models.base_clearance import CLEARANCE_LEVEL_STAFF
 from accelerator_abstract.models.base_user_utils import is_employee
 from mc.utils import swapper_model
 Clearance = swapper_model("Clearance")
