@@ -35,12 +35,12 @@ class CriterionOptionSpecHelper(ModelHelper):
         "count": validate_integer,
         "weight": validate_float,
         "criterion_id": validate_integer,
-        }
+    }
 
     REQUIRED_KEYS = [
         "option",
         "criterion_id",
-        ]
+    ]
     ALL_KEYS = REQUIRED_KEYS + [
         "count",
         "weight",

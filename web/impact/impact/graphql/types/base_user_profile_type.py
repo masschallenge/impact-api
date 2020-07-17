@@ -46,15 +46,14 @@ class BaseUserProfileType(DjangoObjectType):
         program_family_ids = self.user.programrolegrant_set.filter(
             program_role__program__program_status="active",
             program_role__user_role__name__in=desired_user_roles
-            ).values_list(
-                "program_role__program__program_family", flat=True
-                ).distinct()
+        ).values_list(
+            "program_role__program__program_family", flat=True
+        ).distinct()
         ids = list(set(chain(family_ids, program_family_ids)))
         remote = Location.objects.filter(name='Remote').first()
         result = Location.objects.filter(
             programfamilylocation__program_family_id__in=ids,).exclude(
-                name='Remote'
-            ).distinct()
+                name='Remote').distinct()
         locations = list(result)
         locations.append(remote)
 

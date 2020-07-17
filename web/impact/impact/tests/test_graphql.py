@@ -623,7 +623,7 @@ class TestGraphQL(APITestCase):
                     }}
                 """.format(id=user.id)
 
-        expected_json={'data': {'entrepreneurProfile': {'programRoles': {}}}}
+        expected_json = {'data': {'entrepreneurProfile': {'programRoles': {}}}}
         self._assert_response_equals_json(
             query, expected_json, email=allowed_user.email)
 

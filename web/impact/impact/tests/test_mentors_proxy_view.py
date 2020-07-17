@@ -119,10 +119,10 @@ class TestMentorsProxyView(APITestCase):
                     'NumItems': 100,
                     'GroupBy': 'Industry',
                     'ProgramKey': 'MassChallenge+Boston+2016+Accelerator',
-                    }, headers={
+                }, headers={
                     'Accept': 'application/json',
                     'Content-Type': 'application/x-www-form-urlencoded',
-                    }, HTTP_AUTHORIZATION='Bearer %s' % access_token)
+                }, HTTP_AUTHORIZATION='Bearer %s' % access_token)
             self.assertEqual(404, response.status_code)
             assert match_errors({"Default SiteName": "not set",
                                  "Default SecurityKey": "not set"},

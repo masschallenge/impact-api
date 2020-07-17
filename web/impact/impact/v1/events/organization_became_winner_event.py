@@ -41,8 +41,8 @@ class OrganizationBecameWinnerEvent(BaseHistoryEvent):
         return result
 
     def calc_datetimes(self):
-        self.earliest = (self.startup_status.created_at
-                         or self._program.end_date)
+        self.earliest = (
+            self.startup_status.created_at or self._program.end_date)
 
     def description(self):
         return self.DESCRIPTION_FORMAT.format(

@@ -4,7 +4,7 @@
 from datetime import (
     datetime,
     timedelta,
-    )
+)
 from pytz import utc
 from collections import namedtuple
 from itertools import chain

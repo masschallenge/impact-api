@@ -75,7 +75,7 @@ class TestAlgoliaApiKeyView(APITestCase):
 
     def test_logged_in_user_with_role_grants_in_ended_programs_gets_403(self):
         program = _create_batch_program_and_named_group(
-                        ENDED_PROGRAM_STATUS, 1)
+            ENDED_PROGRAM_STATUS, 1)
         user = self._create_user_with_role_grant(program[0], UserRole.FINALIST)
         with self.login(email=user.email):
             response = self.client.get(self._mentor_directory_url())
@@ -83,7 +83,7 @@ class TestAlgoliaApiKeyView(APITestCase):
 
     def test_logged_in_user_generates_token(self):
         program = _create_batch_program_and_named_group(
-                        ACTIVE_PROGRAM_STATUS, 1)
+            ACTIVE_PROGRAM_STATUS, 1)
         user = self._create_user_with_role_grant(program[0], UserRole.FINALIST)
         response_data = self._get_response_data(
             user, self._mentor_directory_url())
@@ -137,7 +137,7 @@ class TestAlgoliaApiKeyView(APITestCase):
     def test_finalist_user_gets_all_programs_in_program_group(
             self):
         programs = _create_batch_program_and_named_group(
-                        ACTIVE_PROGRAM_STATUS, 5)
+            ACTIVE_PROGRAM_STATUS, 5)
         other_program = ProgramFactory(program_status=ACTIVE_PROGRAM_STATUS)
         program = programs[0]
         user = self._create_user_with_role_grant(program, UserRole.FINALIST)
@@ -151,10 +151,10 @@ class TestAlgoliaApiKeyView(APITestCase):
     def test_finalist_user_gets_all_programs_in_past_or_present(
             self):
         programs = _create_batch_program_and_named_group(
-                        ACTIVE_PROGRAM_STATUS, 5)
+            ACTIVE_PROGRAM_STATUS, 5)
         other_program = ProgramFactory(
-                            program_status=UPCOMING_PROGRAM_STATUS,
-                            mentor_program_group=NamedGroupFactory())
+            program_status=UPCOMING_PROGRAM_STATUS,
+            mentor_program_group=NamedGroupFactory())
         program = programs[0]
         user = self._create_user_with_role_grant(program, UserRole.FINALIST)
         response_data = self._get_response_data(
@@ -167,11 +167,11 @@ class TestAlgoliaApiKeyView(APITestCase):
     def test_alumni_user_only_sees_mentors_of_alumni_programs(
             self):
         programs = _create_batch_program_and_named_group(
-                        ENDED_PROGRAM_STATUS, 5)
+            ENDED_PROGRAM_STATUS, 5)
         named_alumni_group = NamedGroupFactory()
         alumni_program = ProgramFactory(
-                                program_status=ACTIVE_PROGRAM_STATUS,
-                                mentor_program_group=named_alumni_group)
+            program_status=ACTIVE_PROGRAM_STATUS,
+            mentor_program_group=named_alumni_group)
         finalist_program = programs[0]
         user = self._create_user_with_role_grant(
             finalist_program, UserRole.FINALIST)
@@ -187,7 +187,7 @@ class TestAlgoliaApiKeyView(APITestCase):
     def test_alumni_user_who_is_also_finalist_sees_mentors_of_both_programs(
             self):
         programs = _create_batch_program_and_named_group(
-                        ACTIVE_PROGRAM_STATUS, 5)
+            ACTIVE_PROGRAM_STATUS, 5)
         named_alumni_group = NamedGroupFactory()
         other_program = ProgramFactory(program_status=ACTIVE_PROGRAM_STATUS,
                                        mentor_program_group=named_alumni_group)

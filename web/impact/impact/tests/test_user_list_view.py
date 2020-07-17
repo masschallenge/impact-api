@@ -88,11 +88,11 @@ EXAMPLE_MEMBER = {
     "user_type": MemberProfile.user_type,
 }
 REQUIRED_POST_FIELDS = set([
-        "email",
-        "first_name",
-        "gender",
-        "last_name",
-        "user_type",
+    "email",
+    "first_name",
+    "gender",
+    "last_name",
+    "user_type",
 ])
 ALL_POST_FIELDS = set(EXPERT_WRITE_FIELDS +
                       MUTABLE_FIELDS +
