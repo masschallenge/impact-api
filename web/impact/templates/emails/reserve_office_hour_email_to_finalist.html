@@ -1,13 +1,24 @@
 Hi {{ recipient.first_name }},
 
 You have an office hour session at {{ start_time }} on
-{{ date }} ({{ timezone }}) with {{ counterpart.full_name }} 
+{{ date }} ({{ timezone }}) with {{ counterpart.full_name }}
 
-Google Calendar: {{calendar_data.gcal_link}}
-Yahoo: {{calendar_data.yahoo_link}}
+<strong>Add a reminder</strong>
+<ul>
+  <li>
+    <a target="_blank" class="google" href="{{calendar_data.gcal_link}}">
+      Google Calendar
+    </a>
+  </li>
+  <li>
+    <a target="_blank" class="yahoo" href="{{calendar_data.yahoo_link}}">
+      Yahoo
+    </a>
+  </li>
+</ul>
 
 {% if message %}
-  {{ message }}
+{{ message }}
 {% endif %}
 
 
