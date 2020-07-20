@@ -1,8 +1,16 @@
-Hi {{ recipient.first_name }},
+{% load static from staticfiles %}
+<html>
+<head>
 
-Your office hour session at {{ start_time }} on {{ date }} ({{ timezone }})
-is reserved for {{ counterpart.full_name }}
-{% if startup %} of {{ startup }} {% endif %}
+</head>
+<body>
+<p>Hi {{ recipient.first_name }},</p>
+
+<p>
+  Your office hour session at {{ start_time }} on {{ date }} ({{ timezone }})
+  is reserved for {{ counterpart.full_name }}
+  {% if startup %} of {{ startup }} {% endif %}
+</p>
 
 <strong>Add a reminder</strong>
 <ul>
@@ -19,13 +27,19 @@ is reserved for {{ counterpart.full_name }}
 </ul>
 
 {% if message %}
-{{ message }}
+<p>{{ message }}</p>
 {% endif %}
 
 
-To view and manage your office hour reservations, visit
-https://accelerate.masschallenge.org/newofficehours
+<p>
+  To view and manage your office hour reservations, visit
+  https://accelerate.masschallenge.org/newofficehours
+</p>
 
 
-Thanks,
-The MassChallenge Team
+<p>
+  Thanks,<br/>
+  The MassChallenge Team
+</p>
+</body>
+</html>
