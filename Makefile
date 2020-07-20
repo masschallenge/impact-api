@@ -36,7 +36,6 @@ targets = \
   clean-db-cache \
   \
   release-list \
-  release \
   deploy \
 
 deprecated_targets = \
@@ -138,14 +137,6 @@ target_help = \
   'configured with a user who has upload permissions prior to execution.' \
   ' ' \
   'release-list - List all releases that are ready to be deployed.' \
-  'release - Create named release of releated servers.' \
-  '\tRelease name is applied as a tag to all the related git repos.' \
-  '\tRelease name defaults release-<version>.<number> where <version> is' \
-  '\tthe first line of impact-api/VERSION and <number> is the next unused' \
-  '\tnon-negative integer (0,1,2,...).' \
-  '\t$$(tag) overrides the entire release name.' \
-  '\tThe tag can be set by adding an optional tag="custom-tag" to the command' \
-  '\te.g. make release tag="XX-XXXX" ' \
   'deploy - Deploy $$(release_name) to a $$(target).' \
   '\tValid targets include "staging" (the default), "production",' \
   '\t "test-1", and "test-2"' \
