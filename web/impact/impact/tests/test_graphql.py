@@ -14,6 +14,7 @@ from mc.models import (
     StartupRole,
     UserRole,
 )
+from ..graphql.auth.utils import FINALISTS_AND_STAFF, PUBLIC, STAFF
 from ..graphql.middleware import NOT_LOGGED_IN_MSG
 from ..graphql.query import (
     ENTREPRENEUR_NOT_FOUND_MESSAGE,
@@ -26,15 +27,16 @@ from .factories import (
     ApplicationFactory,
     EntrepreneurFactory,
     ExpertFactory,
+    LocationFactory,
     ProgramFactory,
+    ProgramFamilyFactory,
+    ProgramFamilyLocationFactory,
     ProgramRoleFactory,
     ProgramRoleGrantFactory,
     ProgramStartupStatusFactory,
     StartupMentorRelationshipFactory,
-    ProgramFamilyLocationFactory,
     StartupStatusFactory,
-    ProgramFamilyFactory,
-    LocationFactory,
+    UserRoleFactory
 )
 from .utils import capture_stderr
 from ..utils import get_user_program_and_startup_roles
@@ -811,6 +813,87 @@ class TestGraphQL(APITestCase):
 
         self._assert_response_equals_json(
             query=query, expected_json=expected_json)
+
+    def test_staff_can_view_staff_privacy_data(self):
+        staff = self.staff_user()
+        self._assert_user_can_view_private_data(
+            STAFF, allowed=True, email=staff.email)
+
+    def test_staff_can_view_finalist_and_staff_privacy_data(self):
+        staff = self.staff_user()
+        self._assert_user_can_view_private_data(
+            FINALISTS_AND_STAFF, allowed=True, email=staff.email)
+
+    def test_staff_can_view_public_privacy_data(self):
+        staff = self.staff_user()
+        self._assert_user_can_view_private_data(
+            PUBLIC, allowed=True, email=staff.email)
+
+    def test_finalist_cannot_view_staff_privacy_data(self):
+        finalist = expert_user(UserRole.FINALIST)
+        self._assert_user_can_view_private_data(
+            STAFF, allowed=False, email=finalist.email)
+
+    def test_finalist_can_view_finalist_and_staff_privacy_data(self):
+        finalist = expert_user(UserRole.FINALIST)
+        self._assert_user_can_view_private_data(
+            FINALISTS_AND_STAFF, allowed=True, email=finalist.email)
+
+    def test_finalist_can_view_public_privacy_data(self):
+        finalist = expert_user(UserRole.FINALIST)
+        self._assert_user_can_view_private_data(
+            PUBLIC, allowed=True, email=finalist.email)
+
+    def test_non_staff_or_finalist_cannot_view_staff_privacy_data(self):
+        user = expert_user(UserRole.MENTOR)
+        self._assert_user_can_view_private_data(
+            STAFF, allowed=False, email=user.email)
+
+    def test_non_staff_or_finalist_cannot_view_finalist_and_staff_data(self):
+        user = expert_user(UserRole.MENTOR)
+        self._assert_user_can_view_private_data(
+            FINALISTS_AND_STAFF, allowed=False, email=user.email)
+
+    def test_non_staff_or_finalist_can_view_public_privacy_data(self):
+        user = expert_user(UserRole.MENTOR)
+        self._assert_user_can_view_private_data(
+            PUBLIC, allowed=True, email=user.email)
+
+    def _assert_user_can_view_private_data(
+            self, privacy_level, allowed=True, email=None):
+        user = ExpertFactory(
+            profile__privacy_email=privacy_level,
+            profile__privacy_web=privacy_level,
+            profile__privacy_phone=privacy_level,
+        )
+        query = """
+            query {{
+                expertProfile(id: {id}) {{
+                    user {{ email }}
+                    phone
+                    personalWebsiteUrl
+                }}
+            }}
+        """.format(id=user.id)
+        profile = user.expertprofile
+        if allowed:
+            expected_phone = profile.phone
+            expected_email = user.email
+            expected_website = profile.personal_website_url
+        else:
+            expected_phone = expected_email = expected_website = ""
+        expected_json = {
+            'data': {
+                'expertProfile': {
+                    'user': {
+                        'email': expected_email,
+                    },
+                    'phone': expected_phone,
+                    'personalWebsiteUrl': expected_website
+                }
+            }
+        }
+        self._assert_response_equals_json(query, expected_json, email=email)
 
     def _assert_expert_can_view_profile(self, expert_role, profile_user_role):
         current_user = expert_user(expert_role)
