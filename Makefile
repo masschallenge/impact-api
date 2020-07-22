@@ -164,11 +164,12 @@ no_release_error_msg = RELEASE must be set.  E.g., 'make deploy RELEASE=1.2.3.4'
 
 # Repos
 ACCELERATE = ../accelerate
+API_APP = ../accelerate/mcproject/api
 DJANGO_ACCELERATOR = ../django-accelerator
 IMPACT_API = ../impact-api
 FRONT_END = ../front-end
 SEMANTIC = ../semantic-ui-theme
-REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(FRONT_END) $(SEMANTIC) $(IMPACT_API) 
+REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(FRONT_END) $(SEMANTIC) $(IMPACT_API) $(API_APP)
 FRONTEND_MAKE = cd $(FRONT_END) && $(MAKE)
 
 .PHONY: $(targets) $(deprecated_targets)
