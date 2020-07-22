@@ -10,6 +10,7 @@ from accelerator.models import MentorProgramOfficeHour
 from ...minimal_email_handler import MinimalEmailHandler
 from ...permissions.v1_api_permissions import OfficeHourMentorPermission
 from ...v1.views.impact_view import ImpactView
+from ...v1.views.utils import get_timezone
 
 User = get_user_model()
 
@@ -32,7 +33,7 @@ def get_office_hours_url():
 
 
 def get_office_hour_shared_context(office_hour, message=None):
-    tz = timezone(office_hour.location.timezone or DEFAULT_TIMEZONE)
+    tz = timezone(get_timezone(office_hour))
     date = office_hour.start_date_time.astimezone(tz).strftime('%A, %d %B, %Y')
     start_time = office_hour.start_date_time.astimezone(tz).strftime('%I:%M%p')
     end_time = office_hour.end_date_time.astimezone(tz).strftime('%I:%M%p')
