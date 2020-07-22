@@ -21,7 +21,7 @@ from ..v1.views.cancel_office_hour_session_view import (
     SESSION_SUCCESS_HEADER,
     CancelOfficeHourSessionView,
 )
-
+from ..v1.views.utils import get_timezone
 
 class TestCancelOfficeHourSession(APITestCase):
     fail_header = FAIL_HEADER
@@ -170,7 +170,7 @@ class TestCancelOfficeHourSession(APITestCase):
             response, True, STAFF_NOTIFICATION.format(**context))
 
     def _get_office_hour_context(self, office_hour):
-        tz = timezone(office_hour.location.timezone or DEFAULT_TIMEZONE)
+        tz = timezone(get_timezone(office_hour))
         start_date_time = office_hour.start_date_time
         date = start_date_time.astimezone(tz).strftime('%A, %d %B, %Y')
         start_time = start_date_time.astimezone(tz).strftime('%I:%M%p')
