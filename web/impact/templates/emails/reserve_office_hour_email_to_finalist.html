@@ -1,19 +1,44 @@
-Hi {{ recipient.first_name }},
+{% load static from staticfiles %}
+<html>
+<head>
 
-You have an office hour session at {{ start_time }} on
-{{ date }} ({{ timezone }}) with {{ counterpart.full_name }} 
+</head>
+<body>
+<p>Hi {{ recipient.first_name }},</p>
 
-Google Calendar: {{calendar_data.gcal_link}}
-Yahoo: {{calendar_data.yahoo_link}}
+<p>
+  You have an office hour session at {{ start_time }} on
+  {{ date }} ({{ timezone }}) with {{ counterpart.full_name }}
+</p>
+
+<strong>Add a reminder</strong>
+<ul>
+  <li>
+    <a target="_blank" class="google" href="{{calendar_data.gcal_link}}">
+      Google Calendar
+    </a>
+  </li>
+  <li>
+    <a target="_blank" class="yahoo" href="{{calendar_data.yahoo_link}}">
+      Yahoo
+    </a>
+  </li>
+</ul>
 
 {% if message %}
-  {{ message }}
+<p>{{ message }}</p>
 {% endif %}
 
 
-To view and manage your office hour reservations, visit
-https://accelerate.masschallenge.org/newofficehours
+<p>
+  To view and manage your office hour reservations, visit
+  https://accelerate.masschallenge.org/newofficehours
+</p>
 
 
-Thanks,
-The MassChallenge Team
+<p>
+  Thanks,<br/>
+  The MassChallenge Team
+</p>
+</body>
+</html>
