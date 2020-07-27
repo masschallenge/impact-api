@@ -9,14 +9,13 @@ from .api_test_case import APITestCase
 from .factories import MentorProgramOfficeHourFactory
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from ..v1.views.cancel_office_hour_session_view import (
-    DEFAULT_TIMEZONE,
-    FAIL_HEADER,
-    OFFICE_HOUR_SESSION_404,
-    MENTOR_NOTIFICATION,
-    RESERVATION_SUCCESS_HEADER,
-    STAFF_NOTIFICATION,
-    SESSION_SUCCESS_HEADER,
     CancelOfficeHourSessionView,
+    FAIL_HEADER,
+    MENTOR_NOTIFICATION,
+    OFFICE_HOUR_SESSION_404,
+    RESERVATION_SUCCESS_HEADER,
+    SESSION_SUCCESS_HEADER,
+    STAFF_NOTIFICATION,
 )
 from ..v1.views.utils import get_timezone
 from mc.utils import swapper_model
