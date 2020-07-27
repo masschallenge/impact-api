@@ -18,10 +18,9 @@ from accelerator_abstract.models import (
     HIDDEN_PROGRAM_STATUS,
     UPCOMING_PROGRAM_STATUS
 )
-from ...graphql.auth.utils import can_view_private_data
-from ...graphql.types import (
-    BaseUserProfileType, StartupMentorRelationshipType
-)
+from ..auth.utils import can_view_private_data
+from .base_user_profile_type import BaseUserProfileType
+from .startup_mentor_relationship_type import StartupMentorRelationshipType
 from ...utils import compose_filter
 from ...v1.helpers.profile_helper import (
     latest_program_id_for_each_program_family
@@ -130,7 +129,6 @@ class ExpertProfileType(BaseUserProfileType):
         """
         roles = [UserRole.MENTOR, UserRole.DESIRED_MENTOR,
                  UserRole.DEFERRED_MENTOR]
-        statuses = ['active', 'upcoming']
         results = map_data(
             ProgramRoleGrant,
             Q(person_id=self.user.pk, program_role__user_role__name__in=roles,
