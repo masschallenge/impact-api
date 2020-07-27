@@ -20,10 +20,7 @@ from accelerator_abstract.models import (
 )
 from ...graphql.auth.utils import can_view_private_data
 from ...graphql.types import (
-    BaseUserProfileType
-)
-from ...graphql.types.startup_mentor_relationship_type import (
-    StartupMentorRelationshipType
+    BaseUserProfileType, StartupMentorRelationshipType
 )
 from ...utils import compose_filter
 from ...v1.helpers.profile_helper import (
