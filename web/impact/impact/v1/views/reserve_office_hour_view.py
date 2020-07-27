@@ -188,13 +188,15 @@ class ReserveOfficeHourView(ImpactView):
                    "calendar_data": calendar_data
                    }
         context.update(office_hour_time_info(self.office_hour))
-        body = loader.render_to_string(template_path, context)
+        html_email = loader.render_to_string(template_path, context)
         return {"to": [recipient.email],
                 "subject": self.SUBJECT,
-                "body": body,
+                "body": None,
                 "attachment": (ICS_FILENAME,
                                calendar_data['ical_content'],
-                               ICS_FILETYPE)}
+                               ICS_FILETYPE),
+                "attach_alternative": (html_email, 'text/html')
+                }
 
     def _succeed(self):
         if self.office_hour.startup:

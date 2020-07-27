@@ -175,7 +175,8 @@ class TestReserveOfficeHourView(APITestCase):
                            request_user=finalist)
         email = mail.outbox[0]
         localized_time = localized_office_hour_start_time(office_hour)
-        self.assertIn(localized_time.strftime("%I:%M"), email.body)
+        self.assertIn(localized_time.strftime(
+            "%I:%M"), email.alternatives[0][0])
 
     def test_previously_reserved_office_hour_gets_failure(self):
         # a finalist reserves a reserved office hour, gets failure response
