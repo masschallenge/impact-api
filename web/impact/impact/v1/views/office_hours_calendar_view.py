@@ -215,7 +215,6 @@ class OfficeHoursCalendarView(ImpactView):
                                              "program",
                                              "program_family",
                                              "name"])
-        self.not_null_location = Q(**{self.location_path + '__isnull': False})
         return True
 
     def _get_office_hours_data(self):
@@ -277,7 +276,7 @@ class OfficeHoursCalendarView(ImpactView):
 
     def location_choices(self):
         locations = self.user_query.filter(
-            self.not_null_location
+            Q(**{self.location_path + '__isnull': False})
         ).values(**_location_lookups(self.location_path)).distinct()
         locations_list = list(locations)
         has_remote_location = _check_remote_location(locations_list)
