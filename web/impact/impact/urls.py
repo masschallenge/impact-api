@@ -9,7 +9,6 @@ from django.conf.urls import (
 )
 
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import TemplateView
 from drf_auto_endpoint.router import router as schema_router
 from .graphql.utils.custom_error_view import SafeGraphQLView
 from rest_framework import routers
