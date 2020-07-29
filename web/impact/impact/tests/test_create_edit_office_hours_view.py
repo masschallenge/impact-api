@@ -3,22 +3,18 @@ from datetime import (
     datetime,
     timedelta,
 )
+from pytz import (
+    timezone,
+    utc,
+)
 
 from django.core import mail
-from pytz import utc, timezone
-
 from django.urls import reverse
 
-from accelerator_abstract.models.base_clearance import (
-    CLEARANCE_LEVEL_EXEC_MD,
-    CLEARANCE_LEVEL_GLOBAL_MANAGER,
-    CLEARANCE_LEVEL_POM,
-    CLEARANCE_LEVEL_STAFF,
-)
 from accelerator.models import (
+    Location,
     MentorProgramOfficeHour,
     UserRole,
-    Location,
 )
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.factories import (
@@ -26,6 +22,12 @@ from accelerator.tests.factories import (
     ProgramFactory,
 )
 from accelerator.tests.factories.location_factory import LocationFactory
+from accelerator_abstract.models.base_clearance import (
+    CLEARANCE_LEVEL_EXEC_MD,
+    CLEARANCE_LEVEL_GLOBAL_MANAGER,
+    CLEARANCE_LEVEL_POM,
+    CLEARANCE_LEVEL_STAFF,
+)
 
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from ..v1.serializers.office_hours_serializer import (
