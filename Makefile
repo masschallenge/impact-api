@@ -36,7 +36,6 @@ targets = \
   clean-db-cache \
   \
   release-list \
-  release \
   deploy \
 
 deprecated_targets = \
@@ -138,14 +137,6 @@ target_help = \
   'configured with a user who has upload permissions prior to execution.' \
   ' ' \
   'release-list - List all releases that are ready to be deployed.' \
-  'release - Create named release of releated servers.' \
-  '\tRelease name is applied as a tag to all the related git repos.' \
-  '\tRelease name defaults release-<version>.<number> where <version> is' \
-  '\tthe first line of impact-api/VERSION and <number> is the next unused' \
-  '\tnon-negative integer (0,1,2,...).' \
-  '\t$$(tag) overrides the entire release name.' \
-  '\tThe tag can be set by adding an optional tag="custom-tag" to the command' \
-  '\te.g. make release tag="XX-XXXX" ' \
   'deploy - Deploy $$(release_name) to a $$(target).' \
   '\tValid targets include "staging" (the default), "production",' \
   '\t "test-1", and "test-2"' \
@@ -164,11 +155,12 @@ no_release_error_msg = RELEASE must be set.  E.g., 'make deploy RELEASE=1.2.3.4'
 
 # Repos
 ACCELERATE = ../accelerate
+API_APP = ../accelerate/mcproject/api
 DJANGO_ACCELERATOR = ../django-accelerator
 IMPACT_API = ../impact-api
 FRONT_END = ../front-end
 SEMANTIC = ../semantic-ui-theme
-REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(FRONT_END) $(SEMANTIC) $(IMPACT_API) 
+REPOS = $(ACCELERATE) $(DJANGO_ACCELERATOR) $(FRONT_END) $(SEMANTIC) $(IMPACT_API) $(API_APP)
 FRONTEND_MAKE = cd $(FRONT_END) && $(MAKE)
 
 .PHONY: $(targets) $(deprecated_targets)
@@ -439,13 +431,8 @@ build-aws:
 TARGET ?= staging
 
 
-release-list:
-	@git ls-remote --tags | grep -o 'refs/tags/v[0-9]*\.[0-9]*\.[0-9]*' | sort -r | grep -o '[^\/]*$$'
-
-
-
-release:
-	@bash create_release.sh
+release release-list:
+	@$(ACCELERATE_MAKE) $@
 
 
 travis-release: DOCKER_REGISTRY = $(shell aws ecr describe-repositories | grep "repositoryArn" | awk -F':repository' '{print $1}' | awk -F'\"repositoryArn\":' '{print $2}')
