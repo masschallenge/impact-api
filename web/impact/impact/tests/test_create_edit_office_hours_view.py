@@ -3,23 +3,31 @@ from datetime import (
     datetime,
     timedelta,
 )
-from pytz import utc
+from pytz import (
+    timezone,
+    utc,
+)
 
+from django.core import mail
 from django.urls import reverse
 
-from accelerator_abstract.models.base_clearance import (
-    CLEARANCE_LEVEL_EXEC_MD,
-    CLEARANCE_LEVEL_GLOBAL_MANAGER,
-    CLEARANCE_LEVEL_POM,
-    CLEARANCE_LEVEL_STAFF
+from accelerator.models import (
+    Location,
+    MentorProgramOfficeHour,
+    UserRole,
 )
-from accelerator.models import MentorProgramOfficeHour, UserRole
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.factories import (
     MentorProgramOfficeHourFactory,
     ProgramFactory,
 )
 from accelerator.tests.factories.location_factory import LocationFactory
+from accelerator_abstract.models.base_clearance import (
+    CLEARANCE_LEVEL_EXEC_MD,
+    CLEARANCE_LEVEL_GLOBAL_MANAGER,
+    CLEARANCE_LEVEL_POM,
+    CLEARANCE_LEVEL_STAFF,
+)
 
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from ..v1.serializers.office_hours_serializer import (
@@ -35,6 +43,7 @@ from ..v1.views.office_hour_view import (
     SUCCESS_EDIT_HEADER,
     OfficeHourViewSet,
 )
+from ..v1.views.utils import HOUR_MINUTE_FORMAT
 from .api_test_case import APITestCase
 
 
@@ -334,6 +343,25 @@ class TestCreateEditOfficeHourView(APITestCase):
         self.assert_user_with_clearance_can_create_office_hours(
             CLEARANCE_LEVEL_GLOBAL_MANAGER)
 
+    def test_create_office_hour_block_mail_has_correct_time(self):
+        mentor = self._expert_user(UserRole.MENTOR)
+        data = self._get_post_request_data(mentor, block_duration=120)
+        self._create_office_hour_session(self.staff_user(), data)
+        tz = Location.objects.get(pk=int(data['location'])).timezone
+        self._assert_mail_has_correct_session_time(data, tz)
+
+    def test_edit_office_hour_session_mail_has_correct_time(self):
+        mentor = self._expert_user(UserRole.MENTOR)
+        office_hour = self._create_office_hour_obj(mentor)
+        tz = office_hour.location.timezone
+        start_time = _now() + timedelta(minutes=60)
+        data = {
+            'start_date_time': start_time,
+            'end_date_time': start_time + timedelta(minutes=30),
+        }
+        self._edit_office_hour_session(self.staff_user(), office_hour, data)
+        self._assert_mail_has_correct_session_time(data, tz)
+
     def _expert_with_inactive_program(self, role):
         program = ProgramFactory(program_status='ended')
         return self._expert_user(role, program)
@@ -341,13 +369,14 @@ class TestCreateEditOfficeHourView(APITestCase):
     def _get_post_request_data(self,
                                mentor,
                                minutes_from_now=0,
-                               get_data=None):
+                               get_data=None,
+                               block_duration=30):
         location = LocationFactory()
         start_time = _now() + timedelta(minutes=minutes_from_now)
         data = {
             'mentor': mentor.id,
             'start_date_time': start_time,
-            'end_date_time': start_time + timedelta(minutes=30),
+            'end_date_time': start_time + timedelta(minutes=block_duration),
             'topics': 'topics',
             'description': 'description',
             'location': location.id
@@ -431,6 +460,18 @@ class TestCreateEditOfficeHourView(APITestCase):
             self.assertEqual(count_after, count_before)
         else:
             self.assertEqual(count_after, count_before + count)
+
+    def _assert_mail_has_correct_session_time(self, data, tz):
+        start_time = _localized_time(data['start_date_time'], tz)
+        end_time = _localized_time(data['end_date_time'], tz)
+        expected_start_time = start_time.strftime(HOUR_MINUTE_FORMAT)
+        expected_end_time = end_time.strftime(HOUR_MINUTE_FORMAT)
+        expected_time = f"{expected_start_time}-{expected_end_time}"
+        self.assertIn(expected_time, mail.outbox[0].body)
+
+
+def _localized_time(time, tz):
+    return time.astimezone(timezone(tz))
 
 
 def _now():
