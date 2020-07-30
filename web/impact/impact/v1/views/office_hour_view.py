@@ -74,9 +74,9 @@ def handle_fail(errors, edit=False):
     })
 
 
-def get_email_context(office_hour):
+def get_email_context(office_hour, last_office_hour=None):
     location = office_hour.location
-    context = office_hour_time_info(office_hour)
+    context = office_hour_time_info(office_hour, last_office_hour)
     context.update({
         'location': location.name if location else '',
         'mentor_email': office_hour.mentor.email,
@@ -98,7 +98,7 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
         save_operation(serializer)
         office_hour = serializer.instance
         if request.user != office_hour.mentor:
-            self.handle_send_mail(office_hour)
+            self.handle_send_mail(office_hour, edit=True)
         return handle_success([serializer.data])
 
     def handle_response(self, request):
@@ -117,17 +117,20 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
             return handle_fail(invalid_serializers[0].errors)
         for serializer in serializers:
             self.perform_create(serializer)
-        office_hour = serializers[0].instance
-        if request.user != office_hour.mentor:
-            self.handle_send_mail(office_hour)
+        first_office_hour = serializers[0].instance
+        last_office_hour = serializers[-1].instance
+        if request.user != first_office_hour.mentor:
+            self.handle_send_mail(
+                first_office_hour,
+                last_office_hour=last_office_hour)
 
         return handle_success([serializer.data for serializer in serializers])
 
     def update(self, request, *args, **kwargs):
         return self.handle_response(request)
 
-    def handle_send_mail(self, office_hour, edit=False):
-        context = get_email_context(office_hour)
+    def handle_send_mail(self, office_hour, edit=False, last_office_hour=None):
+        context = get_email_context(office_hour, last_office_hour)
         body = EDIT_BODY if edit else CREATE_BODY
         MinimalEmailHandler(
             to=[office_hour.mentor.email],
