@@ -68,9 +68,10 @@ def is_office_hour_reserver(user):
         program_role__program__program_status=ACTIVE_PROGRAM_STATUS).exists()
 
 
-def office_hour_time_info(office_hour):
+def office_hour_time_info(office_hour, last_office_hour=None):
     start_time = localized_office_hour_start_time(office_hour)
-    end_time = localized_office_hour_end_time(office_hour)
+    last_office_hour = last_office_hour or office_hour
+    end_time = localized_office_hour_end_time(last_office_hour)
     return {"start_time": start_time.strftime(HOUR_MINUTE_FORMAT),
             "end_time": end_time.strftime(HOUR_MINUTE_FORMAT),
             "date": start_time.strftime(MONTH_DAY_FORMAT),
