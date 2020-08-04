@@ -253,7 +253,6 @@ class OfficeHoursCalendarView(ImpactView):
             finalist_email=F("finalist__email"),
             mentor_email=F("mentor__email"),
         )
-        self.response_elements['location_choices'] = self.location_choices()
         self.response_elements['timezones'] = office_hours.filter(
             location__isnull=False).order_by(
                 "location__timezone").values_list("location__timezone",
@@ -276,8 +275,9 @@ class OfficeHoursCalendarView(ImpactView):
             self.program_family, flat=True).distinct()
 
     def location_choices(self):
-        locations = self.user_query.values(
-            **_location_lookups(self.location_path)).distinct()
+        locations = self.user_query.filter(
+            Q(**{self.location_path + '__isnull': False})
+        ).values(**_location_lookups(self.location_path)).distinct()
         locations_list = list(locations)
         has_remote_location = _check_remote_location(locations_list)
 
