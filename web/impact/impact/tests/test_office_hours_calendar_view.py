@@ -297,13 +297,9 @@ class TestOfficeHoursCalendarView(APITestCase):
         self.assertEqual(timezone_data.count(), 0)
 
     def test_location_always_include_remote_location(self):
-        program_family_location = ProgramFamilyLocationFactory()
-        program_family = program_family_location.program_family
         remote_location = LocationFactory(name="Remote")
-        ProgramFactory(program_family=program_family)
-        staff_user = self.staff_user(program_family=program_family)
-        self.create_office_hour(mentor=staff_user)
-        response = self.get_response(user=staff_user)
+        office_hour = self.create_office_hour()
+        response = self.get_response(user=office_hour.mentor)
         location_choices = response.data['location_choices']
         response_location_names = [
             location['location_name'] for location in location_choices]
@@ -320,6 +316,17 @@ class TestOfficeHoursCalendarView(APITestCase):
     def test_global_manager_sees_own_office_hour(self):
         self.assert_user_with_clearance_sees_own_office_hour(
             CLEARANCE_LEVEL_GLOBAL_MANAGER)
+
+    def test_location_choices_doesnt_include_null_location_values(self):
+        program_family_location = ProgramFamilyLocationFactory()
+        program_family = program_family_location.program_family
+        program_family_location.location.delete()
+        ProgramFactory(program_family=program_family)
+        staff_user = self.staff_user(program_family=program_family)
+        self.create_office_hour(mentor=staff_user)
+        response = self.get_response(user=staff_user)
+        location_choices = response.data['location_choices']
+        self.assertEqual([], location_choices)
 
     def create_office_hour(self,
                            mentor=None,
