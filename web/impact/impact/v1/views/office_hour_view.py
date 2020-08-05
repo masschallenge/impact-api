@@ -9,12 +9,19 @@ from accelerator.models import MentorProgramOfficeHour
 from ...minimal_email_handler import MinimalEmailHandler
 from ...permissions.v1_api_permissions import OfficeHourPermission
 from ..serializers.office_hours_serializer import OfficeHourSerializer
-from .utils import office_hour_time_info
+from .utils import (
+    office_hour_time_info,
+    datetime_is_in_past
+    get_office_hour_shared_context
+)
 
 DEFAULT_TIMEZONE = 'UTC'
-
+GENERIC_ERROR = "Please try again"
 FAIL_CREATE_HEADER = 'Office hour session could not be created'
 FAIL_EDIT_HEADER = 'Office hour session could not be modified'
+SUCCESS_DETAIL = "{start_time} - {end_time} on {date}"
+SUCCESS_PAST_DETAIL = ("{start_time} - {end_time} on {date}"
+                       "<br>This office officehour occurs in the past")
 SUCCESS_CREATE_HEADER = 'Office hour session(s) created'
 SUCCESS_EDIT_HEADER = 'Office hour session modified'
 
@@ -56,14 +63,6 @@ EDIT_BODY = (
 )
 
 
-def handle_success(data, edit=False):
-    return Response({
-        'data': data,
-        'header': SUCCESS_EDIT_HEADER if edit else SUCCESS_CREATE_HEADER,
-        'success': True
-    })
-
-
 def handle_fail(errors, edit=False):
     return Response({
         'errors': errors,
@@ -93,11 +92,14 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
     def perform_save(self, request, serializer, save_operation):
         if not serializer.is_valid():
             return handle_fail(serializer.errors)
-        save_operation(serializer)
-        office_hour = serializer.instance
-        if request.user != office_hour.mentor:
-            self.handle_send_mail(office_hour, edit=True)
-        return handle_success([serializer.data])
+        try:
+            save_operation(serializer)
+            self.office_hour = serializer.instance
+            if request.user != office_hour.mentor:
+                self.handle_send_mail(office_hour, edit=True)
+            return self.handle_success([serializer.data])
+        except Exception:
+            return handle_fail({"error": GENERIC_ERROR})
 
     def handle_response(self, request):
         if request.method == 'PATCH':
@@ -122,7 +124,7 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
                 first_office_hour,
                 last_office_hour=last_office_hour)
 
-        return handle_success([serializer.data for serializer in serializers])
+        return self.handle_success([serializer.data for serializer in serializers])
 
     def update(self, request, *args, **kwargs):
         return self.handle_response(request)
@@ -135,6 +137,17 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
             subject=SUBJECT.format(**context),
             body=body.format(**context),
             from_email=settings.NO_REPLY_EMAIL).send()
+
+    def handle_success(self, data, edit=False,):
+        context = get_office_hour_shared_context(self.office_hour)
+        return Response({
+            'data': data,
+            'header': SUCCESS_EDIT_HEADER if edit else SUCCESS_CREATE_HEADER,
+            "detail": SUCCESS_DETAIL.format(**context) if datetime_is_in_past(
+                    self.office_hour.start_date_time) else SUCCESS_PAST_DETAIL.format(
+                    **context)
+            'success': True
+        })
 
 
 def parse_date_specs(data):
