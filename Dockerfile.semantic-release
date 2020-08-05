@@ -1,5 +1,0 @@
-FROM 997386117669.dkr.ecr.us-east-1.amazonaws.com/semantic-release:py3
-RUN git config --global user.email semantic-release@masschallenge.org
-RUN mkdir /app
-WORKDIR /app
-ADD setup.cfg .
