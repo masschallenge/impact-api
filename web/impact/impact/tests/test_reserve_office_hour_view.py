@@ -30,7 +30,8 @@ class TestReserveOfficeHourView(APITestCase):
         finalist = _finalist()
         response = self.post_response(office_hour.id,
                                       request_user=finalist)
-        self.assert_ui_notification(response, True, self.view.SUCCESS_DETAIL)
+        self.assert_ui_notification(
+            response, True, self.view.SUCCESS_DETAIL, office_hour)
 
     def test_finalist_reserves_office_hour_with_conflict_fail_message(self):
         start_time = minutes_from_now(60)
@@ -194,7 +195,8 @@ class TestReserveOfficeHourView(APITestCase):
         finalist = _finalist()
         response = self.post_response(office_hour.id,
                                       finalist.id)
-        self.assert_ui_notification(response, True, self.view.SUCCESS_DETAIL)
+        self.assert_ui_notification(
+            response, True, self.view.SUCCESS_DETAIL, office_hour)
 
     def test_reserve_on_behalf_of_nonexistent_user(self):
         # staff reserves a session on behalf of finalist, gets success

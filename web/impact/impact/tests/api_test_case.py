@@ -104,9 +104,11 @@ class APITestCase(TestCase):
                 self.assertIn(key, options)
                 self.assertEqual(options[key], params)
 
-    def assert_ui_notification(self, response, success, notification):
+    def assert_ui_notification(self, response, success, notification,
+                               office_hour=None):
         data = response.data
-        header = self.success_header if success else self.fail_header
+        mentor = office_hour.mentor if office_hour else None
+        header = self.success_header.format(mentor) if success else self.fail_header
         self.assertTrue(all([
             data['success'] == success,
             data['header'] == header,
