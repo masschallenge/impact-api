@@ -1,6 +1,7 @@
 from datetime import timedelta
 from dateutil.parser import isoparse
 from django.conf import settings
+from django.http import Http404
 from rest_framework import viewsets
 from rest_framework.response import Response
 
@@ -11,17 +12,17 @@ from ...permissions.v1_api_permissions import OfficeHourPermission
 from ..serializers.office_hours_serializer import OfficeHourSerializer
 from .utils import (
     office_hour_time_info,
-    datetime_is_in_past
+    datetime_is_in_past,
     get_office_hour_shared_context
 )
 
 DEFAULT_TIMEZONE = 'UTC'
-GENERIC_ERROR = "Please try again"
 FAIL_CREATE_HEADER = 'Office hour session could not be created'
 FAIL_EDIT_HEADER = 'Office hour session could not be modified'
 SUCCESS_DETAIL = "{start_time} - {end_time} on {date}"
-SUCCESS_PAST_DETAIL = ("{start_time} - {end_time} on {date}"
-                       "<br>This office officehour occurs in the past")
+NOT_FOUND_HOUR = ("The office hour session you are trying to update "
+                  "doesn't exist")
+SUCCESS_PAST_DETAIL = ("This office officehour occurs in the past")
 SUCCESS_CREATE_HEADER = 'Office hour session(s) created'
 SUCCESS_EDIT_HEADER = 'Office hour session modified'
 
@@ -92,18 +93,18 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
     def perform_save(self, request, serializer, save_operation):
         if not serializer.is_valid():
             return handle_fail(serializer.errors)
-        try:
-            save_operation(serializer)
-            self.office_hour = serializer.instance
-            if request.user != office_hour.mentor:
-                self.handle_send_mail(office_hour, edit=True)
-            return self.handle_success([serializer.data])
-        except Exception:
-            return handle_fail({"error": GENERIC_ERROR})
+        save_operation(serializer)
+        self.office_hour = serializer.instance
+        if request.user != self.office_hour.mentor:
+            self.handle_send_mail(self.office_hour, edit=True)
+        return self.handle_success([serializer.data], True)
 
     def handle_response(self, request):
         if request.method == 'PATCH':
-            instance = self.get_object()
+            try:
+                instance = self.get_object()
+            except Http404:
+                return handle_fail({"errors": NOT_FOUND_HOUR}, edit=True)
             serializer = self.get_serializer(
                 instance, data=request.data, partial=True)
             save_operation = self.perform_update
@@ -118,6 +119,7 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
         for serializer in serializers:
             self.perform_create(serializer)
         first_office_hour = serializers[0].instance
+        self.office_hour = first_office_hour
         last_office_hour = serializers[-1].instance
         if request.user != first_office_hour.mentor:
             self.handle_send_mail(
@@ -143,9 +145,9 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
         return Response({
             'data': data,
             'header': SUCCESS_EDIT_HEADER if edit else SUCCESS_CREATE_HEADER,
-            "detail": SUCCESS_DETAIL.format(**context) if datetime_is_in_past(
-                    self.office_hour.start_date_time) else SUCCESS_PAST_DETAIL.format(
-                    **context)
+            "detail": SUCCESS_DETAIL.format(**context) if not datetime_is_in_past(
+                self.office_hour.start_date_time) else SUCCESS_PAST_DETAIL.format(
+                **context),
             'success': True
         })
 

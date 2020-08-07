@@ -20,8 +20,6 @@ User = get_user_model()
 DEFAULT_TIMEZONE = 'UTC'
 SUBJECT = '[Office Hours] Canceled: {date}, {start_time}'
 
-GENERIC_ERROR = "Please try again"
-
 STAFF_NOTIFICATION = ('on behalf of {mentor_name} at {start_time} '
                       '- {end_time} on {date}')
 MENTOR_NOTIFICATION = 'at {start_time} - {end_time} on {date}'
@@ -32,14 +30,7 @@ RESERVATION_SUCCESS_HEADER = 'Canceled office hour reservation'
 FAIL_HEADER = 'Office hour session could not be canceled'
 
 
-def get_office_hours_url():
-    site_url = 'accelerate.masschallenge.org'
-    return 'https://{}/newofficehour/'.format(site_url)
-
-
-def get_ui_notification(context=None, staff=False, error=False):
-    if error:
-        return GENERIC_ERROR
+def get_ui_notification(context=None, staff=False):
     if staff:
         return STAFF_NOTIFICATION.format(**context)
     return MENTOR_NOTIFICATION.format(**context)
@@ -65,24 +56,15 @@ class CancelOfficeHourSessionView(ImpactView):
         if user == office_hour.mentor:
             cancelled_by = get_cancelled_by(shared_context['mentor_name'])
             self.handle_notification(office_hour, shared_context, cancelled_by)
-            try:
-                ui_notification = get_ui_notification(shared_context)
-                office_hour.delete()
-                return ui_notification, True
-            except Exception:
-                ui_notification = get_ui_notification(error=True)
-                return ui_notification, False
+            ui_notification = get_ui_notification(shared_context)
+            office_hour.delete()
+            return ui_notification, True
         else:
             self.handle_notification(
                 office_hour, shared_context, get_cancelled_by(staff=True))
-            try:
-                ui_notification = get_ui_notification(
-                    shared_context, staff=True)
-                office_hour.delete()
-                return ui_notification, True
-            except Exception:
-                ui_notification = get_ui_notification(error=True)
-                return ui_notification, False
+            ui_notification = get_ui_notification(shared_context, staff=True)
+            office_hour.delete()
+            return ui_notification, True
 
     def post(self, request):
         message = request.data.get('message', None)

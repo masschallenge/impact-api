@@ -92,6 +92,10 @@ def get_timezone(office_hour):
 def datetime_is_in_past(date_time):
     return date_time.astimezone(utc) < utc.localize(date_time.utcnow())
 
+def get_office_hours_url():
+    site_url = 'accelerate.masschallenge.org'
+    return 'https://{}/newofficehour/'.format(site_url)
+
 def get_office_hour_shared_context(office_hour, message=None):
     tz = timezone(get_timezone(office_hour))
     date = office_hour.start_date_time.astimezone(tz).strftime('%A, %d %B, %Y')
