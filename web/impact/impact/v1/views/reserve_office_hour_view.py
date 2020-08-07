@@ -44,7 +44,7 @@ class ReserveOfficeHourView(ImpactView):
     SUCCESS_HEADER = "Office Hour reserved with {}"
     SUCCESS_PAST_DETAIL = ("{start_time} - {end_time} on {date}. "
                            "This office officehour occurs in the past")
-    SUCCESS_DETAIL = "You have reserved this office hour session"
+    SUCCESS_DETAIL = "{start_time} - {end_time} on {date}. "
     FAIL_HEADER = "Fail header"
     NO_OFFICE_HOUR_SPECIFIED = "No office hour was specified"
     NO_SUCH_OFFICE_HOUR = "This office hour is no longer available."
@@ -211,14 +211,18 @@ class ReserveOfficeHourView(ImpactView):
             startup_name = ""
         self.success = True
         self.header = self.SUCCESS_HEADER.format(self.office_hour.mentor)
-        self.detail = self.SUCCESS_DETAIL if not datetime_is_in_past(
-            self.office_hour.start_date_time) else self.SUCCESS_PAST_DETAIL.format(
-                **get_office_hour_shared_context(self.office_hour))
+        self.detail = self._get_detail()
         self.timecard_info = {
             "finalist_first_name": self.target_user.first_name,
             "finalist_last_name": self.target_user.last_name,
             "topics": self.message,
             "startup": startup_name}
+
+    def _get_detail(self):
+        start_date_time = self.office_hour.start_date_time
+        return self.SUCCESS_DETAIL if not datetime_is_in_past(
+            start_date_time) else self.SUCCESS_PAST_DETAIL.format(
+                **get_office_hour_shared_context(self.office_hour))
 
     def fail(self, detail):
         self.success = False

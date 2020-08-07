@@ -1,7 +1,6 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-import datetime
 from pytz import (
     timezone,
     utc
@@ -92,9 +91,11 @@ def get_timezone(office_hour):
 def datetime_is_in_past(date_time):
     return date_time.astimezone(utc) < utc.localize(date_time.utcnow())
 
+
 def get_office_hours_url():
     site_url = 'accelerate.masschallenge.org'
     return 'https://{}/newofficehour/'.format(site_url)
+
 
 def get_office_hour_shared_context(office_hour, message=None):
     tz = timezone(get_timezone(office_hour))

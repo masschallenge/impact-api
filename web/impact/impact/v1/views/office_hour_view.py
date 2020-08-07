@@ -13,7 +13,6 @@ from ..serializers.office_hours_serializer import OfficeHourSerializer
 from .utils import (
     office_hour_time_info,
     datetime_is_in_past,
-    get_office_hour_shared_context
 )
 
 DEFAULT_TIMEZONE = 'UTC'
@@ -126,7 +125,8 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
                 first_office_hour,
                 last_office_hour=last_office_hour)
 
-        return self.handle_success([serializer.data for serializer in serializers])
+        return self.handle_success(
+            [serializer.data for serializer in serializers])
 
     def update(self, request, *args, **kwargs):
         return self.handle_response(request)
@@ -141,13 +141,11 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
             from_email=settings.NO_REPLY_EMAIL).send()
 
     def handle_success(self, data, edit=False,):
-        context = get_office_hour_shared_context(self.office_hour)
         return Response({
             'data': data,
             'header': SUCCESS_EDIT_HEADER if edit else SUCCESS_CREATE_HEADER,
-            "detail": SUCCESS_DETAIL.format(**context) if not datetime_is_in_past(
-                self.office_hour.start_date_time) else SUCCESS_PAST_DETAIL.format(
-                **context),
+            "detail": SUCCESS_PAST_DETAIL if datetime_is_in_past(
+                self.office_hour.start_date_time) else "",
             'success': True
         })
 

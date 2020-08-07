@@ -108,7 +108,8 @@ class APITestCase(TestCase):
                                office_hour=None):
         data = response.data
         mentor = office_hour.mentor if office_hour else None
-        header = self.success_header.format(mentor) if success else self.fail_header
+        header = self.success_header.format(
+            mentor) if success else self.fail_header
         self.assertTrue(all([
             data['success'] == success,
             data['header'] == header,

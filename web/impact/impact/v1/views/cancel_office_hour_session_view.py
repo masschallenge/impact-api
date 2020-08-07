@@ -1,5 +1,3 @@
-from pytz import timezone
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.template import loader
@@ -11,7 +9,6 @@ from ...minimal_email_handler import MinimalEmailHandler
 from ...permissions.v1_api_permissions import OfficeHourMentorPermission
 from ...v1.views.impact_view import ImpactView
 from ...v1.views.utils import (
-    get_timezone,
     get_office_hour_shared_context
 )
 
