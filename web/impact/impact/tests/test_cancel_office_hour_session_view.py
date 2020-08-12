@@ -7,21 +7,20 @@ from accelerator.models import MentorProgramOfficeHour, UserRole
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.utils import days_from_now
 from ..permissions.v1_api_permissions import (
-    DEFAULT_PERMISSION_DENIED_DETAIL,
+    CANCEL_SESSION_PERMISSION_DENIED_DETAIL,
 )
 from ..tests.api_test_case import APITestCase
 from ..tests.factories import MentorProgramOfficeHourFactory
 from ..v1.views.cancel_office_hour_session_view import (
-    DEFAULT_TIMEZONE,
     FAIL_HEADER,
     OFFICE_HOUR_SESSION_404,
     MENTOR_NOTIFICATION,
-    RESERVATION_SUCCESS_HEADER,
     STAFF_NOTIFICATION,
-    SESSION_SUCCESS_HEADER,
+    SUCCESS_HEADER,
     CancelOfficeHourSessionView,
 )
 from ..v1.views.utils import get_timezone
+
 
 class TestCancelOfficeHourSession(APITestCase):
     fail_header = FAIL_HEADER
@@ -44,7 +43,7 @@ class TestCancelOfficeHourSession(APITestCase):
         self.assert_office_hour_session_was_cancelled(office_hour)
 
     def test_mentor_cancel_their_own_unreserved_session_ui_notification(self):
-        self.success_header = SESSION_SUCCESS_HEADER
+        self.success_header = SUCCESS_HEADER
         mentor = self._expert_user(UserRole.MENTOR)
         office_hour = MentorProgramOfficeHourFactory(
             mentor=mentor, finalist=None)
@@ -105,7 +104,7 @@ class TestCancelOfficeHourSession(APITestCase):
         self.assert_notified(mentor)
 
     def test_staff_cancel_office_hour_session_ui_notification(self):
-        self.success_header = RESERVATION_SUCCESS_HEADER
+        self.success_header = SUCCESS_HEADER
         office_hour = MentorProgramOfficeHourFactory()
         response = self._cancel_office_hour_session(office_hour.id,
                                                     self.staff_user())
@@ -124,7 +123,7 @@ class TestCancelOfficeHourSession(APITestCase):
         self.assert_office_hour_session_was_cancelled(office_hour)
 
     def test_mentor_cancel_own_reserved_office_hour_ui_notification(self):
-        self.success_header = RESERVATION_SUCCESS_HEADER
+        self.success_header = SUCCESS_HEADER
         mentor = self._expert_user(UserRole.MENTOR)
         office_hour = MentorProgramOfficeHourFactory(mentor=mentor)
         response = self._cancel_office_hour_session(office_hour.id, mentor)
@@ -145,7 +144,7 @@ class TestCancelOfficeHourSession(APITestCase):
         office_hour = MentorProgramOfficeHourFactory()
         response = self._cancel_office_hour_session(office_hour.id,
                                                     self.basic_user())
-        notification = {'detail': DEFAULT_PERMISSION_DENIED_DETAIL}
+        notification = {'detail': CANCEL_SESSION_PERMISSION_DENIED_DETAIL}
         self.assertEqual(response.data, notification)
 
     def assert_office_hour_session_was_cancelled(self, office_hour):

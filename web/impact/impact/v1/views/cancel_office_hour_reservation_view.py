@@ -22,7 +22,7 @@ finalist_template_name = ("cancel_office_hour_reservation_email_to_finalist."
                           "html")
 SUBJECT_LINE = "MassChallenge | Cancelled Office Hours with {} {}"
 NO_SUCH_RESERVATION = "That session is not reserved."
-NO_SUCH_OFFICE_HOUR = "The specified office hour was not found."
+NO_SUCH_OFFICE_HOUR = "The office hour session does not exist."
 SUCCESS_NOTIFICATION = ("Canceled reservation for {finalist_name} with "
                         "{mentor_name} on {date} at {time}")
 SUCCESS_HEADER = 'Canceled office hour reservation'

@@ -17,13 +17,13 @@ from .utils import (
 
 DEFAULT_TIMEZONE = 'UTC'
 FAIL_CREATE_HEADER = 'Office hour session could not be created'
-FAIL_EDIT_HEADER = 'Office hour session could not be modified'
+FAIL_EDIT_HEADER = 'Office hour session could not be updated'
 SUCCESS_DETAIL = "{start_time} - {end_time} on {date}"
 NOT_FOUND_HOUR = ("The office hour session you are trying to update "
                   "doesn't exist")
 SUCCESS_PAST_DETAIL = ("This office officehour occurs in the past")
 SUCCESS_CREATE_HEADER = 'Office hour session(s) created'
-SUCCESS_EDIT_HEADER = 'Office hour session modified'
+SUCCESS_EDIT_HEADER = 'Office hour updated'
 
 SUBJECT = ("[Office Hours] Confirmation of Office Hours on {date} "
            "from {start_time} to {end_time} ")
@@ -91,7 +91,7 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
 
     def perform_save(self, request, serializer, save_operation):
         if not serializer.is_valid():
-            return handle_fail(serializer.errors)
+            return handle_fail(serializer.errors, True)
         save_operation(serializer)
         self.office_hour = serializer.instance
         if request.user != self.office_hour.mentor:

@@ -14,7 +14,7 @@ from accelerator.models import (
 )
 
 from ...permissions.v1_api_permissions import (
-    DEFAULT_PERMISSION_DENIED_DETAIL,
+    RESERVE_PERMISSION_DENIED_DETAIL,
     IsAuthenticated,
 )
 from ...views import ADD2CAL_DATE_FORMAT
@@ -24,7 +24,6 @@ from .utils import (
     is_office_hour_reserver,
     office_hour_time_info,
     datetime_is_in_past,
-    get_office_hour_shared_context
 )
 from ...minimal_email_handler import send_email
 User = get_user_model()
@@ -42,10 +41,8 @@ class ReserveOfficeHourView(ImpactView):
 
     OFFICE_HOUR_TITLE = "Office Hours Session with {}"
     SUCCESS_HEADER = "Office Hour reserved with {}"
-    SUCCESS_PAST_DETAIL = ("{start_time} - {end_time} on {date}. "
-                           "This office officehour occurs in the past")
-    SUCCESS_DETAIL = "{start_time} - {end_time} on {date}. "
-    FAIL_HEADER = "Fail header"
+    SUCCESS_PAST_DETAIL = ("This office officehour occurs in the past")
+    FAIL_HEADER = "Office hour could not be reserved"
     NO_OFFICE_HOUR_SPECIFIED = "No office hour was specified"
     NO_SUCH_OFFICE_HOUR = "This office hour is no longer available."
     NO_SUCH_STARTUP = "No such startup exists"
@@ -103,7 +100,7 @@ class ReserveOfficeHourView(ImpactView):
             if is_employee(request.user):
                 self.on_behalf_of = True
             else:
-                self.fail(DEFAULT_PERMISSION_DENIED_DETAIL)
+                self.fail(RESERVE_PERMISSION_DENIED_DETAIL)
                 return False
         else:
             self.target_user = request.user
@@ -210,7 +207,8 @@ class ReserveOfficeHourView(ImpactView):
         else:
             startup_name = ""
         self.success = True
-        self.header = self.SUCCESS_HEADER.format(self.office_hour.mentor)
+        self.header = self.SUCCESS_HEADER.format(
+            self.office_hour.mentor.full_name())
         self.detail = self._get_detail()
         self.timecard_info = {
             "finalist_first_name": self.target_user.first_name,
@@ -220,9 +218,8 @@ class ReserveOfficeHourView(ImpactView):
 
     def _get_detail(self):
         start_date_time = self.office_hour.start_date_time
-        return self.SUCCESS_DETAIL if not datetime_is_in_past(
-            start_date_time) else self.SUCCESS_PAST_DETAIL.format(
-                **get_office_hour_shared_context(self.office_hour))
+        return self.SUCCESS_PAST_DETAIL if datetime_is_in_past(
+            start_date_time) else ""
 
     def fail(self, detail):
         self.success = False

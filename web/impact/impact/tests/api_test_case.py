@@ -108,12 +108,14 @@ class APITestCase(TestCase):
                                office_hour=None):
         data = response.data
         mentor = office_hour.mentor if office_hour else None
+        name = mentor.full_name() if mentor else None
+        detail = notification if notification else ""
         header = self.success_header.format(
-            mentor) if success else self.fail_header
+            name) if success else self.fail_header
         self.assertTrue(all([
             data['success'] == success,
             data['header'] == header,
-            data['detail'] == notification
+            data['detail'] == detail
         ]), msg='Notification data was not as expected')
 
     def assert_notified(self,

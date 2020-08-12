@@ -4,7 +4,7 @@ from django.urls import reverse
 from .api_test_case import APITestCase
 from ..v1.views import ReserveOfficeHourView
 from ..v1.views.utils import localized_office_hour_start_time
-from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
+from ..permissions.v1_api_permissions import RESERVE_PERMISSION_DENIED_DETAIL
 from .factories import UserFactory
 from .utils import (
     minutes_from_now,
@@ -31,7 +31,7 @@ class TestReserveOfficeHourView(APITestCase):
         response = self.post_response(office_hour.id,
                                       request_user=finalist)
         self.assert_ui_notification(
-            response, True, self.view.SUCCESS_DETAIL, office_hour)
+            response, True, None, office_hour)
 
     def test_finalist_reserves_office_hour_with_conflict_fail_message(self):
         start_time = minutes_from_now(60)
@@ -196,7 +196,7 @@ class TestReserveOfficeHourView(APITestCase):
         response = self.post_response(office_hour.id,
                                       finalist.id)
         self.assert_ui_notification(
-            response, True, self.view.SUCCESS_DETAIL, office_hour)
+            response, True, None, office_hour)
 
     def test_reserve_on_behalf_of_nonexistent_user(self):
         # staff reserves a session on behalf of finalist, gets success
@@ -243,7 +243,7 @@ class TestReserveOfficeHourView(APITestCase):
                                       request_user=_finalist())
         self.assert_ui_notification(response,
                                     False,
-                                    DEFAULT_PERMISSION_DENIED_DETAIL)
+                                    RESERVE_PERMISSION_DENIED_DETAIL)
 
     def test_received_email_contains_attachment(self):
         # email contains ics attachment

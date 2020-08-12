@@ -20,10 +20,8 @@ SUBJECT = '[Office Hours] Canceled: {date}, {start_time}'
 STAFF_NOTIFICATION = ('on behalf of {mentor_name} at {start_time} '
                       '- {end_time} on {date}')
 MENTOR_NOTIFICATION = 'at {start_time} - {end_time} on {date}'
-OFFICE_HOUR_SESSION_404 = ("The office hour session you are trying to cancel "
-                           "doesn't exist")
-SESSION_SUCCESS_HEADER = 'Canceled office hour session'
-RESERVATION_SUCCESS_HEADER = 'Canceled office hour reservation'
+OFFICE_HOUR_SESSION_404 = ("The office hour session does not exist.")
+SUCCESS_HEADER = 'Canceled office hours'
 FAIL_HEADER = 'Office hour session could not be canceled'
 
 
@@ -49,7 +47,7 @@ class CancelOfficeHourSessionView(ImpactView):
 
     def cancel_office_hour_session(self, office_hour, user, message):
         shared_context = get_office_hour_shared_context(office_hour, message)
-        self._set_header(office_hour)
+        self.header = SUCCESS_HEADER
         if user == office_hour.mentor:
             cancelled_by = get_cancelled_by(shared_context['mentor_name'])
             self.handle_notification(office_hour, shared_context, cancelled_by)
@@ -114,10 +112,6 @@ class CancelOfficeHourSessionView(ImpactView):
             from_email=settings.NO_REPLY_EMAIL,
             attach_alternative=[html_email, 'text/html'],
         ).send()
-
-    def _set_header(self, office_hour):
-        self.header = (RESERVATION_SUCCESS_HEADER
-                       if office_hour.finalist else SESSION_SUCCESS_HEADER)
 
     def get_response(self, success, detail):
         return Response({
