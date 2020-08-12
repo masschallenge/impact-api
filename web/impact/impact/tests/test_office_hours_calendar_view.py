@@ -328,6 +328,29 @@ class TestOfficeHoursCalendarView(APITestCase):
         location_choices = response.data['location_choices']
         self.assertEqual([], location_choices)
 
+    def test_calendar_data_includes_startup_industry(self):
+        startup_team_member = StartupTeamMemberFactory()
+        startup = startup_team_member.startup
+        finalist = startup_team_member.user
+        office_hour = self.create_office_hour(finalist=finalist,
+                                              startup=startup)
+        response = self.get_response(user=office_hour.mentor)
+        self.assertEqual(
+            startup_team_member.startup.primary_industry.name,
+            response.data['calendar_data'][0]['startup_primary_industry'])
+
+    def test_calendar_data_includes_startup_short_pitch(self):
+        startup_team_member = StartupTeamMemberFactory()
+        startup = startup_team_member.startup
+        finalist = startup_team_member.user
+        office_hour = self.create_office_hour(finalist=finalist,
+                                              startup=startup)
+        response = self.get_response(user=office_hour.mentor)
+        self.assertEqual(
+            startup_team_member.startup.short_pitch,
+            response.data['calendar_data'][0]['startup_short_pitch'])
+
+
     def create_office_hour(self,
                            mentor=None,
                            finalist=None,
@@ -335,7 +358,8 @@ class TestOfficeHoursCalendarView(APITestCase):
                            duration_minutes=30,
                            timezone="America/New_York",
                            program=None,
-                           location=None):
+                           location=None,
+                           startup=None):
         create_params = {}
         mentor = mentor or _mentor(program)
         create_params['mentor'] = mentor
@@ -347,6 +371,8 @@ class TestOfficeHoursCalendarView(APITestCase):
         create_params['location__timezone'] = timezone
         create_params['finalist'] = finalist
         create_params['program'] = program
+        if startup:
+            create_params['startup'] = startup
         if not timezone:
             create_params['location'] = location
         return MentorProgramOfficeHourFactory(**create_params)
