@@ -24,7 +24,7 @@ RESERVE_PERMISSION_DENIED_DETAIL = (
 CANCEL_SESSION_PERMISSION_DENIED_DETAIL = (
     "You do not have permission to cancel this office hour")
 CANCEL_RESERVATION_PERMISSION_DENIED_DETAIL = (
-    "You do not have permission to cancel this office hour reservation")
+    "You do not have permission to cancel this session")
 OFFICE_HOUR_RESERVERS = [UserRole.FINALIST, UserRole.AIR, UserRole.ALUM]
 
 
@@ -63,6 +63,7 @@ class OfficeHourFinalistPermission(BasePermission):
 
     def has_object_permission(self, request, view, office_hour):
         self.message = CANCEL_RESERVATION_PERMISSION_DENIED_DETAIL
+        return False
         return (is_employee(request.user) or
                 office_hour.finalist == request.user)
 
