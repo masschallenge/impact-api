@@ -25,7 +25,7 @@ NO_SUCH_RESERVATION = "That session is not reserved."
 NO_SUCH_OFFICE_HOUR = "The office hour session does not exist."
 SUCCESS_NOTIFICATION = ("Canceled reservation for {finalist_name} with "
                         "{mentor_name} on {date} at {time}")
-SUCCESS_HEADER = 'Canceled office hour reservation'
+SUCCESS_HEADER = 'Canceled office hours'
 FAIL_HEADER = 'Office hour reservation could not be canceled'
 
 
