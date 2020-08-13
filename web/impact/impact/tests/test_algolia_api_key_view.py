@@ -126,7 +126,7 @@ class TestAlgoliaApiKeyView(APITestCase):
         user = self._create_user_with_role_grant(program, UserRole.FINALIST)
         response_data = self._get_response_data(
             user, self._mentor_directory_url())
-        self.assertIn(program.name, response_data["finalist_programs"])
+        self.assertIn(program.id, response_data["finalist_programs"])
 
     def test_non_finalists_have_no_finalist_programs(self):
         user = self.staff_user()
