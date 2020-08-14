@@ -15,16 +15,16 @@ from impact.permissions import (
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 DEFAULT_PERMISSION_DENIED_DETAIL = ("You do not have permission to perform "
                                     "this action.")
-CREATE_PERMISSION_DENIED_DETAIL = (
-    "You do not have permission to create this office hour")
-EDIT_PERMISSION_DENIED_DETAIL = (
-    "You do not have permission to edit this office hour")
-RESERVE_PERMISSION_DENIED_DETAIL = (
-    "You do not have permission to reserve this office hour")
-CANCEL_SESSION_PERMISSION_DENIED_DETAIL = (
-    "You do not have permission to cancel this office hour")
-CANCEL_RESERVATION_PERMISSION_DENIED_DETAIL = (
-    "You do not have permission to cancel this session")
+CREATE_PERMISSION_DENIED_DETAIL = ("You do not have permission to create "
+                                   "this office hour")
+EDIT_PERMISSION_DENIED_DETAIL = ("You do not have permission to edit this "
+                                 "office hour")
+RESERVE_PERMISSION_DENIED_DETAIL = ("You do not have permission to reserve "
+                                    "this office hour")
+CANCEL_SESSION_PERMISSION_DENIED_DETAIL = ("You do not have permission to "
+                                           "cancel this office hour")
+CANCEL_RESERVATION_PERMISSION_DENIED_DETAIL = ("You do not have permission "
+                                               "to cancel this session")
 OFFICE_HOUR_RESERVERS = [UserRole.FINALIST, UserRole.AIR, UserRole.ALUM]
 
 
@@ -63,7 +63,6 @@ class OfficeHourFinalistPermission(BasePermission):
 
     def has_object_permission(self, request, view, office_hour):
         self.message = CANCEL_RESERVATION_PERMISSION_DENIED_DETAIL
-        return False
         return (is_employee(request.user) or
                 office_hour.finalist == request.user)
 
@@ -91,9 +90,6 @@ class OfficeHourPermission(IsAuthenticated):
                 office_hour.mentor == request.user and not is_reserved)
 
     def get_message(self, request):
-        if request.method == 'POST':
-            return CREATE_PERMISSION_DENIED_DETAIL
-        elif request.method == 'PATCH':
-            return EDIT_PERMISSION_DENIED_DETAIL
-        else:
-            return DEFAULT_PERMISSION_DENIED_DETAIL
+        dict = {'POST': CREATE_PERMISSION_DENIED_DETAIL,
+                'PATCH': EDIT_PERMISSION_DENIED_DETAIL}
+        return dict.get(request.method, DEFAULT_PERMISSION_DENIED_DETAIL)

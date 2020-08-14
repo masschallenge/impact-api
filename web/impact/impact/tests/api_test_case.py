@@ -107,16 +107,24 @@ class APITestCase(TestCase):
     def assert_ui_notification(self, response, success, notification,
                                office_hour=None):
         data = response.data
-        mentor = office_hour.mentor if office_hour else None
-        name = mentor.full_name() if mentor else None
         detail = notification if notification else ""
-        header = self.success_header.format(
-            name) if success else self.fail_header
+        header = header(success, office_hour)
         self.assertTrue(all([
             data['success'] == success,
             data['header'] == header,
             data['detail'] == detail
         ]), msg='Notification data was not as expected')
+
+    def header(self, success, office_hour):
+        if success:
+            return self.success_header.format(mentor_name(office_hour))
+        else:
+            return self.fail_header
+
+    def mentor_name(office_hour):
+        if office_hour and office_hour.mentor:
+            return office_hour.mentor.full_name()
+        return None
 
     def assert_notified(self,
                         user,

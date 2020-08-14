@@ -53,8 +53,8 @@ class ReserveOfficeHourView(ImpactView):
                                         "choice for {}")
     USER_CANNOT_RESERVE_OFFICE_HOURS = ("The selected user is not allowed to "
                                         "reserve office hour sessions.")
-    CONFLICT_EXISTS = (
-        "The requested time overlaps with another existing officehours")
+    CONFLICT_EXISTS = ("The requested time overlaps with another "
+                       "existing officehours")
 
     def post(self, request):
         '''
@@ -218,8 +218,10 @@ class ReserveOfficeHourView(ImpactView):
 
     def _get_detail(self):
         start_date_time = self.office_hour.start_date_time
-        return self.SUCCESS_PAST_DETAIL if datetime_is_in_past(
-            start_date_time) else ""
+        if datetime_is_in_past(start_date_time):
+            return self.SUCCESS_PAST_DETAIL
+        else:
+            return ""
 
     def fail(self, detail):
         self.success = False
