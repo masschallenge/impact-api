@@ -51,18 +51,18 @@ class UserDetailViewPermission(V1APIPermissions):
 
 class OfficeHourMentorPermission(BasePermission):
     # User has permission to act as mentor on this office hour
+    message = CANCEL_SESSION_PERMISSION_DENIED_DETAIL
 
     def has_object_permission(self, request, view, office_hour):
-        self.message = CANCEL_SESSION_PERMISSION_DENIED_DETAIL
         return (is_employee(request.user) or
                 office_hour.mentor == request.user)
 
 
 class OfficeHourFinalistPermission(BasePermission):
     # User has permission to act as finalist on this office hour
+    message = CANCEL_RESERVATION_PERMISSION_DENIED_DETAIL
 
     def has_object_permission(self, request, view, office_hour):
-        self.message = CANCEL_RESERVATION_PERMISSION_DENIED_DETAIL
         return (is_employee(request.user) or
                 office_hour.finalist == request.user)
 
@@ -75,7 +75,7 @@ class IsExpertUser(IsAuthenticated):
 
 class OfficeHourPermission(IsAuthenticated):
     def has_permission(self, request, view):
-        self.message = self.get_message(request)
+        message = self.get_message(request)
         roles = [UserRole.MENTOR, UserRole.AIR]
         return super().has_permission(request, view) and (
             is_employee(request.user) or
