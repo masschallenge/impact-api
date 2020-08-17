@@ -134,7 +134,7 @@ class TestOfficeHoursCalendarView(APITestCase):
         office_hour = self.create_office_hour(mentor=staff_mentor)
         response = self.get_response(user=staff_user)
         self.assert_hour_in_response(response, office_hour)
-        
+
     def test_staff_sees_current_open_hours_for_their_program(self):
         program = ProgramFactory()
         staff_user = self.staff_user(program_family=program.program_family)
@@ -365,7 +365,6 @@ class TestOfficeHoursCalendarView(APITestCase):
         self.assertEqual(
             startup_team_member.startup.short_pitch,
             response.data['calendar_data'][0]['startup_short_pitch'])
-
 
     def create_office_hour(self,
                            mentor=None,
