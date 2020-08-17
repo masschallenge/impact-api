@@ -63,7 +63,7 @@ class AlgoliaApiKeyView(APIView):
             'userToken': request.user.id,
         }
         finalist_programs = _get_finalist_program_role_grants(
-            request.user).values_list('program_role__program__name', flat=True)
+            request.user).values_list('program_role__program__id', flat=True)
         if filters:
             params['filters'] = filters
         public_key = _get_public_key(params, search_key)

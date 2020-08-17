@@ -252,6 +252,8 @@ class OfficeHoursCalendarView(ImpactView):
             startup_name=F("startup__organization__name"),
             finalist_email=F("finalist__email"),
             mentor_email=F("mentor__email"),
+            startup_primary_industry=F("startup__primary_industry__name"),
+            startup_short_pitch=F("startup__short_pitch")
         )
         self.response_elements['timezones'] = office_hours.filter(
             location__isnull=False).order_by(
