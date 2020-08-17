@@ -26,6 +26,7 @@ from ...permissions.v1_api_permissions import (
 from accelerator.models import (
     Clearance,
     MentorProgramOfficeHour,
+    ProgramFamily,
     ProgramRoleGrant,
     UserRole,
     Location,
@@ -146,10 +147,11 @@ class OfficeHoursCalendarView(ImpactView):
             OFFICE_HOURS_HOLDER &
             in_visible_program_family).values_list(
                 "person__id", flat=True)
+        relevant_staff = _relevant_staff(staff_programs)
         mentors = list(program_mentors) + [self.target_user.id]
         active_mentors = Q(mentor__in=mentors)
         return MentorProgramOfficeHour.objects.filter(
-            active_mentors,
+            active_mentors | relevant_staff,
             start_date_time__range=[self.start_date, self.end_date]).order_by(
                 'start_date_time').annotate(
                     finalist_count=Count("finalist")).annotate(
@@ -174,7 +176,8 @@ class OfficeHoursCalendarView(ImpactView):
         unreserved = Q(finalist__isnull=True)
         user_programs = self.target_user.programrolegrant_set.filter(
             ACTIVE_PROGRAM & OFFICE_HOURS_RESERVER).values_list(
-                "program_role__program_id", flat=True)
+                "program_role__program", flat=True)
+        relevant_staff = _relevant_staff(user_programs)
         relevant_mentors = Q(**compose_filter(("mentor",
                                                "programrolegrant",
                                                "program_role",
@@ -182,7 +185,7 @@ class OfficeHoursCalendarView(ImpactView):
                                                "in"),
                                               user_programs))
         return MentorProgramOfficeHour.objects.filter(
-            reserved_by_user | unreserved & relevant_mentors,
+            reserved_by_user | unreserved & (relevant_mentors|relevant_staff),
             start_date_time__range=[self.start_date, self.end_date]).annotate(
                 own_office_hour=Case(
                     default=Value(False),
@@ -351,3 +354,14 @@ def _is_mentor(user):
 def _is_finalist(user):
     return user.programrolegrant_set.filter(
         ACTIVE_PROGRAM & OFFICE_HOURS_RESERVER).exists()
+
+def _relevant_staff(user_programs):
+    program_families = ProgramFamily.objects.filter(programs__in=user_programs)
+
+    staff_ids = Clearance.objects.filter(program_family_id__in=program_families).values_list(
+        "user_id", flat=True)
+    return Q(**compose_filter(("mentor",
+                               "id",
+                               "in"),
+                              staff_ids))
+
