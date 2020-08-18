@@ -9,7 +9,6 @@ from .api_test_case import APITestCase
 from .factories import MentorProgramOfficeHourFactory
 from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
 from ..v1.views.cancel_office_hour_session_view import (
-    CancelOfficeHourSessionView,
     FAIL_HEADER,
     MENTOR_NOTIFICATION,
     OFFICE_HOUR_SESSION_404,
@@ -21,6 +20,7 @@ from ..v1.views.utils import get_timezone
 from mc.utils import swapper_model
 MentorProgramOfficeHour = swapper_model('MentorProgramOfficeHour')
 UserRole = swapper_model('UserRole')
+
 
 
 class TestCancelOfficeHourSession(APITestCase):
