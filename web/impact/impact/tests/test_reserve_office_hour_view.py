@@ -10,6 +10,7 @@ from .utils import (
     minutes_from_now,
     nonexistent_object_id,
 )
+from add2cal.add2cal import BASE_URLS
 from accelerator.tests.factories import (
     MentorProgramOfficeHourFactory,
     StartupFactory,
@@ -252,6 +253,20 @@ class TestReserveOfficeHourView(APITestCase):
         self.post_response(office_hour.id,
                            finalist.id)
         self.assert_ics_email_attachments(finalist)
+
+    def test_outlook_link_in_reserve_office_hour_email_to_finalist(self):
+        office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        finalist = _finalist()
+        self.post_response(office_hour.id, request_user=finalist)
+        self.assert_notified(
+            finalist, BASE_URLS.get('outlook'), check_alternative=True)
+
+    def test_outlook_link_in_reserve_office_hour_email_to_mentor(self):
+        office_hour = MentorProgramOfficeHourFactory(finalist=None)
+        mentor = office_hour.mentor
+        self.post_response(office_hour.id, request_user=_finalist())
+        self.assert_notified(
+            mentor, BASE_URLS.get('outlook'), check_alternative=True)
 
     def assert_response_contains_session_details(self, response, office_hour):
         office_hour.refresh_from_db()
