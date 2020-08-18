@@ -12,7 +12,6 @@ from ..permissions.v1_api_permissions import (
 from ..tests.api_test_case import APITestCase
 from ..tests.factories import MentorProgramOfficeHourFactory
 from ..v1.views.cancel_office_hour_session_view import (
-    DEFAULT_TIMEZONE,
     FAIL_HEADER,
     OFFICE_HOUR_SESSION_404,
     MENTOR_NOTIFICATION,
@@ -22,6 +21,7 @@ from ..v1.views.cancel_office_hour_session_view import (
     CancelOfficeHourSessionView,
 )
 from ..v1.views.utils import get_timezone
+
 
 class TestCancelOfficeHourSession(APITestCase):
     fail_header = FAIL_HEADER
