@@ -350,7 +350,6 @@ class TestOfficeHoursCalendarView(APITestCase):
             startup_team_member.startup.short_pitch,
             response.data['calendar_data'][0]['startup_short_pitch'])
 
-
     def create_office_hour(self,
                            mentor=None,
                            finalist=None,
