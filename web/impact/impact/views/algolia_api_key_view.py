@@ -69,7 +69,7 @@ class AlgoliaApiKeyView(APIView):
         public_key = _get_public_key(params, search_key)
         return Response({
             'token': public_key,
-            'index_prefix': settings.ALGOLIA_INDEX_PREFIX,
+            'index_prefix': settings.ALGOLIA['INDEX_PREFIX'],
             'filters': filters,
             'finalist_programs': finalist_programs
         })
@@ -77,8 +77,8 @@ class AlgoliaApiKeyView(APIView):
 
 def _get_search_key(request):
     if is_employee(request.user):
-        return settings.ALGOLIA_STAFF_SEARCH_ONLY_API_KEY
-    return settings.ALGOLIA_SEARCH_ONLY_API_KEY
+        return settings.ALGOLIA['STAFF_SEARCH_ONLY_API_KEY']
+    return settings.ALGOLIA['SEARCH_API_KEY']
 
 
 def _get_filters(request):
@@ -195,8 +195,8 @@ def _facet_filters(program_families):
 
 def _get_public_key(params, search_key):
     client = algoliasearch.Client(
-        settings.ALGOLIA_APPLICATION_ID,
-        settings.ALGOLIA_API_KEY)
+        settings.ALGOLIA['APPLICATION_ID'],
+        settings.ALGOLIA['API_KEY'])
     public_key = client.generateSecuredApiKey(search_key, params)
     return public_key
 
