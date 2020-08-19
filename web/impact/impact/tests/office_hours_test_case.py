@@ -1,7 +1,6 @@
 from .api_test_case import APITestCase
 
 
-
 class OfficeHoursTestCase(APITestCase):
 
     def assert_ui_notification(self, response, success, notification,

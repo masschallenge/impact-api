@@ -90,7 +90,8 @@ class OfficeHourPermission(IsAuthenticated):
                 office_hour.mentor == request.user and not is_reserved)
 
     def get_message(self, request):
-        dict = {'POST': CREATE_PERMISSION_DENIED_DETAIL,
+        detail_messages = {'POST': CREATE_PERMISSION_DENIED_DETAIL,
                 'PATCH': EDIT_PERMISSION_DENIED_DETAIL}
-        self.message = dict.get(request.method,
+        self.message = detail_messages.get(request.method,
                                 DEFAULT_PERMISSION_DENIED_DETAIL)
+        
