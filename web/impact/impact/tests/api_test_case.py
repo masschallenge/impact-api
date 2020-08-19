@@ -111,7 +111,7 @@ class APITestCase(TestCase):
         self.assertTrue(all([
             data['success'] == success,
             data['header'] == header,
-            data['detail'] == notification
+            data['detail'] == detail
         ]), msg='Notification data was not as expected')
 
     def assert_notified(self,

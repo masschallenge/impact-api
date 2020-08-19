@@ -91,7 +91,6 @@ class OfficeHourPermission(IsAuthenticated):
 
     def get_message(self, request):
         detail_messages = {'POST': CREATE_PERMISSION_DENIED_DETAIL,
-                'PATCH': EDIT_PERMISSION_DENIED_DETAIL}
+                           'PATCH': EDIT_PERMISSION_DENIED_DETAIL}
         self.message = detail_messages.get(request.method,
-                                DEFAULT_PERMISSION_DENIED_DETAIL)
-        
+                                           DEFAULT_PERMISSION_DENIED_DETAIL)

@@ -21,7 +21,7 @@ FAIL_EDIT_HEADER = 'Office hour session could not be updated'
 SUCCESS_DETAIL = "{start_time} - {end_time} on {date}"
 NOT_FOUND_HOUR = ("The office hour session you are trying to update "
                   "doesn't exist")
-SUCCESS_PAST_DETAIL = ("This office officehour occurs in the past")
+SUCCESS_PAST_DETAIL = "This office hour occurs in the past"
 SUCCESS_CREATE_HEADER = 'Office hour session(s) created'
 SUCCESS_EDIT_HEADER = 'Office hour updated'
 

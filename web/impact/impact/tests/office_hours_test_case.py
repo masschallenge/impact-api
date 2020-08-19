@@ -25,5 +25,3 @@ def mentor_name(office_hour):
     if office_hour and office_hour.mentor:
         return office_hour.mentor.full_name()
     return None
-        
-    
