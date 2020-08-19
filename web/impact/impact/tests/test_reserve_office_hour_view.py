@@ -1,7 +1,7 @@
 from django.core import mail
 from django.urls import reverse
 
-from .api_test_case import APITestCase
+from .office_hours_test_case import OfficeHoursTestCase
 from ..v1.views import ReserveOfficeHourView
 from ..v1.views.utils import localized_office_hour_start_time
 from ..permissions.v1_api_permissions import RESERVE_PERMISSION_DENIED_DETAIL
@@ -20,7 +20,7 @@ from accelerator.tests.contexts import UserRoleContext
 from accelerator.models import UserRole
 
 
-class TestReserveOfficeHourView(APITestCase):
+class TestReserveOfficeHourView(OfficeHoursTestCase):
     view = ReserveOfficeHourView
     success_header = ReserveOfficeHourView.SUCCESS_HEADER
     fail_header = ReserveOfficeHourView.FAIL_HEADER

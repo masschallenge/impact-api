@@ -75,7 +75,7 @@ class IsExpertUser(IsAuthenticated):
 
 class OfficeHourPermission(IsAuthenticated):
     def has_permission(self, request, view):
-        message = self.get_message(request)
+        self.get_message(request)
         roles = [UserRole.MENTOR, UserRole.AIR]
         return super().has_permission(request, view) and (
             is_employee(request.user) or
@@ -92,4 +92,5 @@ class OfficeHourPermission(IsAuthenticated):
     def get_message(self, request):
         dict = {'POST': CREATE_PERMISSION_DENIED_DETAIL,
                 'PATCH': EDIT_PERMISSION_DENIED_DETAIL}
-        return dict.get(request.method, DEFAULT_PERMISSION_DENIED_DETAIL)
+        self.message = dict.get(request.method,
+                                DEFAULT_PERMISSION_DENIED_DETAIL)

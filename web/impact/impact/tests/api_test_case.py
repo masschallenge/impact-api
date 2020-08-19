@@ -104,27 +104,15 @@ class APITestCase(TestCase):
                 self.assertIn(key, options)
                 self.assertEqual(options[key], params)
 
-    def assert_ui_notification(self, response, success, notification,
-                               office_hour=None):
+    def assert_ui_notification(self, response, success, notification):
         data = response.data
         detail = notification if notification else ""
-        header = header(success, office_hour)
+        header = self.success_header if success else self.fail_header
         self.assertTrue(all([
             data['success'] == success,
             data['header'] == header,
-            data['detail'] == detail
+            data['detail'] == notification
         ]), msg='Notification data was not as expected')
-
-    def header(self, success, office_hour):
-        if success:
-            return self.success_header.format(mentor_name(office_hour))
-        else:
-            return self.fail_header
-
-    def mentor_name(office_hour):
-        if office_hour and office_hour.mentor:
-            return office_hour.mentor.full_name()
-        return None
 
     def assert_notified(self,
                         user,
