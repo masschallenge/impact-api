@@ -24,6 +24,7 @@ from ..v1.views.utils import get_timezone
 
 class TestCancelOfficeHourSession(APITestCase):
     fail_header = FAIL_HEADER
+    success_header = SUCCESS_HEADER    
     url = reverse(CancelOfficeHourSessionView.view_name)
 
     def test_mentor_can_cancel_their_own_unreserved_office_hour(self):
@@ -43,7 +44,7 @@ class TestCancelOfficeHourSession(APITestCase):
         self.assert_office_hour_session_was_cancelled(office_hour)
 
     def test_mentor_cancel_their_own_unreserved_session_ui_notification(self):
-        self.success_header = SUCCESS_HEADER
+
         mentor = self._expert_user(UserRole.MENTOR)
         office_hour = MentorProgramOfficeHourFactory(
             mentor=mentor, finalist=None)
@@ -104,7 +105,6 @@ class TestCancelOfficeHourSession(APITestCase):
         self.assert_notified(mentor)
 
     def test_staff_cancel_office_hour_session_ui_notification(self):
-        self.success_header = SUCCESS_HEADER
         office_hour = MentorProgramOfficeHourFactory()
         response = self._cancel_office_hour_session(office_hour.id,
                                                     self.staff_user())
@@ -123,7 +123,6 @@ class TestCancelOfficeHourSession(APITestCase):
         self.assert_office_hour_session_was_cancelled(office_hour)
 
     def test_mentor_cancel_own_reserved_office_hour_ui_notification(self):
-        self.success_header = SUCCESS_HEADER
         mentor = self._expert_user(UserRole.MENTOR)
         office_hour = MentorProgramOfficeHourFactory(mentor=mentor)
         response = self._cancel_office_hour_session(office_hour.id, mentor)
