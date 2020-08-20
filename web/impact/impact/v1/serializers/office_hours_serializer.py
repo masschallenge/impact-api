@@ -22,7 +22,8 @@ INVALID_SESSION_DURATION = 'Please specify a duration of 30 minutes or more.'
 THIRTY_MINUTES = timedelta(minutes=30)
 NO_START_DATE_TIME = "start_date_time must be specified"
 NO_END_DATE_TIME = "end_date_time must be specified"
-CONFLICTING_SESSIONS = "There are conflicts with existing office hours"
+CONFLICTING_SESSIONS = ("Requested times overlap with your existing "
+                        "office hours.")
 
 
 class OfficeHourSerializer(ModelSerializer):

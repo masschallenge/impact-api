@@ -1,6 +1,11 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
-from pytz import timezone
+
+from pytz import (
+    timezone,
+    utc
+)
+
 
 from accelerator.models import ACTIVE_PROGRAM_STATUS
 from mc.utils import swapper_model
@@ -81,3 +86,31 @@ def get_timezone(office_hour):
     if office_hour.location and office_hour.location.timezone:
         return office_hour.location.timezone
     return DEFAULT_TIMEZONE
+
+
+def datetime_is_in_past(date_time):
+    return date_time.astimezone(utc) < utc.localize(date_time.utcnow())
+
+
+def get_office_hours_url():
+    site_url = 'accelerate.masschallenge.org'
+    return 'https://{}/newofficehours/'.format(site_url)
+
+
+def get_office_hour_shared_context(office_hour, message=None):
+    tz = timezone(get_timezone(office_hour))
+    date = office_hour.start_date_time.astimezone(tz).strftime('%A, %d %B, %Y')
+    start_time = office_hour.start_date_time.astimezone(tz).strftime('%I:%M%p')
+    end_time = office_hour.end_date_time.astimezone(tz).strftime('%I:%M%p')
+    program = office_hour.program
+    phone = program.program_family.phone_number if program else ''
+    return {
+        'date': date,
+        'start_time': start_time,
+        'end_time': end_time,
+        'location': office_hour.location.name if office_hour.location else '',
+        'dashboard_url': get_office_hours_url(),
+        'mentor_name': office_hour.mentor.get_profile().full_name(),
+        'phone': phone,
+        'message': message,
+    }
