@@ -44,21 +44,18 @@ class TestCancelOfficeHourSession(APITestCase):
         self.assert_office_hour_session_was_cancelled(office_hour)
 
     def test_mentor_cancel_their_own_unreserved_session_ui_notification(self):
-
         mentor = self._expert_user(UserRole.MENTOR)
         office_hour = MentorProgramOfficeHourFactory(
             mentor=mentor, finalist=None)
         response = self._cancel_office_hour_session(office_hour.id, mentor)
-        self.assert_mentor_cancel_reservation_ui_notification(
-            office_hour, response
-        )
+        self.assert_mentor_cancel_reservation_ui_notification(office_hour,
+                                                              response)
 
     def test_mentor_cannot_cancel_someone_else_unreserved_office_hour(self):
         mentor = self._expert_user(UserRole.MENTOR)
-        mentor2 = self._expert_user(UserRole.MENTOR)
-        office_hour = MentorProgramOfficeHourFactory(
-            finalist=None,
-            mentor=mentor2)
+        other_mentor = self._expert_user(UserRole.MENTOR)
+        office_hour = MentorProgramOfficeHourFactory(finalist=None,
+                                                     mentor=other_mentor)
         self._cancel_office_hour_session(office_hour.id, mentor)
         self.assert_office_hour_session_was_not_cancelled(office_hour)
 
@@ -92,7 +89,7 @@ class TestCancelOfficeHourSession(APITestCase):
         message = 'cancelled due to conflicting meetings'
         self._cancel_office_hour_session(office_hour.id,
                                          self.staff_user(), message)
-        self.assert_notified(office_hour.mentor,
+        self.assert_notified(office_hour.mentor, 
                              message,
                              check_alternative=True)
 
@@ -108,9 +105,8 @@ class TestCancelOfficeHourSession(APITestCase):
         office_hour = MentorProgramOfficeHourFactory()
         response = self._cancel_office_hour_session(office_hour.id,
                                                     self.staff_user())
-        self.assert_staff_cancel_reservation_ui_notification(
-            office_hour, response
-        )
+        self.assert_staff_cancel_reservation_ui_notification(office_hour,
+                                                             response)
 
     def test_office_hour_session_not_existing_ui_notification(self):
         response = self._cancel_office_hour_session(0, self.staff_user())
@@ -177,8 +173,7 @@ class TestCancelOfficeHourSession(APITestCase):
             'date': date,
             'start_time': start_time,
             'end_time': end_time,
-            'mentor_name': office_hour.mentor.get_profile().full_name(),
-        }
+            'mentor_name': office_hour.mentor.get_profile().full_name()}
 
     def _expert_user(self, role):
         user = UserRoleContext(role).user
