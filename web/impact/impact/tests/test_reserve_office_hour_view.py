@@ -29,15 +29,12 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
         # a finalist reserves an office hour, gets success response
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         finalist = _finalist()
-        response = self.post_response(office_hour.id,
-                                      request_user=finalist)
-        self.assert_ui_notification(
-            response, True, None, office_hour)
+        response = self.post_response(office_hour.id, request_user=finalist)
+        self.assert_ui_notification(response, True, None, office_hour)
 
     def test_finalist_reserves_office_hour_with_conflict_fail_message(self):
         start_time = minutes_from_now(60)
         end_time = minutes_from_now(90)
-
         finalist = _finalist()
         MentorProgramOfficeHourFactory(
             finalist=finalist,
@@ -48,7 +45,7 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
             finalist=None,
             start_date_time=start_time,
             end_date_time=end_time)
-        response = self.post_response(new_office_hour.id,
+        response = self.post_response(new_office_hour.id, 
                                       request_user=finalist)
         self.assert_ui_notification(response, False, self.view.CONFLICT_EXISTS)
 
@@ -62,13 +59,11 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
             finalist=finalist,
             start_date_time=start_time,
             end_date_time=shared_midpoint)
-
         new_office_hour = MentorProgramOfficeHourFactory(
             finalist=None,
             start_date_time=shared_midpoint,
             end_date_time=end_time)
-        self.post_response(new_office_hour.id,
-                           request_user=finalist)
+        self.post_response(new_office_hour.id, request_user=finalist)
         self.assert_reserved_by(new_office_hour, finalist)
 
     def test_finalist_reserves_office_hour_with_conflict_reserve_fails(self):
@@ -139,10 +134,9 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
         response = self.post_response(office_hour.id,
                                       startup_id=startup_id,
                                       request_user=finalist)
-        self.assert_ui_notification(
-            response,
-            False,
-            self.view.STARTUP_NOT_ASSOCIATED_WITH_USER.format(finalist.email))
+        message = self.view.STARTUP_NOT_ASSOCIATED_WITH_USER.format(
+            finalist.email)
+        self.assert_ui_notification(response, False, message)
 
     def test_non_finalist_attempts_to_reserve_office_hour_notification(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
@@ -164,8 +158,7 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
         # a finalist reserves and office hour, gets a confirmation email
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         finalist = _finalist()
-        self.post_response(office_hour.id,
-                           request_user=finalist)
+        self.post_response(office_hour.id, request_user=finalist)
         self.assert_notified(finalist)
 
     def test_correct_date_format_in_confirmation_email(self):
@@ -173,8 +166,7 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
 
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         finalist = _finalist()
-        self.post_response(office_hour.id,
-                           request_user=finalist)
+        self.post_response(office_hour.id, request_user=finalist)
         email = mail.outbox[0]
         localized_time = localized_office_hour_start_time(office_hour)
         self.assertIn(localized_time.strftime(
@@ -184,8 +176,7 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
         # a finalist reserves a reserved office hour, gets failure response
         office_hour = MentorProgramOfficeHourFactory()
         finalist = _finalist()
-        response = self.post_response(office_hour.id,
-                                      request_user=finalist)
+        response = self.post_response(office_hour.id, request_user=finalist)
         self.assert_ui_notification(response,
                                     False,
                                     self.view.OFFICE_HOUR_ALREADY_RESERVED)
@@ -194,8 +185,7 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
         # staff reserves a session on behalf of finalist, gets success
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         finalist = _finalist()
-        response = self.post_response(office_hour.id,
-                                      finalist.id)
+        response = self.post_response(office_hour.id, finalist.id)
         self.assert_ui_notification(
             response, True, None, office_hour)
 
@@ -203,16 +193,14 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
         # staff reserves a session on behalf of finalist, gets success
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         finalist_id = nonexistent_object_id(UserFactory)
-        response = self.post_response(office_hour.id,
-                                      finalist_id)
+        response = self.post_response(office_hour.id, finalist_id)
         self.assert_ui_notification(response, False, self.view.NO_SUCH_USER)
 
     def test_nonexistent_office_hour(self):
         # staff reserves a session on behalf of finalist, gets success
         office_hour_id = nonexistent_object_id(MentorProgramOfficeHourFactory)
         finalist = _finalist()
-        response = self.post_response(office_hour_id,
-                                      finalist.id)
+        response = self.post_response(office_hour_id, finalist.id)
         self.assert_ui_notification(response,
                                     False,
                                     self.view.NO_SUCH_OFFICE_HOUR)
@@ -222,8 +210,7 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
         # notified by email
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         finalist = _finalist()
-        self.post_response(office_hour.id,
-                           finalist.id)
+        self.post_response(office_hour.id, finalist.id)
         self.assert_notified(finalist)
 
     def test_reserve_on_behalf_of_mentor_gets_email_notification(self):
@@ -231,8 +218,7 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
         # notified by email
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         finalist = _finalist()
-        self.post_response(office_hour.id,
-                           finalist.id)
+        self.post_response(office_hour.id, finalist.id)
         self.assert_notified(office_hour.mentor)
 
     def test_non_staff_reserve_on_behalf_of_failure(self):
@@ -258,15 +244,17 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         finalist = _finalist()
         self.post_response(office_hour.id, request_user=finalist)
-        self.assert_notified(
-            finalist, BASE_URLS.get('outlook'), check_alternative=True)
+        self.assert_notified(finalist,
+                             BASE_URLS.get('outlook'),
+                             check_alternative=True)
 
     def test_outlook_link_in_reserve_office_hour_email_to_mentor(self):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         mentor = office_hour.mentor
         self.post_response(office_hour.id, request_user=_finalist())
-        self.assert_notified(
-            mentor, BASE_URLS.get('outlook'), check_alternative=True)
+        self.assert_notified(mentor,
+                             BASE_URLS.get('outlook'),
+                             check_alternative=True)
 
     def assert_response_contains_session_details(self, response, office_hour):
         office_hour.refresh_from_db()
