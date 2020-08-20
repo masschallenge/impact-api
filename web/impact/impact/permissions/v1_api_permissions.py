@@ -6,6 +6,8 @@ from accelerator_abstract.models.base_user_utils import (
     is_employee,
     is_expert,
 )
+from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
+
 from accelerator.models import UserRole
 from impact.permissions import (
     settings,
@@ -81,7 +83,7 @@ class OfficeHourPermission(IsAuthenticated):
             is_employee(request.user) or
             request.user.programrolegrant_set.filter(
                 program_role__user_role__name__in=roles,
-                program_role__program__program_status='active',
+                program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
             ).exists())
 
     def has_object_permission(self, request, view, office_hour):
