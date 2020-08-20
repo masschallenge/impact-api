@@ -23,7 +23,6 @@ MentorProgramOfficeHour = swapper_model('MentorProgramOfficeHour')
 UserRole = swapper_model('UserRole')
 
 
-
 class TestCancelOfficeHourSession(APITestCase):
     fail_header = FAIL_HEADER
     url = reverse(CancelOfficeHourSessionView.view_name)
