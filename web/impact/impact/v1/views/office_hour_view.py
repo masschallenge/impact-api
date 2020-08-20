@@ -1,6 +1,7 @@
 from datetime import timedelta
 from dateutil.parser import isoparse
 from django.conf import settings
+from django.http import Http404
 from rest_framework import viewsets
 from rest_framework.response import Response
 
@@ -9,14 +10,20 @@ from accelerator.models import MentorProgramOfficeHour
 from ...minimal_email_handler import MinimalEmailHandler
 from ...permissions.v1_api_permissions import OfficeHourPermission
 from ..serializers.office_hours_serializer import OfficeHourSerializer
-from .utils import office_hour_time_info
+from .utils import (
+    office_hour_time_info,
+    datetime_is_in_past,
+)
 
 DEFAULT_TIMEZONE = 'UTC'
-
 FAIL_CREATE_HEADER = 'Office hour session could not be created'
-FAIL_EDIT_HEADER = 'Office hour session could not be modified'
+FAIL_EDIT_HEADER = 'Office hour session could not be updated'
+SUCCESS_DETAIL = "{start_time} - {end_time} on {date}"
+NOT_FOUND_HOUR = ("The office hour session you are trying to update "
+                  "doesn't exist")
+SUCCESS_PAST_DETAIL = "This office hour occurs in the past"
 SUCCESS_CREATE_HEADER = 'Office hour session(s) created'
-SUCCESS_EDIT_HEADER = 'Office hour session modified'
+SUCCESS_EDIT_HEADER = 'Office hour updated'
 
 SUBJECT = ("[Office Hours] Confirmation of Office Hours on {date} "
            "from {start_time} to {end_time} ")
@@ -56,14 +63,6 @@ EDIT_BODY = (
 )
 
 
-def handle_success(data, edit=False):
-    return Response({
-        'data': data,
-        'header': SUCCESS_EDIT_HEADER if edit else SUCCESS_CREATE_HEADER,
-        'success': True
-    })
-
-
 def handle_fail(errors, edit=False):
     return Response({
         'errors': errors,
@@ -92,16 +91,19 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
 
     def perform_save(self, request, serializer, save_operation):
         if not serializer.is_valid():
-            return handle_fail(serializer.errors)
+            return handle_fail(serializer.errors, True)
         save_operation(serializer)
-        office_hour = serializer.instance
-        if request.user != office_hour.mentor:
-            self.handle_send_mail(office_hour, edit=True)
-        return handle_success([serializer.data])
+        self.office_hour = serializer.instance
+        if request.user != self.office_hour.mentor:
+            self.handle_send_mail(self.office_hour, edit=True)
+        return self.handle_success([serializer.data], True)
 
     def handle_response(self, request):
         if request.method == 'PATCH':
-            instance = self.get_object()
+            try:
+                instance = self.get_object()
+            except Http404:
+                return handle_fail({"errors": NOT_FOUND_HOUR}, edit=True)
             serializer = self.get_serializer(
                 instance, data=request.data, partial=True)
             save_operation = self.perform_update
@@ -116,13 +118,15 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
         for serializer in serializers:
             self.perform_create(serializer)
         first_office_hour = serializers[0].instance
+        self.office_hour = first_office_hour
         last_office_hour = serializers[-1].instance
         if request.user != first_office_hour.mentor:
             self.handle_send_mail(
                 first_office_hour,
                 last_office_hour=last_office_hour)
 
-        return handle_success([serializer.data for serializer in serializers])
+        return self.handle_success(
+            [serializer.data for serializer in serializers])
 
     def update(self, request, *args, **kwargs):
         return self.handle_response(request)
@@ -135,6 +139,15 @@ class OfficeHourViewSet(viewsets.ModelViewSet):
             subject=SUBJECT.format(**context),
             body=body.format(**context),
             from_email=settings.NO_REPLY_EMAIL).send()
+
+    def handle_success(self, data, edit=False,):
+        return Response({
+            'data': data,
+            'header': SUCCESS_EDIT_HEADER if edit else SUCCESS_CREATE_HEADER,
+            "detail": SUCCESS_PAST_DETAIL if datetime_is_in_past(
+                self.office_hour.start_date_time) else "",
+            'success': True
+        })
 
 
 def parse_date_specs(data):

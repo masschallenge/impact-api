@@ -14,7 +14,7 @@ from accelerator.models import (
 )
 
 from ...permissions.v1_api_permissions import (
-    DEFAULT_PERMISSION_DENIED_DETAIL,
+    RESERVE_PERMISSION_DENIED_DETAIL,
     IsAuthenticated,
 )
 from ...views import ADD2CAL_DATE_FORMAT
@@ -23,6 +23,7 @@ from .utils import (
     email_template_path,
     is_office_hour_reserver,
     office_hour_time_info,
+    datetime_is_in_past,
 )
 from ...minimal_email_handler import send_email
 User = get_user_model()
@@ -39,11 +40,11 @@ class ReserveOfficeHourView(ImpactView):
     permission_classes = [IsAuthenticated]
 
     OFFICE_HOUR_TITLE = "Office Hours Session with {}"
-    SUCCESS_HEADER = "Office Hours session reserved"
-    SUCCESS_DETAIL = "You have reserved this office hour session"
-    FAIL_HEADER = "Fail header"
+    SUCCESS_HEADER = "Office Hour reserved with {}"
+    SUCCESS_PAST_DETAIL = ("This office officehour occurs in the past")
+    FAIL_HEADER = "Office hour could not be reserved"
     NO_OFFICE_HOUR_SPECIFIED = "No office hour was specified"
-    NO_SUCH_OFFICE_HOUR = "No such office hour exists."
+    NO_SUCH_OFFICE_HOUR = "This office hour is no longer available."
     NO_SUCH_STARTUP = "No such startup exists"
     NO_SUCH_USER = "No such user exists"
     OFFICE_HOUR_ALREADY_RESERVED = "That session has already been reserved"
@@ -52,8 +53,8 @@ class ReserveOfficeHourView(ImpactView):
                                         "choice for {}")
     USER_CANNOT_RESERVE_OFFICE_HOURS = ("The selected user is not allowed to "
                                         "reserve office hour sessions.")
-    CONFLICT_EXISTS = ("There is a conflict with an existing office hour "
-                       "reservation")
+    CONFLICT_EXISTS = ("The requested time overlaps with another "
+                       "existing officehours")
 
     def post(self, request):
         '''
@@ -99,7 +100,7 @@ class ReserveOfficeHourView(ImpactView):
             if is_employee(request.user):
                 self.on_behalf_of = True
             else:
-                self.fail(DEFAULT_PERMISSION_DENIED_DETAIL)
+                self.fail(RESERVE_PERMISSION_DENIED_DETAIL)
                 return False
         else:
             self.target_user = request.user
@@ -206,13 +207,21 @@ class ReserveOfficeHourView(ImpactView):
         else:
             startup_name = ""
         self.success = True
-        self.header = self.SUCCESS_HEADER
-        self.detail = self.SUCCESS_DETAIL
+        self.header = self.SUCCESS_HEADER.format(
+            self.office_hour.mentor.full_name())
+        self.detail = self._get_detail()
         self.timecard_info = {
             "finalist_first_name": self.target_user.first_name,
             "finalist_last_name": self.target_user.last_name,
             "topics": self.message,
             "startup": startup_name}
+
+    def _get_detail(self):
+        start_date_time = self.office_hour.start_date_time
+        if datetime_is_in_past(start_date_time):
+            return self.SUCCESS_PAST_DETAIL
+        else:
+            return ""
 
     def fail(self, detail):
         self.success = False

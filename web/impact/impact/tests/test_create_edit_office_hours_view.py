@@ -29,7 +29,7 @@ from accelerator_abstract.models.base_clearance import (
     CLEARANCE_LEVEL_STAFF,
 )
 
-from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
+from ..permissions.v1_api_permissions import CREATE_PERMISSION_DENIED_DETAIL
 from ..v1.serializers.office_hours_serializer import (
     CONFLICTING_SESSIONS,
     INVALID_END_DATE,
@@ -191,7 +191,7 @@ class TestCreateEditOfficeHourView(APITestCase):
         data = self._get_post_request_data(mentor)
         response = self._create_office_hour_session(mentor, data)
         self.assertEqual(response.data['detail'],
-                         DEFAULT_PERMISSION_DENIED_DETAIL)
+                         CREATE_PERMISSION_DENIED_DETAIL)
 
     def test_office_hour_end_date_must_be_later_than_start_date(self):
         mentor = self._expert_user(UserRole.MENTOR)
@@ -209,7 +209,7 @@ class TestCreateEditOfficeHourView(APITestCase):
         data = self._get_post_request_data(mentor)
         response = self._create_office_hour_session(self.basic_user(), data)
         self.assertEqual(response.data['detail'],
-                         DEFAULT_PERMISSION_DENIED_DETAIL)
+                         CREATE_PERMISSION_DENIED_DETAIL)
 
     def test_use_request_user_for_mentor_users(self):
         mentor = self._expert_user(UserRole.MENTOR)
