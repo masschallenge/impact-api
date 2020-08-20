@@ -4,6 +4,7 @@ from rest_framework.permissions import (
     IsAuthenticated,
 )
 
+from accelerator_abstract.models import ACTIVE_PROGRAM_STATUS
 from accelerator_abstract.models.base_user_utils import (
     is_employee,
     is_expert,
@@ -14,6 +15,16 @@ from mc.models import UserRole
 SAFE_METHODS = ['GET', 'HEAD', 'OPTIONS']
 DEFAULT_PERMISSION_DENIED_DETAIL = ("You do not have permission to perform "
                                     "this action.")
+CREATE_PERMISSION_DENIED_DETAIL = ("You do not have permission to create "
+                                   "this office hour")
+EDIT_PERMISSION_DENIED_DETAIL = ("You do not have permission to edit this "
+                                 "office hour")
+RESERVE_PERMISSION_DENIED_DETAIL = ("You do not have permission to reserve "
+                                    "this office hour")
+CANCEL_SESSION_PERMISSION_DENIED_DETAIL = ("You do not have permission to "
+                                           "cancel this office hour")
+CANCEL_RESERVATION_PERMISSION_DENIED_DETAIL = ("You do not have permission "
+                                               "to cancel this session")
 OFFICE_HOUR_RESERVERS = [UserRole.FINALIST, UserRole.AIR, UserRole.ALUM]
 
 
@@ -40,6 +51,7 @@ class UserDetailViewPermission(V1APIPermissions):
 
 class OfficeHourMentorPermission(BasePermission):
     # User has permission to act as mentor on this office hour
+    message = CANCEL_SESSION_PERMISSION_DENIED_DETAIL
 
     def has_object_permission(self, request, view, office_hour):
         return (is_employee(request.user) or
@@ -48,6 +60,7 @@ class OfficeHourMentorPermission(BasePermission):
 
 class OfficeHourFinalistPermission(BasePermission):
     # User has permission to act as finalist on this office hour
+    message = CANCEL_RESERVATION_PERMISSION_DENIED_DETAIL
 
     def has_object_permission(self, request, view, office_hour):
         return (is_employee(request.user) or
@@ -62,15 +75,22 @@ class IsExpertUser(IsAuthenticated):
 
 class OfficeHourPermission(IsAuthenticated):
     def has_permission(self, request, view):
+        self.get_message(request)
         roles = [UserRole.MENTOR, UserRole.AIR]
         return super().has_permission(request, view) and (
             is_employee(request.user) or
             request.user.programrolegrant_set.filter(
                 program_role__user_role__name__in=roles,
-                program_role__program__program_status='active',
+                program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
             ).exists())
 
     def has_object_permission(self, request, view, office_hour):
         is_reserved = office_hour.finalist
         return (is_employee(request.user) or
                 office_hour.mentor == request.user and not is_reserved)
+
+    def get_message(self, request):
+        detail_messages = {'POST': CREATE_PERMISSION_DENIED_DETAIL,
+                           'PATCH': EDIT_PERMISSION_DENIED_DETAIL}
+        self.message = detail_messages.get(request.method,
+                                           DEFAULT_PERMISSION_DENIED_DETAIL)
