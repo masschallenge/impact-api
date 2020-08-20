@@ -46,7 +46,7 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
             finalist=None,
             start_date_time=start_time,
             end_date_time=end_time)
-        response = self.post_response(new_office_hour.id, 
+        response = self.post_response(new_office_hour.id,
                                       request_user=finalist)
         self.assert_ui_notification(response, False, self.view.CONFLICT_EXISTS)
 

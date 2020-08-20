@@ -7,13 +7,16 @@ from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.utils import days_from_now
 from .api_test_case import APITestCase
 from .factories import MentorProgramOfficeHourFactory
-from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
+from ..permissions.v1_api_permissions import (
+    CANCEL_SESSION_PERMISSION_DENIED_DETAIL,
+)
 from ..v1.views.cancel_office_hour_session_view import (
+    CancelOfficeHourSessionView,
     FAIL_HEADER,
     MENTOR_NOTIFICATION,
+    OFFICE_HOUR_SESSION_404,
     STAFF_NOTIFICATION,
     SUCCESS_HEADER,
-    CancelOfficeHourSessionView,
 )
 from ..v1.views.utils import get_timezone
 from mc.utils import swapper_model
@@ -21,10 +24,9 @@ MentorProgramOfficeHour = swapper_model('MentorProgramOfficeHour')
 UserRole = swapper_model('UserRole')
 
 
-
 class TestCancelOfficeHourSession(APITestCase):
     fail_header = FAIL_HEADER
-    success_header = SUCCESS_HEADER    
+    success_header = SUCCESS_HEADER
     url = reverse(CancelOfficeHourSessionView.view_name)
 
     def test_mentor_can_cancel_their_own_unreserved_office_hour(self):
@@ -89,7 +91,7 @@ class TestCancelOfficeHourSession(APITestCase):
         message = 'cancelled due to conflicting meetings'
         self._cancel_office_hour_session(office_hour.id,
                                          self.staff_user(), message)
-        self.assert_notified(office_hour.mentor, 
+        self.assert_notified(office_hour.mentor,
                              message,
                              check_alternative=True)
 
