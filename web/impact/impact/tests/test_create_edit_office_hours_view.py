@@ -11,12 +11,6 @@ from pytz import (
 from django.core import mail
 from django.urls import reverse
 
-from accelerator_abstract.models.base_clearance import (
-    CLEARANCE_LEVEL_EXEC_MD,
-    CLEARANCE_LEVEL_GLOBAL_MANAGER,
-    CLEARANCE_LEVEL_POM,
-    CLEARANCE_LEVEL_STAFF
-)
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.factories import (
     MentorProgramOfficeHourFactory,
@@ -29,7 +23,6 @@ from accelerator_abstract.models.base_clearance import (
     CLEARANCE_LEVEL_POM,
     CLEARANCE_LEVEL_STAFF,
 )
-
 from ..permissions.v1_api_permissions import CREATE_PERMISSION_DENIED_DETAIL
 from ..v1.serializers.office_hours_serializer import (
     CONFLICTING_SESSIONS,
