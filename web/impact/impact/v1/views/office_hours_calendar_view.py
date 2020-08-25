@@ -361,8 +361,8 @@ def _relevant_staff(user_programs):
     program_families = ProgramFamily.objects.filter(programs__in=user_programs)
     staff_ids = Clearance.objects.filter(
         program_family_id__in=program_families).values_list(
-            "user_id", flat=True)
-    return Q(**compose_filter(("mentor",
-                               "id",
-                               "in"),
+            'user_id', flat=True)
+    return Q(**compose_filter(('mentor',
+                               'id',
+                               'in'),
                               staff_ids))
