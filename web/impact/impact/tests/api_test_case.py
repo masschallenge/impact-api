@@ -106,11 +106,12 @@ class APITestCase(TestCase):
 
     def assert_ui_notification(self, response, success, notification):
         data = response.data
+        detail = notification if notification else ""
         header = self.success_header if success else self.fail_header
         self.assertTrue(all([
             data['success'] == success,
             data['header'] == header,
-            data['detail'] == notification
+            data['detail'] == detail
         ]), msg='Notification data was not as expected')
 
     def assert_notified(self,

@@ -141,18 +141,6 @@ target_help = \
   '\tValid targets include "staging" (the default), "production",' \
   '\t "test-1", and "test-2"' \
 
-
-RELEASE_EXAMPLE = E.g., 'make release DOCKER_REGISTRY=<ecr-container>.amazonaws.com ENVIRONMENT=staging AWS_SECRET_ACCESS_KEY=abcdefghijk AWS_ACCESS_KEY_ID=ABCDEFGH12IJKL'
-registry_error_msg = DOCKER_REGISTRY must be set.  $(RELEASE_EXAMPLE)
-
-awskey_error_msg  = AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY must be \
-  set.  $(RELEASE_EXAMPLE)
-
-environment_error_msg = ENVIRONMENT must be \
-  set.  $(RELEASE_EXAMPLE)
-
-no_release_error_msg = RELEASE must be set.  E.g., 'make deploy RELEASE=1.2.3.4'
-
 # Repos
 ACCELERATE = ../accelerate
 API_APP = ../accelerate/mcproject/api
@@ -184,7 +172,6 @@ setup: .env
 ACCELERATE_VERSION:=$(shell git describe --tags --abbrev=0)
 build: shutdown-vms delete-vms setup
 	@docker build -f Dockerfile.fpdiff -t masschallenge/fpdiff .
-	@docker build  -f Dockerfile.semantic-release -t semantic-release .
 	@docker-compose build --build-arg ACCELERATE_VERSION=$(ACCELERATE_VERSION)
 
 # Testing, coverage, and code checking targets
