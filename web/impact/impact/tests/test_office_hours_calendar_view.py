@@ -3,6 +3,7 @@ from datetime import (
     timedelta,
 )
 from pytz import utc
+import calendar
 
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
@@ -44,45 +45,69 @@ from .utils import nonexistent_object_id
 class TestOfficeHoursCalendarView(APITestCase):
     view = OfficeHoursCalendarView
 
-    def test_no_date_specified_sees_current_week(self):
+    def test_no_focal_dateified_sees_current_week(self):
         office_hour = self.create_office_hour()
         response = self.get_response(user=office_hour.mentor)
         self.assert_hour_in_response(response, office_hour)
 
-    def test_no_date_specified_does_not_see_last_week(self):
+    def test_no_focal_dateified_does_not_see_last_week(self):
         office_hour = self.create_office_hour(
             start_date_time=days_from_now(-9))
         response = self.get_response(user=office_hour.mentor)
         self.assert_hour_not_in_response(response, office_hour)
 
-    def test_date_specified_sees_sessions_in_range(self):
+    def test_focal_dateified_sees_sessions_in_range(self):
         two_weeks_ago = days_from_now(-14)
-        date_spec = two_weeks_ago.strftime(ISO_8601_DATE_FORMAT)
+        focal_date = two_weeks_ago.strftime(ISO_8601_DATE_FORMAT)
         office_hour = self.create_office_hour(
             start_date_time=two_weeks_ago)
         response = self.get_response(user=office_hour.mentor,
-                                     date_spec=date_spec)
+                                     focal_date=focal_date)
         self.assert_hour_in_response(response, office_hour)
 
-    def test_date_specified_does_not_see_sessions_not_in_range(self):
+    def test_calendar_data_for_monthly_span_last_day_of_the_month(self):
+        today = datetime.now()
+        days_in_month = calendar.monthrange(today.year, today.month)[1]
+        days_to_month_end = days_in_month - int(today.strftime("%d"))
+        month_end = days_from_now(days_to_month_end)
+        office_hour = self.create_office_hour(start_date_time=month_end)
+        focal_date = today.strftime(ISO_8601_DATE_FORMAT)
+        response = self.get_response(user=office_hour.mentor,
+                                     focal_date=focal_date,
+                                     calendar_span="monthly")
+        self.assert_hour_in_response(response, office_hour)
+
+    def test_calendar_data_for_monthly_span_mid_month(self):
+        today = datetime.now()
+        days_in_month = calendar.monthrange(today.year, today.month)[1]
+        days_to_mid_month = (days_in_month - int(today.strftime("%d"))) / 2
+        mid_month = days_from_now(days_to_mid_month)
+        office_hour = self.create_office_hour(start_date_time=mid_month)
+        focal_date = today.strftime(ISO_8601_DATE_FORMAT)
+        response = self.get_response(user=office_hour.mentor,
+                                     focal_date=focal_date,
+                                     calendar_span="monthly")
+        self.assert_hour_in_response(response, office_hour)
+
+    def test_focal_dateified_does_not_see_sessions_not_in_range(self):
         two_weeks_ago = days_from_now(-14)
-        date_spec = two_weeks_ago.strftime(ISO_8601_DATE_FORMAT)
+        focal_date = two_weeks_ago.strftime(ISO_8601_DATE_FORMAT)
         office_hour = self.create_office_hour()
         response = self.get_response(user=office_hour.mentor,
-                                     date_spec=date_spec)
+                                     focal_date=focal_date)
         self.assert_hour_not_in_response(response, office_hour)
 
     def test_hours_returned_in_date_sorted_order(self):
         one_day = timedelta(1)
         wednesday = utc.localize(datetime(2020, 1, 31))
-        date_spec = wednesday.strftime(ISO_8601_DATE_FORMAT)
+        focal_date = wednesday.strftime(ISO_8601_DATE_FORMAT)
         office_hour = self.create_office_hour(start_date_time=wednesday)
         self.create_office_hour(start_date_time=wednesday-one_day,
                                 mentor=office_hour.mentor)
         self.create_office_hour(start_date_time=wednesday+one_day,
                                 mentor=office_hour.mentor)
         response = self.get_response(user=office_hour.mentor,
-                                     date_spec=date_spec)
+                                     focal_date=focal_date)
         self.assert_sessions_sorted_by_date(response)
 
     def test_user_with_no_hours_sees_empty_response(self):
@@ -209,10 +234,10 @@ class TestOfficeHoursCalendarView(APITestCase):
         self.assertTrue(all([name in response_startup_names
                              for name in startup_names]))
 
-    def test_bad_date_spec_gets_fail_response(self):
-        bad_date_spec = "2020-20-20"  # this cannot be parsed as a date
-        response = self.get_response(date_spec=bad_date_spec)
-        self.assert_failure(response, self.view.BAD_DATE_SPEC)
+    def test_bad_focal_date_gets_fail_response(self):
+        bad_focal_date = "2020-20-20"  # this cannot be parsed as a date
+        response = self.get_response(focal_date=bad_focal_date)
+        self.assert_failure(response, self.view.BAD_FOCAL_DATE)
 
     def test_nonexistent_user_gets_fail_response(self):
         bad_user_id = nonexistent_object_id(UserFactory)
@@ -412,14 +437,17 @@ class TestOfficeHoursCalendarView(APITestCase):
     def get_response(self,
                      user=None,
                      target_user_id=None,
-                     date_spec=None):
+                     focal_date=None,
+                     calendar_span=None):
         user = user or self.staff_user()
         user.set_password("password")
         user.save()
         url = reverse(self.view.view_name)
         data = {}
-        if date_spec is not None:
-            data['date_spec'] = date_spec
+        if focal_date is not None:
+            data['focal_date'] = focal_date
+        if calendar_span is not None:
+            data['calendar_span'] = calendar_span
         if target_user_id is not None:
             data['user_id'] = target_user_id
         with self.login(email=user.email):
