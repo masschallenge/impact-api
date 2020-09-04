@@ -35,12 +35,11 @@ from accelerator.models import (
 from accelerator_abstract.models.base_user_utils import is_employee
 User = get_user_model()
 
-today = datetime.today()
-DAYS_IN_MONTH = calendar.monthrange(today.year, today.month)[1]
+
 ISO_8601_DATE_FORMAT = "%Y-%m-%d"
 ONE_DAY = timedelta(1)
 ONE_WEEK = timedelta(8)
-ONE_MONTH = timedelta(DAYS_IN_MONTH)
+
 
 
 STAFF = "staff"
@@ -120,7 +119,7 @@ class OfficeHoursCalendarView(ImpactView):
 
     def _get_date_range(self, request):
         focal_date = request.query_params.get("focal_date", None)
-        calendar_span = request.query_params.get("calendar_span", "weekly")
+        calendar_span = request.query_params.get("calendar_span", "week")
 
         try:
             self.start_date, self.end_date = _date_range(calendar_span, focal_date)
@@ -343,12 +342,14 @@ def _date_range(calendar_span, focal_date=None):
     else:
         initial_date = datetime.now()
     initial_date = utc.localize(initial_date)
-    # This calculation depends on the fact that monday == 0 in python
-    if calendar_span == "monthly":
+    if calendar_span == "month":
         start_date = initial_date - timedelta(int(initial_date.strftime("%d")))
-        end_date = start_date + ONE_MONTH + ONE_DAY
+        days_in_month = calendar.monthrange(start_date.year, start_date.month)[1]
+        one_month = timedelta(days_in_month)
+        end_date = start_date + one_month + ONE_DAY
         adjusted_start_date = start_date + ONE_DAY
     else:
+        # This calculation depends on the fact that monday == 0 in python
         start_date = initial_date - timedelta(initial_date.weekday())
         end_date = start_date + ONE_WEEK + ONE_DAY
         adjusted_start_date = start_date - ONE_DAY

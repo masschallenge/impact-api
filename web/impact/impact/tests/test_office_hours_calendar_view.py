@@ -65,7 +65,7 @@ class TestOfficeHoursCalendarView(APITestCase):
                                      focal_date=focal_date)
         self.assert_hour_in_response(response, office_hour)
 
-    def test_calendar_data_for_monthly_span_last_day_of_the_month(self):
+    def test_calendar_data_for_month_span_last_day_of_the_month(self):
         today = datetime.now()
         days_in_month = calendar.monthrange(today.year, today.month)[1]
         days_to_month_end = days_in_month - int(today.strftime("%d"))
@@ -74,10 +74,10 @@ class TestOfficeHoursCalendarView(APITestCase):
         focal_date = today.strftime(ISO_8601_DATE_FORMAT)
         response = self.get_response(user=office_hour.mentor,
                                      focal_date=focal_date,
-                                     calendar_span="monthly")
+                                     calendar_span="month")
         self.assert_hour_in_response(response, office_hour)
 
-    def test_calendar_data_for_monthly_span_mid_month(self):
+    def test_calendar_data_for_month_span_mid_month(self):
         today = datetime.now()
         days_in_month = calendar.monthrange(today.year, today.month)[1]
         days_to_mid_month = (days_in_month - int(today.strftime("%d"))) / 2
@@ -86,7 +86,7 @@ class TestOfficeHoursCalendarView(APITestCase):
         focal_date = today.strftime(ISO_8601_DATE_FORMAT)
         response = self.get_response(user=office_hour.mentor,
                                      focal_date=focal_date,
-                                     calendar_span="monthly")
+                                     calendar_span="month")
         self.assert_hour_in_response(response, office_hour)
 
     def test_focal_dateified_does_not_see_sessions_not_in_range(self):
