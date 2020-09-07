@@ -351,12 +351,11 @@ def _date_range(calendar_span, focal_date=None):
         days_in_month = calendar.monthrange(start_date.year, start_date.month)[1]
         one_month = timedelta(days_in_month)
         end_date = start_date + one_month + ONE_DAY
-        adjusted_start_date = start_date + ONE_DAY
     else:
         # This calculation depends on the fact that monday == 0 in python
         start_date = initial_date - timedelta(initial_date.weekday())
         end_date = start_date + ONE_WEEK + ONE_DAY
-        adjusted_start_date = start_date - ONE_DAY
+    adjusted_start_date = start_date - ONE_DAY
     return adjusted_start_date, end_date
 
 
