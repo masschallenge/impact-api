@@ -91,16 +91,20 @@ class TestOfficeHoursCalendarView(APITestCase):
         self.assert_hour_in_response(response, office_hour)
 
     def test_return_upcoming_calendar_data(self):
-        two_weeks_ago = days_from_now(-14)
-        focal_date = two_weeks_ago.strftime(ISO_8601_DATE_FORMAT)
-        office_hour = self.create_office_hour(
-            start_date_time=two_weeks_ago,
-            finalist=UserFactory())
-        office_hour1 = self.create_office_hour(start_date_time=two_weeks_ago)
-        response = self.get_response(user=office_hour1.mentor,
-                                     focal_date=focal_date,
+        today = datetime.now()
+        days_in_month = calendar.monthrange(today.year, today.month)[1]
+        days_to_mid_month = (days_in_month - int(today.strftime("%d"))) / 2
+        mid_month = days_from_now(days_to_mid_month)
+        office_hour = self.create_office_hour(start_date_time=mid_month,
+                                              finalist=UserFactory())
+        office_hour1 = self.create_office_hour(start_date_time=mid_month)
+        response = self.get_response(calendar_span="month",
+                                     user=office_hour1.mentor,
                                      upcoming=True)
-        self.assert_hour_not_in_response(response, office_hour)
+        response1 = self.get_response(calendar_span="month",
+                                     user=office_hour.mentor,
+                                     upcoming=True)
+        self.assert_hour_not_in_response(response1, office_hour)
         self.assert_hour_in_response(response, office_hour1)
 
     def test_focal_dateified_does_not_see_sessions_not_in_range(self):

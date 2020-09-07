@@ -121,9 +121,10 @@ class OfficeHoursCalendarView(ImpactView):
     def _get_date_range(self, request):
         focal_date = request.query_params.get("focal_date", None)
         calendar_span = request.query_params.get("calendar_span", "week")
+        upcoming = bool(request.query_params.get("upcoming", False))
 
         try:
-            self.start_date, self.end_date = _date_range(calendar_span, focal_date)
+            self.start_date, self.end_date = _date_range(calendar_span, upcoming, focal_date)
 
         except ValueError:
             self.fail(self.BAD_FOCAL_DATE)
@@ -336,11 +337,17 @@ def _make_f_expression(field, location_path):
     return F("{}__{}".format(location_path, field))
 
 
-def _date_range(calendar_span, focal_date=None):
+def _date_range(calendar_span, upcoming, focal_date=None):
     # returns (start_date, end_date)
+    # When calendar_span == week and upcoming == False
     # start_date is the latest monday that is less than or equal to today,
     # end_date is start_date + seven days
+    # When calendar_span == month and upcoming == False
+    # start_date is the first day of the new month
+    # end_date is start_date + length of the current month
     # both values are then padded by 24 hours to allow for TZ differences
+    # when upcoming == True
+    # start_date is the current date period
 
     # throws ValueError if focal_date is not in ISO-8601 format
 
@@ -348,16 +355,26 @@ def _date_range(calendar_span, focal_date=None):
         initial_date = datetime.strptime(focal_date, ISO_8601_DATE_FORMAT)
     else:
         initial_date = datetime.now()
+
+    if upcoming and initial_date < datetime.now():
+        initial_date = datetime.now()
+
     initial_date = utc.localize(initial_date)
     if calendar_span == "month":
-        start_date = initial_date - timedelta(int(initial_date.strftime("%d")))
-        days_in_month = calendar.monthrange(start_date.year, start_date.month)[1]
-        one_month = timedelta(days_in_month)
-        end_date = start_date + one_month + ONE_DAY
+        
+        elasped_time = timedelta(int(initial_date.strftime("%d")))
+        month_start = initial_date - elasped_time
+        days_in_month = calendar.monthrange(month_start.year, month_start.month)[1]
+        one_month = timedelta(days_in_month + 1)
+        # embedded asumption that only directory will ask for month span data
+        # therefore we should return only upcoming office hours
+        start_date = month_start + elasped_time
+        end_date = month_start + one_month + ONE_DAY
     else:
         # This calculation depends on the fact that monday == 0 in python
         start_date = initial_date - timedelta(initial_date.weekday())
         end_date = start_date + ONE_WEEK + ONE_DAY
+  
     adjusted_start_date = start_date - ONE_DAY
     return adjusted_start_date, end_date
 
