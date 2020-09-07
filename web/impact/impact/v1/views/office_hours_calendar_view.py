@@ -79,10 +79,10 @@ class OfficeHoursCalendarView(ImpactView):
     def get(self, request):
         self.response_elements = {}
         (self._get_target_user(request) and
-         self._check_request_user_type(request) and
+         self._check_request_user_type() and
          self._get_date_range(request) and
          self._set_user_query() and
-         self._get_office_hours_data())
+         self._get_office_hours_data(request))
         return Response(self.response_elements)
 
     def _get_target_user(self, request):
@@ -103,7 +103,7 @@ class OfficeHoursCalendarView(ImpactView):
                     return False
         return True
 
-    def _check_request_user_type(self, request):
+    def _check_request_user_type(self):
         """
         determine whether we are viewing as "staff", "mentor", or "finalist"
         if we pursue AC-7778, this will be modified to read from request data
@@ -227,7 +227,7 @@ class OfficeHoursCalendarView(ImpactView):
                                              "name"])
         return True
 
-    def _get_office_hours_data(self):
+    def _get_office_hours_data(self, request):
         primary_industry_key = "mentor__expertprofile__primary_industry__name"
         office_hours = self._office_hours_queryset().filter(
             program__isnull=True).order_by(
@@ -237,6 +237,9 @@ class OfficeHoursCalendarView(ImpactView):
                 When(finalist_count__gt=0, then=Value(True)),
                 default=Value(False),
                 output_field=BooleanField()))
+
+        if(request.query_params.get("upcoming", False)):
+            office_hours = office_hours.filter(finalist__isnull=True)
 
         self.response_elements['calendar_data'] = office_hours.values(
             "id",

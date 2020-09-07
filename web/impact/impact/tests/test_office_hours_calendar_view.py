@@ -26,6 +26,7 @@ from accelerator.tests.factories import (
     ProgramFamilyLocationFactory,
     ProgramRoleGrantFactory,
     StartupTeamMemberFactory,
+    UserFactory
 )
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.contexts.context_utils import get_user_role_by_name
@@ -88,6 +89,19 @@ class TestOfficeHoursCalendarView(APITestCase):
                                      focal_date=focal_date,
                                      calendar_span="month")
         self.assert_hour_in_response(response, office_hour)
+
+    def test_return_upcoming_calendar_data(self):
+        two_weeks_ago = days_from_now(-14)
+        focal_date = two_weeks_ago.strftime(ISO_8601_DATE_FORMAT)
+        office_hour = self.create_office_hour(
+            start_date_time=two_weeks_ago,
+            finalist=UserFactory())
+        office_hour1 = self.create_office_hour(start_date_time=two_weeks_ago)
+        response = self.get_response(user=office_hour1.mentor,
+                                     focal_date=focal_date,
+                                     upcoming=True)
+        self.assert_hour_not_in_response(response, office_hour)
+        self.assert_hour_in_response(response, office_hour1)
 
     def test_focal_dateified_does_not_see_sessions_not_in_range(self):
         two_weeks_ago = days_from_now(-14)
@@ -454,7 +468,8 @@ class TestOfficeHoursCalendarView(APITestCase):
                      user=None,
                      target_user_id=None,
                      focal_date=None,
-                     calendar_span=None):
+                     calendar_span=None,
+                     upcoming=None):
         user = user or self.staff_user()
         user.set_password("password")
         user.save()
@@ -464,6 +479,8 @@ class TestOfficeHoursCalendarView(APITestCase):
             data['focal_date'] = focal_date
         if calendar_span is not None:
             data['calendar_span'] = calendar_span
+        if upcoming is not None:
+            data['upcoming'] = upcoming
         if target_user_id is not None:
             data['user_id'] = target_user_id
         with self.login(email=user.email):
