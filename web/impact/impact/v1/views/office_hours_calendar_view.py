@@ -22,7 +22,6 @@ from django.db.models import (
 from . import ImpactView
 from ...utils import compose_filter
 from ...permissions.v1_api_permissions import (
-    DEFAULT_PERMISSION_DENIED_DETAIL,
     IsAuthenticated,
 )
 from accelerator.models import (
@@ -95,12 +94,6 @@ class OfficeHoursCalendarView(ImpactView):
             except User.DoesNotExist:
                 self.fail(self.NO_SUCH_USER)
                 return False
-
-            if not is_employee(request.user):
-                if self.target_user != request.user:
-                    # non-staff may not view on behalf of another user
-                    self.fail(DEFAULT_PERMISSION_DENIED_DETAIL)
-                    return False
         return True
 
     def _check_request_user_type(self):

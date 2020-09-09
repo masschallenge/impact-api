@@ -202,14 +202,6 @@ class TestOfficeHoursCalendarView(APITestCase):
         response = self.get_response(staff_user)
         self.assert_hour_not_in_response(response, office_hour)
 
-    def test_non_staff_cannot_view_on_behalf_of(self):
-        user = self.basic_user()
-        finalist = _finalist()
-        response = self.get_response(user=user,
-                                     target_user_id=finalist.id)
-        self.assert_failure(response,
-                            DEFAULT_PERMISSION_DENIED_DETAIL)
-
     def test_mentor_with_no_hours_in_range_sees_empty_response(self):
         two_weeks_ago = days_from_now(-14)
         session = self.create_office_hour(start_date_time=two_weeks_ago)
