@@ -46,18 +46,18 @@ from .utils import nonexistent_object_id
 class TestOfficeHoursCalendarView(APITestCase):
     view = OfficeHoursCalendarView
 
-    def test_no_focal_dateified_sees_current_week(self):
+    def test_no_focal_date_specified_sees_current_week(self):
         office_hour = self.create_office_hour()
         response = self.get_response(user=office_hour.mentor)
         self.assert_hour_in_response(response, office_hour)
 
-    def test_no_focal_dateified_does_not_see_last_week(self):
+    def test_no_focal_date_specified_does_not_see_last_week(self):
         office_hour = self.create_office_hour(
             start_date_time=days_from_now(-9))
         response = self.get_response(user=office_hour.mentor)
         self.assert_hour_not_in_response(response, office_hour)
 
-    def test_focal_dateified_sees_sessions_in_range(self):
+    def test_focal_date_specified_sees_sessions_in_range(self):
         two_weeks_ago = days_from_now(-14)
         focal_date = two_weeks_ago.strftime(ISO_8601_DATE_FORMAT)
         office_hour = self.create_office_hour(
@@ -67,30 +67,16 @@ class TestOfficeHoursCalendarView(APITestCase):
         self.assert_hour_in_response(response, office_hour)
 
     def test_calendar_data_for_month_span_last_day_of_the_month(self):
-        today = datetime.now()
-        days_in_month = calendar.monthrange(today.year, today.month)[1]
-        days_to_month_end = days_in_month - int(today.strftime("%d"))
-        month_end = days_from_now(days_to_month_end)
-        office_hour = self.create_office_hour(start_date_time=month_end)
-        focal_date = today.strftime(ISO_8601_DATE_FORMAT)
+        last_month = days_from_now(-40)
+        last_month_end = days_from_now(-31)
+        office_hour = self.create_office_hour(start_date_time=last_month_end)
+        focal_date = last_month.strftime(ISO_8601_DATE_FORMAT)
         response = self.get_response(user=office_hour.mentor,
                                      focal_date=focal_date,
                                      calendar_span="month")
         self.assert_hour_in_response(response, office_hour)
 
-    def test_calendar_data_for_month_span_mid_month(self):
-        today = datetime.now()
-        days_in_month = calendar.monthrange(today.year, today.month)[1]
-        days_to_mid_month = (days_in_month - int(today.strftime("%d"))) / 2
-        mid_month = days_from_now(days_to_mid_month)
-        office_hour = self.create_office_hour(start_date_time=mid_month)
-        focal_date = today.strftime(ISO_8601_DATE_FORMAT)
-        response = self.get_response(user=office_hour.mentor,
-                                     focal_date=focal_date,
-                                     calendar_span="month")
-        self.assert_hour_in_response(response, office_hour)
-
-    def test_focal_dateified_does_not_see_sessions_not_in_range(self):
+    def test_focal_date_specified_does_not_see_sessions_not_in_range(self):
         two_weeks_ago = days_from_now(-14)
         focal_date = two_weeks_ago.strftime(ISO_8601_DATE_FORMAT)
         office_hour = self.create_office_hour()
