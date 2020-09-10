@@ -67,10 +67,20 @@ class TestOfficeHoursCalendarView(APITestCase):
         self.assert_hour_in_response(response, office_hour)
 
     def test_calendar_data_for_month_span_last_day_of_the_month(self):
-        last_month = days_from_now(-40)
-        last_month_end = days_from_now(-31)
-        office_hour = self.create_office_hour(start_date_time=last_month_end)
-        focal_date = last_month.strftime(ISO_8601_DATE_FORMAT)
+        end_of_month = datetime(2020,1,31,5,0,0)
+        focal_day  = datetime(2020,1,3,5,0,0)
+        office_hour = self.create_office_hour(start_date_time=end_of_month)
+        focal_date = focal_day.strftime(ISO_8601_DATE_FORMAT)
+        response = self.get_response(user=office_hour.mentor,
+                                     focal_date=focal_date,
+                                     calendar_span="month")
+        self.assert_hour_in_response(response, office_hour)
+
+    def test_calendar_data_for_month_span_mid_month(self):
+        end_of_month = datetime(2020,1,31,5,0,0)
+        mid_month = datetime(2020,1,15,5,0,0)
+        office_hour = self.create_office_hour(start_date_time=mid_month)
+        focal_date = end_of_month.strftime(ISO_8601_DATE_FORMAT)
         response = self.get_response(user=office_hour.mentor,
                                      focal_date=focal_date,
                                      calendar_span="month")
