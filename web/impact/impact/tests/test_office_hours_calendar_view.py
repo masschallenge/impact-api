@@ -118,6 +118,22 @@ class TestOfficeHoursCalendarView(APITestCase):
         response = self.get_response(user=finalist)
         self.assert_hour_not_in_response(response, office_hour)
 
+    def test_current_finalist_sees_staff_hours(self):
+        program = ProgramFactory()
+        finalist = _finalist(program=program)
+        staff_user = self.staff_user(program_family=program.program_family)
+        office_hour = self.create_office_hour(mentor=staff_user)
+        response = self.get_response(user=finalist)
+        self.assert_hour_in_response(response, office_hour)
+
+    def test_staff_user_sees_staff_hours(self):
+        program = ProgramFactory()
+        staff_user = self.staff_user(program_family=program.program_family)
+        staff_mentor = self.staff_user(program_family=program.program_family)
+        office_hour = self.create_office_hour(mentor=staff_mentor)
+        response = self.get_response(user=staff_user)
+        self.assert_hour_in_response(response, office_hour)
+
     def test_staff_sees_current_open_hours_for_their_program(self):
         program = ProgramFactory()
         staff_user = self.staff_user(program_family=program.program_family)
