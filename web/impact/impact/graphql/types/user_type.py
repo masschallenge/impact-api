@@ -1,6 +1,9 @@
-from accelerator.models import ExpertProfile
+import graphene
+
 from django.contrib.auth import get_user_model
 from graphene_django import DjangoObjectType
+from accelerator.models import ExpertProfile
+from accelerator_abstract.models.base_user_utils import is_employee
 
 from ...graphql.auth.utils import can_view_private_data
 
@@ -8,6 +11,8 @@ User = get_user_model()
 
 
 class UserType(DjangoObjectType):
+    is_staff = graphene.Boolean()
+
     class Meta:
         model = User
         only_fields = ('id', 'first_name', 'last_name', 'email')
@@ -20,3 +25,6 @@ class UserType(DjangoObjectType):
             if not can_view_private_data(request_user, profile.privacy_email):
                 email = ""
         return email
+
+    def resolve_is_staff(self, info, **kwargs):
+        return is_employee(self)
