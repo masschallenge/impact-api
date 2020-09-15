@@ -3,6 +3,8 @@ from datetime import (
     timedelta,
 )
 
+import calendar
+
 from pytz import utc
 
 from rest_framework.response import Response
@@ -20,7 +22,6 @@ from django.db.models import (
 from . import ImpactView
 from ...utils import compose_filter
 from ...permissions.v1_api_permissions import (
-    DEFAULT_PERMISSION_DENIED_DETAIL,
     IsAuthenticated,
 )
 from accelerator.models import (
@@ -34,9 +35,12 @@ from accelerator.models import (
 from accelerator_abstract.models.base_user_utils import is_employee
 User = get_user_model()
 
+
 ISO_8601_DATE_FORMAT = "%Y-%m-%d"
 ONE_DAY = timedelta(1)
 ONE_WEEK = timedelta(8)
+
+
 
 STAFF = "staff"
 MENTOR = "mentor"
@@ -66,7 +70,7 @@ class OfficeHoursCalendarView(ImpactView):
     view_name = "office_hours_calendar_view"
     SUCCESS_HEADER = "Office hours fetched successfully"
     FAIL_HEADER = "Office hours could not be fetched"
-    BAD_DATE_SPEC = "We were unable to parse the date specifier"
+    BAD_FOCAL_DATE = "We were unable to parse the date specifier"
     NO_SUCH_USER = "We were not able to locate that user"
     NOT_OFFICE_HOURS_VIEWER = ("You are not able to view office hours at this "
                                "time. Please see MassChallenge staff.")
@@ -74,10 +78,10 @@ class OfficeHoursCalendarView(ImpactView):
     def get(self, request):
         self.response_elements = {}
         (self._get_target_user(request) and
-         self._check_request_user_type(request) and
+         self._check_request_user_type() and
          self._get_date_range(request) and
          self._set_user_query() and
-         self._get_office_hours_data())
+         self._get_office_hours_data(request))
         return Response(self.response_elements)
 
     def _get_target_user(self, request):
@@ -90,15 +94,9 @@ class OfficeHoursCalendarView(ImpactView):
             except User.DoesNotExist:
                 self.fail(self.NO_SUCH_USER)
                 return False
-
-            if not is_employee(request.user):
-                if self.target_user != request.user:
-                    # non-staff may not view on behalf of another user
-                    self.fail(DEFAULT_PERMISSION_DENIED_DETAIL)
-                    return False
         return True
 
-    def _check_request_user_type(self, request):
+    def _check_request_user_type(self):
         """
         determine whether we are viewing as "staff", "mentor", or "finalist"
         if we pursue AC-7778, this will be modified to read from request data
@@ -114,13 +112,14 @@ class OfficeHoursCalendarView(ImpactView):
         return True
 
     def _get_date_range(self, request):
-        date_spec = request.query_params.get("date_spec", None)
+        focal_date = request.query_params.get("focal_date", None)
+        calendar_span = request.query_params.get("calendar_span", "week")
 
         try:
-            self.start_date, self.end_date = _date_range(date_spec)
+            self.start_date, self.end_date = _date_range(calendar_span, focal_date)
 
         except ValueError:
-            self.fail(self.BAD_DATE_SPEC)
+            self.fail(self.BAD_FOCAL_DATE)
             return False
         return True
 
@@ -221,7 +220,7 @@ class OfficeHoursCalendarView(ImpactView):
                                              "name"])
         return True
 
-    def _get_office_hours_data(self):
+    def _get_office_hours_data(self, request):
         primary_industry_key = "mentor__expertprofile__primary_industry__name"
         office_hours = self._office_hours_queryset().filter(
             program__isnull=True).order_by(
@@ -327,22 +326,33 @@ def _make_f_expression(field, location_path):
     return F("{}__{}".format(location_path, field))
 
 
-def _date_range(date_spec=None):
+def _date_range(calendar_span, focal_date=None):
     # returns (start_date, end_date)
+    # When calendar_span == week
     # start_date is the latest monday that is less than or equal to today,
     # end_date is start_date + seven days
+    # When calendar_span == month 
+    # start_date is the first day of the new month
+    # end_date is start_date + length of the current month
     # both values are then padded by 24 hours to allow for TZ differences
+    # throws ValueError if focal_date is not in ISO-8601 format
 
-    # throws ValueError if date_spec is not in ISO-8601 format
-
-    if date_spec:
-        initial_date = datetime.strptime(date_spec, ISO_8601_DATE_FORMAT)
+    if focal_date:
+        initial_date = datetime.strptime(focal_date, ISO_8601_DATE_FORMAT)
     else:
         initial_date = datetime.now()
+
     initial_date = utc.localize(initial_date)
-    # This calculation depends on the fact that monday == 0 in python
-    start_date = initial_date - timedelta(initial_date.weekday())
-    end_date = start_date + ONE_WEEK + ONE_DAY
+    if calendar_span == "month":
+        reducer = timedelta(int(initial_date.strftime("%d")))
+        span = timedelta(31)
+    else:
+        # This calculation depends on the fact that monday == 0 in python
+        reducer = timedelta(initial_date.weekday())
+        span = ONE_WEEK
+
+    start_date = initial_date - reducer
+    end_date = start_date + span + ONE_DAY
     adjusted_start_date = start_date - ONE_DAY
     return adjusted_start_date, end_date
 
