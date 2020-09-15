@@ -129,7 +129,7 @@ class TestOfficeHoursCalendarView(APITestCase):
     def test_staff_user_sees_staff_hours(self):
         program = ProgramFactory()
         staff_user = self.staff_user(program_family=program.program_family)
-        staff_mentor = self.staff_user(program_family=program.program_family)
+        staff_mentor = _mentor(user=self.staff_user(), program=program)
         office_hour = self.create_office_hour(mentor=staff_mentor)
         response = self.get_response(user=staff_user)
         self.assert_hour_in_response(response, office_hour)
