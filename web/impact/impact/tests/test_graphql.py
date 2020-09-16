@@ -122,7 +122,7 @@ class TestGraphQL(APITestCase):
     def test_mentor_program_role_grants(self):
         user = ExpertFactory()
         role_grant = ProgramRoleGrantFactory.create(
-            program_role__user_role__name=UserRole.MENTOR,
+            program_role__user_role=get_user_role_by_name(UserRole.MENTOR),
             person=user)
         program = role_grant.program_role.program
         program_overview_link = program.program_overview_link
@@ -150,11 +150,13 @@ class TestGraphQL(APITestCase):
         user = ExpertFactory()
         program = ProgramFactory()
         mentor_role_grant = ProgramRoleGrantFactory.create(
-            program_role__user_role__name=UserRole.MENTOR, person=user)
+            program_role__user_role=get_user_role_by_name(UserRole.MENTOR),
+            person=user)
         program = mentor_role_grant.program_role.program
         program_overview_link = program.program_overview_link
         ProgramRoleGrantFactory.create(
-            program_role__user_role__name=UserRole.JUDGE, person=user)
+            program_role__user_role=get_user_role_by_name(UserRole.JUDGE),
+            person=user)
 
         query = MENTOR_PRG_QUERY.format(id=user.id)
 
@@ -273,7 +275,7 @@ class TestGraphQL(APITestCase):
     def test_office_url_field_returns_correct_value(self):
         program = ProgramFactory()
         confirmed = ExpertFactory()
-        confirmed_role = UserRoleFactory(name=UserRole.MENTOR)
+        confirmed_role = get_user_role_by_name(UserRole.MENTOR)
         program_role = ProgramRoleFactory(program=program,
                                           user_role=confirmed_role)
 
@@ -489,12 +491,11 @@ class TestGraphQL(APITestCase):
 
     def test_query_program_roles_program_role_names_are_normalized(self):
         program_role_name = "BEST IN SHOW (BOS)"
-        user_role_name = UserRole.FINALIST
         user = ExpertFactory()
         ProgramRoleGrantFactory(
             person=user,
             program_role__name=program_role_name,
-            program_role__user_role__name=user_role_name)
+            program_role__user_role=get_user_role_by_name(UserRole.FINALIST))
         query = """
             query{{
                 expertProfile(id:{id}) {{
@@ -568,7 +569,7 @@ class TestGraphQL(APITestCase):
     def test_get_user_confirmed_mentor_program_families(self):
         role_grant = ProgramRoleGrantFactory(
             program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
-            program_role__user_role__name=UserRole.MENTOR,
+            program_role__user_role=get_user_role_by_name(UserRole.MENTOR),
             person=ExpertFactory(),
         )
         user = role_grant.person
