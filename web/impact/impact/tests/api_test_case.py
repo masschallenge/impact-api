@@ -22,6 +22,9 @@ from .factories import (
 
 OAuth_App = get_application_model()
 API_GROUPS = [settings.V0_API_GROUP, settings.V1_API_GROUP]
+DESCRIPTION_CONTENT = 'DESCRIPTION:Topics: {topics}'
+LOCATION_CONTENT = 'LOCATION:{location}\\;'
+LOCATION_INFO = 'LOCATION:{location}\\;{meeting_info}'
 
 
 class APITestCase(TestCase):
@@ -48,12 +51,14 @@ class APITestCase(TestCase):
         user.save()
         return user
 
-    def staff_user(self):
+    def staff_user(self, program_family=None, level=CLEARANCE_LEVEL_STAFF):
         user = self.make_user('basic_user{}@test.com'.format(self._user_count))
         self._user_count += 1
-        clearance = ClearanceFactory(
-            level=CLEARANCE_LEVEL_STAFF,
-            user=user)
+        kwargs = {"level": level,
+                  "user": user}
+        if program_family:
+            kwargs['program_family'] = program_family
+        clearance = ClearanceFactory(**kwargs)
         return clearance.user
 
     def global_operations_manager(self, program_family):
@@ -101,11 +106,12 @@ class APITestCase(TestCase):
 
     def assert_ui_notification(self, response, success, notification):
         data = response.data
+        detail = notification if notification else ""
         header = self.success_header if success else self.fail_header
         self.assertTrue(all([
             data['success'] == success,
             data['header'] == header,
-            data['detail'] == notification
+            data['detail'] == detail
         ]), msg='Notification data was not as expected')
 
     def assert_notified(self,
@@ -128,6 +134,16 @@ class APITestCase(TestCase):
                     message in email.body for email in emails]))
         if subject:
             self.assertIn(subject, [email.subject for email in emails])
+
+    def assert_ics_email_attachments(self, user):
+        '''assert that the ics email attachment exists
+        '''
+        emails = [email for email in mail.outbox if user.email in email.to]
+        for email in emails:
+            attachments = email.attachments
+            self.assertGreater(len(email.attachments), 0)
+            self.assertIn("reminder.ics",
+                          [attachment[0] for attachment in attachments])
 
     def assert_not_notified(self, user):
         '''Assert that the specified user did not receive a notification.

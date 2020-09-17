@@ -39,10 +39,10 @@ class UserJoinedStartupEvent(BaseHistoryEvent):
         self.latest = utc.localize(datetime.now())
         most_recent_stm = User.objects.filter(
             startupteammember__id__lte=self.member.id
-            ).order_by('-date_joined').first()
+        ).order_by('-date_joined').first()
         if most_recent_stm:
             self.earliest = most_recent_stm.date_joined
-        stm_with_created_at = next_instance(self.member,
-                                            Q(created_at__isnull=False))
+        stm_with_created_at = next_instance(
+            self.member, Q(created_at__isnull=False))
         if stm_with_created_at:
             self.latest = stm_with_created_at.created_at

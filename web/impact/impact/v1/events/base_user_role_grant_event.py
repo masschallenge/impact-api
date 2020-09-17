@@ -27,7 +27,7 @@ class BaseUserRoleGrantEvent(BaseHistoryEvent):
         "cycle": OPTIONAL_STRING_FIELD,
         "program_id": OPTIONAL_INTEGER_FIELD,
         "program": OPTIONAL_STRING_FIELD,
-       }
+    }
 
     @classmethod
     def events(cls, user):

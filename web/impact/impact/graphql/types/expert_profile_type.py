@@ -9,23 +9,23 @@ from mc.models import (
     ExpertProfile,
     Program,
     ProgramRole,
-    UserRole,
-    ProgramRoleGrant
+    ProgramRoleGrant,
+    UserRole
 )
-
-from .base_user_profile_type import BaseUserProfileType
-from .startup_mentor_relationship_type import StartupMentorRelationshipType
 from accelerator_abstract.models import (
     ACTIVE_PROGRAM_STATUS,
     ENDED_PROGRAM_STATUS,
     HIDDEN_PROGRAM_STATUS,
     UPCOMING_PROGRAM_STATUS
 )
+from ..auth.utils import can_view_private_data
+from .base_user_profile_type import BaseUserProfileType
+from .startup_mentor_relationship_type import StartupMentorRelationshipType
 from ...utils import compose_filter
-from ...v1.views.utils import map_data
 from ...v1.helpers.profile_helper import (
-    latest_program_id_for_each_program_family,
+    latest_program_id_for_each_program_family
 )
+from ...v1.views.utils import map_data
 
 
 class ExpertProfileType(BaseUserProfileType):
@@ -41,6 +41,7 @@ class ExpertProfileType(BaseUserProfileType):
     class Meta:
         model = ExpertProfile
         only_fields = (
+            'id',
             'title',
             'company',
             'phone',
@@ -131,7 +132,8 @@ class ExpertProfileType(BaseUserProfileType):
         results = map_data(
             ProgramRoleGrant,
             Q(person_id=self.user.pk, program_role__user_role__name__in=roles,
-              program_role__program__program_status__in=['active', 'upcoming']),
+              program_role__program__program_status__in=['active', 'upcoming']
+              ),
             '-program_role__program__start_date',
             [
                 'id',
@@ -158,6 +160,16 @@ class ExpertProfileType(BaseUserProfileType):
             data['program_end_date'] = data['program_end_date'].isoformat()
 
         return {"results": results}
+
+    def resolve_phone(self, info, **kwargs):
+        if can_view_private_data(info.context.user, self.privacy_phone):
+            return self.phone
+        return ""
+
+    def resolve_personal_website_url(self, info, **kwargs):
+        if can_view_private_data(info.context.user, self.privacy_phone):
+            return self.personal_website_url
+        return ""
 
 
 def _get_slugs(obj, mentor_program, latest_mentor_program, **kwargs):

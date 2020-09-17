@@ -1,19 +1,19 @@
+import graphene
 from graphene.types.generic import GenericScalar
 from graphene_django import DjangoObjectType
 from itertools import chain
-import graphene
 
-from mc.models import (
-    BaseProfile,
-    StartupRole,
-    Clearance,
-    UserRole,
-    Location
-)
 
-from accelerator_abstract.models.base_user_utils import is_employee
 from .location_type import LocationType
 from ...utils import get_user_program_and_startup_roles
+from accelerator_abstract.models.base_user_utils import is_employee
+from mc.utils import swapper_model
+
+BaseProfile = swapper_model("BaseProfile")
+StartupRole = swapper_model("StartupRole")
+Clearance = swapper_model("Clearance")
+UserRole = swapper_model("UserRole")
+Location = swapper_model("Location")
 
 
 class BaseUserProfileType(DjangoObjectType):
@@ -46,15 +46,14 @@ class BaseUserProfileType(DjangoObjectType):
         program_family_ids = self.user.programrolegrant_set.filter(
             program_role__program__program_status="active",
             program_role__user_role__name__in=desired_user_roles
-            ).values_list(
-                "program_role__program__program_family", flat=True
-                ).distinct()
+        ).values_list(
+            "program_role__program__program_family", flat=True
+        ).distinct()
         ids = list(set(chain(family_ids, program_family_ids)))
         remote = Location.objects.filter(name='Remote').first()
         result = Location.objects.filter(
             programfamilylocation__program_family_id__in=ids,).exclude(
-                name='Remote'
-            ).distinct()
+                name='Remote').distinct()
         locations = list(result)
         locations.append(remote)
 

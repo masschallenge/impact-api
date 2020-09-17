@@ -3,23 +3,25 @@ from pytz import timezone
 from django.core import mail
 from django.urls import reverse
 
-from mc.models import UserRole
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.utils import days_from_now
-
 from .api_test_case import APITestCase
 from .factories import MentorProgramOfficeHourFactory
-from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
+from ..permissions.v1_api_permissions import (
+    CANCEL_SESSION_PERMISSION_DENIED_DETAIL,
+)
 from ..v1.views.cancel_office_hour_session_view import (
-    DEFAULT_TIMEZONE,
+    CancelOfficeHourSessionView,
     FAIL_HEADER,
-    OFFICE_HOUR_SESSION_404,
     MENTOR_NOTIFICATION,
+    OFFICE_HOUR_SESSION_404,
     STAFF_NOTIFICATION,
     SUCCESS_HEADER,
-    CancelOfficeHourSessionView,
-    MentorProgramOfficeHour,
 )
+from ..v1.views.utils import get_timezone
+from mc.utils import swapper_model
+MentorProgramOfficeHour = swapper_model('MentorProgramOfficeHour')
+UserRole = swapper_model('UserRole')
 
 
 class TestCancelOfficeHourSession(APITestCase):
@@ -48,16 +50,14 @@ class TestCancelOfficeHourSession(APITestCase):
         office_hour = MentorProgramOfficeHourFactory(
             mentor=mentor, finalist=None)
         response = self._cancel_office_hour_session(office_hour.id, mentor)
-        self.assert_mentor_cancel_reservation_ui_notification(
-            office_hour, response
-        )
+        self.assert_mentor_cancel_reservation_ui_notification(office_hour,
+                                                              response)
 
     def test_mentor_cannot_cancel_someone_else_unreserved_office_hour(self):
         mentor = self._expert_user(UserRole.MENTOR)
-        mentor2 = self._expert_user(UserRole.MENTOR)
-        office_hour = MentorProgramOfficeHourFactory(
-            finalist=None,
-            mentor=mentor2)
+        other_mentor = self._expert_user(UserRole.MENTOR)
+        office_hour = MentorProgramOfficeHourFactory(finalist=None,
+                                                     mentor=other_mentor)
         self._cancel_office_hour_session(office_hour.id, mentor)
         self.assert_office_hour_session_was_not_cancelled(office_hour)
 
@@ -107,9 +107,8 @@ class TestCancelOfficeHourSession(APITestCase):
         office_hour = MentorProgramOfficeHourFactory()
         response = self._cancel_office_hour_session(office_hour.id,
                                                     self.staff_user())
-        self.assert_staff_cancel_reservation_ui_notification(
-            office_hour, response
-        )
+        self.assert_staff_cancel_reservation_ui_notification(office_hour,
+                                                             response)
 
     def test_office_hour_session_not_existing_ui_notification(self):
         response = self._cancel_office_hour_session(0, self.staff_user())
@@ -142,7 +141,7 @@ class TestCancelOfficeHourSession(APITestCase):
         office_hour = MentorProgramOfficeHourFactory()
         response = self._cancel_office_hour_session(office_hour.id,
                                                     self.basic_user())
-        notification = {'detail': DEFAULT_PERMISSION_DENIED_DETAIL}
+        notification = {'detail': CANCEL_SESSION_PERMISSION_DENIED_DETAIL}
         self.assertEqual(response.data, notification)
 
     def assert_office_hour_session_was_cancelled(self, office_hour):
@@ -167,7 +166,7 @@ class TestCancelOfficeHourSession(APITestCase):
             response, True, STAFF_NOTIFICATION.format(**context))
 
     def _get_office_hour_context(self, office_hour):
-        tz = timezone(office_hour.location.timezone or DEFAULT_TIMEZONE)
+        tz = timezone(get_timezone(office_hour))
         start_date_time = office_hour.start_date_time
         date = start_date_time.astimezone(tz).strftime('%A, %d %B, %Y')
         start_time = start_date_time.astimezone(tz).strftime('%I:%M%p')
@@ -176,8 +175,7 @@ class TestCancelOfficeHourSession(APITestCase):
             'date': date,
             'start_time': start_time,
             'end_time': end_time,
-            'mentor_name': office_hour.mentor.get_profile().full_name(),
-        }
+            'mentor_name': office_hour.mentor.get_profile().full_name()}
 
     def _expert_user(self, role):
         user = UserRoleContext(role).user

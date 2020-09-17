@@ -26,6 +26,4 @@ class JudgeCriterionHelper(CriterionHelper):
         ]
 
     def analysis_annotate_fields(self):
-        return {
-            self.cache_key: F(self.judge_field),
-            }
+        return {self.cache_key: F(self.judge_field)}

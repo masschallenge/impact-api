@@ -5,12 +5,6 @@ from itertools import chain
 from django.db.models import Count
 from rest_framework.response import Response
 
-from accelerator.models import CriterionOptionSpec
-from mc.models import (
-    Application,
-    JudgePanelAssignment,
-    JudgingRound,
-)
 from . import (
     find_criterion_helpers,
     ImpactView,
@@ -22,7 +16,12 @@ from ..helpers.model_helper import (
     READ_ONLY_OBJECT_FIELD,
     READ_ONLY_STRING_FIELD,
 )
-from ...permissions import global_operations_manager_check
+from accelerator.models import CriterionOptionSpec
+from mc.permission_checks import global_manager_check
+from mc.utils import swapper_model
+Application = swapper_model("Application")
+JudgePanelAssignment = swapper_model("JudgePanelAssignment")
+JudgingRound = swapper_model("JudgingRound")
 
 ANALYZE_JUDGING_ROUND_FIELDS = {
     "criterion_option_spec_id": READ_ONLY_ID_FIELD,
@@ -59,8 +58,7 @@ class AnalyzeJudgingRoundView(ImpactView):
     def get(self, request, pk):
         self.instance = self.model.objects.get(pk=pk)
         program_family = self.instance.program.program_family
-        if not global_operations_manager_check(request.user, program_family):
-            return Response(status=403)
+        global_manager_check(request.user, program_family)
         options = CriterionOptionSpec.objects.filter(
             criterion__judging_round=self.instance).prefetch_related(
                 'criterion')

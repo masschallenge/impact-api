@@ -1,13 +1,13 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
-
+from .base_list_view import BaseListView
+from ..helpers import JudgingRoundHelper
 from mc.models import (
-    Clearance,
     IN_PERSON_JUDGING_ROUND_TYPE,
     ONLINE_JUDGING_ROUND_TYPE,
 )
-from .base_list_view import BaseListView
-from ..helpers import JudgingRoundHelper
+from mc.utils import swapper_model
+Clearance = swapper_model("Clearance")
 
 INVALID_ROUND_TYPE_ERROR = ("Invalid value '{}' for round_type. "
                             "Use 'Online' or 'In-Person'.")

@@ -8,12 +8,14 @@ from accelerator.tests.contexts import (
     UserRoleContext
 )
 from accelerator.tests.contexts.context_utils import get_user_role_by_name
+from accelerator_abstract.models.base_user_utils import is_employee
 from mc.models import (
     ACTIVE_PROGRAM_STATUS,
     ENDED_PROGRAM_STATUS,
     StartupRole,
     UserRole,
 )
+from ..graphql.auth.utils import FINALISTS_AND_STAFF, PUBLIC, STAFF
 from ..graphql.middleware import NOT_LOGGED_IN_MSG
 from ..graphql.query import (
     ENTREPRENEUR_NOT_FOUND_MESSAGE,
@@ -26,15 +28,16 @@ from .factories import (
     ApplicationFactory,
     EntrepreneurFactory,
     ExpertFactory,
+    LocationFactory,
     ProgramFactory,
+    ProgramFamilyFactory,
+    ProgramFamilyLocationFactory,
     ProgramRoleFactory,
     ProgramRoleGrantFactory,
     ProgramStartupStatusFactory,
     StartupMentorRelationshipFactory,
-    ProgramFamilyLocationFactory,
     StartupStatusFactory,
-    ProgramFamilyFactory,
-    LocationFactory,
+    UserRoleFactory
 )
 from .utils import capture_stderr
 from ..utils import get_user_program_and_startup_roles
@@ -118,9 +121,8 @@ class TestGraphQL(APITestCase):
 
     def test_mentor_program_role_grants(self):
         user = ExpertFactory()
-        _mentor = get_user_role_by_name(UserRole.MENTOR)
         role_grant = ProgramRoleGrantFactory.create(
-            program_role__user_role=_mentor,
+            program_role__user_role__name=UserRole.MENTOR,
             person=user)
         program = role_grant.program_role.program
         program_overview_link = program.program_overview_link
@@ -147,14 +149,12 @@ class TestGraphQL(APITestCase):
     def test_mentor_program_role_grants_only_returns_mentor_roles(self):
         user = ExpertFactory()
         program = ProgramFactory()
-        _mentor = get_user_role_by_name(UserRole.MENTOR)
-        _judge = get_user_role_by_name(UserRole.JUDGE)
         mentor_role_grant = ProgramRoleGrantFactory.create(
-            program_role__user_role=_mentor, person=user)
+            program_role__user_role__name=UserRole.MENTOR, person=user)
         program = mentor_role_grant.program_role.program
         program_overview_link = program.program_overview_link
         ProgramRoleGrantFactory.create(
-            program_role__user_role=_judge, person=user)
+            program_role__user_role__name=UserRole.JUDGE, person=user)
 
         query = MENTOR_PRG_QUERY.format(id=user.id)
 
@@ -273,7 +273,7 @@ class TestGraphQL(APITestCase):
     def test_office_url_field_returns_correct_value(self):
         program = ProgramFactory()
         confirmed = ExpertFactory()
-        confirmed_role = get_user_role_by_name(UserRole.MENTOR)
+        confirmed_role = UserRoleFactory(name=UserRole.MENTOR)
         program_role = ProgramRoleFactory(program=program,
                                           user_role=confirmed_role)
 
@@ -489,12 +489,12 @@ class TestGraphQL(APITestCase):
 
     def test_query_program_roles_program_role_names_are_normalized(self):
         program_role_name = "BEST IN SHOW (BOS)"
-        _finalist = get_user_role_by_name(UserRole.FINALIST)
+        user_role_name = UserRole.FINALIST
         user = ExpertFactory()
         ProgramRoleGrantFactory(
             person=user,
             program_role__name=program_role_name,
-            program_role__user_role=_finalist)
+            program_role__user_role__name=user_role_name)
         query = """
             query{{
                 expertProfile(id:{id}) {{
@@ -566,10 +566,9 @@ class TestGraphQL(APITestCase):
         self._assert_response_equals_json(query, expected_json, True)
 
     def test_get_user_confirmed_mentor_program_families(self):
-        _mentor = get_user_role_by_name(UserRole.MENTOR)
         role_grant = ProgramRoleGrantFactory(
             program_role__program__program_status=ACTIVE_PROGRAM_STATUS,
-            program_role__user_role=_mentor,
+            program_role__user_role__name=UserRole.MENTOR,
             person=ExpertFactory(),
         )
         user = role_grant.person
@@ -608,23 +607,24 @@ class TestGraphQL(APITestCase):
             self.assertEqual(expert_profile["confirmedMentorProgramFamilies"],
                              [])
 
-    def test_user_cannot_view_profile_with_non_current_allowed_roles(self):
+    def test_user_can_view_profile_with_non_current_allowed_roles(self):
         allowed_user = expert_user(UserRole.FINALIST)
-        with self.login(email=allowed_user.email):
-            user = EntrepreneurFactory()
-            UserRoleContext(
-                UserRole.MENTOR,
-                user=user,
-                program=ProgramFactory(program_status=ENDED_PROGRAM_STATUS))
-            query = """
-                        query{{
-                            entrepreneurProfile(id:{id}) {{
-                                programRoles
-                            }}
+        user = EntrepreneurFactory()
+        UserRoleContext(
+            UserRole.MENTOR,
+            user=user,
+            program=ProgramFactory(program_status=ENDED_PROGRAM_STATUS))
+        query = """
+                    query{{
+                        entrepreneurProfile(id:{id}) {{
+                            programRoles
                         }}
-                    """.format(id=user.id)
+                    }}
+                """.format(id=user.id)
 
-            self._assert_error_in_response(query, NOT_ALLOWED_ACCESS_MESSAGE)
+        expected_json = {'data': {'entrepreneurProfile': {'programRoles': {}}}}
+        self._assert_response_equals_json(
+            query, expected_json, email=allowed_user.email)
 
     def test_allowed_user_with_non_current_user_role_cannot_view_profile(self):
         current_user = expert_user(
@@ -810,6 +810,107 @@ class TestGraphQL(APITestCase):
 
         self._assert_response_equals_json(
             query=query, expected_json=expected_json)
+
+    def test_staff_can_view_staff_privacy_data(self):
+        staff = self.staff_user()
+        self._assert_user_can_view_private_data(
+            STAFF, allowed=True, email=staff.email)
+
+    def test_staff_can_view_finalist_and_staff_privacy_data(self):
+        staff = self.staff_user()
+        self._assert_user_can_view_private_data(
+            FINALISTS_AND_STAFF, allowed=True, email=staff.email)
+
+    def test_staff_can_view_public_privacy_data(self):
+        staff = self.staff_user()
+        self._assert_user_can_view_private_data(
+            PUBLIC, allowed=True, email=staff.email)
+
+    def test_finalist_cannot_view_staff_privacy_data(self):
+        finalist = expert_user(UserRole.FINALIST)
+        self._assert_user_can_view_private_data(
+            STAFF, allowed=False, email=finalist.email)
+
+    def test_finalist_can_view_finalist_and_staff_privacy_data(self):
+        finalist = expert_user(UserRole.FINALIST)
+        self._assert_user_can_view_private_data(
+            FINALISTS_AND_STAFF, allowed=True, email=finalist.email)
+
+    def test_finalist_can_view_public_privacy_data(self):
+        finalist = expert_user(UserRole.FINALIST)
+        self._assert_user_can_view_private_data(
+            PUBLIC, allowed=True, email=finalist.email)
+
+    def test_non_staff_or_finalist_cannot_view_staff_privacy_data(self):
+        user = expert_user(UserRole.MENTOR)
+        self._assert_user_can_view_private_data(
+            STAFF, allowed=False, email=user.email)
+
+    def test_non_staff_or_finalist_cannot_view_finalist_and_staff_data(self):
+        user = expert_user(UserRole.MENTOR)
+        self._assert_user_can_view_private_data(
+            FINALISTS_AND_STAFF, allowed=False, email=user.email)
+
+    def test_non_staff_or_finalist_can_view_public_privacy_data(self):
+        user = expert_user(UserRole.MENTOR)
+        self._assert_user_can_view_private_data(
+            PUBLIC, allowed=True, email=user.email)
+
+    def test_query_is_staff_for_expert_profile_is_correct(self):
+        expert = expert_user(UserRole.MENTOR)
+        query = """
+        query{{
+            expertProfile(id:{id}) {{
+                user {{isStaff}}
+            }}
+        }}
+        """.format(id=expert.id)
+        expected_json = {
+            'data': {
+                'expertProfile': {
+                    'user': {
+                        'isStaff': is_employee(expert)
+                    }
+                }
+            }
+        }
+        self._assert_response_equals_json(query, expected_json)
+
+    def _assert_user_can_view_private_data(
+            self, privacy_level, allowed=True, email=None):
+        user = ExpertFactory(
+            profile__privacy_email=privacy_level,
+            profile__privacy_web=privacy_level,
+            profile__privacy_phone=privacy_level,
+        )
+        query = """
+            query {{
+                expertProfile(id: {id}) {{
+                    user {{ email }}
+                    phone
+                    personalWebsiteUrl
+                }}
+            }}
+        """.format(id=user.id)
+        profile = user.expertprofile
+        if allowed:
+            expected_phone = profile.phone
+            expected_email = user.email
+            expected_website = profile.personal_website_url
+        else:
+            expected_phone = expected_email = expected_website = ""
+        expected_json = {
+            'data': {
+                'expertProfile': {
+                    'user': {
+                        'email': expected_email,
+                    },
+                    'phone': expected_phone,
+                    'personalWebsiteUrl': expected_website
+                }
+            }
+        }
+        self._assert_response_equals_json(query, expected_json, email=email)
 
     def _assert_expert_can_view_profile(self, expert_role, profile_user_role):
         current_user = expert_user(expert_role)

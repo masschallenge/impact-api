@@ -1,20 +1,17 @@
-from pytz import timezone
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.template import loader
 
 from rest_framework.response import Response
 
-import swapper
-from accelerator.apps import AcceleratorConfig
-MentorProgramOfficeHour = swapper.load_model(AcceleratorConfig.name, 'MentorProgramOfficeHour')
-
 from ...minimal_email_handler import MinimalEmailHandler
 from ...permissions.v1_api_permissions import OfficeHourMentorPermission
 from .impact_view import ImpactView
-
+from .utils import get_office_hour_shared_context
+from mc.utils import swapper_model
+MentorProgramOfficeHour = swapper_model("MentorProgramOfficeHour")
 User = get_user_model()
+
 
 DEFAULT_TIMEZONE = 'UTC'
 SUBJECT = '[Office Hours] Canceled: {date}, {start_time}'
@@ -22,48 +19,15 @@ SUBJECT = '[Office Hours] Canceled: {date}, {start_time}'
 STAFF_NOTIFICATION = ('on behalf of {mentor_name} at {start_time} '
                       '- {end_time} on {date}')
 MENTOR_NOTIFICATION = 'at {start_time} - {end_time} on {date}'
-OFFICE_HOUR_SESSION_404 = ("The office hour session you are trying to cancel "
-                           "doesn't exist")
-SUCCESS_HEADER = 'Canceled office hour session'
+OFFICE_HOUR_SESSION_404 = ("The office hour session does not exist.")
+SUCCESS_HEADER = 'Canceled office hours'
 FAIL_HEADER = 'Office hour session could not be canceled'
 
 
-def get_office_hours_url():
-    site_url = 'accelerate.masschallenge.org'
-    return 'https://{}/newofficehour/'.format(site_url)
-
-
-def get_office_hour_shared_context(office_hour, message=None):
-    tz = timezone(office_hour.location.timezone or DEFAULT_TIMEZONE)
-    date = office_hour.start_date_time.astimezone(tz).strftime('%A, %d %B, %Y')
-    start_time = office_hour.start_date_time.astimezone(tz).strftime('%I:%M%p')
-    end_time = office_hour.end_date_time.astimezone(tz).strftime('%I:%M%p')
-    program = office_hour.program
-    phone = program.program_family.phone_number if program else ''
-    return {
-        'date': date,
-        'start_time': start_time,
-        'end_time': end_time,
-        'location': office_hour.location.name if office_hour.location else '',
-        'dashboard_url': get_office_hours_url(),
-        'mentor_name': office_hour.mentor.get_profile().full_name(),
-        'phone': phone,
-        'message': message,
-    }
-
-
-def get_ui_notification(context, staff=False):
+def get_ui_notification(context=None, staff=False):
     if staff:
         return STAFF_NOTIFICATION.format(**context)
     return MENTOR_NOTIFICATION.format(**context)
-
-
-def get_response(success, detail):
-    return Response({
-        'success': success,
-        'header': SUCCESS_HEADER if success else FAIL_HEADER,
-        'detail': detail
-    })
 
 
 def get_cancelled_by(mentor_name=None, staff=False):
@@ -82,6 +46,7 @@ class CancelOfficeHourSessionView(ImpactView):
 
     def cancel_office_hour_session(self, office_hour, user, message):
         shared_context = get_office_hour_shared_context(office_hour, message)
+        self.header = SUCCESS_HEADER
         if user == office_hour.mentor:
             cancelled_by = get_cancelled_by(shared_context['mentor_name'])
             self.handle_notification(office_hour, shared_context, cancelled_by)
@@ -101,11 +66,11 @@ class CancelOfficeHourSessionView(ImpactView):
         try:
             office_hour = MentorProgramOfficeHour.objects.get(pk=id)
         except MentorProgramOfficeHour.DoesNotExist:
-            return get_response(False, OFFICE_HOUR_SESSION_404)
+            return self.get_response(False, OFFICE_HOUR_SESSION_404)
         self.check_object_permissions(request, office_hour)
         response_detail, success = self.cancel_office_hour_session(
             office_hour, request.user, message)
-        return get_response(success, response_detail)
+        return self.get_response(success, response_detail)
 
     def get_addressee_info(self, office_hour, mentor_name):
         addressee_dict = {
@@ -146,3 +111,10 @@ class CancelOfficeHourSessionView(ImpactView):
             from_email=settings.NO_REPLY_EMAIL,
             attach_alternative=[html_email, 'text/html'],
         ).send()
+
+    def get_response(self, success, detail):
+        return Response({
+            'success': success,
+            'header': self.header if success else FAIL_HEADER,
+            'detail': detail
+        })

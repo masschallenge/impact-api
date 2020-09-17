@@ -16,7 +16,7 @@ class StartupListData(APIData):
 
     def valid(self):
         self.debug = (self.YES == self.validate_field("Debug",
-                                                      [self.NO, self.YES]))
+                      [self.NO, self.YES]))
         self.all_group = self.validate_field("IncludeAllGroup",
                                              self.YES_NO_VALUES)
         self.order_by = self.validate_field("OrderBy", self.ORDER_BY_VALUES)
@@ -49,9 +49,9 @@ class StartupListData(APIData):
 
     def _validate_status_group(self, group_by):
         status_group = group_by[len(self.STATUS_GROUP_PREFIX):]
-        if status_group in ProgramStartupStatus.objects.filter(
-                startup_list_include=True
-                ).values_list("status_group", flat=True):
+        status_groups = ProgramStartupStatus.objects.filter(
+            startup_list_include=True).values_list("status_group", flat=True)
+        if status_group in status_groups:
             return group_by
         self.record_invalid_value(group_by, "StatusGroup")
         return None

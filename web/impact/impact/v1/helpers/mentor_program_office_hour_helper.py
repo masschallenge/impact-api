@@ -32,7 +32,6 @@ OFFFICE_HOUR_FIELDS = {
     "street_address": OPTIONAL_STRING_FIELD,
     "city": OPTIONAL_STRING_FIELD,
     "state": OPTIONAL_STRING_FIELD,
-    "program_family": OPTIONAL_STRING_FIELD,
 }
 
 
@@ -46,11 +45,6 @@ class MentorProgramOfficeHourHelper(ModelHelper):
     @property
     def title(self):
         return str(self.subject)
-
-    @property
-    def program_family(self):
-        program = self.subject.program
-        return program.program_family.name if program else ''
 
     @property
     def location(self):

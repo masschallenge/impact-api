@@ -88,18 +88,12 @@ class UserHelper(ModelHelper):
         "first_name": validate_string,
         "is_active": validate_boolean,
         "last_name": validate_string,
-        }
+    }
 
     model = User
 
-    REQUIRED_KEYS = [
-        "email",
-        "first_name",
-        "last_name",
-        ]
-    OPTIONAL_BOOLEAN_KEYS = [
-        "is_active",
-        ]
+    REQUIRED_KEYS = ["email", "first_name", "last_name"]
+    OPTIONAL_BOOLEAN_KEYS = ["is_active"]
     OPTIONAL_KEYS = OPTIONAL_BOOLEAN_KEYS
     ALL_KEYS = REQUIRED_KEYS + OPTIONAL_KEYS
     INPUT_KEYS = ALL_KEYS + ProfileHelper.INPUT_KEYS

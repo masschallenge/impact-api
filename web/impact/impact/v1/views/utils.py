@@ -1,12 +1,21 @@
 # MIT License
 # Copyright (c) 2017 MassChallenge, Inc.
 
-from pytz import timezone
-
-from accelerator.models import (
-    ACTIVE_PROGRAM_STATUS,
-    UserRole,
+from pytz import (
+    timezone,
+    utc
 )
+
+
+from accelerator.models import ACTIVE_PROGRAM_STATUS
+from mc.utils import swapper_model
+UserRole = swapper_model("UserRole")
+
+
+HOUR_MINUTE_FORMAT = "%I:%M %p"
+MONTH_DAY_FORMAT = "%B %d"
+DEFAULT_TIMEZONE = "UTC"
+
 
 VALID_KEYS_NOTE = "Valid keys are: {}"
 
@@ -41,8 +50,15 @@ def email_template_path(template_name):
 # Note: this function should be replaced with calls to
 # office_hour.local_start once the re-monolith is complete
 def localized_office_hour_start_time(office_hour):
-    tz = timezone(office_hour.location.timezone)
+    tz = timezone(get_timezone(office_hour))
     return office_hour.start_date_time.astimezone(tz)
+
+
+# Note: this function should be replaced with calls to
+# office_hour.local_end once the re-monolith is complete
+def localized_office_hour_end_time(office_hour):
+    tz = timezone(get_timezone(office_hour))
+    return office_hour.end_date_time.astimezone(tz)
 
 
 def is_office_hour_reserver(user):
@@ -54,3 +70,47 @@ def is_office_hour_reserver(user):
     return user.programrolegrant_set.filter(
         program_role__user_role__name__in=reserver_roles,
         program_role__program__program_status=ACTIVE_PROGRAM_STATUS).exists()
+
+
+def office_hour_time_info(office_hour, last_office_hour=None):
+    start_time = localized_office_hour_start_time(office_hour)
+    last_office_hour = last_office_hour or office_hour
+    end_time = localized_office_hour_end_time(last_office_hour)
+    return {"start_time": start_time.strftime(HOUR_MINUTE_FORMAT),
+            "end_time": end_time.strftime(HOUR_MINUTE_FORMAT),
+            "date": start_time.strftime(MONTH_DAY_FORMAT),
+            "timezone": get_timezone(office_hour)}
+
+
+def get_timezone(office_hour):
+    if office_hour.location and office_hour.location.timezone:
+        return office_hour.location.timezone
+    return DEFAULT_TIMEZONE
+
+
+def datetime_is_in_past(date_time):
+    return date_time.astimezone(utc) < utc.localize(date_time.utcnow())
+
+
+def get_office_hours_url():
+    site_url = 'accelerate.masschallenge.org'
+    return 'https://{}/newofficehours/'.format(site_url)
+
+
+def get_office_hour_shared_context(office_hour, message=None):
+    tz = timezone(get_timezone(office_hour))
+    date = office_hour.start_date_time.astimezone(tz).strftime('%A, %d %B, %Y')
+    start_time = office_hour.start_date_time.astimezone(tz).strftime('%I:%M%p')
+    end_time = office_hour.end_date_time.astimezone(tz).strftime('%I:%M%p')
+    program = office_hour.program
+    phone = program.program_family.phone_number if program else ''
+    return {
+        'date': date,
+        'start_time': start_time,
+        'end_time': end_time,
+        'location': office_hour.location.name if office_hour.location else '',
+        'dashboard_url': get_office_hours_url(),
+        'mentor_name': office_hour.mentor.get_profile().full_name(),
+        'phone': phone,
+        'message': message,
+    }

@@ -1,7 +1,10 @@
+from django.core import mail
 from django.urls import reverse
 
-from accelerator.tests.factories import MentorProgramOfficeHourFactory
-from .api_test_case import APITestCase
+from accelerator.tests.factories import (
+    MentorProgramOfficeHourFactory,
+)
+from .office_hours_test_case import OfficeHoursTestCase
 from ..v1.views import (
     CancelOfficeHourReservationView,
     formatted_success_notification,
@@ -12,9 +15,10 @@ from ..v1.views.cancel_office_hour_reservation_view import (
     FAIL_HEADER,
     SUCCESS_HEADER,
 )
+from ..v1.views.utils import localized_office_hour_start_time
 
 
-class TestCancelOfficeHourReservationView(APITestCase):
+class TestCancelOfficeHourReservationView(OfficeHoursTestCase):
     fail_header = FAIL_HEADER
     success_header = SUCCESS_HEADER
 
@@ -123,6 +127,13 @@ class TestCancelOfficeHourReservationView(APITestCase):
         office_hour = MentorProgramOfficeHourFactory(finalist=None)
         self._submit_cancellation(office_hour, user=self.make_user())
         self.assert_not_notified(office_hour.mentor)
+
+    def test_correct_date_format_in_notification_email(self):
+        office_hour = MentorProgramOfficeHourFactory()
+        self._submit_cancellation(office_hour, user=office_hour.finalist)
+        email = mail.outbox[0]
+        localized_time = localized_office_hour_start_time(office_hour)
+        self.assertIn(localized_time.strftime("%I:%M"), email.body)
 
     def _submit_cancellation(self, office_hour, user, message=""):
         if office_hour is None:
