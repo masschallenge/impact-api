@@ -45,7 +45,7 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
             finalist=None,
             start_date_time=start_time,
             end_date_time=end_time)
-        response = self.post_response(new_office_hour.id, 
+        response = self.post_response(new_office_hour.id,
                                       request_user=finalist)
         self.assert_ui_notification(response, False, self.view.CONFLICT_EXISTS)
 
@@ -259,14 +259,18 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
     def assert_response_contains_session_details(self, response, office_hour):
         office_hour.refresh_from_db()
         timecard = response.data['timecard_info']
+        calendar_data = timecard['calendar_data']
         if office_hour.startup:
             startup_name = office_hour.startup.organization.name
         else:
             startup_name = ""
+        calendar_data = timecard['calendar_data']
         oh_details = {'finalist_first_name': office_hour.finalist.first_name,
                       'finalist_last_name': office_hour.finalist.last_name,
                       'topics': office_hour.topics,
-                      'startup': startup_name}
+                      'startup': startup_name,
+                      "finalist_email": office_hour.finalist.email,
+                      "calendar_data": calendar_data}
         self.assertDictEqual(timecard, oh_details)
 
     def assert_reserved_by(self, office_hour, finalist):
