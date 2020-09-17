@@ -183,12 +183,12 @@ class ReserveOfficeHourView(ImpactView):
         else:
             startup_name = ""
         self.mentor_recipient = mentor_recipient
-        calendar_data = self.get_calendar_data(counterpart)
+        self.calendar_data = self.get_calendar_data(counterpart)
         context = {"recipient": recipient,
                    "counterpart": counterpart,
                    "startup": startup_name,
                    "message": self.message,
-                   "calendar_data": calendar_data
+                   "calendar_data": self.calendar_data
                    }
         context.update(office_hour_time_info(self.office_hour))
         html_email = loader.render_to_string(template_path, context)
@@ -196,7 +196,7 @@ class ReserveOfficeHourView(ImpactView):
                 "subject": self.SUBJECT,
                 "body": None,
                 "attachment": (ICS_FILENAME,
-                               calendar_data['ical_content'],
+                               self.calendar_data['ical_content'],
                                ICS_FILETYPE),
                 "attach_alternative": (html_email, 'text/html')
                 }
@@ -213,8 +213,11 @@ class ReserveOfficeHourView(ImpactView):
         self.timecard_info = {
             "finalist_first_name": self.target_user.first_name,
             "finalist_last_name": self.target_user.last_name,
+            "finalist_email": self.target_user.email,
             "topics": self.message,
-            "startup": startup_name}
+            "startup": startup_name,
+            "calendar_data": self.calendar_data,
+        }
 
     def _get_detail(self):
         start_date_time = self.office_hour.start_date_time
