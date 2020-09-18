@@ -3,8 +3,6 @@ from datetime import (
     timedelta,
 )
 
-import calendar
-
 from pytz import utc
 
 from rest_framework.response import Response
@@ -328,7 +326,7 @@ def _date_range(calendar_span, focal_date=None):
     # When calendar_span == week
     # start_date is the latest monday that is less than or equal to today,
     # end_date is start_date + seven days
-    # When calendar_span == month 
+    # When calendar_span == month
     # start_date is the first day of the new month
     # end_date is start_date + length of the current month
     # both values are then padded by 24 hours to allow for TZ differences
