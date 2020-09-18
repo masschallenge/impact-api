@@ -3,7 +3,6 @@ from datetime import (
     timedelta,
 )
 from pytz import utc
-import calendar
 
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
@@ -15,8 +14,6 @@ from ..v1.views import (
     OfficeHoursCalendarView,
 )
 from ..v1.views.office_hours_calendar_view import FINALIST, MENTOR, STAFF
-from ..permissions.v1_api_permissions import DEFAULT_PERMISSION_DENIED_DETAIL
-from .factories import UserFactory
 from .utils import nonexistent_object_id
 from accelerator.tests.factories import (
     LocationFactory,
@@ -67,7 +64,7 @@ class TestOfficeHoursCalendarView(APITestCase):
 
     def test_calendar_data_for_month_span_last_day_of_the_month(self):
         end_of_month = datetime(2020, 1, 31, 5, 0, 0)
-        focal_day  = datetime(2020, 1, 3, 5, 0, 0)
+        focal_day = datetime(2020, 1, 3, 5, 0, 0)
         office_hour = self.create_office_hour(start_date_time=end_of_month)
         focal_date = focal_day.strftime(ISO_8601_DATE_FORMAT)
         response = self.get_response(user=office_hour.mentor,

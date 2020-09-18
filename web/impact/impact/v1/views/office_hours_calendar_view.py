@@ -39,8 +39,6 @@ ISO_8601_DATE_FORMAT = "%Y-%m-%d"
 ONE_DAY = timedelta(1)
 ONE_WEEK = timedelta(8)
 
-
-
 STAFF = "staff"
 MENTOR = "mentor"
 FINALIST = "finalist"
@@ -115,8 +113,8 @@ class OfficeHoursCalendarView(ImpactView):
         calendar_span = request.query_params.get("calendar_span", "week")
 
         try:
-            self.start_date, self.end_date = _date_range(calendar_span, focal_date)
-
+            self.start_date, self.end_date = _date_range(
+                calendar_span, focal_date)
         except ValueError:
             self.fail(self.BAD_FOCAL_DATE)
             return False
