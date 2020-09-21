@@ -37,7 +37,6 @@ from .factories import (
     ProgramStartupStatusFactory,
     StartupMentorRelationshipFactory,
     StartupStatusFactory,
-    UserRoleFactory
 )
 from .utils import capture_stderr
 from ..utils import get_user_program_and_startup_roles
