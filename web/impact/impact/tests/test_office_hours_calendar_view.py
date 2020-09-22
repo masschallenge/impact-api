@@ -3,6 +3,7 @@ from datetime import (
     timedelta,
 )
 from pytz import utc
+import calendar
 
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
@@ -25,6 +26,7 @@ from accelerator.tests.factories import (
     ProgramFamilyLocationFactory,
     ProgramRoleGrantFactory,
     StartupTeamMemberFactory,
+    UserFactory
 )
 from accelerator.tests.contexts import UserRoleContext
 from accelerator.tests.contexts.context_utils import get_user_role_by_name
@@ -44,45 +46,65 @@ from .utils import nonexistent_object_id
 class TestOfficeHoursCalendarView(APITestCase):
     view = OfficeHoursCalendarView
 
-    def test_no_date_specified_sees_current_week(self):
+    def test_no_focal_date_specified_sees_current_week(self):
         office_hour = self.create_office_hour()
         response = self.get_response(user=office_hour.mentor)
         self.assert_hour_in_response(response, office_hour)
 
-    def test_no_date_specified_does_not_see_last_week(self):
+    def test_no_focal_date_specified_does_not_see_last_week(self):
         office_hour = self.create_office_hour(
             start_date_time=days_from_now(-9))
         response = self.get_response(user=office_hour.mentor)
         self.assert_hour_not_in_response(response, office_hour)
 
-    def test_date_specified_sees_sessions_in_range(self):
+    def test_focal_date_specified_sees_sessions_in_range(self):
         two_weeks_ago = days_from_now(-14)
-        date_spec = two_weeks_ago.strftime(ISO_8601_DATE_FORMAT)
+        focal_date = two_weeks_ago.strftime(ISO_8601_DATE_FORMAT)
         office_hour = self.create_office_hour(
             start_date_time=two_weeks_ago)
         response = self.get_response(user=office_hour.mentor,
-                                     date_spec=date_spec)
+                                     focal_date=focal_date)
         self.assert_hour_in_response(response, office_hour)
 
-    def test_date_specified_does_not_see_sessions_not_in_range(self):
+    def test_calendar_data_for_month_span_last_day_of_the_month(self):
+        end_of_month = datetime(2020,1,31,5,0,0)
+        focal_day  = datetime(2020,1,3,5,0,0)
+        office_hour = self.create_office_hour(start_date_time=end_of_month)
+        focal_date = focal_day.strftime(ISO_8601_DATE_FORMAT)
+        response = self.get_response(user=office_hour.mentor,
+                                     focal_date=focal_date,
+                                     calendar_span="month")
+        self.assert_hour_in_response(response, office_hour)
+
+    def test_calendar_data_for_month_span_mid_month(self):
+        end_of_month = datetime(2020,1,31,5,0,0)
+        mid_month = datetime(2020,1,15,5,0,0)
+        office_hour = self.create_office_hour(start_date_time=mid_month)
+        focal_date = end_of_month.strftime(ISO_8601_DATE_FORMAT)
+        response = self.get_response(user=office_hour.mentor,
+                                     focal_date=focal_date,
+                                     calendar_span="month")
+        self.assert_hour_in_response(response, office_hour)
+
+    def test_focal_date_specified_does_not_see_sessions_not_in_range(self):
         two_weeks_ago = days_from_now(-14)
-        date_spec = two_weeks_ago.strftime(ISO_8601_DATE_FORMAT)
+        focal_date = two_weeks_ago.strftime(ISO_8601_DATE_FORMAT)
         office_hour = self.create_office_hour()
         response = self.get_response(user=office_hour.mentor,
-                                     date_spec=date_spec)
+                                     focal_date=focal_date)
         self.assert_hour_not_in_response(response, office_hour)
 
     def test_hours_returned_in_date_sorted_order(self):
         one_day = timedelta(1)
         wednesday = utc.localize(datetime(2020, 1, 31))
-        date_spec = wednesday.strftime(ISO_8601_DATE_FORMAT)
+        focal_date = wednesday.strftime(ISO_8601_DATE_FORMAT)
         office_hour = self.create_office_hour(start_date_time=wednesday)
         self.create_office_hour(start_date_time=wednesday-one_day,
                                 mentor=office_hour.mentor)
         self.create_office_hour(start_date_time=wednesday+one_day,
                                 mentor=office_hour.mentor)
         response = self.get_response(user=office_hour.mentor,
-                                     date_spec=date_spec)
+                                     focal_date=focal_date)
         self.assert_sessions_sorted_by_date(response)
 
     def test_user_with_no_hours_sees_empty_response(self):
@@ -159,14 +181,6 @@ class TestOfficeHoursCalendarView(APITestCase):
         response = self.get_response(staff_user)
         self.assert_hour_not_in_response(response, office_hour)
 
-    def test_non_staff_cannot_view_on_behalf_of(self):
-        user = self.basic_user()
-        finalist = _finalist()
-        response = self.get_response(user=user,
-                                     target_user_id=finalist.id)
-        self.assert_failure(response,
-                            DEFAULT_PERMISSION_DENIED_DETAIL)
-
     def test_mentor_with_no_hours_in_range_sees_empty_response(self):
         two_weeks_ago = days_from_now(-14)
         session = self.create_office_hour(start_date_time=two_weeks_ago)
@@ -225,10 +239,10 @@ class TestOfficeHoursCalendarView(APITestCase):
         self.assertTrue(all([name in response_startup_names
                              for name in startup_names]))
 
-    def test_bad_date_spec_gets_fail_response(self):
-        bad_date_spec = "2020-20-20"  # this cannot be parsed as a date
-        response = self.get_response(date_spec=bad_date_spec)
-        self.assert_failure(response, self.view.BAD_DATE_SPEC)
+    def test_bad_focal_date_gets_fail_response(self):
+        bad_focal_date = "2020-20-20"  # this cannot be parsed as a date
+        response = self.get_response(focal_date=bad_focal_date)
+        self.assert_failure(response, self.view.BAD_FOCAL_DATE)
 
     def test_nonexistent_user_gets_fail_response(self):
         bad_user_id = nonexistent_object_id(UserFactory)
@@ -428,14 +442,20 @@ class TestOfficeHoursCalendarView(APITestCase):
     def get_response(self,
                      user=None,
                      target_user_id=None,
-                     date_spec=None):
+                     focal_date=None,
+                     calendar_span=None,
+                     upcoming=None):
         user = user or self.staff_user()
         user.set_password("password")
         user.save()
         url = reverse(self.view.view_name)
         data = {}
-        if date_spec is not None:
-            data['date_spec'] = date_spec
+        if focal_date is not None:
+            data['focal_date'] = focal_date
+        if calendar_span is not None:
+            data['calendar_span'] = calendar_span
+        if upcoming is not None:
+            data['upcoming'] = upcoming
         if target_user_id is not None:
             data['user_id'] = target_user_id
         with self.login(email=user.email):

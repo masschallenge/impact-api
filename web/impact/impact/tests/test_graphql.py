@@ -14,6 +14,7 @@ from accelerator.tests.contexts import (
     UserRoleContext
 )
 from accelerator.tests.contexts.context_utils import get_user_role_by_name
+from accelerator_abstract.models.base_user_utils import is_employee
 
 from ..graphql.auth.utils import FINALISTS_AND_STAFF, PUBLIC, STAFF
 from ..graphql.middleware import NOT_LOGGED_IN_MSG
@@ -855,6 +856,26 @@ class TestGraphQL(APITestCase):
         user = expert_user(UserRole.MENTOR)
         self._assert_user_can_view_private_data(
             PUBLIC, allowed=True, email=user.email)
+
+    def test_query_is_staff_for_expert_profile_is_correct(self):
+        expert = expert_user(UserRole.MENTOR)
+        query = """
+        query{{
+            expertProfile(id:{id}) {{
+                user {{isStaff}}
+            }}
+        }}
+        """.format(id=expert.id)
+        expected_json = {
+            'data': {
+                'expertProfile': {
+                    'user': {
+                        'isStaff': is_employee(expert)
+                    }
+                }
+            }
+        }
+        self._assert_response_equals_json(query, expected_json)
 
     def _assert_user_can_view_private_data(
             self, privacy_level, allowed=True, email=None):
