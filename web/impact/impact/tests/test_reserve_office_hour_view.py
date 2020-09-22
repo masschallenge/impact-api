@@ -259,7 +259,6 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
     def assert_response_contains_session_details(self, response, office_hour):
         office_hour.refresh_from_db()
         timecard = response.data['timecard_info']
-        calendar_data = timecard['calendar_data']
         if office_hour.startup:
             startup_name = office_hour.startup.organization.name
         else:
