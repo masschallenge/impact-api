@@ -45,7 +45,7 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
             finalist=None,
             start_date_time=start_time,
             end_date_time=end_time)
-        response = self.post_response(new_office_hour.id, 
+        response = self.post_response(new_office_hour.id,
                                       request_user=finalist)
         self.assert_ui_notification(response, False, self.view.CONFLICT_EXISTS)
 
@@ -266,8 +266,19 @@ class TestReserveOfficeHourView(OfficeHoursTestCase):
         oh_details = {'finalist_first_name': office_hour.finalist.first_name,
                       'finalist_last_name': office_hour.finalist.last_name,
                       'topics': office_hour.topics,
-                      'startup': startup_name}
-        self.assertDictEqual(timecard, oh_details)
+                      'startup': startup_name,
+                      "finalist_email": office_hour.finalist.email}
+        assert all([timecard[key] == expected_value for key,
+                    expected_value in oh_details.items()])
+        # calendar_data returned from the Add2cal package has variables
+        # like UUID's that will always return different values.
+        # Hence we can't get the same result from different calls.
+        # The intension here is to just test that the response contains
+        # the calendar_data key.
+        self.assert_timecard_has_calendar_data_key(timecard)
+
+    def assert_timecard_has_calendar_data_key(self, timecard):
+        assert 'calendar_data' in timecard
 
     def assert_reserved_by(self, office_hour, finalist):
         office_hour.refresh_from_db()
