@@ -181,12 +181,11 @@ class ReserveOfficeHourView(ImpactView):
         else:
             startup_name = ""
         self.mentor_recipient = mentor_recipient
-        calendar_data = self.get_calendar_data(counterpart)
         context = {"recipient": recipient,
                    "counterpart": counterpart,
                    "startup": startup_name,
                    "message": self.message,
-                   "calendar_data": calendar_data
+                   "calendar_data": self.get_calendar_data(counterpart)
                    }
         context.update(office_hour_time_info(self.office_hour))
         html_email = loader.render_to_string(template_path, context)
@@ -194,7 +193,7 @@ class ReserveOfficeHourView(ImpactView):
                 "subject": self.SUBJECT,
                 "body": None,
                 "attachment": (ICS_FILENAME,
-                               calendar_data['ical_content'],
+                               self.calendar_data['ical_content'],
                                ICS_FILETYPE),
                 "attach_alternative": (html_email, 'text/html')
                 }
@@ -211,8 +210,11 @@ class ReserveOfficeHourView(ImpactView):
         self.timecard_info = {
             "finalist_first_name": self.target_user.first_name,
             "finalist_last_name": self.target_user.last_name,
+            "finalist_email": self.target_user.email,
             "topics": self.message,
-            "startup": startup_name}
+            "startup": startup_name,
+            "calendar_data": self.get_calendar_data(self.office_hour.mentor),
+        }
 
     def _get_detail(self):
         start_date_time = self.office_hour.start_date_time
@@ -235,6 +237,8 @@ class ReserveOfficeHourView(ImpactView):
             'timecard_info': self.timecard_info})
 
     def get_calendar_data(self, counterpart_name):
+        if hasattr(self, "calendar_data"):
+            return self.calendar_data
         name = counterpart_name
         if self.mentor_recipient:
             name = self.startup.name if self.startup else counterpart_name
@@ -254,7 +258,7 @@ class ReserveOfficeHourView(ImpactView):
         location_info = location_info.format(location=location,
                                              separator=separator,
                                              meeting_info=meeting_info)
-        return Add2Cal(
+        self.calendar_data = Add2Cal(
             start=office_hour.start_date_time.astimezone(tz).strftime(
                 ADD2CAL_DATE_FORMAT),
             end=office_hour.end_date_time.astimezone(tz).strftime(
@@ -263,6 +267,7 @@ class ReserveOfficeHourView(ImpactView):
             description=self._get_description(counterpart_name),
             location=location_info,
             timezone=tz).as_dict()
+        return self.calendar_data
 
     def _get_description(self, counterpart_name):
         topics_block = ""

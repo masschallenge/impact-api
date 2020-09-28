@@ -68,13 +68,10 @@ class ExpertProfileType(BaseUserProfileType):
             'program__program_family__name', flat=True).distinct()
 
     def resolve_available_office_hours(obj, info, **kwargs):
-        user = info.context.user
         filter_kwargs = {
             'finalist__isnull': True,
         }
         now = timezone.now()
-        if not user.is_staff and user != obj.user and not user.is_superuser:
-            filter_kwargs['program__in'] = _get_user_programs(user)
         future_datetime_filter = Q(start_date_time__gte=now)
         return obj.user.mentor_officehours.filter(**filter_kwargs).filter(
             future_datetime_filter).exists()
