@@ -66,10 +66,25 @@ urlpatterns = [
     url(r'^$', IndexView.as_view()),
     url(r'^v0/', include(v0_urlpatterns)),
     url(r'^v1/', include(v1_urlpatterns)),
+    url(r'^oauth/', include('oauth2_provider.urls',
+        namespace='oauth2_provider')),
     url(r'^(?P<app>\w+)/(?P<model>[a-z_]+)/'
         r'(?P<related_model>[a-z_]+)/$',
         GeneralViewSet.as_view({'get': 'list', 'post': 'create'}),
         name='related-object-list'),
+    url(r'^graphql/$',
+        csrf_exempt(SafeGraphQLView.as_view(
+            graphiql=settings.DEBUG,
+            schema=schema,
+            middleware=[
+                IsAuthenticatedMiddleware])),
+        name="graphql"),
+    url(r'^graphql/auth/$',
+        csrf_exempt(SafeGraphQLView.as_view(
+            graphiql=settings.DEBUG,
+            schema=auth_schema)),
+        name="graphql-auth"),
+    url(r'^sso/', include(sso_urlpatterns)),
     url(r'^(?P<app>\w+)/(?P<model>[a-z_]+)/'
         r'(?P<related_model>[a-z_]+)/'
         r'(?P<pk>[0-9]+)/$',
@@ -94,20 +109,5 @@ urlpatterns = [
     url(r'^simpleuser/', include(simpleuser_router.urls)),
     url(r'^mc/', include(schema_router.urls),
         name='api-root'),
-    url(r'^sso/', include(sso_urlpatterns)),
-    url(r'^graphql/$',
-        csrf_exempt(SafeGraphQLView.as_view(
-            graphiql=settings.DEBUG,
-            schema=schema,
-            middleware=[
-                IsAuthenticatedMiddleware])),
-        name="graphql"),
-    url(r'^graphql/auth/$',
-        csrf_exempt(SafeGraphQLView.as_view(
-            graphiql=settings.DEBUG,
-            schema=auth_schema)),
-        name="graphql-auth"),
-    url(r'^oauth/', include('oauth2_provider.urls',
-        namespace='oauth2_provider')),
     url(r'^schema/$', schema_view, name='schema'),
 ]
