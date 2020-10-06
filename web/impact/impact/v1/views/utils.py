@@ -94,7 +94,7 @@ def datetime_is_in_past(date_time):
 
 def get_office_hours_url():
     site_url = 'accelerate.masschallenge.org'
-    return 'https://{}/newofficehours/'.format(site_url)
+    return 'https://{}/officehours/'.format(site_url)
 
 
 def get_office_hour_shared_context(office_hour, message=None):
