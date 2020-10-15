@@ -3,11 +3,11 @@
 
 from django.urls import reverse
 from .api_test_case import APITestCase
-from .v1.helpers import (
+from ..v1.helpers import (
     ORGANIZATION_FIELDS,
     USER_FIELDS,
 )
-from .v1.helpers import ORGANIZATION_USER_FIELDS
+from ..v1.helpers import ORGANIZATION_USER_FIELDS
 from .factories import (
     StartupFactory
 )

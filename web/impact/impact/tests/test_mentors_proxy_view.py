@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from .api_test_case import APITestCase
 from .utils import match_errors
-from .v0.views import MentorsProxyView
+from ..v0.views import MentorsProxyView
 
 
 class TestMentorsProxyView(APITestCase):
