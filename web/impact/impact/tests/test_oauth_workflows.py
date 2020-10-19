@@ -30,7 +30,7 @@ class TestOAuthRoutes(TestCase):
         super().setUpClass()
         Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startup'),
             codename='view_startup_stealth_mode_true',
             name='Can view Startups in Stealth Mode',
@@ -40,7 +40,7 @@ class TestOAuthRoutes(TestCase):
     def tearDownClass(cls):
         Permission.objects.get(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startup'),
             codename='view_startup_stealth_mode_true',
             name='Can view Startups in Stealth Mode',
@@ -51,7 +51,7 @@ class TestOAuthRoutes(TestCase):
         # project setup
         basic_user = self.make_user(
             'basic_user@test.com', perms=["mc.view_startup"])
-        startup_content_type = ContentType.objects.get(app_label='mc',
+        startup_content_type = ContentType.objects.get(app_label='accelerator',
                                                        model='startup')
         perm = Permission.objects.get(content_type=startup_content_type,
                                       codename='view_startup')
@@ -62,7 +62,7 @@ class TestOAuthRoutes(TestCase):
         )
         startup_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startupteammember'),
             codename='view_startupteammember',
         )
@@ -155,7 +155,7 @@ class TestOAuthRoutes(TestCase):
             # this token can be used to access data
             self.get_check_200(
                 self.reverse(
-                    "object-list", model='startup', app='mc'),
+                    "object-list", model='startup', app='accelerator'),
                 extra={
                     "HTTP_AUTHORIZATION":
                         "{} {}".format(
@@ -168,7 +168,7 @@ class TestOAuthRoutes(TestCase):
     def test_oauth_password_grant_workflow(self):
         Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startup'),
             codename='view_startup'
         )
@@ -183,20 +183,20 @@ class TestOAuthRoutes(TestCase):
         )
         startup_stealth_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startup'),
             codename='view_startup_stealth_mode_true',
             name='Can view Startups in Stealth Mode',
         )
         startup_member_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startupteammember'),
             codename='view_startupteammember',
         )
         startup_permission, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
-                app_label='mc',
+                app_label='accelerator',
                 model='startup'),
             codename='view_startup',
         )
@@ -233,7 +233,7 @@ class TestOAuthRoutes(TestCase):
         token_type = content["token_type"]
         self.get_check_200(
             self.reverse(
-                "object-list", model='startup', app='mc'),
+                "object-list", model='startup', app='accelerator'),
             extra={
                 "HTTP_AUTHORIZATION":
                     "{} {}".format(token_type, access_token),

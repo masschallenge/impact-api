@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group
 from .api_test_case import APITestCase
 from .utils import match_errors
-from rest_framework_proxy.views import ProxyView
+from ..v0.views import MentorsProxyView
 
 
 class TestMentorsProxyView(APITestCase):
@@ -24,7 +24,7 @@ class TestMentorsProxyView(APITestCase):
         basic_user.set_password('password')
         basic_user.save()
         access_token = self.get_access_token(basic_user)
-        with patch.object(ProxyView, 'proxy') as patched_proxy:
+        with patch.object(MentorsProxyView, 'proxy') as patched_proxy:
             patched_proxy.return_value = HttpResponse()
             self.client.post(
                 self.reverse("mentors"),
@@ -44,7 +44,7 @@ class TestMentorsProxyView(APITestCase):
         user_without_permissions.set_password('password')
         user_without_permissions.save()
         access_token = self.get_access_token(user_without_permissions)
-        with patch.object(ProxyView, 'proxy') as patched_proxy:
+        with patch.object(MentorsProxyView, 'proxy') as patched_proxy:
             patched_proxy.return_value = HttpResponse()
             self.client.post(
                 self.reverse("mentors"),
