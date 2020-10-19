@@ -8,8 +8,11 @@ from django.contrib.auth.models import (
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.permissions import BasePermission
 
-from ..utils import model_name_case
-from accelerator.apps import AcceleratorConfig
+from ..utils import (
+    model_name_case
+)
+
+from accelerator.tests.utils import get_app_name
 
 
 METHOD_TO_ACTION = {
@@ -34,7 +37,7 @@ class DynamicModelPermissions(BasePermission):
         model = view.kwargs.get('model', '').lower()
         related_model = view.kwargs.get('related_model', '').lower()
         model_name = model_name_case(model, related_model)
-        kwargs = {'app': AcceleratorConfig.name, 'model_name': model_name}
+        kwargs = {'app': get_app_name(), 'model_name': model_name}
         perm = method_to_perm(request.method) % kwargs
         return (
             request.user and (
