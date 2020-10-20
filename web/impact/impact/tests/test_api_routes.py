@@ -234,19 +234,15 @@ class TestApiRoute(TestCase):
         startup_content_type = ContentType.objects.get(
             app_label='mc',
             model='startup')
-        stealth_perm = PermissionFactory(
-            content_type=startup_content_type,
-            codename='view_startup_stealth_mode_true')
-        Permission.objects.get_or_create(
+        stealth_perm, _ = Permission.objects.get_or_create(
             content_type=ContentType.objects.get(
                 app_label='mc',
                 model='startup'),
-            codename='view_startup_stealth_mode_false'
+            codename='view_startup_stealth_mode_true',
+            name='Can view Startups in Stealth Mode',
         )
         view_perm, _ = Permission.objects.get_or_create(
-            content_type=ContentType.objects.get(
-                app_label='mc',
-                model='startup'),
+            content_type=startup_content_type,
             codename='view_startup'
         )
         startup = StartupFactory(is_visible=0)
@@ -262,6 +258,7 @@ class TestApiRoute(TestCase):
         basic_user = self.make_user('basic_user@test.com')
         with self.login(basic_user):
             response = self.get(url_name, **view_kwargs)
+
             self.response_403(response)
 
         change_perm = Permission.objects.get(codename='change_startup',
@@ -269,7 +266,7 @@ class TestApiRoute(TestCase):
         view_perm = Permission.objects.get(codename='view_startup',
                                            content_type=startup_content_type)
         perm_user = self.make_user('perm_user@test.com',
-                                   perms=["mc.view_startup"])
+                                   perms=["accelerator.view_startup"])
         with self.login(perm_user):
             self.response_403(self.get(url_name, **view_kwargs))
 
