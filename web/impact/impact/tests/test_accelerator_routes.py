@@ -48,6 +48,8 @@ class TestAcceleratorRoutes(TestCase):
                 codename='{action}_{model_name}'.format(
                     action=action,
                     model_name=model_name))
+            permission.content_type.app_label = 'mc'
+            permission.content_type.save()
             user.user_permissions.add(permission)
         user.save()
 
