@@ -14,8 +14,8 @@ from .factories import (
 from .contexts import UserContext
 from .utils import match_errors
 from .api_test_case import APITestCase
-from .v0.views.startup_detail_view import EMPTY_DETAIL_RESULT
-from .v0.views.utils import BADGE_DISPLAYS
+from ..v0.views.startup_detail_view import EMPTY_DETAIL_RESULT
+from ..v0.views.utils import BADGE_DISPLAYS
 
 
 EMPTY_RESPONSE = {'startups': []}

@@ -25,8 +25,8 @@ from accelerator_abstract.models import (
 )
 from .api_test_case import APITestCase
 from .factories import UserFactory
-from .views import AlgoliaApiKeyView
-from .views.algolia_api_key_view import (
+from ..views import AlgoliaApiKeyView
+from ..views.algolia_api_key_view import (
     IS_ACTIVE_FILTER,
     IS_FINALIST
 )

@@ -3,7 +3,7 @@
 
 from django.urls import reverse
 
-from .v0.api_data.startup_list_data import StartupListData as Data
+from ..v0.api_data.startup_list_data import StartupListData as Data
 from .api_test_case import APITestCase
 from .factories import (
     IndustryFactory,
@@ -14,7 +14,7 @@ from .factories import (
     StartupStatusFactory,
 )
 from .utils import match_errors
-from .v0.views.utils import BADGE_DISPLAYS
+from ..v0.views.utils import BADGE_DISPLAYS
 
 TEST_BADGE_DISPLAY = BADGE_DISPLAYS[0]
 EMPTY_RESPONSE = {'startups': []}

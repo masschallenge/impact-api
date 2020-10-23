@@ -91,13 +91,11 @@ class UserListView(BaseListView,
         if updated_at_after:
             qs = qs.filter(
                 Q(expertprofile__updated_at__gte=updated_at_after) |
-                Q(entrepreneurprofile__updated_at__gte=updated_at_after) |
-                Q(memberprofile__updated_at__gte=updated_at_after))
+                Q(entrepreneurprofile__updated_at__gte=updated_at_after))
         if updated_at_before:
             qs = qs.exclude(
                 Q(expertprofile__updated_at__gt=updated_at_before) |
-                Q(entrepreneurprofile__updated_at__gt=updated_at_before) |
-                Q(memberprofile__updated_at__gt=updated_at_before))
+                Q(entrepreneurprofile__updated_at__gt=updated_at_before))
         return qs
 
     def create_object(self, posted_data):

@@ -12,7 +12,7 @@ from ..v0.views.utils import (
 URL_WITHOUT_TRAILING_SLASH = "http://cloud.test.com"
 
 
-class TestUtils(TestCase):
+class TestV0Utils(TestCase):
     def test_logo_url_returns_empty_string_if_none(self):
         startup = StartupFactory(high_resolution_logo=None)
         assert logo_url(startup) == ""
