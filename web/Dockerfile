@@ -29,7 +29,6 @@ RUN dpkg -i /tmp/remote-syslog2_0.20_amd64.deb
 COPY log_files.yml /etc/log_files.yml
 COPY nginx/nginx.conf /etc/nginx
 
-RUN pip install --upgrade pip
 RUN wget --no-check-certificate https://bootstrap.pypa.io/ez_setup.py -O - | python2.7
 RUN easy_install-2.7 supervisor
 RUN useradd -s /bin/bash -u 3000 -m impact_user
