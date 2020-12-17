@@ -12,12 +12,16 @@ from unipath import Path
 
 from django.urls import reverse_lazy
 
+from django.db.backends.mysql.base import DatabaseWrapper
+
 
 LOG_FORMAT = 'host: localhost  %(name)s[%(process)d]: ' \
                 '%(levelname)s %(message)s'
 
 
 class Base(Configuration):
+    DatabaseWrapper.data_types['DateTimeField'] = 'datetime'
+
     LANGUAGE_CODE = 'en-us'
 
     TIME_ZONE = 'America/New_York'
