@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-from mc.utils import swapper_model
 from mc.models import Location
 
 
