@@ -8,8 +8,7 @@ from ...minimal_email_handler import MinimalEmailHandler
 from ...permissions.v1_api_permissions import OfficeHourMentorPermission
 from .impact_view import ImpactView
 from .utils import get_office_hour_shared_context
-from mc.utils import swapper_model
-MentorProgramOfficeHour = swapper_model("MentorProgramOfficeHour")
+from mc.models import MentorProgramOfficeHour
 User = get_user_model()
 
 

@@ -18,10 +18,9 @@ from ..helpers.model_helper import (
 )
 from accelerator.models import CriterionOptionSpec
 from mc.permission_checks import global_manager_check
-from mc.utils import swapper_model
-Application = swapper_model("Application")
-JudgePanelAssignment = swapper_model("JudgePanelAssignment")
-JudgingRound = swapper_model("JudgingRound")
+from mc.models import Application
+from mc.models import JudgePanelAssignment
+from mc.models import JudgingRound
 
 ANALYZE_JUDGING_ROUND_FIELDS = {
     "criterion_option_spec_id": READ_ONLY_ID_FIELD,

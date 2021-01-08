@@ -11,8 +11,7 @@ from .utils import (
 )
 from ...minimal_email_handler import send_email
 from accelerator_abstract.models.base_user_utils import is_employee
-from mc.utils import swapper_model
-MentorProgramOfficeHour = swapper_model("MentorProgramOfficeHour")
+from mc.models import MentorProgramOfficeHour
 User = get_user_model()
 
 mentor_template_name = "cancel_office_hour_reservation_email_to_mentor.html"

@@ -34,9 +34,7 @@ from accelerator_abstract.models.base_clearance import (
     CLEARANCE_LEVEL_POM,
     CLEARANCE_LEVEL_STAFF
 )
-from mc.utils import swapper_model
-
-UserRole = swapper_model("UserRole")
+from mc.models import UserRole
 
 
 class TestOfficeHoursCalendarView(APITestCase):

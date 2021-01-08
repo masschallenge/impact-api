@@ -53,10 +53,9 @@ from ..v1.views.user_list_view import (
     UNSUPPORTED_KEY_ERROR,
     UserListView,
 )
-from mc.utils import swapper_model
-EntrepreneurProfile = swapper_model("EntrepreneurProfile")
-ExpertProfile = swapper_model("ExpertProfile")
-MemberProfile = swapper_model("MemberProfile")
+from mc.models import EntrepreneurProfile
+from mc.models import ExpertProfile
+from mc.models import MemberProfile
 
 
 EXAMPLE_ENTREPRENEUR = {

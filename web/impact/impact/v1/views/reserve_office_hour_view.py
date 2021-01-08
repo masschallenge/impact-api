@@ -21,9 +21,8 @@ from .utils import (
     datetime_is_in_past,
 )
 from ...minimal_email_handler import send_email
-from mc.utils import swapper_model
-MentorProgramOfficeHour = swapper_model("MentorProgramOfficeHour")
-Startup = swapper_model("Startup")
+from mc.models import MentorProgramOfficeHour
+from mc.models import Startup
 User = get_user_model()
 
 

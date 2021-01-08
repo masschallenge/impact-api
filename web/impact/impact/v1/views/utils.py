@@ -8,8 +8,7 @@ from pytz import (
 
 
 from accelerator.models import ACTIVE_PROGRAM_STATUS
-from mc.utils import swapper_model
-UserRole = swapper_model("UserRole")
+from mc.models import UserRole
 
 
 HOUR_MINUTE_FORMAT = "%I:%M %p"

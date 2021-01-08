@@ -12,8 +12,7 @@ from .utils import (
     office_hour_time_info,
     datetime_is_in_past,
 )
-from mc.utils import swapper_model
-MentorProgramOfficeHour = swapper_model('MentorProgramOfficeHour')
+from mc.models import MentorProgramOfficeHour
 
 
 DEFAULT_TIMEZONE = 'UTC'

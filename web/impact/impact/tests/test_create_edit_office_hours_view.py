@@ -39,10 +39,9 @@ from ..v1.views.office_hour_view import (
 )
 from ..v1.views.utils import HOUR_MINUTE_FORMAT
 from .api_test_case import APITestCase
-from mc.utils import swapper_model
-Location = swapper_model('Location')
-MentorProgramOfficeHour = swapper_model('MentorProgramOfficeHour')
-UserRole = swapper_model('UserRole')
+from mc.models import Location
+from mc.models import MentorProgramOfficeHour
+from mc.models import UserRole
 
 
 class TestCreateEditOfficeHourView(APITestCase):

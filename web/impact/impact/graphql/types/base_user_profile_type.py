@@ -7,13 +7,11 @@ from itertools import chain
 from .location_type import LocationType
 from ...utils import get_user_program_and_startup_roles
 from accelerator_abstract.models.base_user_utils import is_employee
-from mc.utils import swapper_model
-
-BaseProfile = swapper_model("BaseProfile")
-StartupRole = swapper_model("StartupRole")
-Clearance = swapper_model("Clearance")
-UserRole = swapper_model("UserRole")
-Location = swapper_model("Location")
+from mc.models import BaseProfile
+from mc.models import StartupRole
+from mc.models import Clearance
+from mc.models import UserRole
+from mc.models import Location
 
 
 class BaseUserProfileType(DjangoObjectType):

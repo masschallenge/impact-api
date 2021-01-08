@@ -19,9 +19,8 @@ from ..v1.views.cancel_office_hour_session_view import (
     SUCCESS_HEADER,
 )
 from ..v1.views.utils import get_timezone
-from mc.utils import swapper_model
-MentorProgramOfficeHour = swapper_model('MentorProgramOfficeHour')
-UserRole = swapper_model('UserRole')
+from mc.models import MentorProgramOfficeHour
+from mc.models import UserRole
 
 
 class TestCancelOfficeHourSession(APITestCase):

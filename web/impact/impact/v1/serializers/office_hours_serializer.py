@@ -9,10 +9,9 @@ from rest_framework.serializers import (
 from .location_serializer import LocationSerializer
 from .user_serializer import UserSerializer
 from accelerator_abstract.models.base_user_utils import is_employee
-from mc.utils import swapper_model
-Clearance = swapper_model("Clearance")
-MentorProgramOfficeHour = swapper_model("MentorProgramOfficeHour")
-UserRole = swapper_model("UserRole")
+from mc.models import Clearance
+from mc.models import MentorProgramOfficeHour
+from mc.models import UserRole
 
 
 INVALID_END_DATE = 'office hour end time must be later than the start time'

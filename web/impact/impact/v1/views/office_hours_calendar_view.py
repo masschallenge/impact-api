@@ -23,13 +23,12 @@ from ...permissions.v1_api_permissions import (
     IsAuthenticated,
 )
 from accelerator_abstract.models.base_user_utils import is_employee
-from mc.utils import swapper_model
-Clearance = swapper_model("Clearance")
-Location = swapper_model("Location")
-MentorProgramOfficeHour = swapper_model("MentorProgramOfficeHour")
-ProgramRoleGrant = swapper_model("ProgramRoleGrant")
-ProgramFamily = swapper_model("ProgramFamily")
-UserRole = swapper_model("UserRole")
+from mc.models import Clearance
+from mc.models import Location
+from mc.models import MentorProgramOfficeHour
+from mc.models import ProgramRoleGrant
+from mc.models import ProgramFamily
+from mc.models import UserRole
 User = get_user_model()
 
 
