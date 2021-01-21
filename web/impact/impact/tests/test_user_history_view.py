@@ -15,6 +15,7 @@ from .factories import (
     NewsletterReceiptFactory,
     ProgramCycleFactory,
     ProgramRoleGrantFactory,
+    StartupFactory,
     StartupTeamMemberFactory,
     UserFactory,
 )
@@ -75,8 +76,8 @@ class TestUserHistoryView(APITestCase):
         # Startup.organization should not be null, but if it is the
         # endpoint should not throw an error
         
-        stm = StartupTeamMemberFactory()
-        stm.startup.organization.delete()
+        startup = StartupFactory(organization=None)
+        stm = StartupTeamMemberFactory(startup=startup)
         with self.login(email=self.basic_user().email):
             url = reverse(UserHistoryView.view_name, args=[stm.user.id])
             response = self.client.get(url)
