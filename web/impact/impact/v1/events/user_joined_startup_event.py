@@ -15,7 +15,7 @@ class UserJoinedStartupEvent(BaseHistoryEvent):
     DESCRIPTION_FORMAT = "Joined {name} ({id})"
     EVENT_TYPE = "joined startup"
     NO_ORGANIZATION_DESCRIPTION = "Joined startup (organization unknown)"
-    
+
     def __init__(self, member):
         super().__init__()
         self.member = member

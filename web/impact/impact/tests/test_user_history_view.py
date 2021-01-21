@@ -71,11 +71,11 @@ class TestUserHistoryView(APITestCase):
                 name=startup.name,
                 id=startup.organization.id)
             self.assertEqual(startup_str, events[0]["description"])
-            
+
     def test_user_joined_startup_tolerates_null_organization(self):
         # Startup.organization should not be null, but if it is the
         # endpoint should not throw an error
-        
+
         startup = StartupFactory(organization=None)
         stm = StartupTeamMemberFactory(startup=startup)
         with self.login(email=self.basic_user().email):
@@ -86,7 +86,7 @@ class TestUserHistoryView(APITestCase):
             startup = stm.startup
             startup_str = UserJoinedStartupEvent.NO_ORGANIZATION_DESCRIPTION
             self.assertEqual(startup_str, events[0]["description"])
-            
+
     # signal muting is necessary when running impact tests in accelerate
     # since we ported this test from impact api where we dont expect
     # recievers in accelerate's receivers.py to run.
@@ -341,4 +341,3 @@ class TestUserHistoryView(APITestCase):
             schema = options_response.data["actions"]["GET"]
             validator = Draft4Validator(schema)
             assert validator.is_valid(json.loads(get_response.content))
-
