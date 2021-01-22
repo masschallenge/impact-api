@@ -15,6 +15,7 @@ from .factories import (
     NewsletterReceiptFactory,
     ProgramCycleFactory,
     ProgramRoleGrantFactory,
+    StartupFactory,
     StartupTeamMemberFactory,
     UserFactory,
 )
@@ -49,19 +50,41 @@ class TestUserHistoryView(APITestCase):
             self.assertEqual(1, len(events))
             self.assertEqual(user.date_joined, events[0]["datetime"])
 
-    def test_user_joined_startup(self):
+    def test_user_joined_startup_created_at(self):
         stm = StartupTeamMemberFactory()
         with self.login(email=self.basic_user().email):
             url = reverse(UserHistoryView.view_name, args=[stm.user.id])
             response = self.client.get(url)
             events = find_events(response.data["results"],
                                  UserJoinedStartupEvent.EVENT_TYPE)
-            self.assertEqual(1, len(events))
             self.assertEqual(stm.created_at, events[0]["datetime"])
+
+    def test_user_joined_startup_description(self):
+        stm = StartupTeamMemberFactory()
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[stm.user.id])
+            response = self.client.get(url)
+            events = find_events(response.data["results"],
+                                 UserJoinedStartupEvent.EVENT_TYPE)
             startup = stm.startup
             startup_str = UserJoinedStartupEvent.DESCRIPTION_FORMAT.format(
                 name=startup.name,
                 id=startup.organization.id)
+            self.assertEqual(startup_str, events[0]["description"])
+
+    def test_user_joined_startup_tolerates_null_organization(self):
+        # Startup.organization should not be null, but if it is the
+        # endpoint should not throw an error
+
+        startup = StartupFactory(organization=None)
+        stm = StartupTeamMemberFactory(startup=startup)
+        with self.login(email=self.basic_user().email):
+            url = reverse(UserHistoryView.view_name, args=[stm.user.id])
+            response = self.client.get(url)
+            events = find_events(response.data["results"],
+                                 UserJoinedStartupEvent.EVENT_TYPE)
+            startup = stm.startup
+            startup_str = UserJoinedStartupEvent.NO_ORGANIZATION_DESCRIPTION
             self.assertEqual(startup_str, events[0]["description"])
 
     # signal muting is necessary when running impact tests in accelerate

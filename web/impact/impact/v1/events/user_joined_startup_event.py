@@ -14,15 +14,20 @@ User = get_user_model()
 class UserJoinedStartupEvent(BaseHistoryEvent):
     DESCRIPTION_FORMAT = "Joined {name} ({id})"
     EVENT_TYPE = "joined startup"
+    NO_ORGANIZATION_DESCRIPTION = "Joined startup (organization unknown)"
 
     def __init__(self, member):
         super().__init__()
         self.member = member
 
     def description(self):
-        return self.DESCRIPTION_FORMAT.format(
-            name=self.member.startup.name,
-            id=self.member.startup.organization.id)
+        startup = self.member.startup
+        if startup.organization is None:
+            return self.NO_ORGANIZATION_DESCRIPTION
+        else:
+            return self.DESCRIPTION_FORMAT.format(
+                name=startup.name,
+                id=startup.organization.id)
 
     @classmethod
     def events(cls, user):
